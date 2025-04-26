@@ -54,11 +54,21 @@ export default {
           '0%, 100%': { transform: 'translateY(0px)' },
           '50%': { transform: 'translateY(-25px)' },
         },
+        'rotate-slow': {
+          '0%': { transform: 'rotate(0deg)' },
+          '100%': { transform: 'rotate(360deg)' },
+        },
+        'pulse-subtle': {
+          '0%, 100%': { opacity: '0.3' },
+          '50%': { opacity: '0.4' },
+        },
       },
       animation: {
         float: 'float 8s ease-in-out infinite',
         'float-slow': 'float-slow 12s ease-in-out infinite',
         'float-fast': 'float-fast 6s ease-in-out infinite',
+        'rotate-slow': 'rotate-slow 45s linear infinite',
+        'pulse-subtle': 'pulse-subtle 15s ease-in-out infinite',
       },
     },
   },
