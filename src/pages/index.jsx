@@ -1,14 +1,27 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import NavBar from '../components/NavBar';
 import Hero from '../components/Hero';
-import LogoStrip from '../components/LogoStrip';
 import Services from '../components/Services';
 import Metrics from '../components/Metrics';
 import CaseStudies from '../components/CaseStudies';
 import Testimonials from '../components/Testimonials';
 import ScrollReveal from '../components/ScrollReveal';
+import LogoStrip from '../components/LogoStrip';
+import CodeTestResults from '../components/CodeTestResults';
 
 export default function Home() {
+  const [scrollY, setScrollY] = useState(0);
+  
+  // Track scroll position for scroll-based effects
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrollY(window.scrollY);
+    };
+    
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+  
   return (
     <main className="min-h-screen bg-deep-black text-white antialiased relative overflow-hidden">
       {/* Dynamic Background Layer */}
@@ -33,7 +46,7 @@ export default function Home() {
         
         {/* Blob 3 - Middle Left */}
         <div 
-          className="absolute top-[40%] -left-[5%] w-[500px] h-[500px] bg-gradient-to-tr from-curious-purple-600/25 to-curious-blue-700/10 rounded-full blur-3xl opacity-40 animate-float-fast"
+          className="absolute top-[40%] -left-[5%] w-[500px] h-[500px] bg-gradient-to-tr from-curious-purple-600/25 to-curious-blue-700/10 rounded-full blur-3xl opacity-40 animate-float-slow"
           style={{ animationDelay: '0.9s', willChange: 'transform' }}
         ></div>
         
@@ -55,29 +68,44 @@ export default function Home() {
         {/* Navigation */}
         <NavBar />
 
-        {/* Hero Section - No animation for immediate visibility */}
-        <div className="pt-16">
-          <Hero />
+        {/* First screen: Hero and Logo Strip at bottom */}
+        <div className="min-h-screen flex flex-col">
+          {/* Hero Section - No animation for immediate visibility */}
+          <div className="pt-16 flex-grow">
+            <Hero />
+          </div>
+          
+          {/* Logo Strip positioned at bottom of first viewport */}
+          <div 
+            className="transition-opacity duration-500" 
+            style={{ 
+              opacity: Math.max(0, 1 - scrollY / 300),
+              transform: `translateY(${Math.min(scrollY * 0.1, 20)}px)`
+            }}
+          >
+            <LogoStrip />
+          </div>
         </div>
         
-        {/* Scroll Reveal Sections */}
-        <ScrollReveal>
-          <LogoStrip />
+        {/* Dynamic Code Test Results section - appears as user scrolls */}
+        <ScrollReveal animation="fade-in-up" delay="0.1s">
+          <CodeTestResults />
         </ScrollReveal>
         
-        <ScrollReveal animation="fadeInUp" delay="0.1s" id="services">
+        {/* Rest of content */}
+        <ScrollReveal animation="fade-in-up" delay="0.2s" id="services">
           <Services />
         </ScrollReveal>
         
-        <ScrollReveal animation="fadeInUp" delay="0.2s" id="metrics">
+        <ScrollReveal animation="fade-in-up" delay="0.3s" id="metrics">
           <Metrics />
         </ScrollReveal>
         
-        <ScrollReveal animation="fadeInUp" delay="0.3s">
+        <ScrollReveal animation="fade-in-up" delay="0.4s">
           <CaseStudies />
         </ScrollReveal>
         
-        <ScrollReveal animation="fadeInUp" delay="0.4s">
+        <ScrollReveal animation="fade-in-up" delay="0.5s">
           <Testimonials />
         </ScrollReveal>
         
