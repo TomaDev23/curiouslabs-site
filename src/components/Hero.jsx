@@ -1,78 +1,95 @@
+import React, { useEffect, useRef } from 'react';
+
 export default function Hero() {
+  const orbRef = useRef(null);
+  
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      if (!orbRef.current) return;
+      
+      const { clientX, clientY } = e;
+      const rect = orbRef.current.getBoundingClientRect();
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height / 2;
+      
+      // Calculate distance from mouse to orb center (max 100px movement)
+      const maxDistance = 30;
+      const deltaX = (clientX - centerX) / window.innerWidth * maxDistance;
+      const deltaY = (clientY - centerY) / window.innerHeight * maxDistance;
+      
+      // Apply subtle movement to the orb
+      orbRef.current.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
+    };
+    
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
+  
   return (
-    <section className="relative bg-deep-black py-32 overflow-hidden">
-      {/* Technical background patterns */}
-      <div className="absolute inset-0 bg-circuit-pattern opacity-[0.07] mix-blend-luminosity"></div>
-      <div className="absolute left-0 top-0 w-1/2 h-full bg-chaotic-code-pattern opacity-[0.05] mix-blend-luminosity"></div>
-      <div className="absolute right-0 top-0 w-1/2 h-full bg-legit-code opacity-[0.04] mix-blend-luminosity"></div>
-      <div className="absolute left-1/4 right-1/4 top-0 bottom-0 bg-transition-pattern opacity-[0.06] mix-blend-luminosity"></div>
-      
-      {/* Enhanced glowing centerpiece orb */}
-      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[35vw] max-w-[650px] aspect-square rounded-full bg-gradient-radial from-curious-purple-500/40 to-transparent blur-[80px] opacity-60 animate-pulse-subtle"></div>
-      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[30vw] max-w-[550px] aspect-square rounded-full bg-gradient-radial from-curious-purple-600/30 to-transparent blur-[60px] opacity-50 animate-float"></div>
-      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[25vw] max-w-[450px] aspect-square rounded-full bg-gradient-radial from-white/5 to-transparent blur-[40px] opacity-40 animate-rotate-slow"></div>
-      
-      {/* Central orb core */}
-      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[20vw] max-w-[350px] aspect-square rounded-full bg-gradient-radial from-curious-purple-400/50 to-transparent blur-[2px] opacity-80"></div>
-      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[18vw] max-w-[320px] aspect-square rounded-full border border-white/10 bg-gradient-radial from-curious-purple-800/30 to-transparent backdrop-blur-sm"></div>
-      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[15vw] max-w-[280px] aspect-square rounded-full border border-white/5 bg-gradient-radial from-curious-purple-900/20 to-transparent"></div>
-      
-      {/* Horizontal light beam */}
-      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-screen h-[8px] bg-gradient-to-r from-transparent via-curious-purple-400/75 to-transparent rounded-full blur-[2px] opacity-80"></div>
-      
-      {/* Subtle glowing particles */}
-      <div className="absolute left-[30%] top-[35%] w-[5px] h-[5px] bg-white rounded-full blur-[1px] opacity-70 animate-pulse-subtle"></div>
-      <div className="absolute left-[60%] top-[45%] w-[3px] h-[3px] bg-white rounded-full blur-[1px] opacity-60 animate-pulse-subtle"></div>
-      <div className="absolute left-[45%] top-[60%] w-[4px] h-[4px] bg-white rounded-full blur-[1px] opacity-70 animate-pulse-subtle"></div>
-      <div className="absolute left-[70%] top-[25%] w-[4px] h-[4px] bg-white rounded-full blur-[1px] opacity-60 animate-pulse-subtle"></div>
-      
-      {/* Extra purple glow that extends downward */}
-      <div className="absolute left-1/2 top-[60%] -translate-x-1/2 w-[35vw] max-w-[600px] h-[300px] bg-gradient-to-b from-curious-purple-600/15 to-transparent rounded-full blur-[70px] opacity-60"></div>
-      
-      <div className="relative max-w-7xl mx-auto px-4 text-center z-10">
-        <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold mb-10 px-4">
-          <span className="inline-block pb-4 bg-clip-text text-transparent bg-gradient-to-r from-curious-purple-200 via-white to-curious-blue-200">
-            Fix your broken code.
-          </span>
-          <span className="block mt-6 text-white/95 tracking-tight">Fast. Documented. Traceable.</span>
-        </h1>
-        <p className="text-lg md:text-xl text-gray-300/90 mb-12 max-w-3xl mx-auto leading-relaxed">
-          Elite AI CodeOps missions for founders and dev teams — powered by CuriousLabs.
-        </p>
-        <div className="flex flex-col md:flex-row justify-center gap-6">
-          <a href="#contact">
-            <button className="relative group bg-gradient-to-r from-curious-purple-600 to-curious-purple-500 text-white px-8 py-4 rounded-lg font-medium transition-all duration-300 overflow-hidden">
-              {/* Button glow overlay */}
-              <div className="absolute inset-0 w-full h-full bg-white opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
-              
-              {/* Button hover effect */}
-              <div className="relative z-10 group-hover:-translate-y-1 transform transition-transform duration-300">
-                Send First Mission
-              </div>
-              
-              {/* Button bottom glow */}
-              <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-white/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-            </button>
-          </a>
-          <a href="#case-studies">
-            <button className="relative group border-2 border-curious-purple-500 text-white px-8 py-4 rounded-lg font-medium transition-all duration-300 overflow-hidden">
-              {/* Button hover backdrop */}
-              <div className="absolute inset-0 w-full h-full bg-curious-purple-900/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-              
-              {/* Button hover effect */}
-              <div className="relative z-10 group-hover:-translate-y-1 transform transition-transform duration-300">
-                View Case Studies
-              </div>
-              
-              {/* Button bottom glow */}
-              <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-curious-purple-400/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-            </button>
-          </a>
-        </div>
+    <section className="relative w-full overflow-hidden pt-24 pb-16 md:pb-20 md:pt-36">
+      {/* Background Elements */}
+      <div className="absolute inset-0 z-0 opacity-20">
+        <div className="absolute inset-0 bg-circuit-pattern bg-repeat opacity-10"></div>
       </div>
       
-      {/* Transition gradient to next section */}
-      <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-deep-black to-transparent"></div>
+      {/* Technical light beam */}
+      <div className="absolute left-0 right-0 top-1/3 h-px w-full bg-gradient-to-r from-transparent via-curious-blue-400/30 to-transparent"></div>
+      
+      {/* Orb centerpiece container */}
+      <div className="relative mx-auto flex max-w-6xl flex-col items-center justify-center px-4 text-center">
+        {/* Main glowing orb */}
+        <div ref={orbRef} className="relative mb-10 flex h-64 w-64 items-center justify-center will-change-transform">
+          {/* Base orb layer */}
+          <div className="absolute h-48 w-48 rounded-full bg-gradient-to-br from-curious-blue-900/30 to-curious-purple-800/30 blur-xl"></div>
+          
+          {/* Primary orb glow */}
+          <div className="absolute h-44 w-44 animate-pulse-subtle rounded-full bg-gradient-to-r from-curious-blue-500/40 to-curious-purple-500/40 blur-md"></div>
+          
+          {/* Secondary orb */}
+          <div className="absolute h-40 w-40 animate-rotate-slow rounded-full bg-gradient-to-tr from-curious-blue-400/30 via-curious-purple-500/20 to-curious-blue-600/30 blur-sm"></div>
+          
+          {/* Core orb */}
+          <div className="absolute h-32 w-32 rounded-full bg-gradient-to-b from-curious-blue-400/90 via-curious-purple-500/60 to-curious-blue-800/80 shadow-xl shadow-curious-blue-500/20"></div>
+          
+          {/* Inner glow */}
+          <div className="absolute h-20 w-20 animate-pulse-subtle rounded-full bg-white/10 blur-sm"></div>
+          
+          {/* Center point */}
+          <div className="absolute h-4 w-4 rounded-full bg-white/80 shadow-lg shadow-white/50"></div>
+          
+          {/* Orbiting elements */}
+          <div className="absolute h-60 w-60 animate-rotate-slow rounded-full border border-curious-blue-400/20"></div>
+          <div className="absolute h-5 w-5 -translate-y-28 rounded-full bg-curious-blue-300/60 blur-sm"></div>
+          <div className="absolute h-3 w-3 translate-x-[9rem] translate-y-[5rem] rounded-full bg-curious-purple-400/60 blur-sm"></div>
+          <div className="absolute h-4 w-4 -translate-x-[8rem] translate-y-[6rem] rounded-full bg-curious-blue-300/60 blur-sm"></div>
+        </div>
+        
+        {/* Text content with improved typography */}
+        <h1 className="relative mb-6 bg-gradient-to-r from-white via-white to-curious-blue-100 bg-clip-text text-4xl font-extrabold tracking-tight text-transparent sm:text-5xl md:text-6xl">
+          We Fix <span className="bg-gradient-to-r from-curious-blue-400 to-curious-purple-500 bg-clip-text text-transparent">Broken Code</span>
+        </h1>
+        
+        <p className="relative mb-10 max-w-2xl text-lg text-slate-300/90 sm:text-xl">
+          Our team of expert engineers will rescue your failing projects,
+          fix critical bugs, and optimize your codebase for performance and stability.
+        </p>
+        
+        {/* CTA buttons with improved styling */}
+        <div className="relative z-10 flex flex-col space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0">
+          <a href="#contact" className="group relative inline-flex items-center justify-center overflow-hidden rounded-lg bg-gradient-to-br from-curious-blue-500 to-curious-purple-600 px-8 py-3 text-lg font-medium text-white shadow-lg transition-all duration-300 ease-out hover:shadow-curious-blue-500/25">
+            <span className="absolute inset-0 bg-gradient-to-br from-curious-blue-600 to-curious-purple-700 opacity-0 transition-opacity duration-300 group-hover:opacity-100"></span>
+            <span className="relative">Send Us a Mission</span>
+          </a>
+          <a href="#case-studies" className="group relative inline-flex items-center justify-center overflow-hidden rounded-lg border border-curious-blue-400/30 bg-transparent px-8 py-3 text-lg font-medium text-white transition-all duration-300 ease-out hover:bg-curious-blue-950/20">
+            <span className="relative">View Case Studies</span>
+          </a>
+        </div>
+        
+        {/* Code pattern transitions */}
+        <div className="absolute bottom-0 left-0 h-32 w-full opacity-5">
+          <div className="h-full w-full bg-chaotic-code-pattern bg-repeat-x"></div>
+        </div>
+      </div>
     </section>
   );
 }
