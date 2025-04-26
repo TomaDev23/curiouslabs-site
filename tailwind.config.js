@@ -39,7 +39,9 @@ export default {
           700: '#111827',
           800: '#0b111e',
           900: '#050a14',
+          950: '#030508',
         },
+        'deep-black': '#0a0a0a',
       },
       keyframes: {
         float: {
@@ -74,6 +76,24 @@ export default {
           '0%': { opacity: '0', transform: 'translateX(20px)' },
           '100%': { opacity: '1', transform: 'translateX(0)' },
         },
+        glow: {
+          '0%, 100%': { 
+            boxShadow: '0 0 15px 5px rgba(139, 92, 246, 0.15)',
+            transform: 'scale(1)' 
+          },
+          '50%': { 
+            boxShadow: '0 0 25px 8px rgba(139, 92, 246, 0.25)',
+            transform: 'scale(1.02)' 
+          }
+        },
+        'glow-text': {
+          '0%, 100%': { 
+            textShadow: '0 0 8px rgba(255, 255, 255, 0.5)',
+          },
+          '50%': { 
+            textShadow: '0 0 12px rgba(255, 255, 255, 0.8)',
+          }
+        }
       },
       animation: {
         float: 'float 8s ease-in-out infinite',
@@ -84,7 +104,13 @@ export default {
         'fadeInUp': 'fadeInUp 1s ease-out forwards',
         'fadeInRight': 'fadeInRight 1s ease-out forwards',
         'fadeInLeft': 'fadeInLeft 1s ease-out forwards',
+        'glow': 'glow 4s ease-in-out infinite',
+        'glow-text': 'glow-text 3s ease-in-out infinite',
       },
+      backgroundImage: {
+        'circuit-pattern': "url('/images/circuit-pattern.svg')",
+        'noise-texture': "url('/images/noise-texture.svg')",
+      }
     },
   },
   plugins: [],

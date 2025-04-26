@@ -10,37 +10,43 @@ import ScrollReveal from '../components/ScrollReveal';
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-curious-dark-900 text-white antialiased relative overflow-hidden">
+    <main className="min-h-screen bg-deep-black text-white antialiased relative overflow-hidden">
       {/* Dynamic Background Layer */}
       <div className="absolute inset-0 w-full h-full overflow-hidden z-0">
+        {/* Base Circuit Pattern */}
+        <div className="absolute inset-0 bg-circuit-pattern opacity-[0.07] mix-blend-luminosity"></div>
+        
+        {/* Noise Texture Overlay */}
+        <div className="absolute inset-0 bg-noise-texture opacity-[0.03] mix-blend-overlay"></div>
+        
         {/* Blob 1 - Top Left */}
         <div 
-          className="absolute top-[5%] left-[10%] w-[500px] h-[500px] bg-gradient-to-br from-curious-purple-600/30 to-curious-purple-900/10 rounded-full blur-3xl opacity-30 animate-float animate-pulse-subtle"
-          style={{ animationDelay: '0.5s' }}
+          className="absolute top-[5%] -left-[10%] w-[700px] h-[700px] bg-gradient-to-br from-curious-purple-700/20 via-curious-purple-800/15 to-transparent rounded-full blur-3xl opacity-40 animate-float-slow"
+          style={{ animationDelay: '0.5s', willChange: 'transform' }}
         ></div>
         
         {/* Blob 2 - Top Right */}
         <div 
-          className="absolute top-[20%] right-[5%] w-[400px] h-[400px] bg-gradient-to-bl from-curious-blue-600/30 to-curious-blue-900/10 rounded-full blur-3xl opacity-30 animate-float-slow animate-rotate-slow"
-          style={{ animationDelay: '1.7s' }}
+          className="absolute top-[10%] -right-[10%] w-[600px] h-[600px] bg-gradient-to-bl from-curious-blue-700/20 via-curious-blue-800/15 to-transparent rounded-full blur-3xl opacity-40 animate-float-slow animate-rotate-slow"
+          style={{ animationDelay: '1.7s', willChange: 'transform' }}
         ></div>
         
         {/* Blob 3 - Middle Left */}
         <div 
-          className="absolute top-[45%] left-[5%] w-[350px] h-[350px] bg-gradient-to-tr from-curious-purple-500/30 to-curious-blue-600/10 rounded-full blur-3xl opacity-30 animate-float-fast animate-pulse-subtle"
-          style={{ animationDelay: '0.9s' }}
+          className="absolute top-[40%] -left-[5%] w-[500px] h-[500px] bg-gradient-to-tr from-curious-purple-600/25 to-curious-blue-700/10 rounded-full blur-3xl opacity-40 animate-float-fast"
+          style={{ animationDelay: '0.9s', willChange: 'transform' }}
         ></div>
         
         {/* Blob 4 - Bottom Right */}
         <div 
-          className="absolute bottom-[15%] right-[10%] w-[450px] h-[450px] bg-gradient-to-tl from-curious-blue-500/30 to-curious-purple-700/10 rounded-full blur-3xl opacity-30 animate-float-slow animate-rotate-slow"
-          style={{ animationDelay: '0.2s', animationDirection: 'reverse' }}
+          className="absolute bottom-[10%] -right-[10%] w-[650px] h-[650px] bg-gradient-to-tl from-curious-blue-600/30 via-curious-purple-800/10 to-transparent rounded-full blur-3xl opacity-40 animate-float-slow animate-rotate-slow"
+          style={{ animationDelay: '0.2s', animationDirection: 'reverse', willChange: 'transform' }}
         ></div>
         
         {/* Blob 5 - Bottom Center */}
         <div 
-          className="absolute bottom-[5%] left-[30%] w-[550px] h-[550px] bg-gradient-to-r from-curious-purple-700/20 to-curious-blue-700/10 rounded-full blur-3xl opacity-20 animate-float animate-pulse-subtle"
-          style={{ animationDelay: '1.2s' }}
+          className="absolute bottom-[0%] left-[20%] w-[800px] h-[800px] bg-gradient-to-r from-curious-purple-700/20 via-curious-blue-900/10 to-transparent rounded-full blur-3xl opacity-30 animate-float"
+          style={{ animationDelay: '1.2s', willChange: 'transform' }}
         ></div>
       </div>
       
@@ -75,7 +81,7 @@ export default function Home() {
           <Testimonials />
         </ScrollReveal>
         
-        <footer className="py-12 bg-curious-dark-900 border-t border-curious-dark-700">
+        <footer className="py-12 bg-curious-dark-900/80 border-t border-curious-dark-700/50 backdrop-blur-sm">
           <div className="max-w-7xl mx-auto px-4 text-center">
             <p className="text-gray-400 text-sm">
               &copy; {new Date().getFullYear()} CuriousLabs. All rights reserved.
