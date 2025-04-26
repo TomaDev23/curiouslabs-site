@@ -41,6 +41,25 @@ export default {
           900: '#050a14',
         },
       },
+      keyframes: {
+        float: {
+          '0%, 100%': { transform: 'translateY(0px)' },
+          '50%': { transform: 'translateY(-20px)' },
+        },
+        'float-slow': {
+          '0%, 100%': { transform: 'translateY(0px)' },
+          '50%': { transform: 'translateY(-15px)' },
+        },
+        'float-fast': {
+          '0%, 100%': { transform: 'translateY(0px)' },
+          '50%': { transform: 'translateY(-25px)' },
+        },
+      },
+      animation: {
+        float: 'float 8s ease-in-out infinite',
+        'float-slow': 'float-slow 12s ease-in-out infinite',
+        'float-fast': 'float-fast 6s ease-in-out infinite',
+      },
     },
   },
   plugins: [],
