@@ -1,10 +1,12 @@
 import React from "react";
+import NavBar from '../components/NavBar';
 import Hero from '../components/Hero';
 import LogoStrip from '../components/LogoStrip';
 import Services from '../components/Services';
 import Metrics from '../components/Metrics';
 import CaseStudies from '../components/CaseStudies';
 import Testimonials from '../components/Testimonials';
+import ScrollReveal from '../components/ScrollReveal';
 
 export default function Home() {
   return (
@@ -44,12 +46,34 @@ export default function Home() {
       
       {/* Foreground Content */}
       <div className="relative z-10">
-        <Hero />
-        <LogoStrip />
-        <Services />
-        <Metrics />
-        <CaseStudies />
-        <Testimonials />
+        {/* Navigation */}
+        <NavBar />
+
+        {/* Hero Section - No animation for immediate visibility */}
+        <div className="pt-16">
+          <Hero />
+        </div>
+        
+        {/* Scroll Reveal Sections */}
+        <ScrollReveal>
+          <LogoStrip />
+        </ScrollReveal>
+        
+        <ScrollReveal animation="fadeInUp" delay="0.1s" id="services">
+          <Services />
+        </ScrollReveal>
+        
+        <ScrollReveal animation="fadeInUp" delay="0.2s" id="metrics">
+          <Metrics />
+        </ScrollReveal>
+        
+        <ScrollReveal animation="fadeInUp" delay="0.3s">
+          <CaseStudies />
+        </ScrollReveal>
+        
+        <ScrollReveal animation="fadeInUp" delay="0.4s">
+          <Testimonials />
+        </ScrollReveal>
         
         <footer className="py-12 bg-curious-dark-900 border-t border-curious-dark-700">
           <div className="max-w-7xl mx-auto px-4 text-center">

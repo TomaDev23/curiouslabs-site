@@ -23,9 +23,9 @@ const services = [
 
 export default function Services() {
   return (
-    <section className="py-24 bg-curious-dark-800">
+    <section className="py-16 bg-curious-dark-800">
       <div className="max-w-7xl mx-auto px-4">
-        <h2 className="text-3xl md:text-4xl font-bold mb-12 text-center text-white">
+        <h2 className="text-3xl md:text-4xl font-bold mb-10 text-center text-white">
           <span className="bg-clip-text text-transparent bg-gradient-to-r from-curious-purple-400 to-curious-blue-400">
             Elite AI
           </span>{" "}
@@ -35,9 +35,12 @@ export default function Services() {
           {services.map((service, index) => (
             <div 
               key={index} 
-              className="p-8 bg-gradient-to-br from-curious-dark-700 to-curious-dark-900 rounded-lg shadow-lg border border-curious-purple-900/30 transform hover:-translate-y-2 transition-all duration-300 hover:shadow-xl hover:shadow-curious-purple-700/20"
+              className="p-8 bg-gradient-to-br from-curious-dark-700 to-curious-dark-900 rounded-lg shadow-lg border border-curious-purple-900/30 transform hover:-translate-y-1 transition-all duration-300 hover:shadow-curious-purple-700/20"
             >
-              <h3 className="text-2xl font-bold mb-4 text-curious-purple-400">{service.title}</h3>
+              <div className="flex items-center mb-4">
+                <div className="h-8 w-1 bg-gradient-to-b from-curious-purple-400 to-curious-blue-400 rounded-full mr-3"></div>
+                <h3 className="text-2xl font-bold text-curious-purple-400">{service.title}</h3>
+              </div>
               <ul className="space-y-3 text-gray-300 mb-8">
                 {service.bullets.map((item, idx) => (
                   <li key={idx} className="flex items-center">
@@ -47,7 +50,7 @@ export default function Services() {
                 ))}
               </ul>
               <a href={service.link}>
-                <button className="w-full bg-gradient-to-r from-curious-purple-600 to-curious-blue-600 text-white px-6 py-3 rounded hover:shadow-lg hover:shadow-curious-purple-700/30 transition-all">
+                <button className="w-full bg-gradient-to-r from-curious-purple-600 to-curious-blue-600 text-white px-6 py-3 rounded hover:shadow-lg hover:shadow-curious-purple-700/20 transition-all">
                   Learn More
                 </button>
               </a>
