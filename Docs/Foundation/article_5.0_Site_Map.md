@@ -15,11 +15,15 @@ This document provides a comprehensive map of all website components, text field
                    └────────────────────────────────────┘
                    ┌────────────────────────────────────┐
                    │                                    │
-                   │ ✨ Fix your broken code. ✨        │  <- Hero Section
-                   │ Fast. Documented. Traceable.       │     (Hero.jsx)
+                   │     ✨ Fix your broken code. ✨     │  <- Hero Section with
+                   │     Fast. Documented. Traceable.   │     Glowing Orb Centerpiece
+                   │                                    │     (Hero.jsx)
+                   │  [Send First Mission] [View Cases] │
                    │                                    │
-                   │ [Send First Mission] [View Cases]  │
-                   │                                    │
+                   └────────────────────────────────────┘
+                   ┌────────────────────────────────────┐
+                   │    TRUSTED BY INNOVATIVE TEAMS     │  <- Logo Strip NEW!
+                   │  [Logo1] [Logo2] [Logo3] [Logo4]-->│     (LogoStrip.jsx)
                    └────────────────────────────────────┘
                    ┌────────────────────────────────────┐
                    │    Elite AI Code Operations        │
@@ -56,10 +60,6 @@ This document provides a comprehensive map of all website components, text field
                    │ │Alex R.       │ │Maya T.       │  │
                    │ └──────────────┘ └──────────────┘  │
                    └────────────────────────────────────┘
-                   ┌────────────────────────────────────┐
-                   │      Trusted by companies          │
-                   │ □□□□□   □□□□□   □□□□□   □□□□□      │  <- Company logos
-                   └────────────────────────────────────┘
 
 
                                   🖥️ DESKTOP VIEW 🖥️
@@ -67,11 +67,14 @@ This document provides a comprehensive map of all website components, text field
     │ CuriousLabs      Home  Services  Case Studies  Metrics  About  Contact │  <- NavBar.jsx
     ├────────────────────────────────────────────────────────────────────────┤
     │                                                                        │
-    │                 ✨ Fix your broken code. ✨                           │
-    │                 Fast. Documented. Traceable.                          │
-    │                                                                        │  <- Hero.jsx
-    │               [Send First Mission]  [View Case Studies]                │
+    │                   ✨ Fix your broken code. ✨                          │
+    │                   Fast. Documented. Traceable.                         │  <- Hero.jsx
+    │                                                                        │     with Glowing
+    │               [Send First Mission]  [View Case Studies]                │     Centerpiece Orb
     │                                                                        │
+    ├────────────────────────────────────────────────────────────────────────┤
+    │                    Trusted by innovative teams                         │
+    │        □□□□□     □□□□□     □□□□□     □□□□□     □□□□□                │  <- LogoStrip.jsx NEW!
     ├────────────────────────────────────────────────────────────────────────┤
     │                       Elite AI Code Operations                         │
     │     ┌─────────────────────────┐       ┌─────────────────────────┐      │
@@ -113,25 +116,25 @@ This document provides a comprehensive map of all website components, text field
     │  │  Alex R.                        │ │  Maya T.                    │   │
     │  │  Indie SaaS Founder             │ │  Startup CTO                │   │
     │  └─────────────────────────────────┘ └─────────────────────────────┘   │
-    │                                                                        │
-    │                      Trusted by innovative teams                       │
-    │         □□□□□     □□□□□     □□□□□     □□□□□     □□□□□                │
     └────────────────────────────────────────────────────────────────────────┘
 
   BACKGROUND SYSTEM (In all views):
   ┌────────────────────────────────────────────────────────────────────────┐
   │ ╭──────────────────────────────────────────────────────────────────╮   │
-  │ │                           Deep Black Base                         │   │
+  │ │                          Deep Black Base                          │   │
   │ │                                                                   │   │
-  │ │    ╭─────╮                                        ╭────────╮      │   │
-  │ │    │Blob1│                                        │Circuit │      │   │  <- index.jsx background
-  │ │    ╰─────╯                                        │Pattern │      │   │     (z-index: 0)
-  │ │                          ╭─────╮                  ╰────────╯      │   │
-  │ │                          │Blob2│          ╭────────────╮          │   │
-  │ │                          ╰─────╯          │   Noise    │          │   │
-  │ │                                           │  Texture   │          │   │
-  │ │              ╭─────╮                      ╰────────────╯          │   │
-  │ │              │Blob3│                                              │   │
+  │ │    ╭────────╮                                      ╭────────╮     │   │
+  │ │    │Purple  │                                      │Circuit │     │   │  <- index.jsx background
+  │ │    │Blob 1  │                                      │Pattern │     │   │     (z-index: 0)
+  │ │    ╰────────╯                                      ╰────────╯     │   │
+  │ │                          ╭─────────╮                              │   │
+  │ │                          │Unified  │        ╭────────────╮        │   │
+  │ │                          │Purple   │        │   Noise    │        │   │
+  │ │                          │Glow     │        │  Texture   │        │   │
+  │ │                          ╰─────────╯        ╰────────────╯        │   │
+  │ │              ╭────────╮                                           │   │
+  │ │              │Purple  │                                           │   │
+  │ │              │Blob 2  │                                           │   │
   │ ╰──────────────────────────────────────────────────────────────────╯   │
   └────────────────────────────────────────────────────────────────────────┘
 ```
@@ -139,48 +142,54 @@ This document provides a comprehensive map of all website components, text field
 ## Visual Elements Reference Chart
 
 ```
- COMPONENT TYPE    | PURPLE THEME             | BLUE THEME                 
-------------------|--------------------------|----------------------------
- Headings         | from-curious-purple-400  | to-curious-blue-400        
-                  | to-curious-purple-300    | from-curious-blue-300      
-------------------|--------------------------|----------------------------
- Buttons          | from-curious-purple-600  | from-curious-blue-600      
-                  | to-curious-purple-500    | to-curious-blue-700        
-------------------|--------------------------|----------------------------
- Card Borders     | border-curious-purple-   | border-curious-blue-       
-                  | 900/30 → 700/40 (hover)  | 900/40 → 700/40 (hover)    
-------------------|--------------------------|----------------------------
- Card Accents     | via-curious-purple-      | via-curious-blue-          
-                  | 500/50                   | 500/50                     
-------------------|--------------------------|----------------------------
- Gradient Blobs   | via-curious-purple-      | via-curious-blue-          
-                  | 600/30, opacity-70       | 600/15, opacity-60         
+ COMPONENT TYPE    | PURPLE THEME               | BLUE THEME                 
+------------------|----------------------------|----------------------------
+ Headings         | from-curious-purple-400    | to-curious-blue-400        
+                  | to-curious-purple-300      | from-curious-blue-300      
+------------------|----------------------------|----------------------------
+ Buttons          | from-curious-purple-600    | from-curious-blue-600      
+                  | to-curious-purple-500      | to-curious-blue-700        
+------------------|----------------------------|----------------------------
+ Card Borders     | border-curious-purple-     | border-curious-blue-       
+                  | 900/30 → 700/40 (hover)    | 900/40 → 700/40 (hover)    
+------------------|----------------------------|----------------------------
+ Card Accents     | via-curious-purple-        | via-curious-blue-          
+                  | 500/50                     | 500/50                     
+------------------|----------------------------|----------------------------
+ Gradient Blobs   | via-curious-purple-        | via-curious-blue-          
+                  | 600/30, opacity-70         | 600/15, opacity-60         
+------------------|----------------------------|----------------------------
+ Centerpiece Orb  | via-curious-purple-600/30  | n/a                        
+                  | blur-[80px], opacity-70    |                            
 ```
 
 ## Interactive Elements Reference
 
 ```
- ELEMENT TYPE     | DEFAULT STATE            | HOVER STATE               | ACTIVE STATE
-------------------|--------------------------|---------------------------|------------------
- Primary Button   | bg-gradient-to-r        | + opacity-10 white overlay| opacity-20 white
-                  | from-purple-600         | + -translate-y-1          | + scale-95
-                  | to-purple-500           | + bottom glow             |
-------------------|--------------------------|---------------------------|------------------
- Secondary Button | border-2                | + bg-purple-900/30        | + bg-purple-900/50
-                  | border-purple-500       | + -translate-y-1          | + scale-95
-                  |                         | + bottom glow             |
-------------------|--------------------------|---------------------------|------------------
- Cards            | border-purple-900/30    | + scale-[1.02]            | 
-                  | bg-gradient-to-br       | + border-purple-700/40    |
-                  | from-dark-700           | + top edge glow           |
-                  | to-dark-900             |                           |
+ ELEMENT TYPE     | DEFAULT STATE            | HOVER STATE                | ACTIVE STATE
+------------------|--------------------------|----------------------------|------------------
+ Primary Button   | bg-gradient-to-r        | + opacity-20 white overlay | opacity-20 white
+                  | from-purple-600         | + -translate-y-1           | + scale-95
+                  | to-purple-500           | + bottom glow              |
+------------------|--------------------------|----------------------------|------------------
+ Secondary Button | border-2                | + bg-purple-900/30         | + bg-purple-900/50
+                  | border-purple-500       | + -translate-y-1           | + scale-95
+                  |                         | + bottom glow              |
+------------------|--------------------------|----------------------------|------------------
+ Cards            | border-purple-900/30    | + scale-[1.02]             | 
+                  | bg-gradient-to-br       | + border-purple-700/40     |
+                  | from-dark-700           | + top edge glow            |
+                  | to-dark-900             |                            |
+------------------|--------------------------|----------------------------|------------------
+ Logo Strip Logos | grayscale               | + grayscale-0              |
+                  | opacity-60              | + opacity-100              |
 ```
 
 
 
 
 
-## Site Structure Overview
+## Site Structure Overview (Updated)
 
 ```
 CuriousLabs Website
@@ -191,19 +200,22 @@ CuriousLabs Website
 │   └── Mobile Navigation Toggle
 │
 ├── Home Page (index.jsx)
-│   ├── Hero Section (Hero.jsx)
+│   ├── First Screen (h-screen flex flex-col)
+│   │   ├── Hero Section (Hero.jsx) - Enhanced
+│   │   └── LogoStrip Section (LogoStrip.jsx) - NEW
 │   ├── Services Section (Services.jsx)
 │   ├── Metrics Section (Metrics.jsx)
 │   ├── Case Studies Section (CaseStudies.jsx)
 │   ├── Testimonials Section (Testimonials.jsx)
 │   └── Footer
 │
-└── Background System (index.jsx)
+└── Background System (index.jsx) - Enhanced
     ├── Base Layer (bg-deep-black)
-    ├── Gradient Blobs (positioned absolutely)
-    ├── Circuit Pattern Overlay
-    └── Noise Texture Overlay
-
+    ├── Enhanced Gradient Blobs (5 positioned elements with purple emphasis)
+    ├── Circuit Pattern Overlay (reduced opacity)
+    ├── Noise Texture Overlay (reduced opacity)
+    └── Unified Purple Glow Effect
+```
 
 ## Detailed Component Breakdown
 
@@ -222,18 +234,19 @@ NavBar
     └── Contact (#contact)
 ```
 
-### 2. Hero Component
+### 2. Hero Component (Enhanced)
 **File:** `src/components/Hero.jsx`
 
 ```
 Hero Section
 ├── Background Elements
-│   ├── Gradient Background: from-curious-dark-900/90 via-curious-dark-800/80 to-curious-dark-900/90
-│   ├── Circuit Pattern Overlay: bg-circuit-pattern opacity-[0.05]
-│   └── Glowing Centerpiece Orb (3 layered elements)
-│       ├── Large Blob: w-[600px] h-[300px] opacity-65
-│       ├── Medium Blob: w-[500px] h-[120px] opacity-55
-│       └── Thin Line: w-[400px] h-[8px] opacity-75
+│   ├── Gradient Background: from-curious-dark-900/90 via-curious-dark-800/80 to-curious-dark-900/60
+│   ├── Circuit Pattern Overlay: bg-circuit-pattern opacity-[0.04]
+│   └── Glowing Centerpiece Orb (Enhanced with 4 layered elements)
+│       ├── Large Blob: w-[650px] h-[300px] opacity-70 animate-pulse-subtle
+│       ├── Medium Blob: w-[500px] h-[120px] opacity-60
+│       ├── Thin Line: w-[400px] h-[8px] opacity-80
+│       └── Bottom Extension: w-[400px] h-[300px] opacity-60
 │
 ├── Text Elements
 │   ├── Main Heading: "Fix your broken code." (gradient text)
@@ -245,7 +258,26 @@ Hero Section
     └── Secondary: "View Case Studies" (outlined button with hover effects)
 ```
 
-### 3. Services Component
+### 3. LogoStrip Component (NEW)
+**File:** `src/components/LogoStrip.jsx`
+
+```
+LogoStrip Section
+├── Background Elements
+│   ├── Subtle purple glow: w-[800px] h-[80px] opacity via-curious-purple-700/5
+│   └── Edge fades: Left and right gradients for smooth transition
+│
+├── Heading: "Trusted by innovative teams" (small uppercase text)
+│
+└── Scrolling Logo Container
+    ├── Animation: animate-scroll infinite (CSS animation)
+    ├── Logo Items: 6 logo placeholders with duplicates for seamless looping
+    └── Logo Styling:
+        ├── Default: h-10 md:h-12 opacity-60 grayscale
+        └── Hover: opacity-100 grayscale-0
+```
+
+### 4. Services Component
 **File:** `src/components/Services.jsx`
 
 ```
@@ -270,7 +302,7 @@ Services Section
             └── "LEGIT compliance"
 ```
 
-### 4. Metrics Component
+### 5. Metrics Component
 **File:** `src/components/Metrics.jsx`
 
 ```
@@ -292,7 +324,7 @@ Metrics Section
         └── Label: "Documented Fixes"
 ```
 
-### 5. Case Studies Component
+### 6. Case Studies Component
 **File:** `src/components/CaseStudies.jsx`
 
 ```
@@ -312,7 +344,7 @@ Case Studies Section
         └── Solution: "Token rotation and HMAC guards implemented."
 ```
 
-### 6. Testimonials Component
+### 7. Testimonials Component
 **File:** `src/components/Testimonials.jsx`
 
 ```
@@ -331,24 +363,28 @@ Testimonials Section
         └── Author Company: "Startup CTO"
 ```
 
-### 7. Background System
+### 8. Background System (Enhanced)
 **File:** `src/pages/index.jsx`
 
 ```
 Background System
 ├── Base Background: bg-deep-black
 │
-├── Gradient Blobs
-│   ├── Blob 1: positioned at top-1/4 left-1/4, purple gradient
-│   ├── Blob 2: positioned at bottom-1/3 right-1/4, blue gradient
-│   └── Additional blobs for visual depth
+├── Enhanced Gradient Blobs (with increased purple emphasis)
+│   ├── Blob 1 - Top Left: w-[700px] h-[700px] opacity-45 (purple gradient)
+│   ├── Blob 2 - Top Right: w-[600px] h-[600px] opacity-40 (blue gradient)
+│   ├── Blob 3 - Middle Left: w-[500px] h-[500px] opacity-45 (purple gradient)
+│   ├── Blob 4 - Bottom Right: w-[650px] h-[650px] opacity-45 (blue/purple gradient)
+│   └── Blob 5 - Bottom Center: w-[800px] h-[800px] opacity-35 (purple/blue gradient)
 │
-├── Circuit Pattern: bg-circuit-pattern with opacity-[0.05]
+├── Circuit Pattern: bg-circuit-pattern with reduced opacity-[0.06]
 │
-└── Noise Texture: subtle grain overlay with opacity-[0.03]
+├── Noise Texture: subtle grain overlay with reduced opacity-[0.02]
+│
+└── Unified Purple Glow: top-1/3 bottom-0 from-curious-purple-900/10
 ```
 
-## Text Content Inventory
+## Text Content Inventory (Updated)
 
 ### Hero Section
 - Main Heading: "Fix your broken code."
@@ -356,6 +392,10 @@ Background System
 - Description: "Elite AI CodeOps missions for founders and dev teams — powered by CuriousLabs."
 - CTA Primary: "Send First Mission"
 - CTA Secondary: "View Case Studies"
+
+### LogoStrip Section (NEW)
+- Section Text: "Trusted by innovative teams"
+- Logo placeholders: 6 placeholder logos in SVG format
 
 ### Services Section
 - Section Title: "Elite AI Code Operations"
@@ -402,49 +442,54 @@ Background System
 - Testimonial 2 Author: "Maya T."
 - Testimonial 2 Position: "Startup CTO"
 
-## Visual Elements & Animation Inventory
+## Visual Elements & Animation Inventory (Updated)
 
-### Animations
+### Animations (Enhanced)
 - `animate-float-slow`: Slow floating animation for background blobs
 - `animate-float`: Standard floating animation
+- `animate-rotate-slow`: Slow rotation animation for some blobs
 - `animate-pulse-subtle`: Subtle pulsing animation for glow effects
-- `animate-glow-text`: Text glow animation (when applied)
+- `animate-scroll`: Horizontal scrolling for LogoStrip (NEW)
 - `group-hover:-translate-y-1`: Button hover animation
 
-### Gradients
+### Gradients (Enhanced)
 - Text Gradients: 
   - `bg-gradient-to-r from-curious-purple-200 via-white to-curious-blue-200` (Hero)
   - `bg-gradient-to-r from-curious-purple-400 to-curious-blue-400` (Section titles)
 - Button Gradients: 
   - `bg-gradient-to-r from-curious-purple-600 to-curious-purple-500` (Primary)
-  - `bg-gradient-to-r from-curious-blue-600 to-curious-blue-700` (Case studies)
-  - `bg-gradient-to-r from-curious-purple-600 to-curious-blue-600` (Services)
 - Background Gradients: 
-  - `bg-gradient-to-b from-curious-dark-900/90 via-curious-dark-800/80 to-curious-dark-900/90` (Hero)
-  - `bg-gradient-to-br from-curious-dark-700 to-curious-dark-900` (Cards)
-  - `bg-gradient-to-br from-curious-dark-900 via-curious-purple-900/50 to-curious-dark-900` (Testimonials)
+  - `bg-gradient-to-b from-curious-dark-900/90 via-curious-dark-800/80 to-curious-dark-900/60` (Hero)
+  - `bg-gradient-to-b from-deep-black to-curious-dark-900/90` (Footer)
 
-### Background Elements
-- Circuit Pattern: Technical pattern overlay at low opacity
-- Noise Texture: Subtle grain texture for depth
-- Gradient Blobs: Multiple floating color elements
-- Card Borders: `border border-curious-purple-900/30`, `border border-curious-blue-900/30`
+### Background Elements (Enhanced)
+- Circuit Pattern: Technical pattern overlay with reduced opacity (0.06)
+- Noise Texture: Subtle grain texture with reduced opacity (0.02)
+- Gradient Blobs: Multiple floating color elements with enhanced purple emphasis
+- Centerpiece Orb: Multi-layered glowing effect in Hero section (NEW)
+- Unified Purple Glow: Subtle glow effect throughout the page (NEW)
 
 ## Z-Index Structure
 - Background Elements: `z-0`
 - Main Content Container: `z-10`
+- Logo Strip Side Fades: `z-10`
 - NavBar (when floating): `z-50`
 
 ## CSS Classes for Component Enhancement
 
-### Card Enhancement Classes
-- Base Card: `bg-gradient-to-br from-curious-dark-700 to-curious-dark-800 rounded-lg shadow-lg border border-curious-purple-900/30`
-- Hover Effect: `hover:-translate-y-1 transition-all duration-300 hover:shadow-curious-purple-700/20`
-- Card Header Accent: `h-8 w-1 bg-gradient-to-b from-curious-purple-400 to-curious-blue-400 rounded-full`
+### Centerpiece Orb Classes (NEW)
+- Primary Glow: `absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[650px] h-[300px] bg-gradient-to-r from-transparent via-curious-purple-600/30 to-transparent rounded-full blur-[80px] opacity-70 animate-pulse-subtle`
+- Secondary Layer: `absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[120px] bg-gradient-to-r from-transparent via-white/10 to-transparent rounded-full blur-[40px] opacity-60`
+- Accent Beam: `absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[8px] bg-gradient-to-r from-transparent via-curious-purple-400/75 to-transparent rounded-full blur-[2px] opacity-80`
 
-### Button Enhancement Classes
-- Primary Button: `bg-gradient-to-r from-curious-purple-600 to-curious-purple-500 text-white px-8 py-4 rounded-lg font-medium`
-- Secondary Button: `border-2 border-curious-purple-500 text-white px-8 py-4 rounded-lg font-medium`
-- Button Hover: `hover:shadow-lg hover:shadow-curious-purple-700/30 transform transition-all hover:-translate-y-1`
+### LogoStrip Classes (NEW)
+- Logo Container: `animate-scroll flex items-center whitespace-nowrap py-2`
+- Logo Item: `h-10 md:h-12 opacity-60 hover:opacity-100 transition-opacity duration-300 filter grayscale hover:grayscale-0`
+- Side Fade: `absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-deep-black to-transparent z-10`
 
-This comprehensive map provides a clear reference for editing specific components, text fields, and visual elements across the website structure.
+### Layout Enhancement
+- First Screen: `h-screen flex flex-col`
+- Hero Section: `flex-grow pt-16`
+- Logo Strip Container: `w-full`
+
+This comprehensive map provides a clear reference for all enhancements made during the implementation of TILE 2B and TILE 2C, reflecting the current state of the website structure and components.

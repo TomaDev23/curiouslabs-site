@@ -52,11 +52,6 @@ export default {
           '0%, 100%': { transform: 'translateY(0)' },
           '50%': { transform: 'translateY(-20px)' },
         },
-        'float-blob': {
-          '0%, 100%': { transform: 'translate(0, 0) scale(1)' },
-          '33%': { transform: 'translate(5px, -5px) scale(1.02)' },
-          '66%': { transform: 'translate(-5px, 5px) scale(0.98)' },
-        },
         'rotate-slow': {
           '0%': { transform: 'rotate(0deg)' },
           '100%': { transform: 'rotate(360deg)' },
@@ -87,17 +82,12 @@ export default {
         },
         'scroll': {
           '0%': { transform: 'translateX(0)' },
-          '100%': { transform: 'translateX(-33.33%)' },
-        },
-        'cursor-glow': {
-          '0%': { opacity: '0', transform: 'scale(0.8)' },
-          '100%': { opacity: '0.6', transform: 'scale(1)' },
+          '100%': { transform: 'translateX(-50%)' },
         },
       },
       animation: {
         'float': 'float 6s ease-in-out infinite',
         'float-slow': 'float-slow 10s ease-in-out infinite',
-        'float-blob': 'float-blob 12s ease-in-out infinite',
         'rotate-slow': 'rotate-slow 20s linear infinite',
         'pulse-subtle': 'pulse-subtle 4s ease-in-out infinite',
         'fade-in-up': 'fade-in-up 0.6s ease-out',
@@ -105,12 +95,15 @@ export default {
         'fade-in-left': 'fade-in-left 0.6s ease-out',
         'fade-in-right': 'fade-in-right 0.6s ease-out',
         'glow-text': 'glow-text 3s ease-in-out infinite',
-        'scroll': 'scroll 60s linear infinite',
-        'cursor-glow': 'cursor-glow 0.5s ease-out forwards',
+        'scroll': 'scroll 40s linear infinite',
       },
       backgroundImage: {
         'circuit-pattern': "url('/images/circuit-pattern.svg')",
         'noise-texture': "url('/images/noise-texture.svg')",
+        'chaotic-code-pattern': "url('/images/chaotic-code-pattern.svg')",
+        'transition-pattern': "url('/images/transition-pattern.svg')",
+        'legit-code': "url('/images/legit-code-pattern.svg')",
+        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
       },
     },
   },

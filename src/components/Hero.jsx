@@ -1,22 +1,42 @@
 export default function Hero() {
   return (
-    <section className="relative bg-gradient-to-b from-curious-dark-900/90 via-curious-dark-800/80 to-curious-dark-900/90 py-32 overflow-hidden">
-      {/* Circuit pattern background - subtle */}
-      <div className="absolute inset-0 bg-circuit-pattern opacity-[0.05] mix-blend-luminosity"></div>
+    <section className="relative bg-deep-black py-32 overflow-hidden">
+      {/* Technical background patterns */}
+      <div className="absolute inset-0 bg-circuit-pattern opacity-[0.07] mix-blend-luminosity"></div>
+      <div className="absolute left-0 top-0 w-1/2 h-full bg-chaotic-code-pattern opacity-[0.05] mix-blend-luminosity"></div>
+      <div className="absolute right-0 top-0 w-1/2 h-full bg-legit-code opacity-[0.04] mix-blend-luminosity"></div>
+      <div className="absolute left-1/4 right-1/4 top-0 bottom-0 bg-transition-pattern opacity-[0.06] mix-blend-luminosity"></div>
       
-      {/* Glowing centerpiece orb - reduced intensity by only 10% */}
-      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-gradient-to-r from-transparent via-curious-purple-600/27 to-transparent rounded-full blur-[80px] opacity-65 animate-pulse-subtle"></div>
-      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[120px] bg-gradient-to-r from-transparent via-white/9 to-transparent rounded-full blur-[40px] opacity-55"></div>
-      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[8px] bg-gradient-to-r from-transparent via-curious-purple-400/70 to-transparent rounded-full blur-[2px] opacity-75"></div>
+      {/* Enhanced glowing centerpiece orb */}
+      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[35vw] max-w-[650px] aspect-square rounded-full bg-gradient-radial from-curious-purple-500/40 to-transparent blur-[80px] opacity-60 animate-pulse-subtle"></div>
+      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[30vw] max-w-[550px] aspect-square rounded-full bg-gradient-radial from-curious-purple-600/30 to-transparent blur-[60px] opacity-50 animate-float"></div>
+      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[25vw] max-w-[450px] aspect-square rounded-full bg-gradient-radial from-white/5 to-transparent blur-[40px] opacity-40 animate-rotate-slow"></div>
+      
+      {/* Central orb core */}
+      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[20vw] max-w-[350px] aspect-square rounded-full bg-gradient-radial from-curious-purple-400/50 to-transparent blur-[2px] opacity-80"></div>
+      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[18vw] max-w-[320px] aspect-square rounded-full border border-white/10 bg-gradient-radial from-curious-purple-800/30 to-transparent backdrop-blur-sm"></div>
+      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[15vw] max-w-[280px] aspect-square rounded-full border border-white/5 bg-gradient-radial from-curious-purple-900/20 to-transparent"></div>
+      
+      {/* Horizontal light beam */}
+      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-screen h-[8px] bg-gradient-to-r from-transparent via-curious-purple-400/75 to-transparent rounded-full blur-[2px] opacity-80"></div>
+      
+      {/* Subtle glowing particles */}
+      <div className="absolute left-[30%] top-[35%] w-[5px] h-[5px] bg-white rounded-full blur-[1px] opacity-70 animate-pulse-subtle"></div>
+      <div className="absolute left-[60%] top-[45%] w-[3px] h-[3px] bg-white rounded-full blur-[1px] opacity-60 animate-pulse-subtle"></div>
+      <div className="absolute left-[45%] top-[60%] w-[4px] h-[4px] bg-white rounded-full blur-[1px] opacity-70 animate-pulse-subtle"></div>
+      <div className="absolute left-[70%] top-[25%] w-[4px] h-[4px] bg-white rounded-full blur-[1px] opacity-60 animate-pulse-subtle"></div>
+      
+      {/* Extra purple glow that extends downward */}
+      <div className="absolute left-1/2 top-[60%] -translate-x-1/2 w-[35vw] max-w-[600px] h-[300px] bg-gradient-to-b from-curious-purple-600/15 to-transparent rounded-full blur-[70px] opacity-60"></div>
       
       <div className="relative max-w-7xl mx-auto px-4 text-center z-10">
-        <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-10 px-4">
+        <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold mb-10 px-4">
           <span className="inline-block pb-4 bg-clip-text text-transparent bg-gradient-to-r from-curious-purple-200 via-white to-curious-blue-200">
             Fix your broken code.
           </span>
-          <span className="block mt-6 text-white">Fast. Documented. Traceable.</span>
+          <span className="block mt-6 text-white/95 tracking-tight">Fast. Documented. Traceable.</span>
         </h1>
-        <p className="text-lg md:text-xl text-gray-300 mb-12 max-w-3xl mx-auto">
+        <p className="text-lg md:text-xl text-gray-300/90 mb-12 max-w-3xl mx-auto leading-relaxed">
           Elite AI CodeOps missions for founders and dev teams — powered by CuriousLabs.
         </p>
         <div className="flex flex-col md:flex-row justify-center gap-6">
@@ -50,6 +70,9 @@ export default function Hero() {
           </a>
         </div>
       </div>
+      
+      {/* Transition gradient to next section */}
+      <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-deep-black to-transparent"></div>
     </section>
   );
 }
