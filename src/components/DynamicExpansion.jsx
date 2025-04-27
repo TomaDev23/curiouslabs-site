@@ -133,14 +133,14 @@ export default function DynamicExpansion({ scrollProgress = 0 }) {
   const beamPosition = 200 + (scrollProgress * 400); // Move from top to bottom as user scrolls
   
   return (
-    <section className="relative min-h-[150vh] overflow-hidden bg-deep-black">
+    <section className="relative min-h-[200vh] overflow-hidden bg-deep-black">
       {/* Background Layers (Messy to Clean) */}
       <div className="absolute inset-0 z-0">
         {/* Chaotic Code Layer (top) - more visible when scrollProgress is low */}
         <div 
           className="absolute inset-0 bg-chaotic-code-pattern mix-blend-luminosity"
           style={{ 
-            opacity: Math.max(0.02, 0.15 - scrollProgress * 0.15),
+            opacity: Math.max(0.02, 0.2 - scrollProgress * 0.2),
             willChange: 'opacity'
           }}
         ></div>
@@ -149,7 +149,7 @@ export default function DynamicExpansion({ scrollProgress = 0 }) {
         <div 
           className="absolute inset-0 bg-transition-pattern mix-blend-luminosity"
           style={{ 
-            opacity: Math.max(0.02, 0.15 - Math.abs(scrollProgress - 0.5) * 0.2),
+            opacity: Math.max(0.02, 0.2 - Math.abs(scrollProgress - 0.5) * 0.3),
             willChange: 'opacity'
           }}
         ></div>
@@ -158,7 +158,7 @@ export default function DynamicExpansion({ scrollProgress = 0 }) {
         <div 
           className="absolute inset-0 bg-legit-code mix-blend-luminosity"
           style={{ 
-            opacity: Math.min(0.15, scrollProgress * 0.15),
+            opacity: Math.min(0.2, scrollProgress * 0.2),
             willChange: 'opacity'
           }}
         ></div>
