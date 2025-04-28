@@ -56,13 +56,13 @@ export default function Home() {
   }, []);
   
   // Calculate scroll progress for DynamicExpansion (0 to 1 range)
-  // Adjusted to start only after scrolling well past the Hero
+  // Adjusted to start only after scrolling significantly past the Hero
   const calculateDynamicExpansionProgress = () => {
-    // Start showing cards only after 65% of the viewport height is scrolled
-    const triggerPoint = viewportHeight * 0.65;
+    // Start showing cards only after 75% of the viewport height is scrolled
+    const triggerPoint = viewportHeight * 0.75;
     
     // Use a smaller divisor for more gradual transition
-    const progress = Math.max(0, (scrollY - triggerPoint) / (viewportHeight * 0.7));
+    const progress = Math.max(0, (scrollY - triggerPoint) / (viewportHeight * 0.8));
     
     // Return current progress, capped at 1
     return Math.min(1, progress);
