@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 // Define the service blobs data
 const serviceBlobs = [
@@ -46,55 +46,33 @@ const serviceBlobs = [
   }
 ];
 
-// Card component for cleaner code organization
-const Card = ({ title, description, scrollProgress, scrollTrigger, position }) => {
-  // Refined animation calculation with smoother transitions
-  // Increase the threshold to ensure they appear exactly when needed
-  const opacity = scrollProgress > scrollTrigger ? Math.min(1, (scrollProgress - scrollTrigger) * 15) : 0;
-  const yOffset = scrollProgress > scrollTrigger ? Math.max(0, 18 - ((scrollProgress - scrollTrigger) * 15) * 18) : 18;
+export default function DynamicExpansion({ scrollProgress = 0 }) {
+  const [isMobile, setIsMobile] = useState(false);
   
-  // Determine dot positions based on card position
-  let dotPositions = {
-    topLeft: position === 'left' || position === 'center',
-    topRight: position === 'right' || position === 'center',
-    bottomLeft: position === 'left',
-    bottomRight: position === 'right' || position === 'center'
+  // Detect mobile devices for responsive adjustments
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    // Initialize on component mount
+    handleResize();
+    
+    // Add event listener for window resize
+    window.addEventListener('resize', handleResize);
+    
+    // Clean up event listener
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
+  
+  // Adjust scroll triggers based on mobile/desktop
+  const getScrollTrigger = (baseValue) => {
+    return isMobile ? Math.max(0.01, baseValue - 0.02) : baseValue;
   };
   
-  return (
-    <div 
-      className={`relative bg-white/5 p-4 rounded-lg backdrop-blur-sm ${
-        position === 'center' ? 'w-72 md:w-80' : 'w-full md:w-72'
-      }`}
-      style={{ 
-        opacity, 
-        transform: `translateY(${yOffset}px)`,
-        willChange: 'opacity, transform'
-      }}
-    >
-      {/* Decorative dots */}
-      {dotPositions.topLeft && (
-        <div className="absolute top-2 left-2 w-[4px] h-[4px] bg-white rounded-full blur-[1px] opacity-50"></div>
-      )}
-      {dotPositions.topRight && (
-        <div className="absolute top-2 right-2 w-[4px] h-[4px] bg-white rounded-full blur-[1px] opacity-50"></div>
-      )}
-      {dotPositions.bottomLeft && (
-        <div className="absolute bottom-2 left-2 w-[4px] h-[4px] bg-white rounded-full blur-[1px] opacity-45"></div>
-      )}
-      {dotPositions.bottomRight && (
-        <div className="absolute bottom-2 right-2 w-[4px] h-[4px] bg-white rounded-full blur-[1px] opacity-40"></div>
-      )}
-      
-      <h3 className="text-lg font-semibold text-white mb-1">{title}</h3>
-      <p className="text-white/80 text-sm">{description}</p>
-    </div>
-  );
-};
-
-export default function DynamicExpansion({ scrollProgress = 0 }) {
   // Calculate animation progress for different elements based on scroll position
-  // Refined for smoother animations and proper timing
   const calculateOpacity = (threshold) => {
     return scrollProgress > threshold ? Math.min(1, (scrollProgress - threshold) * 6) : 0;
   };
@@ -104,6 +82,36 @@ export default function DynamicExpansion({ scrollProgress = 0 }) {
     return scrollProgress > threshold 
       ? `translateY(${Math.max(0, 30 - ((scrollProgress - threshold) * 6) * 30)}px)` 
       : 'translateY(30px)';
+  };
+  
+  // Function to calculate card visibility and position
+  const calculateCardStyle = (triggerPoint) => {
+    const progress = Math.max(0, Math.min(1, (scrollProgress - triggerPoint) * 10));
+    const yOffset = isMobile ? '10px' : '20px';
+    
+    return {
+      opacity: progress,
+      transform: `translateY(${progress > 0 ? '0px' : yOffset})`,
+      willChange: 'opacity, transform',
+      transition: 'opacity 0.3s ease-out, transform 0.3s ease-out'
+    };
+  };
+
+  // Card component with optimized styling
+  const Card = ({ title, description, scrollTrigger }) => {
+    const style = calculateCardStyle(scrollTrigger);
+    
+    return (
+      <div
+        className={`card bg-gradient-to-br from-dark-700 to-dark-900 
+          ${isMobile ? 'p-4' : 'p-5'} 
+          border border-curious-purple-900/30 rounded-lg`}
+        style={style}
+      >
+        <h3 className="text-xl font-bold text-white mb-2">{title}</h3>
+        <p className="text-gray-300">{description}</p>
+      </div>
+    );
   };
   
   return (
@@ -117,143 +125,102 @@ export default function DynamicExpansion({ scrollProgress = 0 }) {
         <div className="absolute inset-0 bg-gradient-to-b from-curious-purple-900/5 via-transparent to-transparent"></div>
       </div>
       
-      {/* Cards Cluster - Appears FIRST */}
+      {/* We Fix Broken Code Section */}
+      <div className="relative z-10 max-w-4xl mx-auto pt-8 pb-12 text-center">
+        <h2 
+          className="text-4xl sm:text-5xl md:text-6xl font-bold mb-4 text-white"
+          style={{ 
+            opacity: calculateOpacity(0.05),
+            transform: calculateTransform(0.05),
+            willChange: 'opacity, transform'
+          }}
+        >
+          We Fix Broken Code
+        </h2>
+        <p 
+          className="text-xl sm:text-2xl text-white/80 max-w-3xl mx-auto"
+          style={{ 
+            opacity: calculateOpacity(0.08),
+            transform: calculateTransform(0.08),
+            willChange: 'opacity, transform'
+          }}
+        >
+          Fast. Documented. Traceable.
+        </p>
+      </div>
+      
+      {/* Cards Cluster - Updated to appear after 80-90% Hero scroll */}
       <div className="relative z-10 w-full max-w-5xl mx-auto flex flex-col gap-4 md:gap-6 pt-4">
         {/* Row 1: Two cards side by side */}
-        <div className="flex flex-col md:flex-row justify-between gap-3 md:gap-4">
-          <Card 
-            title="Rescue Systems" 
-            description="Recover broken pipelines and workflows instantly." 
-            scrollProgress={scrollProgress}
-            scrollTrigger={0.01}  /* Start appearing after small amount of scroll */
-            position="left"
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+          <Card
+            title="Code Analysis"
+            description="Deep analysis of your codebase to identify patterns and opportunities."
+            scrollTrigger={getScrollTrigger(0.08)}
           />
-          <Card 
-            title="Security Hardening" 
-            description="Lock down critical ops and validate configs." 
-            scrollProgress={scrollProgress}
-            scrollTrigger={0.01}  /* Start appearing after small amount of scroll */
-            position="right"
+          <Card
+            title="Pattern Recognition"
+            description="Advanced algorithms to detect and categorize code patterns."
+            scrollTrigger={getScrollTrigger(0.08)}
           />
         </div>
         
         {/* Row 2: One centered card */}
-        <div className="flex justify-center">
-          <Card 
-            title="Automation Boost" 
-            description="Accelerate pipelines, testing, and deployment flows." 
-            scrollProgress={scrollProgress}
-            scrollTrigger={0.03}  /* Slightly delayed appearance */
-            position="center"
+        <div className="flex justify-center mb-8">
+          <Card
+            title="Intelligent Transformation"
+            description="Automated refactoring with human-like understanding."
+            scrollTrigger={getScrollTrigger(0.12)}
           />
         </div>
         
         {/* Row 3: Two cards side by side */}
-        <div className="flex flex-col md:flex-row justify-between gap-3 md:gap-4">
-          <Card 
-            title="Documentation Engine" 
-            description="Auto-generate real traceable logs with precision." 
-            scrollProgress={scrollProgress}
-            scrollTrigger={0.05}  /* Further delayed appearance */
-            position="left"
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+          <Card
+            title="Quality Assurance"
+            description="Comprehensive testing and validation of transformed code."
+            scrollTrigger={getScrollTrigger(0.16)}
           />
-          <Card 
-            title="Recovery Systems" 
-            description="Instantly fallback and recover from critical errors." 
-            scrollProgress={scrollProgress}
-            scrollTrigger={0.05}  /* Further delayed appearance */
-            position="right"
+          <Card
+            title="Performance Optimization"
+            description="Enhanced code efficiency and maintainability."
+            scrollTrigger={getScrollTrigger(0.16)}
           />
         </div>
         
         {/* Row 4: One centered card */}
         <div className="flex justify-center">
-          <Card 
-            title="LEGIT Compliance" 
-            description="Align code to contract-level legal and audit standards." 
-            scrollProgress={scrollProgress}
-            scrollTrigger={0.07}  /* Last to appear */
-            position="center"
+          <Card
+            title="Continuous Improvement"
+            description="Ongoing monitoring and optimization of your codebase."
+            scrollTrigger={getScrollTrigger(0.20)}
           />
         </div>
       </div>
       
-      {/* Elite AI Code Operations Title */}
-      <div className="relative z-10 max-w-4xl mx-auto pt-16 pb-8 text-center">
-        <h2 
-          className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 text-white"
-          style={{ 
-            opacity: calculateOpacity(0.20),
-            transform: calculateTransform(0.20),
-            willChange: 'opacity, transform'
-          }}
-        >
-          Elite AI Code Operations
-        </h2>
-      </div>
-      
-      {/* Title Section 1 - Appears AFTER cards */}
-      <div className="relative z-10 max-w-4xl mx-auto pb-10 text-center">
+      {/* Title Section - From Chaos to Clarity */}
+      <div className="relative z-10 max-w-4xl mx-auto pt-16 pb-10 text-center">
         <h2 
           className="text-4xl sm:text-5xl md:text-6xl font-bold mb-4 text-white"
           style={{ 
-            opacity: calculateOpacity(0.30),
-            transform: calculateTransform(0.30),
+            opacity: calculateOpacity(0.60),
+            transform: calculateTransform(0.60),
             willChange: 'opacity, transform'
           }}
         >
-          CodeOps Redefined.
+          From Chaos to Clarity
         </h2>
-        
         <p 
-          className="max-w-3xl mx-auto text-lg md:text-xl text-white/90"
+          className="text-xl sm:text-2xl text-white/80 max-w-3xl mx-auto"
           style={{ 
-            opacity: calculateOpacity(0.35),
-            transform: calculateTransform(0.35),
-            willChange: 'opacity, transform'
-          }}
-        >
-          Turning chaos into structured intelligence.
-        </p>
-      </div>
-      
-      {/* Visual separator - subtle line */}
-      <div 
-        className="w-24 h-[1px] bg-gradient-to-r from-transparent via-curious-purple-500/50 to-transparent mb-10"
-        style={{ 
-          opacity: calculateOpacity(0.40),
-          transform: `scaleX(${scrollProgress > 0.40 ? Math.min(1, Math.max(0.3, (scrollProgress - 0.40) * 5)) : 0.3})`,
-          willChange: 'opacity, transform'
-        }}
-      ></div>
-      
-      {/* Title Section 2 - Appears LAST */}
-      <div className="relative z-10 max-w-4xl mx-auto pb-32 text-center">
-        <h2 
-          className="text-4xl sm:text-5xl md:text-6xl font-bold mb-4 text-white"
-          style={{ 
-            opacity: calculateOpacity(0.50),
-            transform: calculateTransform(0.50),
-            willChange: 'opacity, transform'
-          }}
-        >
-          From Chaos to Clarity.
-        </h2>
-        
-        <p 
-          className="max-w-3xl mx-auto text-lg md:text-xl text-white/90"
-          style={{ 
-            opacity: calculateOpacity(0.55),
-            transform: calculateTransform(0.55),
+            opacity: calculateOpacity(0.64),
+            transform: calculateTransform(0.64),
             willChange: 'opacity, transform'
           }}
         >
           Seamless AI-powered workflows, fully traceable, LEGIT certified.
         </p>
       </div>
-      
-      {/* Bottom fade transition */}
-      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-transparent to-transparent z-10"></div>
     </section>
   );
 } 
