@@ -25,7 +25,7 @@ export default function Services() {
   return (
     <section id="services" className="relative py-20 bg-curious-dark-800 overflow-hidden">
       {/* Circuit pattern background - subtle */}
-      <div className="absolute inset-0 bg-circuit-pattern opacity-[0.05] mix-blend-luminosity"></div>
+      <div className="absolute inset-0 bg-circuit-pattern opacity-0 mix-blend-luminosity"></div>
       
       {/* Subtle accent glow */}
       <div className="absolute -bottom-32 left-1/2 -translate-x-1/2 w-[800px] h-[200px] bg-gradient-to-r from-transparent via-curious-purple-600/20 to-transparent rounded-full blur-[100px] opacity-50"></div>

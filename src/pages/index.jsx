@@ -53,8 +53,10 @@ export default function Home() {
   }, []);
   
   // Calculate scroll progress for DynamicExpansion (0 to 1 range)
+  // Adjusted to start immediately after the navbar is passed
   const dynamicExpansionProgress = Math.min(1, Math.max(0, 
-    (scrollY - viewportHeight) / (viewportHeight * 2)
+    // Start showing content as soon as user begins scrolling past the hero section
+    (scrollY - (viewportHeight * 0.1)) / (viewportHeight * 2)
   ));
   
   // Calculate LogoStrip opacity based on metrics section position
@@ -86,47 +88,17 @@ export default function Home() {
   }, [viewportHeight]);
   
   return (
-    <main className="min-h-screen bg-deep-black text-white antialiased relative overflow-hidden">
-      {/* Dynamic Background Layer */}
+    <main className="min-h-screen bg-gradient-to-b from-[#5D45B8] via-[#403962] to-[#28293D] text-white antialiased relative overflow-hidden">
+      {/* Refined Background Layer - minimal and sophisticated */}
       <div className="absolute inset-0 w-full h-full overflow-hidden z-0">
-        {/* Base Circuit Pattern - slightly reduced opacity */}
-        <div className="absolute inset-0 bg-circuit-pattern opacity-[0.06] mix-blend-luminosity"></div>
+        {/* Subtle color infusion for visual interest */}
+        <div className="absolute inset-0 bg-gradient-to-r from-[#5D45B8]/15 via-[#383053]/10 to-transparent opacity-[0.2]"></div>
         
-        {/* Noise Texture Overlay - reduced opacity */}
-        <div className="absolute inset-0 bg-noise-texture opacity-[0.02] mix-blend-overlay"></div>
-        
-        {/* Blob 1 - Top Left - enhanced purple */}
+        {/* Single elegant blob for depth - positioned strategically */}
         <div 
-          className="absolute top-[5%] -left-[10%] w-[700px] h-[700px] bg-gradient-to-br from-curious-purple-700/25 via-curious-purple-800/20 to-transparent rounded-full blur-3xl opacity-45 animate-float-slow"
-          style={{ animationDelay: '0.5s', willChange: 'transform' }}
+          className="absolute top-[5%] left-[5%] w-[500px] h-[500px] bg-gradient-to-br from-[#5D45B8]/8 to-transparent rounded-full blur-3xl opacity-[0.15]"
+          style={{ willChange: 'transform' }}
         ></div>
-        
-        {/* Blob 2 - Top Right */}
-        <div 
-          className="absolute top-[10%] -right-[10%] w-[600px] h-[600px] bg-gradient-to-bl from-curious-blue-700/20 via-curious-blue-800/15 to-transparent rounded-full blur-3xl opacity-40 animate-float-slow animate-rotate-slow"
-          style={{ animationDelay: '1.7s', willChange: 'transform' }}
-        ></div>
-        
-        {/* Blob 3 - Middle Left - enhanced purple */}
-        <div 
-          className="absolute top-[40%] -left-[5%] w-[500px] h-[500px] bg-gradient-to-tr from-curious-purple-600/30 to-curious-blue-700/15 rounded-full blur-3xl opacity-45 animate-float-slow"
-          style={{ animationDelay: '0.9s', willChange: 'transform' }}
-        ></div>
-        
-        {/* Blob 4 - Bottom Right - more purple tint */}
-        <div 
-          className="absolute bottom-[10%] -right-[10%] w-[650px] h-[650px] bg-gradient-to-tl from-curious-blue-600/30 via-curious-purple-800/20 to-transparent rounded-full blur-3xl opacity-45 animate-float-slow animate-rotate-slow"
-          style={{ animationDelay: '0.2s', animationDirection: 'reverse', willChange: 'transform' }}
-        ></div>
-        
-        {/* Blob 5 - Bottom Center - enhanced purple */}
-        <div 
-          className="absolute bottom-[0%] left-[20%] w-[800px] h-[800px] bg-gradient-to-r from-curious-purple-700/25 via-curious-blue-900/15 to-transparent rounded-full blur-3xl opacity-35 animate-float"
-          style={{ animationDelay: '1.2s', willChange: 'transform' }}
-        ></div>
-        
-        {/* Unified glow effect through the page */}
-        <div className="absolute inset-x-0 top-1/3 bottom-0 bg-gradient-to-b from-curious-purple-900/10 via-transparent to-transparent pointer-events-none"></div>
       </div>
       
       {/* Foreground Content */}
@@ -148,17 +120,17 @@ export default function Home() {
         {/* Unified container for all main content */}
         <div className="relative" style={{ minHeight: '450vh' }}>
           {/* Hero Section */}
-          <div className="relative pt-16 pb-24 min-h-screen z-20">
+          <div className="relative pt-16 pb-12 min-h-screen z-20">
             <Hero />
           </div>
           
-          {/* Dynamic expansion section */}
+          {/* Dynamic expansion section - positioned to appear immediately after scrolling */}
           <div className="relative z-20">
             <DynamicExpansion scrollProgress={dynamicExpansionProgress} />
           </div>
           
           {/* Services section */}
-          <div className="relative z-20">
+          <div className="relative z-20 pt-8 md:pt-12">
             <ScrollReveal animation="fade-in-up" delay="0.1s" id="services">
               <Services />
             </ScrollReveal>
@@ -182,7 +154,7 @@ export default function Home() {
           </ScrollReveal>
         </div>
         
-        <footer className="py-12 bg-gradient-to-b from-deep-black to-curious-dark-900/90 border-t border-curious-dark-700/50 backdrop-blur-sm">
+        <footer className="py-12 bg-gradient-to-b from-transparent to-[#28293D]/90 border-t border-[#3D3A63]/20 backdrop-blur-sm">
           <div className="max-w-7xl mx-auto px-4 text-center">
             <p className="text-gray-400 text-sm">
               &copy; {new Date().getFullYear()} CuriousLabs. All rights reserved.

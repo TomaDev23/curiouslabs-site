@@ -48,10 +48,10 @@ const serviceBlobs = [
 
 // Card component for cleaner code organization
 const Card = ({ title, description, scrollProgress, scrollTrigger, position }) => {
-  // Calculate opacity and transform based on scroll position
-  // Much faster animation multiplier (30) and negative trigger to start animations earlier
-  const opacity = scrollProgress > scrollTrigger ? Math.min(1, (scrollProgress - scrollTrigger) * 30) : 0;
-  const yOffset = scrollProgress > scrollTrigger ? Math.max(0, 15 - ((scrollProgress - scrollTrigger) * 30) * 15) : 15;
+  // Refined animation calculation with smoother transitions
+  // Increase the threshold to ensure they appear exactly when needed
+  const opacity = scrollProgress > scrollTrigger ? Math.min(1, (scrollProgress - scrollTrigger) * 15) : 0;
+  const yOffset = scrollProgress > scrollTrigger ? Math.max(0, 18 - ((scrollProgress - scrollTrigger) * 15) * 18) : 18;
   
   // Determine dot positions based on card position
   let dotPositions = {
@@ -94,44 +94,45 @@ const Card = ({ title, description, scrollProgress, scrollTrigger, position }) =
 
 export default function DynamicExpansion({ scrollProgress = 0 }) {
   // Calculate animation progress for different elements based on scroll position
+  // Refined for smoother animations and proper timing
   const calculateOpacity = (threshold) => {
-    return scrollProgress > threshold ? Math.min(1, (scrollProgress - threshold) * 8) : 0;
+    return scrollProgress > threshold ? Math.min(1, (scrollProgress - threshold) * 6) : 0;
   };
   
   // Calculate transform for titles based on scroll position
   const calculateTransform = (threshold) => {
     return scrollProgress > threshold 
-      ? `translateY(${Math.max(0, 30 - ((scrollProgress - threshold) * 8) * 30)}px)` 
+      ? `translateY(${Math.max(0, 30 - ((scrollProgress - threshold) * 6) * 30)}px)` 
       : 'translateY(30px)';
   };
   
   return (
-    <section className="relative min-h-[130vh] flex flex-col items-center justify-start text-white px-6 overflow-hidden -mt-16">
+    <section className="relative min-h-[130vh] flex flex-col items-center justify-start text-white px-6 overflow-hidden">
       {/* Simple background elements */}
       <div className="absolute inset-0 z-0">
         {/* Subtle background pattern */}
-        <div className="absolute inset-0 bg-circuit-pattern opacity-[0.04] mix-blend-luminosity"></div>
+        <div className="absolute inset-0 bg-circuit-pattern opacity-0 mix-blend-luminosity"></div>
         
         {/* Subtle glow effect */}
         <div className="absolute inset-0 bg-gradient-to-b from-curious-purple-900/5 via-transparent to-transparent"></div>
       </div>
       
       {/* Cards Cluster - Appears FIRST */}
-      <div className="relative z-10 w-full max-w-5xl mx-auto flex flex-col gap-4 md:gap-6 pt-0">
+      <div className="relative z-10 w-full max-w-5xl mx-auto flex flex-col gap-4 md:gap-6 pt-4">
         {/* Row 1: Two cards side by side */}
         <div className="flex flex-col md:flex-row justify-between gap-3 md:gap-4">
           <Card 
             title="Rescue Systems" 
             description="Recover broken pipelines and workflows instantly." 
             scrollProgress={scrollProgress}
-            scrollTrigger={-0.05} /* Start appearing BEFORE scrolling begins */
+            scrollTrigger={0.01}  /* Start appearing after small amount of scroll */
             position="left"
           />
           <Card 
             title="Security Hardening" 
             description="Lock down critical ops and validate configs." 
             scrollProgress={scrollProgress}
-            scrollTrigger={-0.05} /* Start appearing BEFORE scrolling begins */
+            scrollTrigger={0.01}  /* Start appearing after small amount of scroll */
             position="right"
           />
         </div>
@@ -142,7 +143,7 @@ export default function DynamicExpansion({ scrollProgress = 0 }) {
             title="Automation Boost" 
             description="Accelerate pipelines, testing, and deployment flows." 
             scrollProgress={scrollProgress}
-            scrollTrigger={-0.03} /* Start appearing BEFORE scrolling begins */
+            scrollTrigger={0.03}  /* Slightly delayed appearance */
             position="center"
           />
         </div>
@@ -153,14 +154,14 @@ export default function DynamicExpansion({ scrollProgress = 0 }) {
             title="Documentation Engine" 
             description="Auto-generate real traceable logs with precision." 
             scrollProgress={scrollProgress}
-            scrollTrigger={-0.01} /* Start appearing with minimal scroll */
+            scrollTrigger={0.05}  /* Further delayed appearance */
             position="left"
           />
           <Card 
             title="Recovery Systems" 
             description="Instantly fallback and recover from critical errors." 
             scrollProgress={scrollProgress}
-            scrollTrigger={-0.01} /* Start appearing with minimal scroll */
+            scrollTrigger={0.05}  /* Further delayed appearance */
             position="right"
           />
         </div>
@@ -171,7 +172,7 @@ export default function DynamicExpansion({ scrollProgress = 0 }) {
             title="LEGIT Compliance" 
             description="Align code to contract-level legal and audit standards." 
             scrollProgress={scrollProgress}
-            scrollTrigger={0} /* Start appearing right at scroll start */
+            scrollTrigger={0.07}  /* Last to appear */
             position="center"
           />
         </div>
@@ -182,8 +183,8 @@ export default function DynamicExpansion({ scrollProgress = 0 }) {
         <h2 
           className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 text-white"
           style={{ 
-            opacity: calculateOpacity(0.15),
-            transform: calculateTransform(0.15),
+            opacity: calculateOpacity(0.20),
+            transform: calculateTransform(0.20),
             willChange: 'opacity, transform'
           }}
         >
@@ -196,8 +197,8 @@ export default function DynamicExpansion({ scrollProgress = 0 }) {
         <h2 
           className="text-4xl sm:text-5xl md:text-6xl font-bold mb-4 text-white"
           style={{ 
-            opacity: calculateOpacity(0.25),
-            transform: calculateTransform(0.25),
+            opacity: calculateOpacity(0.30),
+            transform: calculateTransform(0.30),
             willChange: 'opacity, transform'
           }}
         >
@@ -207,8 +208,8 @@ export default function DynamicExpansion({ scrollProgress = 0 }) {
         <p 
           className="max-w-3xl mx-auto text-lg md:text-xl text-white/90"
           style={{ 
-            opacity: calculateOpacity(0.30),
-            transform: calculateTransform(0.30),
+            opacity: calculateOpacity(0.35),
+            transform: calculateTransform(0.35),
             willChange: 'opacity, transform'
           }}
         >
@@ -220,8 +221,8 @@ export default function DynamicExpansion({ scrollProgress = 0 }) {
       <div 
         className="w-24 h-[1px] bg-gradient-to-r from-transparent via-curious-purple-500/50 to-transparent mb-10"
         style={{ 
-          opacity: calculateOpacity(0.35),
-          transform: `scaleX(${scrollProgress > 0.35 ? Math.min(1, Math.max(0.3, (scrollProgress - 0.35) * 5)) : 0.3})`,
+          opacity: calculateOpacity(0.40),
+          transform: `scaleX(${scrollProgress > 0.40 ? Math.min(1, Math.max(0.3, (scrollProgress - 0.40) * 5)) : 0.3})`,
           willChange: 'opacity, transform'
         }}
       ></div>
@@ -231,8 +232,8 @@ export default function DynamicExpansion({ scrollProgress = 0 }) {
         <h2 
           className="text-4xl sm:text-5xl md:text-6xl font-bold mb-4 text-white"
           style={{ 
-            opacity: calculateOpacity(0.45),
-            transform: calculateTransform(0.45),
+            opacity: calculateOpacity(0.50),
+            transform: calculateTransform(0.50),
             willChange: 'opacity, transform'
           }}
         >
@@ -242,8 +243,8 @@ export default function DynamicExpansion({ scrollProgress = 0 }) {
         <p 
           className="max-w-3xl mx-auto text-lg md:text-xl text-white/90"
           style={{ 
-            opacity: calculateOpacity(0.50),
-            transform: calculateTransform(0.50),
+            opacity: calculateOpacity(0.55),
+            transform: calculateTransform(0.55),
             willChange: 'opacity, transform'
           }}
         >
@@ -252,7 +253,7 @@ export default function DynamicExpansion({ scrollProgress = 0 }) {
       </div>
       
       {/* Bottom fade transition */}
-      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-deep-black to-transparent z-10"></div>
+      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-transparent to-transparent z-10"></div>
     </section>
   );
 } 

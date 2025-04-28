@@ -17,7 +17,7 @@ export default function LogoStrip() {
       <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[100px] bg-gradient-to-r from-transparent via-curious-purple-700/5 to-transparent rounded-full blur-[60px]"></div>
       
       {/* Very subtle circuit pattern */}
-      <div className="absolute inset-0 bg-circuit-pattern opacity-[0.01] mix-blend-luminosity"></div>
+      <div className="absolute inset-0 bg-circuit-pattern opacity-0 mix-blend-luminosity"></div>
       
       <div className="max-w-7xl mx-auto px-4 mb-0">
         <p className="text-center text-xs uppercase tracking-widest text-gray-500 mb-4 opacity-70">
@@ -28,10 +28,10 @@ export default function LogoStrip() {
       {/* Container with overflow hidden and side fades */}
       <div className="relative overflow-hidden w-full">
         {/* Left fade for smooth edge transition */}
-        <div className="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-deep-black to-transparent z-10"></div>
+        <div className="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-transparent via-transparent to-transparent z-10"></div>
         
         {/* Right fade for smooth edge transition */}
-        <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-deep-black to-transparent z-10"></div>
+        <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-transparent via-transparent to-transparent z-10"></div>
         
         {/* The scrolling container */}
         <div className="animate-scroll flex items-center whitespace-nowrap py-2">
@@ -60,7 +60,7 @@ export default function LogoStrip() {
       </div>
       
       {/* Bottom fade for better fit with next section */}
-      <div className="absolute bottom-0 left-0 right-0 h-2 bg-gradient-to-t from-deep-black to-transparent"></div>
+      <div className="absolute bottom-0 left-0 right-0 h-2 bg-gradient-to-t from-transparent to-transparent"></div>
     </section>
   );
 }

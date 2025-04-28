@@ -74,64 +74,62 @@ export default function NavBar() {
     <nav 
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         isScrolled 
-          ? 'bg-deep-black/80 backdrop-blur-md py-3 border-b border-curious-purple-600/20 shadow-[0_2px_20px_-2px_rgba(109,40,217,0.2)]' 
-          : 'bg-transparent py-5'
+          ? 'bg-[#403962]/80 backdrop-blur-xl py-3 border-b border-[#5D45B8]/25 shadow-[0_4px_20px_-6px_rgba(93,69,184,0.35)]' 
+          : 'bg-transparent py-4'
       }`}
+      style={{ 
+        willChange: 'background-color, box-shadow, padding',
+        transform: 'translateZ(0)'
+      }}
     >
-      {/* Technical line accent at top */}
-      <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-curious-purple-500/70 to-transparent"></div>
+      {/* Subtle top accent line */}
+      <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#5D45B8]/50 to-transparent"></div>
       
-      <div className="max-w-7xl mx-auto px-4 flex justify-between items-center">
-        {/* Logo */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 flex justify-between items-center">
+        {/* Logo with refined styling */}
         <div className="flex items-center">
           <div className="relative">
-            <span className="text-xl font-bold text-white bg-clip-text text-transparent bg-gradient-to-r from-curious-purple-400 to-curious-blue-400">
+            <span className="text-xl font-medium text-white tracking-wide">
               CuriousLabs
             </span>
             {/* Subtle underline with gradient */}
-            <div className="absolute -bottom-1 left-0 right-0 h-[1px] bg-gradient-to-r from-curious-purple-500/50 to-curious-blue-500/50"></div>
+            <div className="absolute -bottom-1 left-0 right-0 h-[1px] bg-gradient-to-r from-[#5D45B8]/50 to-[#5D9EEB]/50"></div>
           </div>
         </div>
 
-        {/* Desktop Navigation */}
+        {/* Desktop Navigation with refined styling */}
         <div className="hidden md:flex items-center space-x-8">
           {navLinks.map((link, index) => (
             <a 
               key={index} 
               href={link.href} 
-              className={`relative px-2 py-1 text-sm font-medium transition-colors ${
+              className={`relative px-2 py-1.5 text-sm font-medium transition-all duration-200 ${
                 activeSection === link.id 
                 ? 'text-white' 
-                : 'text-gray-400 hover:text-gray-200'
+                : 'text-white/70 hover:text-white'
               }`}
             >
               {link.title}
-              {/* Active indicator */}
+              {/* Active indicator with refined styling */}
               {activeSection === link.id && (
-                <span className="absolute -bottom-1 left-0 right-0 h-[2px] bg-gradient-to-r from-curious-purple-500 to-curious-blue-500"></span>
+                <span className="absolute -bottom-1 left-0 right-0 h-[2px] bg-gradient-to-r from-[#5D45B8]/80 to-[#5D9EEB]/80 rounded-full"></span>
               )}
             </a>
           ))}
           <a 
             href="#contact" 
-            className="group relative bg-gradient-to-r from-curious-purple-600 to-curious-purple-500 text-white px-5 py-2 rounded-lg transition-all hover:-translate-y-1 overflow-hidden"
+            className="group relative bg-gradient-to-r from-[#5D45B8] to-[#4A3E80] text-white px-5 py-2.5 rounded-md text-sm transition-all duration-300 hover:shadow-lg hover:shadow-[#5D45B8]/20 hover:translate-y-[-1px]"
           >
-            {/* Button glow overlay */}
-            <div className="absolute inset-0 w-full h-full bg-white opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
-            
             {/* Button text */}
             <span className="relative z-10">Contact</span>
-            
-            {/* Button bottom highlight */}
-            <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
           </a>
         </div>
 
-        {/* Mobile Menu Button */}
+        {/* Mobile Menu Button with refined styling */}
         <div className="md:hidden">
           <button 
             onClick={toggleMobileMenu}
-            className="relative text-gray-300 hover:text-white transition-colors p-2"
+            className="relative text-white/90 hover:text-white transition-colors duration-200 p-2 focus:outline-none"
             aria-label="Toggle mobile menu"
           >
             <svg
@@ -157,40 +155,35 @@ export default function NavBar() {
                 />
               )}
             </svg>
-            
-            {/* Button highlight effect */}
-            {isMobileMenuOpen && (
-              <span className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-curious-purple-500/70 to-transparent"></span>
-            )}
           </button>
         </div>
       </div>
 
-      {/* Mobile Menu */}
+      {/* Mobile Menu with refined styling */}
       {isMobileMenuOpen && (
-        <div className="md:hidden bg-deep-black/95 backdrop-blur-lg border-b border-curious-purple-900/30">
-          <div className="px-4 py-5 space-y-5">
+        <div className="md:hidden bg-[#403962]/90 backdrop-blur-xl border-b border-[#5D45B8]/30 shadow-md">
+          <div className="px-4 py-5 space-y-4">
             {navLinks.map((link, index) => (
               <a
                 key={index}
                 href={link.href}
-                className={`block transition-colors relative pl-3 ${
+                className={`block transition-all duration-200 relative pl-3 py-2 ${
                   activeSection === link.id 
                   ? 'text-white' 
-                  : 'text-gray-400 hover:text-white'
+                  : 'text-white/70 hover:text-white'
                 }`}
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 {/* Active indicator for mobile */}
                 {activeSection === link.id && (
-                  <span className="absolute left-0 top-0 bottom-0 w-[2px] bg-curious-purple-500"></span>
+                  <span className="absolute left-0 top-0 bottom-0 w-[2px] bg-[#5D45B8]/80 rounded-full"></span>
                 )}
                 {link.title}
               </a>
             ))}
             <a
               href="#contact"
-              className="block w-full text-center bg-gradient-to-r from-curious-purple-600 to-curious-purple-500 text-white px-5 py-3 rounded-lg mt-8"
+              className="block w-full text-center bg-gradient-to-r from-[#5D45B8] to-[#4A3E80] text-white px-5 py-3 rounded-md mt-6 transition-all duration-300 hover:shadow-lg hover:shadow-[#5D45B8]/20"
               onClick={() => setIsMobileMenuOpen(false)}
             >
               Contact

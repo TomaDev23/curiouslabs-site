@@ -9,7 +9,7 @@ export default function Metrics() {
   return (
     <section id="metrics" className="relative py-24 bg-gradient-to-b from-curious-dark-900 via-curious-dark-800 to-curious-dark-900 overflow-hidden">
       {/* Circuit pattern background - subtle */}
-      <div className="absolute inset-0 bg-circuit-pattern opacity-[0.04] mix-blend-luminosity"></div>
+      <div className="absolute inset-0 bg-circuit-pattern opacity-0 mix-blend-luminosity"></div>
       
       {/* Subtle gradient accents */}
       <div className="absolute -left-40 top-1/4 w-[400px] h-[400px] bg-gradient-to-br from-curious-purple-800/20 to-transparent rounded-full blur-[120px] opacity-40"></div>

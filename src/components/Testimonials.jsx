@@ -15,10 +15,10 @@ export default function Testimonials() {
   return (
     <section id="testimonials" className="relative py-28 bg-gradient-to-br from-curious-dark-900 via-curious-purple-900/20 to-curious-dark-900 overflow-hidden">
       {/* Circuit pattern background - subtle */}
-      <div className="absolute inset-0 bg-circuit-pattern opacity-[0.03] mix-blend-luminosity"></div>
+      <div className="absolute inset-0 bg-circuit-pattern opacity-0 mix-blend-luminosity"></div>
       
       {/* Subtle noise texture */}
-      <div className="absolute inset-0 bg-noise-texture opacity-[0.03] mix-blend-overlay"></div>
+      <div className="absolute inset-0 bg-noise-texture opacity-0 mix-blend-overlay"></div>
       
       {/* Glowing accent */}
       <div className="absolute left-1/2 top-1/4 -translate-x-1/2 w-[800px] h-[300px] bg-gradient-to-r from-transparent via-curious-purple-600/20 to-transparent rounded-full blur-[100px] opacity-50"></div>
