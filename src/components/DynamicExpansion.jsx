@@ -46,7 +46,7 @@ const serviceBlobs = [
   }
 ];
 
-export default function DynamicExpansion({ scrollProgress = 0 }) {
+export default function DynamicExpansion({ scrollProgress }) {
   const [isMobile, setIsMobile] = useState(false);
   
   // Detect mobile devices for responsive adjustments
@@ -74,152 +74,180 @@ export default function DynamicExpansion({ scrollProgress = 0 }) {
   
   // Calculate animation progress for different elements based on scroll position
   const calculateOpacity = (threshold) => {
-    return scrollProgress > threshold ? Math.min(1, (scrollProgress - threshold) * 6) : 0;
+    // Ensure smoother fade-in with a lower multiplier for more gradual appearance
+    return scrollProgress > threshold ? Math.min(1, (scrollProgress - threshold) * 2) : 0;
   };
   
   // Calculate transform for titles based on scroll position
   const calculateTransform = (threshold) => {
+    // Smoother translation with less dramatic movement
     return scrollProgress > threshold 
-      ? `translateY(${Math.max(0, 30 - ((scrollProgress - threshold) * 6) * 30)}px)` 
-      : 'translateY(30px)';
+      ? `translateY(${Math.max(0, 15 - ((scrollProgress - threshold) * 2) * 15)}px)` 
+      : 'translateY(15px)';
   };
   
   // Function to calculate card visibility and position
-  const calculateCardStyle = (triggerPoint) => {
-    const progress = Math.max(0, Math.min(1, (scrollProgress - triggerPoint) * 10));
-    const yOffset = isMobile ? '10px' : '20px';
+  const calculateCardStyle = (scrollTrigger, animationMultiplier = 10) => {
+    // Determine when card should start appearing - use lower values
+    const startPoint = scrollTrigger * 0.5; // Lower the trigger thresholds by half
+    
+    // Ensure cards stay visible once they appear
+    const hasAppeared = scrollProgress > startPoint;
+    
+    // Calculate card opacity based on scroll progress
+    const opacity = hasAppeared 
+      ? Math.min(1, (scrollProgress - startPoint) * animationMultiplier) 
+      : 0;
+    
+    // Calculate vertical offset - moving up as scroll increases
+    const translateY = hasAppeared 
+      ? Math.max(0, 40 - ((scrollProgress - startPoint) * animationMultiplier * 100)) 
+      : 40;
     
     return {
-      opacity: progress,
-      transform: `translateY(${progress > 0 ? '0px' : yOffset})`,
-      willChange: 'opacity, transform',
-      transition: 'opacity 0.3s ease-out, transform 0.3s ease-out'
+      opacity,
+      transform: `translateY(${translateY}px)`,
+      transition: 'opacity 0.5s ease-out, transform 0.6s ease-out',
+      willChange: 'opacity, transform'
     };
   };
 
   // Card component with optimized styling
-  const Card = ({ title, description, scrollTrigger }) => {
+  const Card = ({ children, scrollTrigger, columnSpan = 1 }) => {
     const style = calculateCardStyle(scrollTrigger);
     
     return (
-      <div
-        className={`card bg-gradient-to-br from-dark-700 to-dark-900 
-          ${isMobile ? 'p-4' : 'p-5'} 
-          border border-curious-purple-900/30 rounded-lg`}
+      <div 
+        className={`bg-[#312D4B] border border-[#473F7B]/60 rounded-xl shadow-xl overflow-hidden 
+                   backdrop-blur-sm col-span-1 md:col-span-${columnSpan}
+                   transition-all duration-500 ease-out`}
         style={style}
       >
-        <h3 className="text-xl font-bold text-white mb-2">{title}</h3>
-        <p className="text-gray-300">{description}</p>
+        <div className="p-6">
+          {children}
+        </div>
       </div>
     );
   };
   
+  // Calculate title opacity and transform with persistence
+  const calculateTitleStyle = (threshold) => {
+    // Use lower threshold values for earlier appearance
+    const adjustedThreshold = threshold * 0.5;
+    
+    const hasAppeared = scrollProgress > adjustedThreshold;
+    const opacity = hasAppeared ? Math.min(1, (scrollProgress - adjustedThreshold) * 8) : 0;
+    const transformY = hasAppeared 
+      ? Math.max(0, 30 - ((scrollProgress - adjustedThreshold) * 15 * 10)) 
+      : 30;
+    
+    return {
+      opacity,
+      transform: `translateY(${transformY}px)`,
+      transition: 'opacity 0.5s ease-out, transform 0.5s ease-out',
+      willChange: 'opacity, transform'
+    };
+  };
+
+  // Use title style calculations with earlier thresholds
+  const title1Style = calculateTitleStyle(0.2);
+  const title2Style = calculateTitleStyle(0.3);
+
   return (
-    <section className="relative min-h-[130vh] flex flex-col items-center justify-start text-white px-6 overflow-hidden">
-      {/* Simple background elements */}
-      <div className="absolute inset-0 z-0">
-        {/* Subtle background pattern */}
-        <div className="absolute inset-0 bg-circuit-pattern opacity-0 mix-blend-luminosity"></div>
-        
-        {/* Subtle glow effect */}
-        <div className="absolute inset-0 bg-gradient-to-b from-curious-purple-900/5 via-transparent to-transparent"></div>
-      </div>
-      
-      {/* We Fix Broken Code Section */}
-      <div className="relative z-10 max-w-4xl mx-auto pt-8 pb-12 text-center">
-        <h2 
-          className="text-4xl sm:text-5xl md:text-6xl font-bold mb-4 text-white"
-          style={{ 
-            opacity: calculateOpacity(0.05),
-            transform: calculateTransform(0.05),
-            willChange: 'opacity, transform'
-          }}
-        >
-          We Fix Broken Code
-        </h2>
-        <p 
-          className="text-xl sm:text-2xl text-white/80 max-w-3xl mx-auto"
-          style={{ 
-            opacity: calculateOpacity(0.08),
-            transform: calculateTransform(0.08),
-            willChange: 'opacity, transform'
-          }}
-        >
-          Fast. Documented. Traceable.
-        </p>
-      </div>
-      
-      {/* Cards Cluster - Updated to appear after 80-90% Hero scroll */}
-      <div className="relative z-10 w-full max-w-5xl mx-auto flex flex-col gap-4 md:gap-6 pt-4">
-        {/* Row 1: Two cards side by side */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          <Card
-            title="Code Analysis"
-            description="Deep analysis of your codebase to identify patterns and opportunities."
-            scrollTrigger={getScrollTrigger(0.08)}
-          />
-          <Card
-            title="Pattern Recognition"
-            description="Advanced algorithms to detect and categorize code patterns."
-            scrollTrigger={getScrollTrigger(0.08)}
-          />
+    <section className="pt-32 pb-32 relative">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        {/* We Fix Broken Code Section with delayed appearance */}
+        <div className="text-center mb-32">
+          <h2 
+            className="text-4xl sm:text-5xl md:text-6xl font-bold mb-4 text-white"
+            style={{ 
+              opacity: calculateOpacity(0.2),
+              transform: calculateTransform(0.2),
+              willChange: 'opacity, transform',
+              transition: 'opacity 1s ease-out, transform 1s ease-out'
+            }}
+          >
+            We Fix Broken Code
+          </h2>
+          <p 
+            className="text-xl sm:text-2xl text-white/80 max-w-3xl mx-auto"
+            style={{ 
+              opacity: calculateOpacity(0.25),
+              transform: calculateTransform(0.25),
+              willChange: 'opacity, transform',
+              transition: 'opacity 1s ease-out, transform 1s ease-out'
+            }}
+          >
+            Fast. Documented. Traceable.
+          </p>
+        </div>
+
+        {/* First row - Two cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <Card scrollTrigger={0.25}>
+            <h3 className="text-xl font-semibold text-indigo-300 mb-3">Chaotic Code Debt</h3>
+            <p className="text-gray-300">
+              Unstructured development leading to technical debt, bugs, and delayed releases. A disorganized approach to software engineering that creates long-term problems.
+            </p>
+          </Card>
+          
+          <Card scrollTrigger={0.25}>
+            <h3 className="text-xl font-semibold text-indigo-300 mb-3">Error-Prone Processes</h3>
+            <p className="text-gray-300">
+              Manual deployments and lack of testing lead to frequent production issues and customer complaints. Without automated safeguards, risks multiply.
+            </p>
+          </Card>
         </div>
         
-        {/* Row 2: One centered card */}
-        <div className="flex justify-center mb-8">
-          <Card
-            title="Intelligent Transformation"
-            description="Automated refactoring with human-like understanding."
-            scrollTrigger={getScrollTrigger(0.12)}
-          />
+        {/* Second row - Centered card */}
+        <div className="grid grid-cols-1 mb-6">
+          <Card scrollTrigger={0.27} columnSpan={2}>
+            <h3 className="text-xl font-semibold text-blue-300 mb-3">Transformation Zone</h3>
+            <p className="text-gray-300">
+              The critical transition phase where teams adopt new practices, tools, and mindsets to bridge the gap between chaos and structure. This is where OpsPipe's guidance becomes most valuable.
+            </p>
+          </Card>
         </div>
         
-        {/* Row 3: Two cards side by side */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          <Card
-            title="Quality Assurance"
-            description="Comprehensive testing and validation of transformed code."
-            scrollTrigger={getScrollTrigger(0.16)}
-          />
-          <Card
-            title="Performance Optimization"
-            description="Enhanced code efficiency and maintainability."
-            scrollTrigger={getScrollTrigger(0.16)}
-          />
+        {/* Second Title - To Clarity */}
+        <div 
+          className="mb-16 mt-20 text-center"
+          style={title2Style}
+        >
+          <h2 className="text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-300 to-cyan-300 tracking-tight">
+            Engineering Excellence Achieved
+          </h2>
+          <p className="mt-2 text-xl text-blue-200/80">
+            The outcome of systematic transformation
+          </p>
         </div>
         
-        {/* Row 4: One centered card */}
-        <div className="flex justify-center">
-          <Card
-            title="Continuous Improvement"
-            description="Ongoing monitoring and optimization of your codebase."
-            scrollTrigger={getScrollTrigger(0.20)}
-          />
+        {/* Third row - Two cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <Card scrollTrigger={0.29}>
+            <h3 className="text-xl font-semibold text-blue-300 mb-3">Clean Architecture</h3>
+            <p className="text-gray-300">
+              Well-structured, maintainable code with clear separation of concerns. Every component has a single responsibility, making the system more reliable and easier to extend.
+            </p>
+          </Card>
+          
+          <Card scrollTrigger={0.29}>
+            <h3 className="text-xl font-semibold text-blue-300 mb-3">Automated Pipelines</h3>
+            <p className="text-gray-300">
+              Continuous integration and delivery with comprehensive testing and validation gates. This automation ensures consistent quality and dramatically reduces deployment risks.
+            </p>
+          </Card>
         </div>
-      </div>
-      
-      {/* Title Section - From Chaos to Clarity */}
-      <div className="relative z-10 max-w-4xl mx-auto pt-16 pb-10 text-center">
-        <h2 
-          className="text-4xl sm:text-5xl md:text-6xl font-bold mb-4 text-white"
-          style={{ 
-            opacity: calculateOpacity(0.60),
-            transform: calculateTransform(0.60),
-            willChange: 'opacity, transform'
-          }}
-        >
-          From Chaos to Clarity
-        </h2>
-        <p 
-          className="text-xl sm:text-2xl text-white/80 max-w-3xl mx-auto"
-          style={{ 
-            opacity: calculateOpacity(0.64),
-            transform: calculateTransform(0.64),
-            willChange: 'opacity, transform'
-          }}
-        >
-          Seamless AI-powered workflows, fully traceable, LEGIT certified.
-        </p>
+        
+        {/* Fourth row - Centered card */}
+        <div className="grid grid-cols-1">
+          <Card scrollTrigger={0.31} columnSpan={2}>
+            <h3 className="text-xl font-semibold text-cyan-300 mb-3">Predictable Delivery</h3>
+            <p className="text-gray-300">
+              Reliable release schedules with minimal disruption and maximum business value. Teams can now confidently commit to deadlines and deliver new features at a sustainable pace.
+            </p>
+          </Card>
+        </div>
       </div>
     </section>
   );

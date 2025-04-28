@@ -23,7 +23,7 @@ const services = [
 
 export default function Services() {
   return (
-    <section id="services" className="relative py-20 bg-curious-dark-800 overflow-hidden">
+    <section id="services" className="relative pt-8 pb-20 bg-curious-dark-800 overflow-hidden">
       {/* Circuit pattern background - subtle */}
       <div className="absolute inset-0 bg-circuit-pattern opacity-0 mix-blend-luminosity"></div>
       
@@ -31,7 +31,7 @@ export default function Services() {
       <div className="absolute -bottom-32 left-1/2 -translate-x-1/2 w-[800px] h-[200px] bg-gradient-to-r from-transparent via-curious-purple-600/20 to-transparent rounded-full blur-[100px] opacity-50"></div>
       
       <div className="relative z-10 max-w-7xl mx-auto px-4">
-        <h2 className="text-3xl md:text-4xl font-bold mb-12 text-center">
+        <h2 className="text-3xl md:text-4xl font-bold mb-10 text-center">
           <span className="bg-clip-text text-transparent bg-gradient-to-r from-curious-purple-400 to-curious-blue-400">
             Elite AI
           </span>{" "}

@@ -74,8 +74,8 @@ export default function NavBar() {
     <nav 
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         isScrolled 
-          ? 'bg-[#403962]/80 backdrop-blur-xl py-3 border-b border-[#5D45B8]/25 shadow-[0_4px_20px_-6px_rgba(93,69,184,0.35)]' 
-          : 'bg-transparent py-4'
+          ? 'bg-[#2D2940]/90 backdrop-blur-xl py-3 border-b border-[#5D45B8]/30 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.5)]' 
+          : 'bg-[#2D2940]/60 backdrop-blur-sm py-4 border-b border-[#2c2c2c] shadow-[0_2px_5px_rgba(0,0,0,0.3)]'
       }`}
       style={{ 
         willChange: 'background-color, box-shadow, padding',
@@ -161,7 +161,7 @@ export default function NavBar() {
 
       {/* Mobile Menu with refined styling */}
       {isMobileMenuOpen && (
-        <div className="md:hidden bg-[#403962]/90 backdrop-blur-xl border-b border-[#5D45B8]/30 shadow-md">
+        <div className="md:hidden bg-[#2D2940]/95 backdrop-blur-xl border-b border-[#2c2c2c] shadow-lg">
           <div className="px-4 py-5 space-y-4">
             {navLinks.map((link, index) => (
               <a
