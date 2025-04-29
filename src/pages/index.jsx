@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useMemo } from "react";
 import NavBar from '../components/NavBar';
 import Hero from '../components/Hero';
 import LogoStrip from '../components/LogoStrip';
@@ -56,13 +56,13 @@ export default function Home() {
   }, []);
   
   // Calculate scroll progress for DynamicExpansion (0 to 1 range)
-  // Adjusted to start only after scrolling significantly past the Hero
+  // Adjusted to start immediately on first scroll
   const calculateDynamicExpansionProgress = () => {
-    // Start showing cards only after 75% of the viewport height is scrolled
-    const triggerPoint = viewportHeight * 0.75;
+    // Start showing cards with minimal scroll
+    const triggerPoint = viewportHeight * 0.1;
     
-    // Use a smaller divisor for more gradual transition
-    const progress = Math.max(0, (scrollY - triggerPoint) / (viewportHeight * 0.8));
+    // Use a divisor that ensures quick initial appearance but smooth progression
+    const progress = Math.max(0, (scrollY - triggerPoint) / (viewportHeight * 1.2));
     
     // Return current progress, capped at 1
     return Math.min(1, progress);
@@ -81,10 +81,21 @@ export default function Home() {
   // Use the greater of current or last progress to ensure elements stay visible
   const dynamicExpansionProgress = Math.max(currentProgress, lastScrollProgress);
   
-  // Calculate parallax scroll positions for SVG layers
-  const chaoticLayerTransform = `translateY(${scrollY * 0.15}px)`;
-  const transitionLayerTransform = `translateY(${scrollY * 0.25}px)`;
-  const legitLayerTransform = `translateY(${scrollY * 0.35}px)`;
+  // Calculate parallax scroll positions with better performance
+  const chaoticLayerTransform = useMemo(() => 
+    `translateY(${scrollY * 0.15}px)`, 
+    [scrollY]
+  );
+
+  const transitionLayerTransform = useMemo(() => 
+    `translateY(${scrollY * 0.25}px)`, 
+    [scrollY]
+  );
+
+  const legitLayerTransform = useMemo(() => 
+    `translateY(${scrollY * 0.35}px)`, 
+    [scrollY]
+  );
   
   // Calculate transformation beam progress
   const beamStartTrigger = viewportHeight * 1.2; // Start after hero section
@@ -125,6 +136,15 @@ export default function Home() {
     return () => window.removeEventListener('scroll', calculateLogoStripOpacity);
   }, [viewportHeight]);
   
+  // Detect Safari for browser-specific optimizations
+  const [isSafari, setIsSafari] = useState(false);
+
+  useEffect(() => {
+    // Simple Safari detection
+    const isSafariCheck = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+    setIsSafari(isSafariCheck);
+  }, []);
+  
   return (
     <main className="min-h-screen bg-gradient-to-b from-[#5D45B8] via-[#403962] to-[#28293D] text-white antialiased relative overflow-hidden">
       {/* SVG Background Layers with Parallax Effect */}
@@ -134,62 +154,67 @@ export default function Home() {
         
         {/* Chaotic code pattern - starts visible at top */}
         <div 
-          className="absolute inset-0 w-full h-full z-0"
+          className={`absolute inset-0 w-full h-full z-0 parallax-layer ${isSafari ? 'safari-transform' : ''}`}
           style={{ 
-            transform: chaoticLayerTransform,
+            transform: isMobile ? `translateY(${Math.round(scrollY * 0.15)}px)` : chaoticLayerTransform,
             willChange: 'transform',
-            opacity: isMobile ? 0.15 : 0.25
+            opacity: isMobile ? 0.12 : 0.25,
+            backfaceVisibility: 'hidden'
           }}
         >
-          <div className="absolute top-0 left-0 w-full h-[150vh] bg-[url('/images/chaotic-code-pattern.svg')] bg-repeat bg-[length:500px_500px]"></div>
+          <div className="absolute top-0 left-0 w-full h-[150vh] bg-[url('/images/chaotic-code-pattern.svg')] bg-repeat bg-[length:400px_400px] sm:bg-[length:500px_500px]"></div>
         </div>
         
         {/* Transition pattern - middle layer */}
         <div 
-          className="absolute inset-0 w-full h-full z-1"
+          className={`absolute inset-0 w-full h-full z-1 parallax-layer ${isSafari ? 'safari-transform' : ''}`}
           style={{ 
-            transform: transitionLayerTransform,
+            transform: isMobile ? `translateY(${Math.round(scrollY * 0.25)}px)` : transitionLayerTransform,
             willChange: 'transform',
-            opacity: isMobile ? 0.12 : 0.2
+            opacity: isMobile ? 0.1 : 0.2,
+            backfaceVisibility: 'hidden'
           }}
         >
-          <div className="absolute top-[80vh] left-0 w-full h-[150vh] bg-[url('/images/transition-code-pattern.svg')] bg-repeat bg-[length:500px_500px]"></div>
+          <div className="absolute top-[80vh] left-0 w-full h-[150vh] bg-[url('/images/transition-code-pattern.svg')] bg-repeat bg-[length:400px_400px] sm:bg-[length:500px_500px]"></div>
         </div>
         
         {/* Legit code pattern - bottom layer */}
         <div 
-          className="absolute inset-0 w-full h-full z-2"
+          className={`absolute inset-0 w-full h-full z-2 parallax-layer ${isSafari ? 'safari-transform' : ''}`}
           style={{ 
-            transform: legitLayerTransform,
+            transform: isMobile ? `translateY(${Math.round(scrollY * 0.35)}px)` : legitLayerTransform,
             willChange: 'transform',
-            opacity: isMobile ? 0.1 : 0.18
+            opacity: isMobile ? 0.08 : 0.18,
+            backfaceVisibility: 'hidden'
           }}
         >
-          <div className="absolute top-[160vh] left-0 w-full h-[150vh] bg-[url('/images/legit-code-pattern.svg')] bg-repeat bg-[length:500px_500px]"></div>
+          <div className="absolute top-[160vh] left-0 w-full h-[150vh] bg-[url('/images/legit-code-pattern.svg')] bg-repeat bg-[length:400px_400px] sm:bg-[length:500px_500px]"></div>
         </div>
         
         {/* Transformation beam */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 h-full flex flex-col items-center z-3">
           {/* Vertical line that grows from top to bottom */}
           <div 
-            className="w-[2px] bg-gradient-to-b from-purple-300 to-blue-300"
+            className={`bg-gradient-to-b from-purple-300 to-blue-300 ${isSafari ? 'safari-transform' : ''}`}
             style={{ 
               height: beamHeight, 
               maxHeight: '100%',
               width: isMobile ? '1px' : '2px',
               opacity: 0.6,
               boxShadow: '0 0 8px rgba(147, 112, 219, 0.7)',
-              willChange: 'height'
+              willChange: 'height',
+              transform: 'translate3d(0,0,0)'
             }}
           ></div>
           
           {/* Transformation complete text */}
           <div 
-            className="absolute bottom-[20%] bg-gradient-to-r from-purple-400 to-blue-400 px-4 py-2 rounded-full text-white font-bold tracking-wider"
+            className={`absolute bottom-[20%] bg-gradient-to-r from-purple-400 to-blue-400 px-4 py-2 rounded-full text-white font-bold tracking-wider ${isSafari ? 'safari-transform' : ''}`}
             style={{ 
               opacity: transformationTextOpacity,
               transform: 'translateY(-50%)',
-              fontSize: isMobile ? '0.8rem' : '1rem'
+              fontSize: isMobile ? '0.8rem' : '1rem',
+              willChange: 'opacity'
             }}
           >
             Transformation Complete
@@ -213,7 +238,8 @@ export default function Home() {
           className="fixed bottom-0 left-0 right-0 w-full z-30 transition-opacity duration-700"
           style={{ 
             opacity: logoStripOpacity,
-            willChange: 'opacity'
+            willChange: 'opacity',
+            transform: 'translateZ(0)'
           }}
         >
           <LogoStrip />
@@ -264,6 +290,17 @@ export default function Home() {
           </div>
         </footer>
       </div>
+      
+      {/* Safari-specific optimizations */}
+      {isSafari && (
+        <style jsx>{`
+          .safari-transform {
+            -webkit-transform: translate3d(0, 0, 0);
+            -webkit-backface-visibility: hidden;
+            -webkit-perspective: 1000;
+          }
+        `}</style>
+      )}
     </main>
   );
 }

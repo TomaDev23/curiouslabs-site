@@ -87,27 +87,27 @@ export default function DynamicExpansion({ scrollProgress }) {
   };
   
   // Function to calculate card visibility and position
-  const calculateCardStyle = (scrollTrigger, animationMultiplier = 10) => {
-    // Determine when card should start appearing - use lower values
-    const startPoint = scrollTrigger * 0.5; // Lower the trigger thresholds by half
+  const calculateCardStyle = (scrollTrigger, animationMultiplier = 7) => {
+    // Determine when card should start appearing - use direct trigger values
+    const startPoint = scrollTrigger;
     
     // Ensure cards stay visible once they appear
     const hasAppeared = scrollProgress > startPoint;
     
-    // Calculate card opacity based on scroll progress
+    // Calculate card opacity based on scroll progress with smoother curve
     const opacity = hasAppeared 
       ? Math.min(1, (scrollProgress - startPoint) * animationMultiplier) 
       : 0;
     
-    // Calculate vertical offset - moving up as scroll increases
+    // Calculate vertical offset - moving up as scroll increases with smoother motion
     const translateY = hasAppeared 
-      ? Math.max(0, 40 - ((scrollProgress - startPoint) * animationMultiplier * 100)) 
-      : 40;
+      ? Math.max(0, 30 - ((scrollProgress - startPoint) * animationMultiplier * 90)) 
+      : 30;
     
     return {
       opacity,
       transform: `translateY(${translateY}px)`,
-      transition: 'opacity 0.5s ease-out, transform 0.6s ease-out',
+      transition: 'opacity 0.6s ease-out, transform 0.7s ease-out',
       willChange: 'opacity, transform'
     };
   };
@@ -154,10 +154,12 @@ export default function DynamicExpansion({ scrollProgress }) {
   const title2Style = calculateTitleStyle(0.3);
 
   return (
-    <section className="pt-48 pb-32 relative">
+    <section className={`pt-24 sm:pt-32 pb-32 relative transition-opacity duration-700 ease-out ${
+      scrollProgress > 0.01 ? 'opacity-100' : 'opacity-0'
+    }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* We Fix Broken Code Section with delayed appearance */}
-        <div className="text-center mb-40">
+        <div className="text-center mb-32 mt-16">
           <h2 
             className="text-4xl sm:text-5xl md:text-6xl font-bold mb-4 text-white"
             style={{ 
@@ -184,14 +186,14 @@ export default function DynamicExpansion({ scrollProgress }) {
 
         {/* First row - Two cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-          <Card scrollTrigger={0.25}>
+          <Card scrollTrigger={0.04}>
             <h3 className="text-xl font-semibold text-indigo-300 mb-3">Chaotic Code Debt</h3>
             <p className="text-gray-300">
               Unstructured development leading to technical debt, bugs, and delayed releases. A disorganized approach to software engineering that creates long-term problems.
             </p>
           </Card>
           
-          <Card scrollTrigger={0.25}>
+          <Card scrollTrigger={0.04}>
             <h3 className="text-xl font-semibold text-indigo-300 mb-3">Error-Prone Processes</h3>
             <p className="text-gray-300">
               Manual deployments and lack of testing lead to frequent production issues and customer complaints. Without automated safeguards, risks multiply.
@@ -201,7 +203,7 @@ export default function DynamicExpansion({ scrollProgress }) {
         
         {/* Second row - Centered card */}
         <div className="grid grid-cols-1 mb-6">
-          <Card scrollTrigger={0.27} columnSpan={2}>
+          <Card scrollTrigger={0.08} columnSpan={2}>
             <h3 className="text-xl font-semibold text-blue-300 mb-3">Transformation Zone</h3>
             <p className="text-gray-300">
               The critical transition phase where teams adopt new practices, tools, and mindsets to bridge the gap between chaos and structure. This is where OpsPipe's guidance becomes most valuable.
@@ -212,7 +214,14 @@ export default function DynamicExpansion({ scrollProgress }) {
         {/* Second Title - To Clarity */}
         <div 
           className="mb-16 mt-20 text-center"
-          style={title2Style}
+          style={{ 
+            opacity: scrollProgress > 0.12 ? Math.min(1, (scrollProgress - 0.12) * 8) : 0,
+            transform: scrollProgress > 0.12 
+              ? `translateY(${Math.max(0, 30 - ((scrollProgress - 0.12) * 15 * 10))}px)` 
+              : 'translateY(30px)',
+            transition: 'opacity 0.5s ease-out, transform 0.5s ease-out',
+            willChange: 'opacity, transform'
+          }}
         >
           <h2 className="text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-300 to-cyan-300 tracking-tight">
             Engineering Excellence Achieved
@@ -224,14 +233,14 @@ export default function DynamicExpansion({ scrollProgress }) {
         
         {/* Third row - Two cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-          <Card scrollTrigger={0.29}>
+          <Card scrollTrigger={0.16}>
             <h3 className="text-xl font-semibold text-blue-300 mb-3">Clean Architecture</h3>
             <p className="text-gray-300">
               Well-structured, maintainable code with clear separation of concerns. Every component has a single responsibility, making the system more reliable and easier to extend.
             </p>
           </Card>
           
-          <Card scrollTrigger={0.29}>
+          <Card scrollTrigger={0.16}>
             <h3 className="text-xl font-semibold text-blue-300 mb-3">Automated Pipelines</h3>
             <p className="text-gray-300">
               Continuous integration and delivery with comprehensive testing and validation gates. This automation ensures consistent quality and dramatically reduces deployment risks.
@@ -241,7 +250,7 @@ export default function DynamicExpansion({ scrollProgress }) {
         
         {/* Fourth row - Centered card */}
         <div className="grid grid-cols-1">
-          <Card scrollTrigger={0.31} columnSpan={2}>
+          <Card scrollTrigger={0.20} columnSpan={2}>
             <h3 className="text-xl font-semibold text-cyan-300 mb-3">Predictable Delivery</h3>
             <p className="text-gray-300">
               Reliable release schedules with minimal disruption and maximum business value. Teams can now confidently commit to deadlines and deliver new features at a sustainable pace.

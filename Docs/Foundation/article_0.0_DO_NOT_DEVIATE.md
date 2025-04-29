@@ -83,4 +83,27 @@ Every component must be:
 
 This is how we maintain visual and code quality.
 
+📜 Official Additional Directives for Cursor
+🔵 Environment Rule:
+
+Do NOT rerun or reset the development server between minor changes unless absolutely necessary.
+
+Use Hot Reload behavior (Vite dev server) to preview and validate changes in real-time.
+
+🔵 Scope Rule:
+
+Cursor must ONLY touch files and components explicitly mentioned in the mission scope (Hero section components and DynamicExpansion/Parallax layers).
+
+Absolutely forbidden to modify, move, or refactor any other sections, structures, or assets without explicit Commander permission.
+
+🔵 Sacred Location Rule:
+
+The file and folder structure is locked.
+
+No moving, renaming, or reorganizing components, pages, assets, or folders unless directly commanded.
+
+Treat the project's structure like sacred architecture until post-launch cleanup.
+
+
+
 **– Commander Authorization Required for Exceptions**
