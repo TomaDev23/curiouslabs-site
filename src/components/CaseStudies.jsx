@@ -1,5 +1,5 @@
 import React from 'react';
-import CaseStudyGrid from '../components/CaseStudies/CaseStudyGrid';
+import CaseStudyGrid from '../components/casestudies/CaseStudyGrid';
 
 export default function CaseStudies() {
   return (
