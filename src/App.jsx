@@ -2,21 +2,22 @@ import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import ScrollToTop from './components/ScrollToTop';
 
-// Import existing pages
-import Home from './pages/index.jsx';
-import ProductsPortal from './pages/products/index.jsx';
-import Aegis from './pages/products/aegis.jsx';
-import OpsPipe from './pages/products/opspipe.jsx';
-import CodeLab from './pages/codelab.jsx';
+// ✅ Use path alias or direct directory import
+import Home from './pages'; // This resolves to index.jsx safely
 
-// Import our newly created pages
-import Blog from './pages/blog.jsx';
-import About from './pages/about.jsx';
-import Contact from './pages/contact.jsx';
-import Documentation from './pages/docs.jsx';
-import NotFound from './pages/404.jsx';
+// ✅ Valid page imports
+import ProductsPortal from './pages/products';
+import Aegis from './pages/products/aegis';
+import OpsPipe from './pages/products/opspipe';
+import CodeLab from './pages/codelab';
 
-// Import placeholder pages for now
+import Blog from './pages/blog';
+import About from './pages/about';
+import Contact from './pages/contact';
+import Documentation from './pages/docs';
+import NotFound from './pages/404';
+
+// 🧪 Temporary stubs
 const MoonSignal = () => <div>MoonSignal Page</div>;
 const Curious = () => <div>Curious Page</div>;
 const Guardian = () => <div>Guardian Page</div>;
@@ -39,9 +40,8 @@ export default function App() {
         <Route path="/contact" element={<Contact />} />
         <Route path="/docs" element={<Documentation />} />
         <Route path="/docs/*" element={<Documentation />} />
-        {/* 404 catch-all route */}
         <Route path="*" element={<NotFound />} />
       </Routes>
     </>
   );
-} 
+}
