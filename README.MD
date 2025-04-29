@@ -1,73 +1,98 @@
-
 # 📄 Full CuriousLabs README.md (Reformatted)
 
-```markdown
-# CuriousLabs — AI Tactical CodeOps Services
+# CuriousLabs Website
 
-CuriousLabs is an elite AI-driven CodeOps lab — delivering clean, fast, and trace-validated code repair missions for founders, dev teams, and indie hackers.
+This repository contains the code for the CuriousLabs website, a modern web application built with React and Tailwind CSS.
 
-This repository contains the official **CuriousLabs Landing Page**, built using:
-- ⚡ React
-- 🎨 Tailwind CSS
-- ⚙️ Vite
+## Table of Contents
 
----
+- [Overview](#overview)
+- [Features](#features)
+- [Installation](#installation)
+- [Development](#development)
+- [Project Structure](#project-structure)
+- [Utilities](#utilities)
+- [Contributing](#contributing)
 
-## 🚀 What CuriousLabs Offers
+## Overview
 
-- Bug Fixes (with full validation)
-- AI-enhanced Test Repairs
-- Security Patching
-- Code Documentation as a Service
-- Tactical Website Launch Packages
+The CuriousLabs website showcases the company's AI products and services with a modern, responsive design. The site features smooth animations, interactive elements, and a consistent design language across all pages.
 
----
+## Features
 
-## 📦 Project Structure
+- Responsive design optimized for all device sizes
+- Modern UI with animations and interactive elements
+- React Router for seamless navigation
+- Centralized asset management
+- Custom hooks for scroll effects and responsiveness
+- Modular component structure
 
-```plaintext
-src/
-├── components/    # Hero, Services, Metrics, Case Studies, Testimonials
-├── pages/         # Main landing page
-├── index.css      # Tailwind CSS base
-└── main.jsx       # Entry point
+## Installation
+
+To install and set up the project locally:
+
+```bash
+# Clone the repository
+git clone https://github.com/your-username/curiouslabs-website.git
+
+# Navigate to the project directory
+cd curiouslabs-website
+
+# Install dependencies
+npm install
 ```
 
----
+## Development
 
-## 🌐 Live Deployment
+To start the development server:
 
-_Localhost preview available at:_  
-**http://localhost:5173**
+```bash
+npm run dev
+```
 
-_Production deployment will be announced soon._
+This will start the development server at http://localhost:5181 (or another port if 5181 is in use).
 
----
+## Project Structure
 
-## 🧠 About the Project
+```
+/src
+  /components       # Reusable UI components
+    /Hero           # Modularized Hero components
+  /hooks            # Custom React hooks
+  /pages            # Page components
+    /products       # Product pages
+  /utils            # Utility functions
+  index.jsx         # Application entry point
+  App.jsx           # Main app component
+  index.css         # Global styles
+/public             # Static assets
+  /images           # Images and SVGs
+/scripts            # Helper scripts
+```
 
-CuriousLabs landing page is designed to demonstrate tactical execution, modular component architecture, and AI-accelerated frontend development.
+## Utilities
 
-Built under a pure "no-fluff" philosophy:
-- Tailwind-only styling
-- Component modularity
-- Dynamic data mapping
-- Mobile-first responsiveness
-- Minimalist, performance-first mindset
+### Product Page Generator
 
-Each section (Hero, Services, Metrics, Case Studies, Testimonials) is cleanly separated for maximum scalability and reusability.
+The project includes a script to generate new product pages with consistent styling:
 
----
+```bash
+node scripts/create-product-page.js
+```
 
-## 📜 License
+Follow the prompts to create a new product page with:
+- Product name
+- Description
+- Up to 6 key features
 
-This repository is currently private-use focused.  
-If you clone or fork it for your own learning, **please retain original attribution**.
+## Contributing
 
-Commercial reuse or resale is not permitted without explicit permission.
+1. Create a feature branch: `git checkout -b feature/your-feature-name`
+2. Make your changes
+3. Test your changes thoroughly
+4. Commit and push your changes
+5. Create a pull request
 
----
+## License
 
-_Curiosity isn't just a trait — it's a method._ 🧠
-
-– Tomaly | CuriousLabs
+MIT

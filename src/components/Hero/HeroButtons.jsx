@@ -1,15 +1,15 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 const HeroButtons = () => {
   return (
-    <div className="flex flex-col sm:flex-row gap-5 sm:gap-6 w-full max-w-xs sm:max-w-none mx-auto">
-      <button className="px-6 sm:px-8 py-3 bg-gradient-to-r from-[#5D45B8] to-[#4A3E80] text-white font-medium rounded-md shadow-md hover:shadow-lg hover:shadow-[#5D45B8]/30 hover:translate-y-[-2px] transition-all duration-300 whitespace-nowrap">
-        Send First Mission
-      </button>
-      
-      <button className="px-6 sm:px-8 py-3 bg-white/5 backdrop-blur-sm border border-white/20 text-white font-medium rounded-md hover:bg-white/10 hover:border-white/30 transition-all duration-300 whitespace-nowrap">
-        View Case Studies
-      </button>
+    <div className="flex flex-col sm:flex-row justify-center gap-4">
+      <Link to="/products" className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white font-medium py-3 px-6 rounded-md transition-all duration-300">
+        Explore Our Products
+      </Link>
+      <Link to="/codelab" className="bg-transparent border border-purple-500 text-white hover:bg-purple-500/10 font-medium py-3 px-6 rounded-md transition-all duration-300">
+        Visit CodeLab
+      </Link>
     </div>
   );
 };

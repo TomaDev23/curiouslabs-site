@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="800" height="600" xmlns="http://www.w3.org/2000/svg">
+  <!-- Define the LEGIT code -->
+  <defs>
+    <pattern id="legit-code" patternUnits="userSpaceOnUse" width="800" height="600">
+      <g opacity="0.2">
+        <!-- Clean, structured code with proper comments and error handling -->
+        <text x="200" y="40" font-family="'Courier New', monospace" font-size="12" fill="#7ed4fc" opacity="0.8">/**</text>
+        <text x="200" y="60" font-family="'Courier New', monospace" font-size="12" fill="#7ed4fc" opacity="0.8"> * Process data with validation and error handling</text>
+        <text x="200" y="80" font-family="'Courier New', monospace" font-size="12" fill="#7ed4fc" opacity="0.8"> * @param {Object} data - The input data</text>
+        <text x="200" y="100" font-family="'Courier New', monospace" font-size="12" fill="#7ed4fc" opacity="0.8"> * @returns {Object} Processed result</text>
+        <text x="200" y="120" font-family="'Courier New', monospace" font-size="12" fill="#7ed4fc" opacity="0.8"> */</text>
+        <text x="200" y="140" font-family="'Courier New', monospace" font-size="12" fill="#7ed4fc" opacity="0.8">function processData(data) {</text>
+        <text x="200" y="160" font-family="'Courier New', monospace" font-size="12" fill="#7ed4fc" opacity="0.8">  // Input validation</text>
+        <text x="200" y="180" font-family="'Courier New', monospace" font-size="12" fill="#7ed4fc" opacity="0.8">  if (!validator.isValid(data)) {</text>
+        <text x="200" y="200" font-family="'Courier New', monospace" font-size="12" fill="#7ed4fc" opacity="0.8">    logger.error('Invalid data format');</text>
+        <text x="200" y="220" font-family="'Courier New', monospace" font-size="12" fill="#7ed4fc" opacity="0.8">    throw new ValidationError('Invalid data');</text>
+        <text x="200" y="240" font-family="'Courier New', monospace" font-size="12" fill="#7ed4fc" opacity="0.8">  }</text>
+        <text x="200" y="260" font-family="'Courier New', monospace" font-size="12" fill="#7ed4fc" opacity="0.8">  </text>
+        <text x="200" y="280" font-family="'Courier New', monospace" font-size="12" fill="#7ed4fc" opacity="0.8">  try {</text>
+        <text x="200" y="300" font-family="'Courier New', monospace" font-size="12" fill="#7ed4fc" opacity="0.8">    const result = transformer.process(data);</text>
+        <text x="200" y="320" font-family="'Courier New', monospace" font-size="12" fill="#7ed4fc" opacity="0.8">    logger.info('Data processed successfully');</text>
+        <text x="200" y="340" font-family="'Courier New', monospace" font-size="12" fill="#7ed4fc" opacity="0.8">    return result;</text>
+        <text x="200" y="360" font-family="'Courier New', monospace" font-size="12" fill="#7ed4fc" opacity="0.8">  } catch (error) {</text>
+        <text x="200" y="380" font-family="'Courier New', monospace" font-size="12" fill="#7ed4fc" opacity="0.8">    logger.error(`Processing failed: ${error.message}`);</text>
+        <text x="200" y="400" font-family="'Courier New', monospace" font-size="12" fill="#7ed4fc" opacity="0.8">    throw new ProcessingError(error);</text>
+        <text x="200" y="420" font-family="'Courier New', monospace" font-size="12" fill="#7ed4fc" opacity="0.8">  }</text>
+        <text x="200" y="440" font-family="'Courier New', monospace" font-size="12" fill="#7ed4fc" opacity="0.8">}</text>
+        
+        <!-- Additional clean code structure -->
+        <text x="200" y="480" font-family="'Courier New', monospace" font-size="12" fill="#7ed4fc" opacity="0.8">/**</text>
+        <text x="200" y="500" font-family="'Courier New', monospace" font-size="12" fill="#7ed4fc" opacity="0.8"> * Validate configuration before application startup</text>
+        <text x="200" y="520" font-family="'Courier New', monospace" font-size="12" fill="#7ed4fc" opacity="0.8"> * @param {Config} config - Application configuration</text>
+        <text x="200" y="540" font-family="'Courier New', monospace" font-size="12" fill="#7ed4fc" opacity="0.8"> * @returns {boolean} Validation result</text>
+        <text x="200" y="560" font-family="'Courier New', monospace" font-size="12" fill="#7ed4fc" opacity="0.8"> */</text>
+        <text x="200" y="580" font-family="'Courier New', monospace" font-size="12" fill="#7ed4fc" opacity="0.8">function validateConfig(config) {</text>
+      </g>
+    </pattern>
+  </defs>
+  
+  <!-- Apply the pattern -->
+  <rect width="800" height="600" fill="url(#legit-code)" />
+</svg> 

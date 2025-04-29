@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useMemo } from "react";
+import React, { useState, useEffect, useRef } from 'react';
 import NavBar from '../components/NavBar';
 import Hero from '../components/Hero';
 import LogoStrip from '../components/LogoStrip';
@@ -6,260 +6,147 @@ import Services from '../components/Services';
 import Metrics from '../components/Metrics';
 import CaseStudies from '../components/CaseStudies';
 import Testimonials from '../components/Testimonials';
+import Footer from '../components/Footer';
 import ScrollReveal from '../components/ScrollReveal';
 import DynamicExpansion from '../components/DynamicExpansion';
+import useParallax from '../hooks/useParallax';
+import useBreakpoint from '../hooks/useBreakpoint';
+import { IMAGES } from '../utils/assets';
 
 export default function Home() {
-  const [scrollY, setScrollY] = useState(0);
+  const [scrollPosition, setScrollPosition] = useState(0);
   const [viewportHeight, setViewportHeight] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
-  const [lastScrollProgress, setLastScrollProgress] = useState(0);
+  
+  // Reference for DOM elements
   const metricsRef = useRef(null);
   
-  // Track scroll position and viewport height for scroll-based effects
+  // Dynamic progress for animations based on scroll position
+  const dynamicExpansionProgress = Math.min(1, Math.max(0, (scrollPosition - viewportHeight * 0.8) / (viewportHeight * 0.5)));
+  
+  // Calculate LogoStrip opacity based on metrics section position
+  const logoStripOpacity = metricsRef.current 
+    ? Math.max(0, 1 - Math.max(0, (scrollPosition - metricsRef.current.offsetTop + 300) / 300))
+    : 1;
+
+  // Update scroll position with requestAnimationFrame for better performance
   useEffect(() => {
-    // Handler to update scroll position
-    const handleScroll = () => {
-      setScrollY(window.scrollY);
-    };
-    
-    // Handler to update viewport height on resize
-    const handleResize = () => {
-      setViewportHeight(window.innerHeight);
-      setIsMobile(window.innerWidth < 768);
-    };
-    
-    // Initialize viewport height and mobile check
-    handleResize();
-    
-    // Optimize scroll performance with requestAnimationFrame
     let ticking = false;
-    const throttledScroll = () => {
+    
+    const handleScroll = () => {
       if (!ticking) {
         window.requestAnimationFrame(() => {
-          setScrollY(window.scrollY);
+          setScrollPosition(window.scrollY);
           ticking = false;
         });
         ticking = true;
       }
     };
     
+    const handleResize = () => {
+      setViewportHeight(window.innerHeight);
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    // Set initial values
+    handleResize();
+    
     // Add event listeners
-    window.addEventListener('scroll', throttledScroll);
+    window.addEventListener('scroll', handleScroll);
     window.addEventListener('resize', handleResize);
     
-    // Cleanup event listeners
+    // Remove event listeners on cleanup
     return () => {
-      window.removeEventListener('scroll', throttledScroll);
+      window.removeEventListener('scroll', handleScroll);
       window.removeEventListener('resize', handleResize);
     };
   }, []);
   
-  // Calculate scroll progress for DynamicExpansion (0 to 1 range)
-  // Adjusted to start immediately on first scroll
-  const calculateDynamicExpansionProgress = () => {
-    // Start showing cards with minimal scroll
-    const triggerPoint = viewportHeight * 0.1;
-    
-    // Use a divisor that ensures quick initial appearance but smooth progression
-    const progress = Math.max(0, (scrollY - triggerPoint) / (viewportHeight * 1.2));
-    
-    // Return current progress, capped at 1
-    return Math.min(1, progress);
-  };
-
-  // Calculate current progress
-  const currentProgress = calculateDynamicExpansionProgress();
-  
-  // Update lastScrollProgress if current progress is greater
-  useEffect(() => {
-    if (currentProgress > lastScrollProgress) {
-      setLastScrollProgress(currentProgress);
-    }
-  }, [currentProgress, lastScrollProgress]);
-  
-  // Use the greater of current or last progress to ensure elements stay visible
-  const dynamicExpansionProgress = Math.max(currentProgress, lastScrollProgress);
-  
-  // Calculate parallax scroll positions with better performance
-  const chaoticLayerTransform = useMemo(() => 
-    `translateY(${scrollY * 0.15}px)`, 
-    [scrollY]
-  );
-
-  const transitionLayerTransform = useMemo(() => 
-    `translateY(${scrollY * 0.25}px)`, 
-    [scrollY]
-  );
-
-  const legitLayerTransform = useMemo(() => 
-    `translateY(${scrollY * 0.35}px)`, 
-    [scrollY]
-  );
-  
-  // Calculate LogoStrip opacity based on metrics section position
-  const [logoStripOpacity, setLogoStripOpacity] = useState(1);
-  
-  useEffect(() => {
-    const calculateLogoStripOpacity = () => {
-      if (metricsRef.current) {
-        const metricsPosition = metricsRef.current.getBoundingClientRect().top;
-        // Start fading when metrics section is 150% of viewport height away
-        const fadeStartDistance = viewportHeight * 1.5;
-        // Complete fade when metrics section is 75% of viewport height away
-        const fadeEndDistance = viewportHeight * 0.75;
-        
-        if (metricsPosition <= fadeStartDistance) {
-          const fadeProgress = Math.max(0, Math.min(1, 
-            (metricsPosition - fadeEndDistance) / (fadeStartDistance - fadeEndDistance)
-          ));
-          setLogoStripOpacity(fadeProgress);
-        } else {
-          setLogoStripOpacity(1);
-        }
-      }
-    };
-    
-    calculateLogoStripOpacity();
-    window.addEventListener('scroll', calculateLogoStripOpacity);
-    return () => window.removeEventListener('scroll', calculateLogoStripOpacity);
-  }, [viewportHeight]);
-  
-  // Detect Safari for browser-specific optimizations
-  const [isSafari, setIsSafari] = useState(false);
-
-  useEffect(() => {
-    // Simple Safari detection
-    const isSafariCheck = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-    setIsSafari(isSafariCheck);
-  }, []);
-  
   return (
-    <main className="min-h-screen bg-gradient-to-b from-[#5D45B8] via-[#403962] to-[#28293D] text-white antialiased relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-b from-[#1A1A2E] via-[#272750] to-[#1A1A2E] relative overflow-hidden">
       {/* SVG Background Layers with Parallax Effect */}
-      <div className="absolute inset-0 w-full h-full overflow-hidden z-0">
-        {/* Base gradient layer */}
-        <div className="absolute inset-0 bg-gradient-to-r from-[#5D45B8]/15 via-[#383053]/10 to-transparent opacity-[0.2]"></div>
-        
-        {/* Chaotic code pattern - starts visible at top */}
-        <div 
-          className={`absolute inset-0 w-full h-full z-0 parallax-layer ${isSafari ? 'safari-transform' : ''}`}
-          style={{ 
-            transform: isMobile ? `translateY(${Math.round(scrollY * 0.15)}px)` : chaoticLayerTransform,
-            willChange: 'transform',
-            opacity: isMobile ? 0.12 : 0.25,
-            backfaceVisibility: 'hidden'
-          }}
-        >
-          <div className="absolute top-0 left-0 w-full h-[150vh] bg-[url('/images/chaotic-code-pattern.svg')] bg-repeat bg-[length:400px_400px] sm:bg-[length:500px_500px]"></div>
-        </div>
-        
-        {/* Transition pattern - middle layer */}
-        <div 
-          className={`absolute inset-0 w-full h-full z-1 parallax-layer ${isSafari ? 'safari-transform' : ''}`}
-          style={{ 
-            transform: isMobile ? `translateY(${Math.round(scrollY * 0.25)}px)` : transitionLayerTransform,
-            willChange: 'transform',
-            opacity: isMobile ? 0.1 : 0.2,
-            backfaceVisibility: 'hidden'
-          }}
-        >
-          <div className="absolute top-[80vh] left-0 w-full h-[150vh] bg-[url('/images/transition-code-pattern.svg')] bg-repeat bg-[length:400px_400px] sm:bg-[length:500px_500px]"></div>
-        </div>
-        
-        {/* Legit code pattern - bottom layer */}
-        <div 
-          className={`absolute inset-0 w-full h-full z-2 parallax-layer ${isSafari ? 'safari-transform' : ''}`}
-          style={{ 
-            transform: isMobile ? `translateY(${Math.round(scrollY * 0.35)}px)` : legitLayerTransform,
-            willChange: 'transform',
-            opacity: isMobile ? 0.08 : 0.18,
-            backfaceVisibility: 'hidden'
-          }}
-        >
-          <div className="absolute top-[160vh] left-0 w-full h-[150vh] bg-[url('/images/legit-code-pattern.svg')] bg-repeat bg-[length:400px_400px] sm:bg-[length:500px_500px]"></div>
-        </div>
-        
-        {/* Single elegant blob for depth */}
-        <div 
-          className="absolute top-[5%] left-[5%] w-[500px] h-[500px] bg-gradient-to-br from-[#5D45B8]/8 to-transparent rounded-full blur-3xl opacity-[0.15]"
-          style={{ willChange: 'transform' }}
-        ></div>
+      <div 
+        className="absolute inset-0 z-0 pointer-events-none" 
+        style={{ 
+          opacity: isMobile ? 0.15 : 0.25,
+          transform: `translateY(${scrollPosition * 0.15}px)` 
+        }}
+      >
+        <img 
+          src={IMAGES.SVG.CHAOTIC_CODE}
+          alt="" 
+          className="w-full h-full object-cover" 
+        />
       </div>
       
-      {/* Foreground Content */}
-      <div className="relative z-10">
-        {/* Navigation */}
-        <NavBar />
-        
-        {/* LogoStrip - Fixed at bottom from page load */}
-        <div 
-          className="fixed bottom-0 left-0 right-0 w-full z-30 transition-opacity duration-700"
-          style={{ 
-            opacity: logoStripOpacity,
-            willChange: 'opacity',
-            transform: 'translateZ(0)'
+      <div 
+        className="absolute inset-0 z-0 pointer-events-none" 
+        style={{ 
+          opacity: isMobile ? 0.15 : 0.25,
+          transform: `translateY(${scrollPosition * 0.25}px)` 
+        }}
+      >
+        <img 
+          src={IMAGES.SVG.LEGIT_CODE}
+          alt="" 
+          className="w-full h-full object-cover opacity-0 transition-opacity duration-1000"
+          style={{
+            opacity: dynamicExpansionProgress
           }}
-        >
-          <LogoStrip />
-        </div>
-        
-        {/* Unified container for all main content */}
-        <div className="relative">
-          {/* Hero Section */}
-          <div className="relative pt-16 pb-0 min-h-[85vh] z-20">
-            <Hero />
-          </div>
-          
-          {/* Dynamic expansion section with no negative margin */}
-          <div className="relative z-20">
-            <DynamicExpansion scrollProgress={dynamicExpansionProgress} />
-          </div>
-          
-          {/* Services section - reduced spacing for better flow */}
-          <div className="relative z-20">
-            <ScrollReveal animation="fade-in-up" delay="0.1s" id="services">
-              <Services />
-            </ScrollReveal>
-          </div>
-        </div>
-        
-        {/* Sections that come after the unified container */}
-        <div className="relative z-40">
-          <div ref={metricsRef} id="metrics">
-            <ScrollReveal animation="fade-in-up" delay="0.2s">
-              <Metrics />
-            </ScrollReveal>
-          </div>
-          
-          <ScrollReveal animation="fade-in-up" delay="0.3s" id="case-studies">
-            <CaseStudies />
-          </ScrollReveal>
-          
-          <ScrollReveal animation="fade-in-up" delay="0.4s">
-            <Testimonials />
-          </ScrollReveal>
-        </div>
-        
-        <footer className="py-12 bg-gradient-to-b from-transparent to-[#28293D]/90 border-t border-[#3D3A63]/20 backdrop-blur-sm">
-          <div className="max-w-7xl mx-auto px-4 text-center">
-            <p className="text-gray-400 text-sm">
-              &copy; {new Date().getFullYear()} CuriousLabs. All rights reserved.
-            </p>
-          </div>
-        </footer>
+        />
       </div>
       
-      {/* Safari-specific optimizations */}
-      {isSafari && (
-        <style jsx>{`
-          .safari-transform {
-            -webkit-transform: translate3d(0, 0, 0);
-            -webkit-backface-visibility: hidden;
-            -webkit-perspective: 1000;
-          }
-        `}</style>
-      )}
-    </main>
+      {/* Transformation Beam */}
+      <div 
+        className="absolute left-1/2 top-[100vh] z-1 pointer-events-none" 
+        style={{ 
+          width: isMobile ? '1px' : '2px',
+          height: `${dynamicExpansionProgress * viewportHeight * 1.2}px`,
+          background: 'linear-gradient(to bottom, rgba(147, 51, 234, 0.7), rgba(59, 130, 246, 0.7))',
+          opacity: dynamicExpansionProgress < 0.1 ? 0 : dynamicExpansionProgress,
+          transform: 'translateX(-50%)',
+        }}
+      >
+        {/* Transformation Complete Text */}
+        <div 
+          className="absolute bottom-0 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-purple-500 to-blue-500 text-white px-3 py-1 rounded whitespace-nowrap"
+          style={{ 
+            opacity: dynamicExpansionProgress > 0.8 ? 1 : 0,
+            fontSize: isMobile ? '0.75rem' : '0.875rem'
+          }}
+        >
+          Transformation Complete
+        </div>
+      </div>
+      
+      <NavBar />
+      
+      <main className="relative z-10">
+        {/* Hero Section */}
+        <Hero />
+        
+        {/* Dynamic Expansion Section */}
+        <DynamicExpansion scrollProgress={dynamicExpansionProgress} />
+        
+        {/* Logo Strip with fading effect */}
+        <LogoStrip style={{ opacity: logoStripOpacity }} />
+        
+        {/* Services Section */}
+        <Services />
+        
+        {/* Metrics Section */}
+        <div ref={metricsRef}>
+          <Metrics />
+        </div>
+        
+        {/* Case Studies Section */}
+        <CaseStudies />
+        
+        {/* Testimonials Section */}
+        <Testimonials />
+      </main>
+      
+      <Footer />
+    </div>
   );
 }
