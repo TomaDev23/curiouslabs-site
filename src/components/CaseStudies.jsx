@@ -1,18 +1,5 @@
 import React from 'react';
-import CaseStudyGrid from './CaseStudies/CaseStudyGrid';
-
-const caseStudies = [
-  {
-    title: "CLI Parser Repair",
-    problem: "Broken OCR pipelines with async edge cases.",
-    solution: "Dynamic agent fallback tree rebuilt with 100% test pass.",
-  },
-  {
-    title: "Security Config Recovery",
-    problem: "Leaking token through public headers.",
-    solution: "Token rotation and HMAC guards implemented.",
-  },
-];
+import CaseStudyGrid from '../components/CaseStudies/CaseStudyGrid';
 
 export default function CaseStudies() {
   return (
