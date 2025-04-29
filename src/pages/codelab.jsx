@@ -9,6 +9,8 @@ import Metrics from '../components/Metrics';
 import CaseStudies from '../components/CaseStudies';
 import Testimonials from '../components/Testimonials';
 import ScrollReveal from '../components/ScrollReveal';
+import ScrollToTop from '../components/ScrollToTop';
+import { IMAGES } from '../utils/assets';
 
 export default function CodeLab() {
   const [scrollY, setScrollY] = useState(0);
@@ -151,7 +153,10 @@ export default function CodeLab() {
             backfaceVisibility: 'hidden'
           }}
         >
-          <div className="absolute top-0 left-0 w-full h-[150vh] bg-[url('/images/chaotic-code-pattern.svg')] bg-repeat bg-[length:400px_400px] sm:bg-[length:500px_500px]"></div>
+          <div 
+            className="absolute top-0 left-0 w-full h-[150vh] bg-repeat bg-[length:400px_400px] sm:bg-[length:500px_500px]"
+            style={{ backgroundImage: `url(${IMAGES.SVG.CHAOTIC_CODE})` }}
+          ></div>
         </div>
         
         {/* Transition pattern - middle layer */}
@@ -164,7 +169,10 @@ export default function CodeLab() {
             backfaceVisibility: 'hidden'
           }}
         >
-          <div className="absolute top-[80vh] left-0 w-full h-[150vh] bg-[url('/images/transition-code-pattern.svg')] bg-repeat bg-[length:400px_400px] sm:bg-[length:500px_500px]"></div>
+          <div 
+            className="absolute top-[80vh] left-0 w-full h-[150vh] bg-repeat bg-[length:400px_400px] sm:bg-[length:500px_500px]"
+            style={{ backgroundImage: `url(${IMAGES.SVG.TRANSITION_CODE})` }}
+          ></div>
         </div>
         
         {/* Legit code pattern - bottom layer */}
@@ -177,7 +185,10 @@ export default function CodeLab() {
             backfaceVisibility: 'hidden'
           }}
         >
-          <div className="absolute top-[160vh] left-0 w-full h-[150vh] bg-[url('/images/legit-code-pattern.svg')] bg-repeat bg-[length:400px_400px] sm:bg-[length:500px_500px]"></div>
+          <div 
+            className="absolute top-[160vh] left-0 w-full h-[150vh] bg-repeat bg-[length:400px_400px] sm:bg-[length:500px_500px]"
+            style={{ backgroundImage: `url(${IMAGES.SVG.LEGIT_CODE})` }}
+          ></div>
         </div>
         
         {/* Single elegant blob for depth */}
@@ -254,6 +265,7 @@ export default function CodeLab() {
       )}
       
       <Footer />
+      <ScrollToTop />
     </main>
   );
 } 

@@ -14,6 +14,7 @@ import Blog from './pages/blog.jsx';
 import About from './pages/about.jsx';
 import Contact from './pages/contact.jsx';
 import Documentation from './pages/docs.jsx';
+import NotFound from './pages/404.jsx';
 
 // Import placeholder pages for now
 const MoonSignal = () => <div>MoonSignal Page</div>;
@@ -38,6 +39,8 @@ export default function App() {
         <Route path="/contact" element={<Contact />} />
         <Route path="/docs" element={<Documentation />} />
         <Route path="/docs/*" element={<Documentation />} />
+        {/* 404 catch-all route */}
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </>
   );

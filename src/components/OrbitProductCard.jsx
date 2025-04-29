@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 export default function OrbitProductCard({ title, description, icon, link, color = "blue" }) {
   // Color variants
@@ -17,14 +18,14 @@ export default function OrbitProductCard({ title, description, icon, link, color
       <div className="absolute -inset-1 bg-gradient-to-r from-transparent via-purple-500/20 to-transparent rounded-lg blur opacity-0 group-hover:opacity-40 transition duration-500"></div>
       
       {/* Card content */}
-      <div className="relative bg-[#1F1F35] p-6 rounded-lg border border-white/10 h-full flex flex-col">
-        <div className="mb-4 text-2xl">{icon}</div>
-        <h3 className="text-xl font-medium text-white mb-2">{title}</h3>
-        <p className="text-gray-400 text-sm flex-grow">{description}</p>
+      <div className="relative bg-[#1F1F35] p-4 sm:p-6 rounded-lg border border-white/10 h-full flex flex-col">
+        <div className="mb-3 sm:mb-4 text-xl sm:text-2xl">{icon}</div>
+        <h3 className="text-lg sm:text-xl font-medium text-white mb-2">{title}</h3>
+        <p className="text-gray-400 text-xs sm:text-sm flex-grow">{description}</p>
         
-        <a href={link} className={`mt-4 self-start bg-gradient-to-r ${gradientClass} text-white text-sm font-medium py-1.5 px-3 rounded-md transition-all duration-300`}>
+        <Link to={link} className={`mt-3 sm:mt-4 self-start bg-gradient-to-r ${gradientClass} text-white text-xs sm:text-sm font-medium py-1.5 px-3 rounded-md transition-all duration-300`}>
           Learn More
-        </a>
+        </Link>
       </div>
     </div>
   );

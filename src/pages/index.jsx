@@ -15,6 +15,7 @@ import useBreakpoint from '../hooks/useBreakpoint';
 import { IMAGES } from '../utils/assets';
 
 export default function Home() {
+  // HOME-SPECIFIC: Scroll state for parallax effects and animations
   const [scrollPosition, setScrollPosition] = useState(0);
   const [viewportHeight, setViewportHeight] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
@@ -22,15 +23,15 @@ export default function Home() {
   // Reference for DOM elements
   const metricsRef = useRef(null);
   
-  // Dynamic progress for animations based on scroll position
+  // HOME-SPECIFIC: Dynamic progress for animations based on scroll position
   const dynamicExpansionProgress = Math.min(1, Math.max(0, (scrollPosition - viewportHeight * 0.8) / (viewportHeight * 0.5)));
   
-  // Calculate LogoStrip opacity based on metrics section position
+  // HOME-SPECIFIC: Calculate LogoStrip opacity based on metrics section position
   const logoStripOpacity = metricsRef.current 
     ? Math.max(0, 1 - Math.max(0, (scrollPosition - metricsRef.current.offsetTop + 300) / 300))
     : 1;
 
-  // Update scroll position with requestAnimationFrame for better performance
+  // HOME-SPECIFIC: Update scroll position with requestAnimationFrame for better performance
   useEffect(() => {
     let ticking = false;
     
@@ -75,7 +76,7 @@ export default function Home() {
         <meta property="og:url" content="https://curiouslabs.io/" />
       </Helmet>
       
-      {/* SVG Background Layers with Parallax Effect */}
+      {/* HOME-SPECIFIC: SVG Background Layers with Parallax Effect */}
       <div 
         className="absolute inset-0 z-0 pointer-events-none" 
         style={{ 
@@ -90,6 +91,7 @@ export default function Home() {
         />
       </div>
       
+      {/* HOME-SPECIFIC: Second parallax layer */}
       <div 
         className="absolute inset-0 z-0 pointer-events-none" 
         style={{ 
@@ -107,7 +109,7 @@ export default function Home() {
         />
       </div>
       
-      {/* Transformation Beam */}
+      {/* HOME-SPECIFIC: Transformation Beam */}
       <div 
         className="absolute left-1/2 top-[100vh] z-1 pointer-events-none" 
         style={{ 
@@ -118,7 +120,7 @@ export default function Home() {
           transform: 'translateX(-50%)',
         }}
       >
-        {/* Transformation Complete Text */}
+        {/* HOME-SPECIFIC: Transformation Complete Text */}
         <div 
           className="absolute bottom-0 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-purple-500 to-blue-500 text-white px-3 py-1 rounded whitespace-nowrap"
           style={{ 
@@ -136,10 +138,10 @@ export default function Home() {
         {/* Hero Section */}
         <Hero />
         
-        {/* Dynamic Expansion Section */}
+        {/* HOME-SPECIFIC: Dynamic Expansion Section */}
         <DynamicExpansion scrollProgress={dynamicExpansionProgress} />
         
-        {/* Logo Strip with fading effect */}
+        {/* HOME-SPECIFIC: Logo Strip with fading effect */}
         <LogoStrip style={{ opacity: logoStripOpacity }} />
         
         {/* Services Section */}

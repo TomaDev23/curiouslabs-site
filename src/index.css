@@ -4,7 +4,18 @@
 
 /* Global styles */
 html {
+  /* Remove global smooth scrolling to prevent ghost effects on route changes */
+  /* scroll-behavior: smooth; */
+}
+
+/* Only apply smooth scrolling for anchor links, not for route changes */
+html:not([data-route-change="true"]) {
   scroll-behavior: smooth;
+}
+
+/* Prevent horizontal overflow across the site */
+body {
+  overflow-x: hidden;
 }
 
 /* Custom utilities and overrides can be added below */

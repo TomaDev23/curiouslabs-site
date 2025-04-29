@@ -1,10 +1,27 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import NavBar from '../../components/NavBar';
 import Footer from '../../components/Footer';
-import AegisCenterCard from '../../components/AegisCenterCard';
-import OrbitProductCard from '../../components/OrbitProductCard';
+import ScrollToTop from '../../components/ScrollToTop';
+import SolarSystem from '../../components/SolarSystem';
 
 export default function ProductsPortal() {
+  // Reference to track mounting
+  const mountedRef = useRef(false);
+  
+  // Ensure page always starts at the top when mounted
+  useEffect(() => {
+    if (!mountedRef.current) {
+      // First render - ensure we're at the top
+      window.scrollTo(0, 0);
+      mountedRef.current = true;
+    }
+    
+    return () => {
+      // Clean up when unmounting
+      mountedRef.current = false;
+    };
+  }, []);
+
   const products = [
     {
       title: "OpsPipe",
@@ -37,54 +54,25 @@ export default function ProductsPortal() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#1A1A2E] via-[#272750] to-[#1A1A2E]">
+    <div className="min-h-screen bg-gradient-to-b from-[#1A1A2E] via-[#272750] to-[#1A1A2E] overflow-hidden">
       <NavBar />
       
-      <main className="pt-24 pb-16">
-        <section className="max-w-7xl mx-auto px-4 py-16">
-          <h1 className="text-4xl font-bold text-center text-white mb-4">
+      <main className="pt-24 pb-16 px-4 sm:px-6">
+        <section className="max-w-7xl mx-auto py-12 sm:py-16">
+          <h1 className="text-3xl sm:text-4xl font-bold text-center text-white mb-4">
             Our <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400">Creations</span>
           </h1>
-          <p className="text-center text-gray-300 mb-16 max-w-2xl mx-auto">
+          <p className="text-center text-gray-300 mb-12 sm:mb-16 max-w-2xl mx-auto px-4">
             Powered by the Aegis core, our products work in harmony to solve complex challenges.
           </p>
           
-          {/* Solar System Layout */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-16">
-            {/* First row - Top satellites */}
-            <div className="lg:col-span-1">
-              <OrbitProductCard {...products[0]} />
-            </div>
-            <div className="lg:col-span-1 hidden lg:block"></div>
-            <div className="lg:col-span-1">
-              <OrbitProductCard {...products[1]} />
-            </div>
-            
-            {/* Center row with Aegis */}
-            <div className="lg:col-span-3 flex justify-center -my-4 lg:my-0">
-              <div className="w-full max-w-xl">
-                <AegisCenterCard />
-              </div>
-            </div>
-            
-            {/* Bottom row - Bottom satellites */}
-            <div className="lg:col-span-1">
-              <OrbitProductCard {...products[2]} />
-            </div>
-            <div className="lg:col-span-1 hidden lg:block"></div>
-            <div className="lg:col-span-1">
-              <OrbitProductCard {...products[3]} />
-            </div>
-          </div>
-          
-          {/* Mobile-only vertical layout for small screens */}
-          <div className="lg:hidden mt-8 text-center text-sm text-gray-400">
-            <p>On larger screens, see our unique solar system layout!</p>
-          </div>
+          {/* Using the modular SolarSystem component */}
+          <SolarSystem products={products} />
         </section>
       </main>
       
       <Footer />
+      <ScrollToTop />
     </div>
   );
 } 
