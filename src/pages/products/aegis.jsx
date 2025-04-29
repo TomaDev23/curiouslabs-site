@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import NavBar from '../../components/NavBar';
 import Footer from '../../components/Footer';
 import { IMAGES } from '../../utils/assets';
@@ -7,6 +8,16 @@ import { IMAGES } from '../../utils/assets';
 export default function Aegis() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#1A1A2E] via-[#272750] to-[#1A1A2E]">
+      <Helmet>
+        <title>Aegis - Core Process Engine | CuriousLabs</title>
+        <meta name="description" content="The central intelligence unit that powers all CuriousLabs products with advanced algorithms and machine learning capabilities." />
+        <meta property="og:title" content="Aegis - Core Process Engine | CuriousLabs" />
+        <meta property="og:description" content="The central intelligence unit that powers all CuriousLabs products with advanced algorithms and machine learning capabilities." />
+        <meta property="og:image" content="/images/logo.svg" />
+        <meta property="og:type" content="product" />
+        <meta property="og:url" content="https://curiouslabs.io/products/aegis" />
+      </Helmet>
+      
       <NavBar />
       
       <main className="pt-24 pb-16">

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { Helmet } from 'react-helmet-async';
 import NavBar from '../components/NavBar';
 import Hero from '../components/Hero';
 import LogoStrip from '../components/LogoStrip';
@@ -64,6 +65,16 @@ export default function Home() {
   
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#1A1A2E] via-[#272750] to-[#1A1A2E] relative overflow-hidden">
+      <Helmet>
+        <title>CuriousLabs Cambodia – AI CodeOps Hub</title>
+        <meta name="description" content="Elite AI CodeOps missions, backburners and dev systems — powered by CuriousLabs." />
+        <meta property="og:title" content="CuriousLabs Cambodia" />
+        <meta property="og:description" content="Elite AI CodeOps missions, backburners and dev systems — powered by CuriousLabs." />
+        <meta property="og:image" content="/images/logo.svg" />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://curiouslabs.io/" />
+      </Helmet>
+      
       {/* SVG Background Layers with Parallax Effect */}
       <div 
         className="absolute inset-0 z-0 pointer-events-none" 

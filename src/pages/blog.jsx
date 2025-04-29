@@ -1,4 +1,5 @@
 import React from 'react';
+import { Helmet } from 'react-helmet-async';
 import NavBar from '../components/NavBar';
 import Footer from '../components/Footer';
 import { IMAGES } from '../utils/assets';
@@ -6,6 +7,16 @@ import { IMAGES } from '../utils/assets';
 export default function Blog() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#1A1A2E] via-[#272750] to-[#1A1A2E]">
+      <Helmet>
+        <title>Blog - Insights & Updates | CuriousLabs</title>
+        <meta name="description" content="Read the latest insights, case studies and updates from the CuriousLabs team of AI and development experts." />
+        <meta property="og:title" content="CuriousLabs Blog - Insights & Updates" />
+        <meta property="og:description" content="Read the latest insights, case studies and updates from the CuriousLabs team of AI and development experts." />
+        <meta property="og:image" content="/images/logo.svg" />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://curiouslabs.io/blog" />
+      </Helmet>
+      
       <NavBar />
       
       <main className="pt-24 pb-16">

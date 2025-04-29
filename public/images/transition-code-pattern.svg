@@ -1,0 +1,68 @@
+<svg width="800" height="600" xmlns="http://www.w3.org/2000/svg">
+  <!-- Define the transition pattern -->
+  <defs>
+    <pattern id="transition-code" patternUnits="userSpaceOnUse" width="800" height="600">
+      <g opacity="0.15">
+        <!-- Chaotic code elements (left side) -->
+        <text x="50" y="40" font-family="'Courier New', monospace" font-size="11" fill="#ff6b6b" opacity="0.7">if(x=y){doThing()//forgot to check</text>
+        <text x="30" y="60" font-family="'Courier New', monospace" font-size="11" fill="#ff6b6b" opacity="0.8">var data = getData()</text>
+        <text x="40" y="80" font-family="'Courier New', monospace" font-size="11" fill="#ff6b6b" opacity="0.7">ERROR: undefined is not a function</text>
+        <text x="20" y="100" font-family="'Courier New', monospace" font-size="11" fill="#ff6b6b" opacity="0.8">function process(x) {return x.map()}</text>
+        <text x="35" y="120" font-family="'Courier New', monospace" font-size="11" fill="#ff6b6b" opacity="0.7">const arr = ["test",]</text>
+        <text x="60" y="140" font-family="'Courier New', monospace" font-size="11" fill="#ff6b6b" opacity="0.6">"Unexpected token }"</text>
+        <text x="15" y="160" font-family="'Courier New', monospace" font-size="11" fill="#ff6b6b" opacity="0.8">$ git push -f origin main</text>
+        <text x="45" y="180" font-family="'Courier New', monospace" font-size="11" fill="#ff6b6b" opacity="0.7">Pipeline Failed: Error Code 255</text>
+        <text x="25" y="200" font-family="'Courier New', monospace" font-size="11" fill="#ff6b6b" opacity="0.6">if (error) { throw new Error(); }</text>
+        
+        <!-- Transition elements (middle) -->
+        <line x1="350" y1="20" x2="350" y2="580" stroke="#8a85bb" stroke-width="1" stroke-dasharray="4,4" opacity="0.3"/>
+        <line x1="450" y1="20" x2="450" y2="580" stroke="#7a75aa" stroke-width="1" stroke-dasharray="4,4" opacity="0.4"/>
+        
+        <text x="370" y="40" font-family="'Courier New', monospace" font-size="11" fill="#a792ee" opacity="0.6">function validateInput(data) {</text>
+        <text x="370" y="60" font-family="'Courier New', monospace" font-size="11" fill="#a792ee" opacity="0.6">  // Add validation</text>
+        <text x="370" y="80" font-family="'Courier New', monospace" font-size="11" fill="#a792ee" opacity="0.6">  return data;</text>
+        <text x="370" y="100" font-family="'Courier New', monospace" font-size="11" fill="#a792ee" opacity="0.6">}</text>
+        
+        <text x="370" y="140" font-family="'Courier New', monospace" font-size="11" fill="#a792ee" opacity="0.6">try {</text>
+        <text x="370" y="160" font-family="'Courier New', monospace" font-size="11" fill="#a792ee" opacity="0.6">  processData(input);</text>
+        <text x="370" y="180" font-family="'Courier New', monospace" font-size="11" fill="#a792ee" opacity="0.6">} catch (err) {</text>
+        <text x="370" y="200" font-family="'Courier New', monospace" font-size="11" fill="#a792ee" opacity="0.6">  logError(err);</text>
+        <text x="370" y="220" font-family="'Courier New', monospace" font-size="11" fill="#a792ee" opacity="0.6">}</text>
+        
+        <!-- LEGIT code elements (right side) -->
+        <text x="500" y="40" font-family="'Courier New', monospace" font-size="11" fill="#7ed4fc" opacity="0.8">/**</text>
+        <text x="500" y="60" font-family="'Courier New', monospace" font-size="11" fill="#7ed4fc" opacity="0.8"> * Process data with validation and error handling</text>
+        <text x="500" y="80" font-family="'Courier New', monospace" font-size="11" fill="#7ed4fc" opacity="0.8"> * @param {Object} data - The input data</text>
+        <text x="500" y="100" font-family="'Courier New', monospace" font-size="11" fill="#7ed4fc" opacity="0.8"> * @returns {Object} Processed result</text>
+        <text x="500" y="120" font-family="'Courier New', monospace" font-size="11" fill="#7ed4fc" opacity="0.8"> */</text>
+        <text x="500" y="140" font-family="'Courier New', monospace" font-size="11" fill="#7ed4fc" opacity="0.8">function processData(data) {</text>
+        <text x="500" y="160" font-family="'Courier New', monospace" font-size="11" fill="#7ed4fc" opacity="0.8">  // Input validation</text>
+        <text x="500" y="180" font-family="'Courier New', monospace" font-size="11" fill="#7ed4fc" opacity="0.8">  if (!validator.isValid(data)) {</text>
+        <text x="500" y="200" font-family="'Courier New', monospace" font-size="11" fill="#7ed4fc" opacity="0.8">    logger.error('Invalid data format');</text>
+        <text x="500" y="220" font-family="'Courier New', monospace" font-size="11" fill="#7ed4fc" opacity="0.8">    throw new ValidationError('Invalid data');</text>
+        <text x="500" y="240" font-family="'Courier New', monospace" font-size="11" fill="#7ed4fc" opacity="0.8">  }</text>
+        <text x="500" y="260" font-family="'Courier New', monospace" font-size="11" fill="#7ed4fc" opacity="0.8">  </text>
+        <text x="500" y="280" font-family="'Courier New', monospace" font-size="11" fill="#7ed4fc" opacity="0.8">  try {</text>
+        <text x="500" y="300" font-family="'Courier New', monospace" font-size="11" fill="#7ed4fc" opacity="0.8">    const result = transformer.process(data);</text>
+        <text x="500" y="320" font-family="'Courier New', monospace" font-size="11" fill="#7ed4fc" opacity="0.8">    logger.info('Data processed successfully');</text>
+        <text x="500" y="340" font-family="'Courier New', monospace" font-size="11" fill="#7ed4fc" opacity="0.8">    return result;</text>
+        <text x="500" y="360" font-family="'Courier New', monospace" font-size="11" fill="#7ed4fc" opacity="0.8">  } catch (error) {</text>
+        <text x="500" y="380" font-family="'Courier New', monospace" font-size="11" fill="#7ed4fc" opacity="0.8">    logger.error(`Processing failed: ${error.message}`);</text>
+        <text x="500" y="400" font-family="'Courier New', monospace" font-size="11" fill="#7ed4fc" opacity="0.8">    throw new ProcessingError(error);</text>
+        <text x="500" y="420" font-family="'Courier New', monospace" font-size="11" fill="#7ed4fc" opacity="0.8">  }</text>
+        <text x="500" y="440" font-family="'Courier New', monospace" font-size="11" fill="#7ed4fc" opacity="0.8">}</text>
+        
+        <!-- Transition visual elements -->
+        <path d="M350,300 C400,320 400,280 450,300" stroke="#a792ee" stroke-width="1" fill="none" opacity="0.4"/>
+        <path d="M350,340 C400,360 400,320 450,340" stroke="#a792ee" stroke-width="1" fill="none" opacity="0.4"/>
+        <path d="M350,380 C400,400 400,360 450,380" stroke="#a792ee" stroke-width="1" fill="none" opacity="0.4"/>
+        
+        <!-- Directional arrows -->
+        <text x="370" y="480" font-family="'Arial', sans-serif" font-size="14" fill="#a792ee" opacity="0.6">→ LEGIT Transformation →</text>
+      </g>
+    </pattern>
+  </defs>
+  
+  <!-- Apply the pattern -->
+  <rect width="800" height="600" fill="url(#transition-code)" />
+</svg> 

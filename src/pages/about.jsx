@@ -1,4 +1,5 @@
 import React from 'react';
+import { Helmet } from 'react-helmet-async';
 import NavBar from '../components/NavBar';
 import Footer from '../components/Footer';
 import { IMAGES } from '../utils/assets';
@@ -6,6 +7,16 @@ import { IMAGES } from '../utils/assets';
 export default function About() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#1A1A2E] via-[#272750] to-[#1A1A2E]">
+      <Helmet>
+        <title>About CuriousLabs | Our Mission and Values</title>
+        <meta name="description" content="Learn about CuriousLabs Cambodia, our mission, story, and the values that drive our innovation in AI and machine learning solutions." />
+        <meta property="og:title" content="About CuriousLabs | Our Mission and Values" />
+        <meta property="og:description" content="Learn about CuriousLabs Cambodia, our mission, story, and the values that drive our innovation in AI and machine learning solutions." />
+        <meta property="og:image" content="/images/logo.svg" />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://curiouslabs.io/about" />
+      </Helmet>
+      
       <NavBar />
       
       <main className="pt-24 pb-16">
