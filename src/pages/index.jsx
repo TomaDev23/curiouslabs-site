@@ -97,17 +97,6 @@ export default function Home() {
     [scrollY]
   );
   
-  // Calculate transformation beam progress
-  const beamStartTrigger = viewportHeight * 1.2; // Start after hero section
-  const beamEndTrigger = viewportHeight * 2.2; // Complete at end of DynamicExpansion
-  const beamProgress = Math.min(1, Math.max(0, 
-    (scrollY - beamStartTrigger) / (beamEndTrigger - beamStartTrigger)
-  ));
-  
-  // Calculate beam height and text opacity based on progress
-  const beamHeight = `${beamProgress * 100}%`;
-  const transformationTextOpacity = beamProgress > 0.9 ? (beamProgress - 0.9) * 10 : 0;
-  
   // Calculate LogoStrip opacity based on metrics section position
   const [logoStripOpacity, setLogoStripOpacity] = useState(1);
   
@@ -189,36 +178,6 @@ export default function Home() {
           }}
         >
           <div className="absolute top-[160vh] left-0 w-full h-[150vh] bg-[url('/images/legit-code-pattern.svg')] bg-repeat bg-[length:400px_400px] sm:bg-[length:500px_500px]"></div>
-        </div>
-        
-        {/* Transformation beam */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 h-full flex flex-col items-center z-3">
-          {/* Vertical line that grows from top to bottom */}
-          <div 
-            className={`bg-gradient-to-b from-purple-300 to-blue-300 ${isSafari ? 'safari-transform' : ''}`}
-            style={{ 
-              height: beamHeight, 
-              maxHeight: '100%',
-              width: isMobile ? '1px' : '2px',
-              opacity: 0.6,
-              boxShadow: '0 0 8px rgba(147, 112, 219, 0.7)',
-              willChange: 'height',
-              transform: 'translate3d(0,0,0)'
-            }}
-          ></div>
-          
-          {/* Transformation complete text */}
-          <div 
-            className={`absolute bottom-[20%] bg-gradient-to-r from-purple-400 to-blue-400 px-4 py-2 rounded-full text-white font-bold tracking-wider ${isSafari ? 'safari-transform' : ''}`}
-            style={{ 
-              opacity: transformationTextOpacity,
-              transform: 'translateY(-50%)',
-              fontSize: isMobile ? '0.8rem' : '1rem',
-              willChange: 'opacity'
-            }}
-          >
-            Transformation Complete
-          </div>
         </div>
         
         {/* Single elegant blob for depth */}
