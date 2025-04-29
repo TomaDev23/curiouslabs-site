@@ -1,0 +1,5 @@
+# 🔒 Normalize line endings
+* text=auto
+
+# 🔒 Explicitly deny tracking node_modules
+node_modules/** linguist-vendored
