@@ -261,3 +261,196 @@ git commit -m "TILE 4.2A: Cleanup – Footer dedupe, backup/index purge, Hero fo
 ```
 
 I'll await your approval before executing this cleanup plan.
+
+==========================================================================================================================
+
+
+# TILE 4.2A Cleanup Sweep Mission Report
+
+## ✅ Mission Summary
+Successfully executed the TILE 4.2A cleanup and reorganization mission, focusing on removing legacy components, deduplicating files, and maintaining backward compatibility with non-migrated pages.
+
+## 🎯 Actions Completed
+
+### 1. Homepage Backup Removal
+- ✅ Deleted redundant `src/pages/index.jsx.backup` file
+- Eliminated potential confusion from stale homepage copy
+
+### 2. Footer Component Refactoring
+- ✅ Renamed `Footer.jsx` to `Footer_legacy.jsx`
+- ✅ Updated all Footer import references in 8 files:
+  - 404.jsx, about.jsx, blog.jsx, codelab.jsx
+  - contact.jsx, docs.jsx, products/aegis.jsx, products/index.jsx, products/opspipe.jsx
+
+### 3. Hero Component Relocation
+- ✅ Moved entire `Hero/` directory to `src/components/legacy/Hero/`
+- ✅ Updated Hero component import in codelab.jsx
+- Maintained backward compatibility for codelab.jsx which still relies on legacy Hero
+
+### 4. Documentation
+- ✅ Created documentation file: `Docs/planning/Site_v2/Tile_4/v1.1.2.md`
+- ✅ Documented all cleanup operations and rationale
+
+### 5. Git Hygiene
+- ✅ Excluded node_modules from git operations
+- ✅ Committed changes with commit message: "TILE 4.2A: Cleanup – Footer dedupe, backup/index purge, Hero folder sweep"
+- ✅ Maintained clean local state (did not push to main)
+
+## 🧪 Validation Results
+
+### Component Integrity
+- ✅ Homepage maintained with proper TILE 4.0 structure
+- ✅ All pages reference correct component paths
+- ✅ Legacy components still accessible to pages needing them
+
+### Backward Compatibility
+- ✅ CodeLab page loads correctly with relocated Hero components
+- ✅ All pages with Footer references now use Footer_legacy
+- ✅ No functionality broken during cleanup operations
+
+## 📊 Current Project State
+The project structure is now cleaner with:
+- Clear separation between current TILE 4.0 components and legacy components
+- Homepage exclusively using the approved component structure
+- No unnecessary file duplication
+- Clean git staging area
+
+All operations completed successfully according to mission parameters.
+
+
+============================================================================================================================
+
+## 📊 TILE 4.2B - Site Visual & Navigation Recovery Simulation
+
+I'll simulate this mission thoroughly before taking any action. This analysis will identify any potential issues and ensure a complete understanding of the required changes.
+
+### Phase 1: Asset Verification & Patch - Simulation
+
+First, I'll check for the existence of visual assets:
+
+```bash
+Get-ChildItem -Path public -Recurse | Where-Object { $_.Extension -match "\.(svg|png|jpg|jpeg|gif)$" } | Format-Table FullName
+```
+It looks like we may not have any image assets found in the public directory. Let's check if the public directory exists:
+
+```bash
+Test-Path public
+```
+Let's check if there are any image assets elsewhere in the project:
+
+```bash
+Get-ChildItem -Path . -Recurse -Include *.svg,*.png,*.jpg,*.jpeg,*.gif | Where-Object { $_.FullName -notlike "*node_modules*" } | Format-Table FullName
+```
+We found some assets in the website_resources directory, but they don't appear to be the site's operational assets. Let's look for references to image paths in the code to understand how they're being referenced:
+
+Read file: src/components/NavBar.jsx
+Let's check the assets.js file to see how images are referenced:
+
+Read file: src/utils/assets.js
+Based on our findings, the site is expecting image assets in a `/images` directory, but we don't currently have a `/public/images` directory. Let's look at the Homepage file to understand its structure:
+
+Read file: src/pages/index.jsx
+Now let's check if we have all the required components for the homepage:
+
+```bash
+Test-Path src/components/HeroMain.jsx ; Test-Path src/components/SolutionsPreview.jsx ; Test-Path src/components/FeedbackBlock.jsx ; Test-Path src/components/FooterMain.jsx ; Test-Path src/components/NavBar.jsx
+```
+Now let's check the Footer_legacy component:
+
+Read file: src/components/Footer_legacy.jsx
+Let's check one of the footer usages in a page to ensure they're using Footer_legacy:
+
+```bash
+Get-ChildItem -Path src/pages -Recurse -File | Select-String -Pattern "import Footer"
+```
+## Phase 1 (Simulation): Asset Verification & Patch
+
+Based on the analysis:
+1. The `/public` directory doesn't exist, so we need to create it
+2. Required image assets are missing, based on the references in `src/utils/assets.js`
+3. We need to create the following structure:
+   - /public/images/logo.svg
+   - /public/images/chaotic-code-pattern.svg
+   - /public/images/legit-code-pattern.svg
+   - /public/images/transition-code-pattern.svg
+
+## Phase 2 (Simulation): Homepage NavBar Injection
+
+We need to:
+1. Add `import NavBar from '@/components/NavBar';` to index.jsx
+2. Insert `<NavBar />` before `<HeroMain />` in the render function
+
+## Phase 3 (Simulation): Footer Presence Audit
+
+All the pages appear to be correctly importing Footer from Footer_legacy.jsx, which is good. No changes needed for this phase.
+
+## 📊 Mission Execution Plan
+
+### 1. Create missing public directory structure
+```powershell
+mkdir -p public/images
+```
+
+### 2. Create placeholder assets
+Since we don't have the original SVG files, we'll create placeholder SVGs for now:
+```powershell
+# Create basic SVG assets
+@"
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="50">
+  <text x="10" y="30" font-family="Arial" font-size="24" fill="#8B5CF6">CuriousLabs</text>
+</svg>
+"@ | Out-File -FilePath public/images/logo.svg -Encoding utf8
+
+@"
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100">
+  <rect width="100" height="100" fill="#1A1A2E" />
+  <text x="10" y="50" font-family="monospace" font-size="10" fill="#8B5CF6">chaotic-code</text>
+</svg>
+"@ | Out-File -FilePath public/images/chaotic-code-pattern.svg -Encoding utf8
+
+@"
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100">
+  <rect width="100" height="100" fill="#1A1A2E" />
+  <text x="10" y="50" font-family="monospace" font-size="10" fill="#8B5CF6">legit-code</text>
+</svg>
+"@ | Out-File -FilePath public/images/legit-code-pattern.svg -Encoding utf8
+
+@"
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100">
+  <rect width="100" height="100" fill="#1A1A2E" />
+  <text x="10" y="50" font-family="monospace" font-size="10" fill="#8B5CF6">transition-code</text>
+</svg>
+"@ | Out-File -FilePath public/images/transition-code-pattern.svg -Encoding utf8
+```
+
+### 3. Update the homepage to include NavBar
+```jsx
+// DO NOT MODIFY THIS FILE WITHOUT COMMANDER APPROVAL — TILE 4.1
+import HeroMain from '@/components/HeroMain';
+import SolutionsPreview from '@/components/SolutionsPreview';
+import FeedbackBlock from '@/components/FeedbackBlock';
+import FooterMain from '@/components/FooterMain';
+import NavBar from '@/components/NavBar';
+
+export default function Home() {
+  return (
+    <>
+      <NavBar />
+      <HeroMain />
+      <SolutionsPreview />
+      <FeedbackBlock />
+      <FooterMain />
+    </>
+  );
+}
+```
+
+### 4. Validation and verification
+- Test that the assets are accessible
+- Ensure NavBar appears on the homepage
+- Confirm Footer_legacy appears on all specified pages
+
+This plan will address all the requirements in TILE 4.2B without any git actions until you give explicit permission to proceed.
+
+
+=
