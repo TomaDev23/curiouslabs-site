@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import NavBar from '../../components/NavBar';
-import Footer from '../../components/Footer';
+import Footer from '../../components/Footer_legacy';
 import ScrollToTop from '../../components/ScrollToTop';
 import SolarSystem from '../../components/SolarSystem';
 

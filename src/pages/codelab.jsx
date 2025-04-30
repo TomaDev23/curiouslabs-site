@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef, useMemo } from "react";
 import NavBar from '../components/NavBar';
-import Footer from '../components/Footer';
-import Hero from '../components/Hero';
+import Footer from '../components/Footer_legacy';
+import Hero from '../components/legacy/Hero';
 import LogoStrip from '../components/LogoStrip';
 import DynamicExpansion from '../components/DynamicExpansion';
 import Services from '../components/Services';

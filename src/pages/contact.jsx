@@ -1,6 +1,6 @@
 import React from 'react';
 import NavBar from '../components/NavBar';
-import Footer from '../components/Footer';
+import Footer from '../components/Footer_legacy';
 import { IMAGES } from '../utils/assets';
 
 export default function Contact() {
