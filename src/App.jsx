@@ -7,17 +7,15 @@ import Home from './pages/index.jsx';
 import ProductsPortal from './pages/products/index.jsx';
 import Aegis from './pages/products/aegis.jsx';
 import OpsPipe from './pages/products/opspipe.jsx';
+import MoonSignal from './pages/products/moonsignal.jsx';
+import Curious from './pages/products/curious.jsx';
+import Guardian from './pages/products/guardian.jsx';
 import CodeLab from './pages/codelab.jsx';
 import Blog from './pages/blog.jsx';
 import About from './pages/about.jsx';
 import Contact from './pages/contact.jsx';
 import Documentation from './pages/docs.jsx';
 import NotFound from './pages/404.jsx';
-
-// Placeholder Routes
-const MoonSignal = () => <div className="p-8 text-white">MoonSignal Page</div>;
-const Curious = () => <div className="p-8 text-white">Curious Page</div>;
-const Guardian = () => <div className="p-8 text-white">Guardian Page</div>;
 
 export default function App() {
   return (
