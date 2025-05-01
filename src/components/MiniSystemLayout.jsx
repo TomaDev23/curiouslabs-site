@@ -231,9 +231,9 @@ export default function MiniSystemLayout() {
       
       {/* Background cosmic image */}
       <motion.div 
-        className="absolute w-[110%] h-[120%] left-[-5%] top-[-10%] overflow-hidden z-0 pointer-events-none"
+        className="absolute w-[100%] h-[110%] left-0 top-[-5%] overflow-hidden z-0 pointer-events-none"
         style={{
-          backgroundImage: "url('/images/Earth1.png')",
+          backgroundImage: "url('/images/earthscape-bg.jpg')",
           backgroundPosition: "center center",
           backgroundSize: "cover",
           backgroundRepeat: "no-repeat",
