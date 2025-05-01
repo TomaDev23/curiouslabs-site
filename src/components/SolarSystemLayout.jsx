@@ -3,8 +3,8 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 
 const orbitData = [
-  { icon: "🛠️", title: "OpsPipe", path: "/products/opspipe", angle: 0, adjustX: 30, adjustY: 0 },
-  { icon: "🚀", title: "MoonSignal", path: "/products/moonsignal", angle: 90, adjustX: 0, adjustY: -20 },
+  { icon: "🛠️", title: "OpsPipe", path: "/products/opspipe", angle: 0, adjustX: 100, adjustY: 20 },
+  { icon: "🚀", title: "MoonSignal", path: "/products/moonsignal", angle: 90, adjustX: 20, adjustY: 100 },
   { icon: "🛡️", title: "Guardian", path: "/products/guardian", angle: 180, adjustX: -20, adjustY: 0 },
   { icon: "🧠", title: "Curious", path: "/products/curious", angle: 270, adjustX: 0, adjustY: 30 },
 ];
