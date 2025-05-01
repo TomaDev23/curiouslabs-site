@@ -156,22 +156,66 @@ export default function ProductsPortal() {
           </div>
         </section>
         
-        {/* Optional CTA section */}
-        <motion.section 
-          className="max-w-xl mx-auto text-center mt-16 sm:mt-24 relative z-10"
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 0.7 }}
-        >
-          <div className="bg-gradient-to-r from-purple-900/30 to-blue-900/30 rounded-xl p-8 border border-purple-500/20">
-            <h3 className="text-xl font-semibold text-white mb-3">Ready to launch your project?</h3>
-            <p className="text-gray-400 mb-6">Our interconnected products can be used individually or as a complete suite.</p>
-            <Link to="/contact" className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white font-medium py-2 px-6 rounded-lg transition duration-300">
-              Contact Us
-            </Link>
-          </div>
-        </motion.section>
+        {/* Space divider with nebula effect before CTA */}
+        <div className="relative mt-24 mb-16">
+          <div className="absolute inset-x-0 h-px bg-gradient-to-r from-transparent via-purple-500/30 to-transparent"></div>
+          <motion.div 
+            className="absolute inset-x-0 h-8 -mt-4"
+            style={{ 
+              background: "radial-gradient(ellipse at center, rgba(139, 92, 246, 0.15) 0%, rgba(30, 27, 75, 0.01) 70%)" 
+            }}
+            animate={{ 
+              opacity: [0.5, 0.8, 0.5] 
+            }}
+            transition={{ 
+              duration: 4, 
+              repeat: Infinity, 
+              repeatType: "reverse" 
+            }}
+          />
+        </div>
+        
+        {/* Enhanced CTA Section with Box */}
+        <div className="pt-8 pb-20 sm:pb-32">
+          <motion.div 
+            className="max-w-2xl mx-auto bg-[#1E1A42] border border-purple-600/30 rounded-xl p-6 shadow-lg shadow-purple-900/20"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.7 }}
+          >
+            <motion.h2 
+              className="text-2xl sm:text-3xl font-bold text-white tracking-wider uppercase text-center"
+              style={{ letterSpacing: '0.05em' }}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.1 }}
+            >
+              Want to build like this?
+            </motion.h2>
+            <motion.p 
+              className="max-w-xl mx-auto text-base sm:text-lg text-gray-300 mt-3 mb-6 text-center"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.2 }}
+            >
+              Our platform makes engineering excellence accessible to everyone
+            </motion.p>
+            <motion.div
+              className="text-center"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.3 }}
+            >
+              <Link to="/contact" className="bg-purple-600 hover:bg-purple-700 text-white font-medium py-2 px-6 rounded-full inline-flex items-center transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-purple-500/20">
+                Contact our team
+                <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                </svg>
+              </Link>
+            </motion.div>
+          </motion.div>
+        </div>
       </main>
       
       <Footer />
