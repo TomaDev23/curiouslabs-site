@@ -17,6 +17,7 @@ import About from './pages/about.jsx';
 import Contact from './pages/contact.jsx';
 import Documentation from './pages/docs.jsx';
 import NotFound from './pages/404.jsx';
+import UniverseExperience from './pages/UniverseExperience.jsx';
 
 export default function App() {
   return (
@@ -37,6 +38,7 @@ export default function App() {
         <Route path="/contact" element={<Contact />} />
         <Route path="/docs" element={<Documentation />} />
         <Route path="/docs/*" element={<Documentation />} />
+        <Route path="/universe" element={<UniverseExperience />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </>
