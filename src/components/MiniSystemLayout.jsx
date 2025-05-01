@@ -17,7 +17,7 @@ const orbitData = [
   { icon: "🔬", title: "Labs", path: "/products", angle: 315, adjustX: 20, adjustY: -50, size: "xs" },
 ];
 
-// Comet paths for more variety
+// Enhanced comet paths for more variety
 const cometPaths = [
   // Diagonal paths
   { x: [-300, 300], y: [-300, 300] },
@@ -27,10 +27,19 @@ const cometPaths = [
   { x: [300, 0, -300], y: [0, 150, 0] },
 ];
 
-// Small comet component for dynamic visual elements
+// Enhanced comet component with colored trails
 const MiniComet = ({ delay, angle, duration, pathIndex }) => {
   const sizeClass = "w-16 h-0.5";
   const path = cometPaths[pathIndex % cometPaths.length];
+  
+  // Enhanced colors for comets
+  const colors = [
+    "bg-gradient-to-r from-white/0 via-white/40 to-white/80",
+    "bg-gradient-to-r from-blue-400/0 via-blue-400/40 to-blue-400/80",
+    "bg-gradient-to-r from-purple-400/0 via-purple-400/40 to-purple-400/80"
+  ];
+  
+  const colorClass = colors[Math.floor(Math.random() * colors.length)];
   
   return (
     <motion.div
@@ -57,21 +66,21 @@ const MiniComet = ({ delay, angle, duration, pathIndex }) => {
         ease: "easeInOut"
       }}
     >
-      <div className={`${sizeClass} bg-gradient-to-r from-white/0 via-white/40 to-white/80 rounded-full blur-sm`} />
+      <div className={`${sizeClass} ${colorClass} rounded-full blur-sm`} />
     </motion.div>
   );
 };
 
-// Product color palette - matching SolarSystemLayout
+// Enhanced color palette with deeper, more vibrant colors
 const productColors = {
-  "OpsPipe": "from-blue-500/20 to-blue-600/10",
-  "MoonSignal": "from-purple-500/20 to-purple-600/10",
-  "Guardian": "from-red-500/20 to-red-600/10",
-  "Curious": "from-green-500/20 to-green-600/10",
-  "SaaS": "from-cyan-500/20 to-cyan-600/10",
-  "WhiteLabel": "from-pink-500/20 to-pink-600/10",
-  "AI Edge": "from-amber-500/20 to-amber-600/10",
-  "Labs": "from-teal-500/20 to-teal-600/10",
+  "OpsPipe": "from-blue-500/40 to-blue-700/20",
+  "MoonSignal": "from-purple-500/40 to-purple-700/20",
+  "Guardian": "from-red-500/40 to-red-700/20",
+  "Curious": "from-green-500/40 to-green-600/20",
+  "SaaS": "from-cyan-400/40 to-cyan-600/20",
+  "WhiteLabel": "from-pink-400/40 to-pink-600/20",
+  "AI Edge": "from-amber-400/40 to-amber-600/20",
+  "Labs": "from-teal-400/40 to-teal-600/20",
 };
 
 export default function MiniSystemLayout() {
@@ -137,20 +146,24 @@ export default function MiniSystemLayout() {
         />
       </div>
 
-      {/* Background nebula effect - expanded size */}
+      {/* Enhanced background nebula effects */}
       <div className="absolute inset-0 w-[150%] h-[150%] left-[-25%] top-[-25%]" style={{ zIndex: 0 }}>
-        {/* Base nebula glow */}
-        <div className="absolute inset-0 w-full h-full bg-gradient-radial from-purple-900/15 via-purple-800/5 to-transparent opacity-40" />
+        {/* Base nebula glow - more colorful and vibrant */}
+        <div className="absolute inset-0 w-full h-full opacity-50" 
+          style={{
+            background: 'radial-gradient(circle at 30% 40%, rgba(139, 92, 246, 0.15), transparent 70%), radial-gradient(circle at 70% 60%, rgba(244, 114, 182, 0.12), transparent 70%), radial-gradient(circle at 50% 50%, rgba(56, 189, 248, 0.1), transparent 70%)'
+          }}
+        />
         
-        {/* Central nebula cloud */}
+        {/* Pulsating central nebula cloud */}
         <motion.div 
           className="absolute top-0 left-0 w-full h-full opacity-30"
           style={{
-            background: 'radial-gradient(circle at 50% 45%, rgba(147, 51, 234, 0.15) 0%, rgba(139, 92, 246, 0.05) 50%, transparent 70%)',
+            background: 'radial-gradient(circle at 50% 45%, rgba(147, 51, 234, 0.2) 0%, rgba(139, 92, 246, 0.1) 50%, transparent 70%)',
           }}
           animate={{ 
             scale: prefersReducedMotion ? 1 : [1, 1.05, 1],
-            opacity: prefersReducedMotion ? 0.3 : [0.25, 0.35, 0.25],
+            opacity: prefersReducedMotion ? 0.3 : [0.2, 0.35, 0.2],
           }}
           transition={{ 
             duration: 15, 
@@ -160,11 +173,11 @@ export default function MiniSystemLayout() {
           }}
         />
         
-        {/* Additional cosmic dust layer with parallax effect */}
+        {/* Additional cosmic dust layers with parallax effects */}
         <motion.div
-          className="absolute inset-0 w-full h-full opacity-20"
+          className="absolute inset-0 w-full h-full opacity-25"
           style={{
-            background: 'radial-gradient(ellipse at 30% 40%, rgba(186, 230, 253, 0.1) 0%, transparent 70%), radial-gradient(ellipse at 70% 60%, rgba(216, 180, 254, 0.1) 0%, transparent 70%)'
+            background: 'radial-gradient(ellipse at 30% 40%, rgba(186, 230, 253, 0.15) 0%, transparent 70%), radial-gradient(ellipse at 70% 60%, rgba(216, 180, 254, 0.15) 0%, transparent 70%)'
           }}
           animate={{
             scale: prefersReducedMotion ? 1 : [1, 1.1, 1]
@@ -177,11 +190,29 @@ export default function MiniSystemLayout() {
           }}
         />
         
+        {/* Orange-pink nebula for warm accents */}
+        <motion.div
+          className="absolute inset-0 w-full h-full opacity-15"
+          style={{
+            background: 'radial-gradient(ellipse at 20% 30%, rgba(254, 215, 170, 0.15) 0%, transparent 70%), radial-gradient(ellipse at 80% 70%, rgba(251, 113, 133, 0.15) 0%, transparent 70%)'
+          }}
+          animate={{
+            scale: prefersReducedMotion ? 1 : [1.05, 1, 1.05]
+          }}
+          transition={{
+            duration: 25,
+            repeat: Infinity,
+            repeatType: "reverse",
+            ease: "easeInOut",
+            delay: 5
+          }}
+        />
+        
         {/* Bottom gradient transition to blend with solutions section */}
         <div 
-          className="absolute bottom-[-10%] left-0 w-full h-[50%]"
+          className="absolute bottom-[-5%] left-0 w-full h-[30%]"
           style={{
-            background: 'linear-gradient(to bottom, transparent 0%, rgba(22, 33, 62, 0.5) 70%, rgba(22, 33, 62, 0.8) 100%)',
+            background: 'linear-gradient(to bottom, transparent 0%, rgba(22, 33, 62, 0.3) 70%, rgba(22, 33, 62, 0.5) 100%)',
             zIndex: 2
           }}
         />
@@ -198,20 +229,77 @@ export default function MiniSystemLayout() {
         />
       ))}
       
+      {/* Background cosmic image */}
+      <motion.div 
+        className="absolute w-[110%] h-[120%] left-[-5%] top-[-10%] overflow-hidden z-0 pointer-events-none"
+        style={{
+          backgroundImage: "url('/images/Earth1.png')",
+          backgroundPosition: "center center",
+          backgroundSize: "cover",
+          backgroundRepeat: "no-repeat",
+          filter: "brightness(0.95) contrast(1.05)",
+          isolation: "isolate"
+        }}
+      />
+      
+      {/* Top transition line with dynamic hue */}
+      <motion.div 
+        className="absolute top-0 left-0 w-full h-[2px] z-20 overflow-hidden pointer-events-none"
+        style={{
+          boxShadow: "0 0 10px rgba(139, 92, 246, 0.3)"
+        }}
+        animate={{
+          background: [
+            "linear-gradient(90deg, transparent 0%, rgba(139, 92, 246, 0.8) 50%, transparent 100%)",
+            "linear-gradient(90deg, transparent 0%, rgba(56, 189, 248, 0.8) 50%, transparent 100%)",
+            "linear-gradient(90deg, transparent 0%, rgba(234, 179, 8, 0.8) 50%, transparent 100%)",
+            "linear-gradient(90deg, transparent 0%, rgba(139, 92, 246, 0.8) 50%, transparent 100%)"
+          ]
+        }}
+        transition={{
+          duration: 8,
+          repeat: Infinity,
+          repeatType: "loop",
+          ease: "linear"
+        }}
+      />
+      
+      {/* Bottom transition line with dynamic hue */}
+      <motion.div 
+        className="absolute bottom-0 left-0 w-full h-[2px] z-20 overflow-hidden pointer-events-none"
+        style={{
+          boxShadow: "0 0 10px rgba(234, 179, 8, 0.3)"
+        }}
+        animate={{
+          background: [
+            "linear-gradient(90deg, transparent 0%, rgba(234, 179, 8, 0.8) 50%, transparent 100%)",
+            "linear-gradient(90deg, transparent 0%, rgba(139, 92, 246, 0.8) 50%, transparent 100%)",
+            "linear-gradient(90deg, transparent 0%, rgba(56, 189, 248, 0.8) 50%, transparent 100%)",
+            "linear-gradient(90deg, transparent 0%, rgba(234, 179, 8, 0.8) 50%, transparent 100%)"
+          ]
+        }}
+        transition={{
+          duration: 8,
+          repeat: Infinity,
+          repeatType: "loop",
+          ease: "linear",
+          delay: 2
+        }}
+      />
+      
       {/* Z-index hierarchy matching SolarSystemLayout */}
       
       {/* Orbit visualization - only visible on larger screens */}
       <div className="hidden lg:block relative h-full">
-        {/* Animated star backdrop */}
+        {/* Animated star backdrop - enhanced with CSS-based stars */}
         <motion.div 
-          className="absolute inset-0 z-1 opacity-40"
+          className="absolute inset-0 z-1 opacity-60"
           style={{
-            backgroundImage: "url(/images/stars.svg)",
-            backgroundSize: "cover",
-            filter: "blur(1px)"
+            background: 'radial-gradient(1px circle at 20% 40%, white, transparent), radial-gradient(1px circle at 40% 20%, white, transparent), radial-gradient(2px circle at 60% 30%, white, transparent), radial-gradient(1px circle at 70% 60%, white, transparent), radial-gradient(1px circle at 30% 80%, white, transparent), radial-gradient(1px circle at 80% 90%, white, transparent)',
+            backgroundSize: '200px 200px'
           }}
           animate={{ 
-            backgroundPosition: prefersReducedMotion ? "0% 0%" : ["0% 0%", "2% 2%"]
+            backgroundPosition: prefersReducedMotion ? "0% 0%" : ["0% 0%", "5% 5%"]
           }}
           transition={{ 
             duration: 120, 
@@ -221,20 +309,20 @@ export default function MiniSystemLayout() {
           }}
         />
         
-        {/* Orbital rings - expanded size */}
+        {/* Enhanced orbital rings with better colors */}
         <svg 
           className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px]"
           viewBox="0 0 500 500" 
           style={{ zIndex: 10 }}
         >
-          {/* Inner orbit ring */}
+          {/* Inner orbit ring - enhanced purple color */}
           <motion.circle
             cx="250"
             cy="250" 
             r={radius + 20}
             fill="none"
-            stroke="rgba(139, 92, 246, 0.15)"
-            strokeWidth="1"
+            stroke="rgba(139, 92, 246, 0.25)"
+            strokeWidth="1.5"
             strokeDasharray="1,3"
             initial={{ rotate: 0 }}
             animate={{ 
@@ -247,13 +335,13 @@ export default function MiniSystemLayout() {
             }}
           />
           
-          {/* Outer orbit ring */}
+          {/* Outer orbit ring - enhanced cyan color */}
           <motion.circle
             cx="250"
             cy="250" 
             r={radius + 70}
             fill="none"
-            stroke="rgba(139, 92, 246, 0.1)"
+            stroke="rgba(56, 189, 248, 0.2)"
             strokeWidth="1"
             strokeDasharray="1,5"
             initial={{ rotate: 0 }}
@@ -268,9 +356,9 @@ export default function MiniSystemLayout() {
           />
         </svg>
         
-        {/* Aegis glow effect */}
+        {/* Aegis glow effect - enhanced warm glow */}
         <motion.div
-          className="absolute left-1/2 top-[85%] -translate-x-1/2 -translate-y-full w-32 h-32 rounded-full bg-orange-500/10 blur-xl z-20"
+          className="absolute left-1/2 top-[85%] -translate-x-1/2 -translate-y-full w-32 h-32 rounded-full bg-gradient-radial from-orange-500/20 to-amber-500/5 blur-xl z-20"
           initial={{ opacity: 0 }}
           animate={{ 
             opacity: [0.4, 0.7, 0.4],
@@ -284,18 +372,18 @@ export default function MiniSystemLayout() {
           }}
         />
         
-        {/* Aegis core - positioned at bottom center */}
+        {/* Aegis core - enhanced with better gradients */}
         <Link
           to="/products/aegis"
           className="absolute left-1/2 top-[85%] -translate-x-1/2 -translate-y-full z-40"
         >
           <motion.div 
-            className="w-20 h-20 bg-gradient-to-br from-yellow-500/30 to-orange-600/30 flex items-center justify-center rounded-full border border-yellow-500/30 shadow-lg shadow-orange-500/20 backdrop-blur-sm"
+            className="w-20 h-20 bg-gradient-to-br from-yellow-500/40 to-orange-600/30 flex items-center justify-center rounded-full border border-yellow-500/30 shadow-lg shadow-orange-500/30 backdrop-blur-sm"
             whileHover={{ scale: 1.1 }}
             animate={{ 
               boxShadow: prefersReducedMotion ? 
-                "0 0 10px rgba(234, 179, 8, 0.3)" : 
-                ["0 0 10px rgba(234, 179, 8, 0.3)", "0 0 20px rgba(234, 179, 8, 0.5)", "0 0 10px rgba(234, 179, 8, 0.3)"]
+                "0 0 15px rgba(234, 179, 8, 0.4)" : 
+                ["0 0 10px rgba(234, 179, 8, 0.3)", "0 0 25px rgba(234, 179, 8, 0.5)", "0 0 10px rgba(234, 179, 8, 0.3)"]
             }}
             transition={{ 
               duration: 3, 
@@ -307,7 +395,7 @@ export default function MiniSystemLayout() {
           </motion.div>
         </Link>
         
-        {/* Orbital products - expanded positions */}
+        {/* Orbital products - original layout with enhanced colors */}
         {orbitData.map((item, i) => {
           // Calculate orbital position
           const angle = item.angle * (Math.PI / 180);
@@ -328,7 +416,7 @@ export default function MiniSystemLayout() {
           };
           
           return (
-            <Link
+            <Link 
               key={`orbit-${i}`}
               to={item.path}
               className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-30"
@@ -337,7 +425,7 @@ export default function MiniSystemLayout() {
               }}
             >
               <motion.div 
-                className={`${sizeClasses[item.size || "sm"]} bg-gradient-to-br ${productColors[item.title]} border border-purple-400/10 backdrop-blur-md flex items-center justify-center rounded-full shadow-sm transition-all duration-300 hover:scale-110`}
+                className={`${sizeClasses[item.size || "sm"]} bg-gradient-to-br ${productColors[item.title]} border border-purple-400/20 backdrop-blur-md flex items-center justify-center rounded-full shadow-md transition-all duration-300 hover:scale-110`}
                 animate={{ 
                   y: prefersReducedMotion ? 0 : [0, -5, 0] 
                 }}
@@ -345,6 +433,9 @@ export default function MiniSystemLayout() {
                   duration: 2 + i, 
                   repeat: Infinity, 
                   ease: "easeInOut" 
+                }}
+                whileHover={{
+                  boxShadow: "0 0 20px rgba(139, 92, 246, 0.4)"
                 }}
               >
                 <span>{item.icon}</span>
@@ -358,10 +449,11 @@ export default function MiniSystemLayout() {
       <div className="lg:hidden block h-full relative">
         <div className="h-full flex items-center justify-center">
           <motion.div 
-            className="w-20 h-20 bg-gradient-to-br from-yellow-500/30 to-orange-600/30 flex items-center justify-center rounded-full shadow-lg"
+            className="w-20 h-20 bg-gradient-to-br from-yellow-500/40 to-orange-600/30 flex items-center justify-center rounded-full shadow-lg shadow-orange-500/20"
             animate={{ 
               scale: [1, 1.1, 1],
-              opacity: [0.7, 1, 0.7]
+              opacity: [0.7, 1, 0.7],
+              boxShadow: ["0 0 10px rgba(234, 179, 8, 0.3)", "0 0 20px rgba(234, 179, 8, 0.5)", "0 0 10px rgba(234, 179, 8, 0.3)"]
             }}
             transition={{ 
               duration: 4, 
