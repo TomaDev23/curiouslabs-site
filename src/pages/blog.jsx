@@ -6,7 +6,7 @@ import { IMAGES } from '../utils/assets';
 
 export default function Blog() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#1A1A2E] via-[#272750] to-[#1A1A2E]">
+    <div className="flex flex-col min-h-screen bg-gradient-to-b from-[#1A1A2E] via-[#272750] to-[#1A1A2E]">
       <Helmet>
         <title>Blog - Insights & Updates | CuriousLabs</title>
         <meta name="description" content="Read the latest insights, case studies and updates from the CuriousLabs team of AI and development experts." />
@@ -19,7 +19,7 @@ export default function Blog() {
       
       <NavBar />
       
-      <main className="pt-24 pb-16">
+      <main className="pt-24 pb-16 flex-grow">
         <section className="max-w-7xl mx-auto px-4 py-16 text-center">
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">
             Our <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400">Blog</span>

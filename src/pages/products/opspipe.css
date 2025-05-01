@@ -1,0 +1,32 @@
+/* Custom animations for OpsPipe page */
+
+@keyframes pulse-glow {
+  0% {
+    opacity: 0.2;
+    box-shadow: 0 0 15px rgba(59, 130, 246, 0.1);
+  }
+  50% {
+    opacity: 0.6;
+    box-shadow: 0 0 25px rgba(59, 130, 246, 0.25);
+  }
+  100% {
+    opacity: 0.2;
+    box-shadow: 0 0 15px rgba(59, 130, 246, 0.1);
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 4s infinite cubic-bezier(0.4, 0, 0.6, 1);
+}
+
+/* Secondary glow animation with slight delay for a dynamic effect */
+@keyframes secondary-glow {
+  0%, 100% {
+    opacity: 0.15;
+    transform: scale(0.98);
+  }
+  50% {
+    opacity: 0.3;
+    transform: scale(1.02);
+  }
+} 

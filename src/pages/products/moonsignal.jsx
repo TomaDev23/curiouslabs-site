@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import NavBar from '../../components/NavBar';
 import Footer from '../../components/Footer_legacy';
 import { IMAGES } from '../../utils/assets';
@@ -8,10 +9,21 @@ import ScrollToTop from '../../components/ScrollToTop';
 export default function MoonSignal() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#1A1A2E] via-[#1E1A36] to-[#1A1A2E] overflow-hidden">
+      <Helmet>
+        <title>MoonSignal - Market Intelligence | CuriousLabs</title>
+        <meta name="description" content="Market Intelligence from the Edge. MoonSignal captures social, behavioral, and transactional signals to generate real-time market insights." />
+        <meta property="og:title" content="MoonSignal - Market Intelligence | CuriousLabs" />
+        <meta property="og:description" content="Market Intelligence from the Edge. MoonSignal captures social, behavioral, and transactional signals to generate real-time market insights." />
+        <meta property="og:image" content="/images/logo.svg" />
+        <meta property="og:type" content="product" />
+        <meta property="og:url" content="https://curiouslabs.io/products/moonsignal" />
+      </Helmet>
+      
       <NavBar />
       
       <main className="pt-20 sm:pt-24 pb-12 sm:pb-16">
-        <section className="max-w-7xl mx-auto px-4 py-10 sm:py-16 text-center">
+        {/* Overview Section with anchor ID */}
+        <section id="overview" className="max-w-7xl mx-auto px-4 py-10 sm:py-16 text-center">
           <div className="inline-block mb-4 sm:mb-6">
             <div className="relative w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-4">
               <div className="absolute inset-0 bg-gradient-to-r from-indigo-400 to-purple-500 rounded-full blur-md opacity-50"></div>
@@ -66,38 +78,45 @@ export default function MoonSignal() {
           </div>
         </section>
         
-        {/* Features */}
-        <section className="max-w-7xl mx-auto px-4 py-6 sm:py-8 mb-12 sm:mb-16">
+        {/* Features Section with anchor ID */}
+        <section id="features" className="max-w-7xl mx-auto px-4 py-6 sm:py-8 mb-12 sm:mb-16">
           <h2 className="text-2xl sm:text-3xl font-bold text-white mb-8 sm:mb-12 text-center">Core Capabilities</h2>
           
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8">
             {[
               {
                 title: 'Signal Clustering',
-                description: 'Groups related patterns across diverse data sources to identify meaningful correlations',
+                description: 'Group input patterns into meaningful signal "families."',
+                icon: '📈'
               },
               {
-                title: 'Realtime Visualizations',
-                description: 'Dynamic dashboards showing market sentiment, volume anomalies, and trend indicators',
+                title: 'Realtime Visualization',
+                description: 'Render signal maps as live dashboards or charts.',
+                icon: '📊'
               },
               {
-                title: 'Platform Integration',
-                description: 'Connects with X, Discord, wallets, and other sources to gather comprehensive data',
+                title: 'Integrates with Aegis',
+                description: 'Sends parsed signal data into the decision engine.',
+                icon: '🧩'
               },
               {
-                title: 'Predictive Modeling',
-                description: 'Uses advanced neural networks to forecast potential market movements and timing',
+                title: 'Discord / X / Wallet Ready',
+                description: 'Built to pull from modern platforms with Web3 compatibility.',
+                icon: '🤖'
               },
               {
-                title: 'Anomaly Detection',
-                description: 'Identifies unusual patterns that may indicate emerging opportunities or risks',
+                title: 'Signal Classification',
+                description: 'Tag each cluster with confidence, volatility, risk.',
+                icon: '⚙️'
               },
               {
-                title: 'Custom Alerts',
-                description: 'Configurable notification system for specific signals, thresholds, or pattern matches',
+                title: 'Adaptive Thresholds',
+                description: 'Learns which signal types matter to your stack.',
+                icon: '🔂'
               },
             ].map((feature, index) => (
               <div key={index} className="bg-gradient-to-br from-[#2A2A45]/50 to-[#1A1A30]/50 p-5 sm:p-6 rounded-xl border border-indigo-500/10 hover:border-indigo-500/30 transition duration-300">
+                <div className="text-2xl mb-3">{feature.icon}</div>
                 <h3 className="text-lg sm:text-xl font-semibold text-white mb-2 sm:mb-3">{feature.title}</h3>
                 <p className="text-xs sm:text-sm text-gray-400">{feature.description}</p>
               </div>
@@ -105,8 +124,8 @@ export default function MoonSignal() {
           </div>
         </section>
         
-        {/* Call to Action */}
-        <section className="max-w-5xl mx-auto px-4 py-10 sm:py-16 text-center">
+        {/* Call to Action Section with anchor ID */}
+        <section id="cta" className="max-w-5xl mx-auto px-4 py-10 sm:py-16 text-center">
           <div className="bg-gradient-to-r from-indigo-900/30 to-purple-900/20 rounded-2xl p-6 sm:p-10">
             <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4 sm:mb-6">Harness the Power of Signal Intelligence</h2>
             <p className="text-base sm:text-xl text-gray-300 mb-6 sm:mb-8">

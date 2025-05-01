@@ -1,89 +1,99 @@
-# 🧾 CuriousLabs GitOps Doctrine — Branch Discipline & Production Integrity (Contract v1.0)
+# 🧠 CuriousLabs Git Doctrine – Branch Discipline & Deployment Strategy
 
 ## 🎯 Purpose
-This contract defines the Git hygiene, branching policy, and working discipline for all CuriousLabs projects to ensure zero-risk deployments, stable production branches, and clean developer workflows.
+To enforce clean separation between development and deployment environments. This doctrine ensures:
+- `main` remains a **pure, deploy-only branch**
+- `dev` holds all **local build tools, runtime folders, and WIP components**
+- Every change to `main` is intentional, tested, and layered
 
 ---
 
-## 1️⃣ Branching Protocol
+## 🧱 Branch Roles
 
-### 🔵 `main` Branch (Protected)
-- 🔒 No direct commits.
-- ✅ Only merged via PR from vetted branches.
-- 💡 Always reflects clean, production-ready state.
-- ❌ Must not include:
-  - `node_modules/`
-  - `dist/`, `build/`
-  - `public/` assets unless explicitly required.
+### 🔐 `main` – Deploy-Only Branch
+**Purpose:**
+- This is the version Vercel deploys.
+- It should never be run or built locally.
 
-### 🧪 Dev/Feature Branches
-- Naming: `feature/{slug}`, `fix/{slug}`, `cleanup/{slug}`
-- Must run locally and be testable.
-- May contain temporary folders (e.g., `dist/`, `node_modules/`)
-- Examples:
-  - `feature/TILE-4.3-navbar-tune`
-  - `cleanup/footer-dedupe`
+**Characteristics:**
+- No `node_modules/`, `dist/`, `.vercel/`, `.DS_Store`, or runtime-only folders
+- No `.vercelignore` file
+- No temporary assets or test code
+- No experimental components
+- Only source files, config files, SVGs, and declared assets
 
-### 🧯 Hotfix Branches
-- Used for urgent corrections.
-- Naming: `hotfix/{desc}`
-- Must still follow commit and PR discipline.
+**Allowed Files:**
+- `src/`
+- `public/images/` and `/logos/`
+- `package.json`, `vite.config.js`, `tailwind.config.js`, `postcss.config.js`
+- `.gitignore` (but not `.vercelignore`)
+- Design-complete, tested components
+
+**Forbidden in `main`:**
+- Anything not essential to clean deployment
+- Placeholder content
+- Dev-only experiments
+
+### 🛠️ `dev` – Development Workspace
+**Purpose:**
+- All visual design, component development, testing, and local work happen here
+
+**Characteristics:**
+- `node_modules/`, `.vercel/`, `dist/` are present (but ignored via `.gitignore`)
+- All components and design changes are created and validated here
+- You only push to `main` when a section is **visually complete and deploy-ready**
+
+**Tools:**
+- `.gitignore` enforces hygiene
+- Optional `.vercelignore` may exist (local use only, not to be pushed)
+- `npm run dev` and `npm run build` are used only here
 
 ---
 
-## 2️⃣ Cursor Protocol Enforcement
-- Cursor agents must never commit to `main`.
-- All cursor-generated work must:
-  - Operate within a separate branch.
-  - Declare all `git add`, `commit`, `status` steps explicitly.
-  - Submit PR-ready commit messages.
-- Any auto-pushes must be pre-approved.
+## 🔄 Flow: `dev → main`
 
----
+### ✅ When to Push to Main
+Only push from `dev → main` when:
+- The section is fully designed and implemented (e.g. Hero, LogoStrip, Footer)
+- You’ve tested local build on `dev`
+- You’ve confirmed no runtime folders are included
 
-## 3️⃣ GitIgnore Enforcement
+### 🧼 Steps to Push
+```bash
+# While on dev
+npm run build    # Confirm it builds
 
-Main must be clean:
+# Manually copy ONLY final assets/code to main
+# Switch to main
+git checkout main
+
+# Copy in only finalized components and assets
+# Add, commit, and push cleanly
+
+git add .
+git commit -m "TILE 4.X: Finalize [component] design – deploy-ready"
+git push origin main
 ```
-node_modules/
-dist/
-build/
-public/
-*.log
-*.local
-.vercel/
-```
-
-Dev branches may temporarily allow these for local runtime.
 
 ---
 
-## 4️⃣ Production Push Discipline
-
-- Final merges into `main` must:
-  - Be fast-forward or squashed from clean dev branch
-  - Be followed by manual review
-  - Be preceded by a working local build confirmation
-
----
-
-## 5️⃣ Optional GitHub Rule
-
-Enable branch protection for `main`:
-- ✅ Require PRs for merge
-- ✅ Prevent force push
-- ✅ Require 1 approval or check (optionally via CI)
+## 🚫 Forbidden Practices
+- Never develop or test directly in `main`
+- Never commit `node_modules/`, `.vercel/`, or build artifacts
+- Never push `.vercelignore` to main
+- Never merge `dev` into `main` automatically — all transfers must be clean, controlled, manual
 
 ---
 
-## 🧠 Summary
-This contract protects CuriousLabs from unexpected file leaks, unstable build states, or agent drift. All development work should be channeled into testable, clean branches, and only merged into `main` when reviewed, confirmed, and purged of non-production artifacts.
-
-"Push no chaos to `main`."
+## 📦 Deployment Summary
+| Branch | Purpose           | Buildable | Deployable | Has Runtime | Allowed to Push to Vercel |
+|--------|--------------------|-----------|------------|-------------|----------------------------|
+| main   | Deploy only        | ❌        | ✅         | ❌          | ✅                         |
+| dev    | Development branch | ✅        | ❌         | ✅          | ❌                         |
 
 ---
-Signed:
-**🧑‍🚀 Commander, CuriousLabs**
 
+## 🧠 Remember
+> CuriousLabs isn’t just a site — it’s a **deploy pipeline with discipline.**
+> `main` is your polished façade. `dev` is your lab. Treat them accordingly.
 
-==============================================================================================================================

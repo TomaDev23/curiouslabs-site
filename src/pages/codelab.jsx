@@ -1,271 +1,241 @@
-import React, { useEffect, useState, useRef, useMemo } from "react";
+import React from 'react';
+import { Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import NavBar from '../components/NavBar';
 import Footer from '../components/Footer_legacy';
-import Hero from '../components/legacy/Hero';
-import LogoStrip from '../components/LogoStrip';
-import DynamicExpansion from '../components/DynamicExpansion';
-import Services from '../components/Services';
+import ScrollToTop from '../components/ScrollToTop';
 import Metrics from '../components/Metrics';
 import CaseStudies from '../components/CaseStudies';
 import Testimonials from '../components/Testimonials';
-import ScrollReveal from '../components/ScrollReveal';
-import ScrollToTop from '../components/ScrollToTop';
-import { IMAGES } from '../utils/assets';
 
 export default function CodeLab() {
-  const [scrollY, setScrollY] = useState(0);
-  const [viewportHeight, setViewportHeight] = useState(0);
-  const [isMobile, setIsMobile] = useState(false);
-  const [lastScrollProgress, setLastScrollProgress] = useState(0);
-  const metricsRef = useRef(null);
-  
-  // Track scroll position and viewport height for scroll-based effects
-  useEffect(() => {
-    // Handler to update scroll position
-    const handleScroll = () => {
-      setScrollY(window.scrollY);
-    };
-    
-    // Handler to update viewport height on resize
-    const handleResize = () => {
-      setViewportHeight(window.innerHeight);
-      setIsMobile(window.innerWidth < 768);
-    };
-    
-    // Initialize viewport height and mobile check
-    handleResize();
-    
-    // Optimize scroll performance with requestAnimationFrame
-    let ticking = false;
-    const throttledScroll = () => {
-      if (!ticking) {
-        window.requestAnimationFrame(() => {
-          setScrollY(window.scrollY);
-          ticking = false;
-        });
-        ticking = true;
-      }
-    };
-    
-    // Add event listeners
-    window.addEventListener('scroll', throttledScroll);
-    window.addEventListener('resize', handleResize);
-    
-    // Cleanup event listeners
-    return () => {
-      window.removeEventListener('scroll', throttledScroll);
-      window.removeEventListener('resize', handleResize);
-    };
-  }, []);
-  
-  // Calculate scroll progress for DynamicExpansion (0 to 1 range)
-  const calculateDynamicExpansionProgress = () => {
-    // Start showing cards with minimal scroll
-    const triggerPoint = viewportHeight * 0.1;
-    
-    // Use a divisor that ensures quick initial appearance but smooth progression
-    const progress = Math.max(0, (scrollY - triggerPoint) / (viewportHeight * 1.2));
-    
-    // Return current progress, capped at 1
-    return Math.min(1, progress);
-  };
-
-  // Calculate current progress
-  const currentProgress = calculateDynamicExpansionProgress();
-  
-  // Update lastScrollProgress if current progress is greater
-  useEffect(() => {
-    if (currentProgress > lastScrollProgress) {
-      setLastScrollProgress(currentProgress);
-    }
-  }, [currentProgress, lastScrollProgress]);
-  
-  // Use the greater of current or last progress to ensure elements stay visible
-  const dynamicExpansionProgress = Math.max(currentProgress, lastScrollProgress);
-  
-  // Calculate parallax scroll positions with better performance
-  const chaoticLayerTransform = useMemo(() => 
-    `translateY(${scrollY * 0.15}px)`, 
-    [scrollY]
-  );
-
-  const transitionLayerTransform = useMemo(() => 
-    `translateY(${scrollY * 0.25}px)`, 
-    [scrollY]
-  );
-
-  const legitLayerTransform = useMemo(() => 
-    `translateY(${scrollY * 0.35}px)`, 
-    [scrollY]
-  );
-  
-  // Calculate LogoStrip opacity based on metrics section position
-  const [logoStripOpacity, setLogoStripOpacity] = useState(1);
-  
-  useEffect(() => {
-    const calculateLogoStripOpacity = () => {
-      if (metricsRef.current) {
-        const metricsPosition = metricsRef.current.getBoundingClientRect().top;
-        // Start fading when metrics section is 150% of viewport height away
-        const fadeStartDistance = viewportHeight * 1.5;
-        // Complete fade when metrics section is 75% of viewport height away
-        const fadeEndDistance = viewportHeight * 0.75;
-        
-        if (metricsPosition <= fadeStartDistance) {
-          const fadeProgress = Math.max(0, Math.min(1, 
-            (metricsPosition - fadeEndDistance) / (fadeStartDistance - fadeEndDistance)
-          ));
-          setLogoStripOpacity(fadeProgress);
-        } else {
-          setLogoStripOpacity(1);
-        }
-      }
-    };
-    
-    calculateLogoStripOpacity();
-    window.addEventListener('scroll', calculateLogoStripOpacity);
-    return () => window.removeEventListener('scroll', calculateLogoStripOpacity);
-  }, [viewportHeight]);
-  
-  // Detect Safari for browser-specific optimizations
-  const [isSafari, setIsSafari] = useState(false);
-
-  useEffect(() => {
-    // Simple Safari detection
-    const isSafariCheck = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-    setIsSafari(isSafariCheck);
-  }, []);
-  
   return (
-    <main className="min-h-screen bg-gradient-to-b from-[#5D45B8] via-[#403962] to-[#28293D] text-white antialiased relative overflow-hidden">
-      {/* SVG Background Layers with Parallax Effect */}
-      <div className="absolute inset-0 w-full h-full overflow-hidden z-0">
-        {/* Base gradient layer */}
-        <div className="absolute inset-0 bg-gradient-to-r from-[#5D45B8]/15 via-[#383053]/10 to-transparent opacity-[0.2]"></div>
-        
-        {/* Chaotic code pattern - starts visible at top */}
-        <div 
-          className={`absolute inset-0 w-full h-full z-0 parallax-layer ${isSafari ? 'safari-transform' : ''}`}
-          style={{ 
-            transform: isMobile ? `translateY(${Math.round(scrollY * 0.15)}px)` : chaoticLayerTransform,
-            willChange: 'transform',
-            opacity: isMobile ? 0.12 : 0.25,
-            backfaceVisibility: 'hidden'
-          }}
-        >
-          <div 
-            className="absolute top-0 left-0 w-full h-[150vh] bg-repeat bg-[length:400px_400px] sm:bg-[length:500px_500px]"
-            style={{ backgroundImage: `url(${IMAGES.SVG.CHAOTIC_CODE})` }}
-          ></div>
-        </div>
-        
-        {/* Transition pattern - middle layer */}
-        <div 
-          className={`absolute inset-0 w-full h-full z-1 parallax-layer ${isSafari ? 'safari-transform' : ''}`}
-          style={{ 
-            transform: isMobile ? `translateY(${Math.round(scrollY * 0.25)}px)` : transitionLayerTransform,
-            willChange: 'transform',
-            opacity: isMobile ? 0.1 : 0.2,
-            backfaceVisibility: 'hidden'
-          }}
-        >
-          <div 
-            className="absolute top-[80vh] left-0 w-full h-[150vh] bg-repeat bg-[length:400px_400px] sm:bg-[length:500px_500px]"
-            style={{ backgroundImage: `url(${IMAGES.SVG.TRANSITION_CODE})` }}
-          ></div>
-        </div>
-        
-        {/* Legit code pattern - bottom layer */}
-        <div 
-          className={`absolute inset-0 w-full h-full z-2 parallax-layer ${isSafari ? 'safari-transform' : ''}`}
-          style={{ 
-            transform: isMobile ? `translateY(${Math.round(scrollY * 0.35)}px)` : legitLayerTransform,
-            willChange: 'transform',
-            opacity: isMobile ? 0.08 : 0.18,
-            backfaceVisibility: 'hidden'
-          }}
-        >
-          <div 
-            className="absolute top-[160vh] left-0 w-full h-[150vh] bg-repeat bg-[length:400px_400px] sm:bg-[length:500px_500px]"
-            style={{ backgroundImage: `url(${IMAGES.SVG.LEGIT_CODE})` }}
-          ></div>
-        </div>
-        
-        {/* Single elegant blob for depth */}
-        <div 
-          className="absolute top-[5%] left-[5%] w-[500px] h-[500px] bg-gradient-to-br from-[#5D45B8]/8 to-transparent rounded-full blur-3xl opacity-[0.15]"
-          style={{ willChange: 'transform' }}
-        ></div>
-      </div>
+    <div className="min-h-screen bg-gradient-to-b from-[#1A1A2E] via-[#16213E] to-[#0F172A] text-white flex flex-col">
+      <Helmet>
+        <title>CodeLab - Developer Tools & Resources | CuriousLabs</title>
+        <meta name="description" content="Explore our collection of LEGIT-compliant developer tools, patterns, and AI logic built for production-grade systems." />
+        <meta property="og:title" content="CodeLab - Developer Tools & Resources | CuriousLabs" />
+        <meta property="og:description" content="Explore our collection of LEGIT-compliant developer tools, patterns, and AI logic built for production-grade systems." />
+        <meta property="og:image" content="/images/logo.svg" />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://curiouslabs.io/codelab" />
+      </Helmet>
       
-      {/* Foreground Content */}
-      <div className="relative z-10">
-        {/* Navigation */}
-        <NavBar />
+      <NavBar />
+      
+      <main className="flex-grow container mx-auto px-4 sm:px-6 py-16 sm:py-24 max-w-7xl">
+        {/* Hero Section */}
+        <section className="text-center mb-16">
+          <h1 className="text-4xl sm:text-5xl font-extrabold text-white mb-4">The CuriousLabs CodeLab</h1>
+          <p className="text-lg sm:text-xl text-gray-300 max-w-3xl mx-auto">
+            Behind the scenes — tools, patterns, and AI logic we built to support production-grade systems. Everything you see here is LEGIT-compliant and running in the wild.
+          </p>
+          <div className="text-xs text-purple-400 uppercase tracking-wide mt-4 mb-6 text-center">
+            LEGIT Traced · Agent-Tested · Production-Proven
+          </div>
+        </section>
         
-        {/* LogoStrip - Fixed at bottom from page load */}
-        <div 
-          className="fixed bottom-0 left-0 right-0 w-full z-30 transition-opacity duration-700"
-          style={{ 
-            opacity: logoStripOpacity,
-            willChange: 'opacity',
-            transform: 'translateZ(0)'
-          }}
-        >
-          <LogoStrip />
-        </div>
+        {/* Description Block */}
+        <section className="max-w-4xl mx-auto mb-16 px-4 text-purple-200/80 text-sm sm:text-base leading-relaxed text-center">
+          <p>
+            CuriousLabs doesn't just build interfaces — we build runtimes, FSMs, CLI pipelines, and composable agent wrappers.
+          </p>
+          <p className="mt-4">
+            CodeLab is where these internal tools and patterns are stabilized and made public. Each one is traceable, testable, and tied to a real deployment case.
+          </p>
+        </section>
         
-        {/* Unified container for all main content */}
-        <div className="relative">
-          {/* Hero Section */}
-          <div className="relative pt-16 pb-0 min-h-[85vh] z-20">
-            <Hero />
-          </div>
-          
-          {/* Dynamic expansion section with no negative margin */}
-          <div className="relative z-20">
-            <DynamicExpansion scrollProgress={dynamicExpansionProgress} />
-          </div>
-          
-          {/* Services section - reduced spacing for better flow */}
-          <div className="relative z-20">
-            <ScrollReveal animation="fade-in-up" delay="0.1s" id="services">
-              <Services />
-            </ScrollReveal>
-          </div>
-        </div>
+        {/* Section Divider */}
+        <hr className="my-12 border-purple-900/30" />
         
-        {/* Sections that come after the unified container */}
-        <div className="relative z-40">
-          <div ref={metricsRef} id="metrics">
-            <ScrollReveal animation="fade-in-up" delay="0.2s">
-              <Metrics />
-            </ScrollReveal>
-          </div>
+        {/* Featured Tools Grid */}
+        <section className="max-w-7xl mx-auto px-4 py-6 sm:py-8 mb-12 sm:mb-16">
+          <h2 className="text-2xl sm:text-3xl font-bold text-white text-left sm:text-center mb-6">Featured Lab Tools</h2>
           
-          <ScrollReveal animation="fade-in-up" delay="0.3s" id="case-studies">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8">
+            {[
+              {
+                icon: "🧹",
+                category: "CLI Tool",
+                title: "SweepHammer",
+                description: "A CLI-ready linter and hygiene tool for operational codebases. Designed for Git CI flows."
+              },
+              {
+                icon: "🧠",
+                category: "Document Processing",
+                title: "OpsPipe Parser",
+                description: "FSM-driven document parser with CLI ingestion and agent slot selection."
+              },
+              {
+                icon: "📊",
+                category: "Telemetry",
+                title: "Telemetry Trace Pack",
+                description: "Sample outputs for trace.json, recovery.json, and state.json — used for audit visibility."
+              },
+              {
+                icon: "🧪",
+                category: "Test Framework",
+                title: "LEGIT CLI Runner",
+                description: "Contract-driven test runner with structured logging, session tracebacks, and fallback verification."
+              },
+              {
+                icon: "🔌",
+                category: "Agent Integration",
+                title: "Agent Bus",
+                description: "Unified wrapper for GPT, Claude, Gemini — supports slot fallback and runtime logging."
+              },
+              {
+                icon: "🌧️",
+                category: "UI Component",
+                title: "CodeRain Terminal",
+                description: "UI effect to simulate CLI drip animations. Used on dev portals and trace dashboards."
+              }
+            ].map((tool, index) => (
+              <div key={index} className="bg-gradient-to-br from-[#1C1C2C]/60 to-[#12121C]/60 border border-purple-300/10 hover:border-purple-400/40 shadow-md shadow-purple-900/20 p-6 rounded-xl min-h-[220px] flex flex-col">
+                <div className="flex items-center gap-2 text-purple-400 text-sm mb-2">
+                  <span className="text-lg">{tool.icon}</span>
+                  <span>{tool.category}</span>
+                </div>
+                <h3 className="text-lg sm:text-xl font-semibold text-white mb-2">{tool.title}</h3>
+                <p className="text-sm text-purple-200/80">{tool.description}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+        
+        {/* Section Divider */}
+        <hr className="my-12 border-purple-900/30" />
+        
+        {/* LEGIT Protocol Section (adapted from Aegis) */}
+        <section className="max-w-6xl mx-auto px-4 py-6 sm:py-10 mb-8 sm:mb-12">
+          <div className="bg-gradient-to-br from-[#1C1C2C]/70 to-[#12121C]/70 border border-purple-500/20 rounded-2xl p-6 sm:p-8 relative overflow-hidden shadow-[0_0_25px_rgba(139,92,246,0.15)]">
+            {/* Purple glow effect */}
+            <div className="absolute -inset-1 bg-purple-500/5 blur-md animate-pulse-glow"></div>
+            <div className="absolute inset-0 bg-purple-400/5 blur-lg" style={{ animation: 'secondary-glow 5s infinite ease-in-out 0.5s' }}></div>
+            
+            <div className="relative z-10">
+              <h2 className="text-xl sm:text-2xl font-bold text-purple-400 mb-4 sm:mb-6 text-center">
+                Built LEGIT for Technical Excellence
+              </h2>
+              <p className="text-sm sm:text-base text-gray-300 text-center max-w-3xl mx-auto mb-6 sm:mb-8">
+                Every tool in CodeLab follows the <span className="font-semibold text-purple-300">LEGIT</span> standard — our framework for secure, testable, and audit-compliant development.
+              </p>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4 text-sm sm:text-base text-white text-center mb-12">
+                <div className="bg-black/20 p-4 rounded-lg border border-purple-500/10">
+                  <div className="text-xl mb-2">📜</div>
+                  <h3 className="font-semibold text-purple-300 mb-1">Logged</h3>
+                  <p className="text-gray-400">All transitions, operations, and executions are comprehensively trace-logged.</p>
+                </div>
+
+                <div className="bg-black/20 p-4 rounded-lg border border-purple-500/10">
+                  <div className="text-xl mb-2">🧪</div>
+                  <h3 className="font-semibold text-purple-300 mb-1">Evaluated</h3>
+                  <p className="text-gray-400">Components are validated against test specs and regression patterns.</p>
+                </div>
+
+                <div className="bg-black/20 p-4 rounded-lg border border-purple-500/10">
+                  <div className="text-xl mb-2">🧠</div>
+                  <h3 className="font-semibold text-purple-300 mb-1">Grounded</h3>
+                  <p className="text-gray-400">Every system output is schema-bound, type-safe, and verifiable.</p>
+                </div>
+
+                <div className="bg-black/20 p-4 rounded-lg border border-purple-500/10">
+                  <div className="text-xl mb-2">🛡️</div>
+                  <h3 className="font-semibold text-purple-300 mb-1">Isolated</h3>
+                  <p className="text-gray-400">Operations run in isolated contexts with no shared state leakage.</p>
+                </div>
+
+                <div className="bg-black/20 p-4 rounded-lg border border-purple-500/10">
+                  <div className="text-xl mb-2">✅</div>
+                  <h3 className="font-semibold text-purple-300 mb-1">Tested</h3>
+                  <p className="text-gray-400">Every component is tested thoroughly for reliability and edge cases.</p>
+                </div>
+              </div>
+              
+              {/* Technical LEGIT Meaning Section */}
+              <div className="max-w-4xl mx-auto px-4 sm:px-6 text-gray-300 text-sm sm:text-base leading-relaxed">
+                <h3 className="text-lg sm:text-xl text-white font-semibold mb-4 sm:mb-6">
+                  What LEGIT Means in Code
+                </h3>
+                <p className="mb-5">
+                  The LEGIT protocol isn't branding — it's enforced by the Aegis runtime. Every part of the system maps to real contract logic, trace outputs, and test validation.
+                </p>
+                <ul className="space-y-4 border-l border-purple-500/20 pl-4">
+                  <li>
+                    <span className="text-purple-400 font-medium">L – Lifecycle Simulation Tested:</span><br />
+                    Every core phase is validated via state-machine simulations with full control replay.
+                  </li>
+                  <li>
+                    <span className="text-purple-400 font-medium">E – Enum & State Traceability Verified:</span><br />
+                    All transitions use strongly-typed enums. State changes emit traceable artifacts like <code className="text-purple-300 bg-purple-900/20 px-1 rounded">state.json</code>.
+                  </li>
+                  <li>
+                    <span className="text-purple-400 font-medium">G – Guardrails Locked:</span><br />
+                    Fallbacks, overrides, and failures are schema-validated and tracked in files like <code className="text-purple-300 bg-purple-900/20 px-1 rounded">recovery.json</code>.
+                  </li>
+                  <li>
+                    <span className="text-purple-400 font-medium">I – Interface Contracts Enforced:</span><br />
+                    Parsers, agents, and sync layers must conform to spec. No schema = no ship.
+                  </li>
+                  <li>
+                    <span className="text-purple-400 font-medium">T – Trace Artifacts Written:</span><br />
+                    All sessions output structured trace logs (<code className="text-purple-300 bg-purple-900/20 px-1 rounded">trace/</code>, <code className="text-purple-300 bg-purple-900/20 px-1 rounded">logs/audit/</code>) that drive real-time dashboard panels and diagnostics.
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </section>
+        
+        {/* Section Divider */}
+        <hr className="my-12 border-purple-900/30" />
+        
+        {/* CTA Section */}
+        <section className="bg-gradient-to-r from-purple-900/40 to-black py-16 px-6 rounded-2xl text-center max-w-6xl mx-auto mb-16">
+          <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4">Want to build like this?</h2>
+          <p className="text-purple-200/80 mb-6">Get in touch for audits, rapid prototyping, or access to our private dev toolchain.</p>
+          <Link to="/contact" className="inline-block bg-purple-600 hover:bg-purple-500 text-white font-semibold py-3 px-6 rounded-md transition-all duration-300">
+            Contact CuriousLabs
+          </Link>
+        </section>
+        
+        {/* Section Divider */}
+        <hr className="my-12 border-purple-900/30" />
+        
+        {/* Metrics Section (from original page) */}
+        <section className="max-w-7xl mx-auto mb-24">
+          <h2 className="text-2xl sm:text-3xl font-bold text-white text-left sm:text-center mb-10">CodeLab Impact</h2>
+          <div className="bg-gradient-to-br from-[#1C1C2C]/60 to-[#12121C]/60 border border-purple-300/10 p-6 rounded-xl shadow-md shadow-purple-900/20">
+            <Metrics />
+          </div>
+        </section>
+        
+        {/* Section Divider */}
+        <hr className="my-12 border-purple-900/30" />
+        
+        {/* Case Studies Section (from original page) */}
+        <section className="max-w-7xl mx-auto mb-24" id="case-studies">
+          <h2 className="text-2xl sm:text-3xl font-bold text-white text-left sm:text-center mb-10">Featured Projects</h2>
+          <div className="bg-gradient-to-br from-[#1C1C2C]/60 to-[#12121C]/60 border border-purple-300/10 p-6 rounded-xl shadow-md shadow-purple-900/20">
             <CaseStudies />
-          </ScrollReveal>
-          
-          <ScrollReveal animation="fade-in-up" delay="0.4s">
+          </div>
+        </section>
+        
+        {/* Section Divider */}
+        <hr className="my-12 border-purple-900/30" />
+        
+        {/* Testimonials Section (from original page) */}
+        <section className="max-w-7xl mx-auto mb-24">
+          <h2 className="text-2xl sm:text-3xl font-bold text-white text-left sm:text-center mb-10">Developer Feedback</h2>
+          <div className="bg-gradient-to-br from-[#1C1C2C]/60 to-[#12121C]/60 border border-purple-300/10 p-6 rounded-xl shadow-md shadow-purple-900/20">
             <Testimonials />
-          </ScrollReveal>
-        </div>
-      </div>
-      
-      {/* Safari-specific optimizations */}
-      {isSafari && (
-        <style jsx>{`
-          .safari-transform {
-            -webkit-transform: translate3d(0, 0, 0);
-            -webkit-backface-visibility: hidden;
-            -webkit-perspective: 1000;
-          }
-        `}</style>
-      )}
+          </div>
+        </section>
+      </main>
       
       <Footer />
       <ScrollToTop />
-    </main>
+    </div>
   );
 } 

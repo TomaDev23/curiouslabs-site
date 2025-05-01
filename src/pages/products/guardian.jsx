@@ -4,14 +4,26 @@ import NavBar from '../../components/NavBar';
 import Footer from '../../components/Footer_legacy';
 import { IMAGES } from '../../utils/assets';
 import ScrollToTop from '../../components/ScrollToTop';
+import { Helmet } from 'react-helmet-async';
 
 export default function Guardian() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#1A1A2E] via-[#1A2D2A] to-[#1A1A2E] overflow-hidden">
+      <Helmet>
+        <title>Guardian - Child Protection | CuriousLabs</title>
+        <meta name="description" content="Guardian is an AI-powered protector designed to guide children toward healthy digital habits, filtering harmful content and promoting learning." />
+        <meta property="og:title" content="Guardian - Child Protection | CuriousLabs" />
+        <meta property="og:description" content="Guardian is an AI-powered protector designed to guide children toward healthy digital habits, filtering harmful content and promoting learning." />
+        <meta property="og:image" content="/images/logo.svg" />
+        <meta property="og:type" content="product" />
+        <meta property="og:url" content="https://curiouslabs.io/products/guardian" />
+      </Helmet>
+      
       <NavBar />
       
       <main className="pt-20 sm:pt-24 pb-12 sm:pb-16">
-        <section className="max-w-7xl mx-auto px-4 py-10 sm:py-16 text-center">
+        {/* Overview Section with anchor ID */}
+        <section id="overview" className="max-w-7xl mx-auto px-4 py-10 sm:py-16 text-center">
           <div className="inline-block mb-4 sm:mb-6">
             <div className="relative w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-4">
               <div className="absolute inset-0 bg-gradient-to-r from-green-400 to-teal-500 rounded-full blur-md opacity-50"></div>
@@ -66,8 +78,8 @@ export default function Guardian() {
           </div>
         </section>
         
-        {/* Features */}
-        <section className="max-w-7xl mx-auto px-4 py-6 sm:py-8 mb-12 sm:mb-16">
+        {/* Features Section with anchor ID */}
+        <section id="features" className="max-w-7xl mx-auto px-4 py-6 sm:py-8 mb-12 sm:mb-16">
           <h2 className="text-2xl sm:text-3xl font-bold text-white mb-8 sm:mb-12 text-center">Core Capabilities</h2>
           
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8">
@@ -75,29 +87,36 @@ export default function Guardian() {
               {
                 title: 'Content Redirection AI',
                 description: 'Intelligently redirects from harmful content to educational alternatives tailored to interests',
+                icon: '🔄'
               },
               {
                 title: 'Emotionally Smart Responses',
                 description: 'Recognizes frustration and provides age-appropriate explanations rather than simple blocks',
+                icon: '❤️'
               },
               {
                 title: 'Always-On Companion',
                 description: 'Provides continuous protection across devices and platforms without gaps',
+                icon: '🔒'
               },
               {
                 title: 'Parental Controls',
                 description: 'Customizable protection levels with detailed activity insights for parents',
+                icon: '👪'
               },
               {
                 title: 'Learning Promotion',
                 description: 'Actively suggests educational content aligned with current interests and curriculum',
+                icon: '📚'
               },
               {
                 title: 'Digital Wellbeing',
                 description: 'Encourages healthy screen time habits and balanced digital/physical activities',
+                icon: '⏱️'
               },
             ].map((feature, index) => (
               <div key={index} className="bg-gradient-to-br from-[#2A2A45]/50 to-[#1A1A30]/50 p-5 sm:p-6 rounded-xl border border-green-500/10 hover:border-green-500/30 transition duration-300">
+                <div className="text-2xl mb-3">{feature.icon}</div>
                 <h3 className="text-lg sm:text-xl font-semibold text-white mb-2 sm:mb-3">{feature.title}</h3>
                 <p className="text-xs sm:text-sm text-gray-400">{feature.description}</p>
               </div>
@@ -105,8 +124,8 @@ export default function Guardian() {
           </div>
         </section>
         
-        {/* Call to Action */}
-        <section className="max-w-5xl mx-auto px-4 py-10 sm:py-16 text-center">
+        {/* Call to Action Section with anchor ID */}
+        <section id="cta" className="max-w-5xl mx-auto px-4 py-10 sm:py-16 text-center">
           <div className="bg-gradient-to-r from-green-900/30 to-teal-900/20 rounded-2xl p-6 sm:p-10">
             <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4 sm:mb-6">Secure Your Child's Digital Journey</h2>
             <p className="text-base sm:text-xl text-gray-300 mb-6 sm:mb-8">

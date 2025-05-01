@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import NavBar from '../../components/NavBar';
 import Footer from '../../components/Footer_legacy';
 import { IMAGES } from '../../utils/assets';
@@ -8,10 +9,21 @@ import ScrollToTop from '../../components/ScrollToTop';
 export default function Curious() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#1A1A2E] via-[#2D1A3B] to-[#1A1A2E] overflow-hidden">
+      <Helmet>
+        <title>Curious - AI Companion | CuriousLabs</title>
+        <meta name="description" content="AI Companion for Thought and Discovery. A playful AI presence built to stimulate imagination, reflection, and curiosity." />
+        <meta property="og:title" content="Curious - AI Companion | CuriousLabs" />
+        <meta property="og:description" content="AI Companion for Thought and Discovery. A playful AI presence built to stimulate imagination, reflection, and curiosity." />
+        <meta property="og:image" content="/images/logo.svg" />
+        <meta property="og:type" content="product" />
+        <meta property="og:url" content="https://curiouslabs.io/products/curious" />
+      </Helmet>
+      
       <NavBar />
       
       <main className="pt-20 sm:pt-24 pb-12 sm:pb-16">
-        <section className="max-w-7xl mx-auto px-4 py-10 sm:py-16 text-center">
+        {/* Overview Section with anchor ID */}
+        <section id="overview" className="max-w-7xl mx-auto px-4 py-10 sm:py-16 text-center">
           <div className="inline-block mb-4 sm:mb-6">
             <div className="relative w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-4">
               <div className="absolute inset-0 bg-gradient-to-r from-purple-400 to-pink-500 rounded-full blur-md opacity-50"></div>
@@ -66,8 +78,8 @@ export default function Curious() {
           </div>
         </section>
         
-        {/* Features */}
-        <section className="max-w-7xl mx-auto px-4 py-6 sm:py-8 mb-12 sm:mb-16">
+        {/* Features Section with anchor ID */}
+        <section id="features" className="max-w-7xl mx-auto px-4 py-6 sm:py-8 mb-12 sm:mb-16">
           <h2 className="text-2xl sm:text-3xl font-bold text-white mb-8 sm:mb-12 text-center">Core Capabilities</h2>
           
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8">
@@ -75,29 +87,36 @@ export default function Curious() {
               {
                 title: 'Conversational Memory',
                 description: 'Remembers your thought patterns and references past ideas to build meaningful connections',
+                icon: '💭'
               },
               {
                 title: 'Creative Co-Pilot',
                 description: 'Explores ideas with you, challenging assumptions and suggesting novel perspectives',
+                icon: '✨'
               },
               {
                 title: 'Emotionally Aware',
                 description: 'Recognizes emotional tones and adapts responses to your current thinking state',
+                icon: '❤️'
               },
               {
                 title: 'Boundary Respecting',
                 description: 'Maintains a healthy balance between suggestion and intrusion with customizable presence',
+                icon: '🛡️'
               },
               {
                 title: 'Multi-Modal Thinking',
                 description: 'Moves fluently between visual, logical, and emotional thought frameworks',
+                icon: '🔄'
               },
               {
                 title: 'Knowledge Integration',
                 description: 'Seamlessly connects your ideas with relevant knowledge domains and references',
+                icon: '📚'
               },
             ].map((feature, index) => (
               <div key={index} className="bg-gradient-to-br from-[#2A2A45]/50 to-[#1A1A30]/50 p-5 sm:p-6 rounded-xl border border-purple-500/10 hover:border-purple-500/30 transition duration-300">
+                <div className="text-2xl mb-3">{feature.icon}</div>
                 <h3 className="text-lg sm:text-xl font-semibold text-white mb-2 sm:mb-3">{feature.title}</h3>
                 <p className="text-xs sm:text-sm text-gray-400">{feature.description}</p>
               </div>
@@ -105,8 +124,8 @@ export default function Curious() {
           </div>
         </section>
         
-        {/* Call to Action */}
-        <section className="max-w-5xl mx-auto px-4 py-10 sm:py-16 text-center">
+        {/* Call to Action Section with anchor ID */}
+        <section id="cta" className="max-w-5xl mx-auto px-4 py-10 sm:py-16 text-center">
           <div className="bg-gradient-to-r from-purple-900/30 to-pink-900/20 rounded-2xl p-6 sm:p-10">
             <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4 sm:mb-6">Ready to Enhance Your Thinking?</h2>
             <p className="text-base sm:text-xl text-gray-300 mb-6 sm:mb-8">

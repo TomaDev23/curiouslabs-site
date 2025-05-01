@@ -5,10 +5,10 @@ import { IMAGES } from '../utils/assets';
 
 export default function Contact() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#1A1A2E] via-[#272750] to-[#1A1A2E]">
+    <div className="flex flex-col min-h-screen bg-gradient-to-b from-[#1A1A2E] via-[#272750] to-[#1A1A2E]">
       <NavBar />
       
-      <main className="pt-24 pb-16">
+      <main className="pt-24 pb-16 flex-grow">
         <section className="max-w-5xl mx-auto px-4 py-16">
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-6 text-center">
             Get in <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400">Touch</span>

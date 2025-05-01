@@ -10,6 +10,7 @@ import OpsPipe from './pages/products/opspipe.jsx';
 import MoonSignal from './pages/products/moonsignal.jsx';
 import Curious from './pages/products/curious.jsx';
 import Guardian from './pages/products/guardian.jsx';
+import Tools from './pages/tools.jsx';
 import CodeLab from './pages/codelab.jsx';
 import Blog from './pages/blog.jsx';
 import About from './pages/about.jsx';
@@ -29,6 +30,7 @@ export default function App() {
         <Route path="/products/moonsignal" element={<MoonSignal />} />
         <Route path="/products/curious" element={<Curious />} />
         <Route path="/products/guardian" element={<Guardian />} />
+        <Route path="/tools" element={<Tools />} />
         <Route path="/codelab" element={<CodeLab />} />
         <Route path="/blog" element={<Blog />} />
         <Route path="/about" element={<About />} />

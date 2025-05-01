@@ -86,6 +86,13 @@ export default function NavBar() {
             Home
           </Link>
           
+          <Link 
+            to="/codelab" 
+            className={`text-white hover:text-purple-300 transition ${location.pathname === '/codelab' ? 'text-purple-300' : ''}`}
+          >
+            CodeLab
+          </Link>
+          
           {/* Products dropdown */}
           <div className="relative group">
             <Link 
@@ -111,10 +118,10 @@ export default function NavBar() {
           </div>
           
           <Link 
-            to="/codelab" 
-            className={`text-white hover:text-purple-300 transition ${location.pathname === '/codelab' ? 'text-purple-300' : ''}`}
+            to="/tools" 
+            className={`text-white hover:text-purple-300 transition ${location.pathname === '/tools' ? 'text-purple-300' : ''}`}
           >
-            CodeLab
+            Tools
           </Link>
           
           <Link 
@@ -167,6 +174,13 @@ export default function NavBar() {
               className={`block py-2 text-white hover:text-purple-300 ${location.pathname === '/' ? 'text-purple-300' : ''}`}
             >
               Home
+            </Link>
+            
+            <Link 
+              to="/codelab" 
+              className={`block py-2 text-white hover:text-purple-300 ${location.pathname === '/codelab' ? 'text-purple-300' : ''}`}
+            >
+              CodeLab
             </Link>
             
             {/* Products dropdown for mobile */}
@@ -224,10 +238,10 @@ export default function NavBar() {
             </div>
             
             <Link 
-              to="/codelab" 
-              className={`block py-2 text-white hover:text-purple-300 ${location.pathname === '/codelab' ? 'text-purple-300' : ''}`}
+              to="/tools" 
+              className={`block py-2 text-white hover:text-purple-300 ${location.pathname === '/tools' ? 'text-purple-300' : ''}`}
             >
-              CodeLab
+              Tools
             </Link>
             
             <Link 

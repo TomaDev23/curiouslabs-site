@@ -1,0 +1,28 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+echo "🛡️ Running pre-push validation..."
+
+branch="$(git symbolic-ref --short HEAD)"
+if [ "$branch" = "main" ]; then
+  echo "🔍 Checking for sensitive files in main branch..."
+  
+  # Check for development files that shouldn't be in main
+  if git diff --cached --name-only | grep -E 'node_modules|\.env|\.log|\.DS_Store'; then
+    echo "🚫 Prevented push to main with development files."
+    echo "❌ Please remove the files listed above from your commit."
+    exit 1
+  fi
+  
+  # Check for unfinished work markers
+  if git diff --cached -U0 | grep -E 'TODO|FIXME|console\.log|debugger'; then
+    echo "🚫 Prevented push to main with unfinished work."
+    echo "❌ Please remove TODOs, FIXMEs, console.logs, or debugger statements."
+    exit 1
+  fi
+  
+  echo "✅ Main branch validation passed."
+fi
+
+echo "✅ Pre-push hook completed successfully."
+exit 0 
