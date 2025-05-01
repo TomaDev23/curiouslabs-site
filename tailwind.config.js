@@ -92,6 +92,22 @@ export default {
           '0%': { transform: 'translateX(0)' },
           '100%': { transform: 'translateX(-50%)' },
         },
+        'pulse-glow': {
+          '0%, 100%': { boxShadow: '0 0 0 0 rgba(252, 211, 77, 0.2)' },
+          '50%': { boxShadow: '0 0 40px 25px rgba(252, 211, 77, 0.1)' },
+        },
+        'orbit-spin': {
+          '0%': { transform: 'translate(-50%, -50%) rotate(0deg)' },
+          '100%': { transform: 'translate(-50%, -50%) rotate(360deg)' },
+        },
+        'orbit-spin-reverse': {
+          '0%': { transform: 'translate(-50%, -50%) rotate(0deg)' },
+          '100%': { transform: 'translate(-50%, -50%) rotate(-360deg)' },
+        },
+        'twinkle': {
+          '0%, 100%': { opacity: '1' },
+          '50%': { opacity: '0.8' },
+        },
       },
       animation: {
         'float': 'float 6s ease-in-out infinite',
@@ -106,6 +122,10 @@ export default {
         'fade-in-right': 'fade-in-right 0.6s ease-out',
         'glow-text': 'glow-text 3s ease-in-out infinite',
         'scroll': 'scroll 40s linear infinite',
+        'pulse-glow': 'pulse-glow 4s ease-in-out infinite',
+        'orbit-spin': 'orbit-spin 45s linear infinite',
+        'orbit-spin-reverse': 'orbit-spin-reverse 60s linear infinite',
+        'twinkle': 'twinkle 3s ease-in-out infinite',
       },
       backgroundImage: {
         'circuit-pattern': "url('/images/circuit-pattern.svg')",
@@ -114,6 +134,7 @@ export default {
         'transition-pattern': "url('/images/transition-pattern.svg')",
         'legit-code': "url('/images/legit-code-pattern.svg')",
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+        'star-field': 'radial-gradient(circle at center, rgba(255, 255, 255, 0.1) 1px, transparent 1px)',
       },
     },
   },

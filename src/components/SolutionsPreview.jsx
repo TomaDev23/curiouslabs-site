@@ -20,6 +20,14 @@ export default function SolutionsPreview() {
       link: '/products/opspipe'
     },
     {
+      id: 'moonsignal',
+      title: 'MoonSignal',
+      description: 'Advanced market signals and trading intelligence platform. Gain real-time insights and make data-driven decisions.',
+      icon: '🚀',
+      color: 'orange',
+      link: '/products/moonsignal'
+    },
+    {
       id: 'curious',
       title: 'Curious',
       description: 'AI companion for thought and discovery. Explore knowledge and generate insights with context-aware intelligence.',
@@ -48,7 +56,7 @@ export default function SolutionsPreview() {
         </p>
       </div>
       
-      <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+      <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 lg:gap-8">
         {solutions.map((solution) => (
           <SolutionCard key={solution.id} solution={solution} />
         ))}
@@ -77,6 +85,14 @@ function SolutionCard({ solution }) {
           shadow: "shadow-blue-900/10 hover:shadow-blue-900/20",
           title: "text-blue-400",
           button: "bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400"
+        };
+      case 'orange':
+        return {
+          bg: "from-[#2D1D12]/60 to-[#1D1207]/60",
+          border: "border-orange-500/20 hover:border-orange-500/40",
+          shadow: "shadow-orange-900/10 hover:shadow-orange-900/20", 
+          title: "text-orange-400",
+          button: "bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-500 hover:to-amber-500"
         };
       case 'purple':
         return {
