@@ -52,10 +52,10 @@ export default function ProductsPortal() {
     <div className="min-h-screen bg-gradient-to-b from-[#0F172A] via-[#141432] to-[#1A1A30] overflow-hidden">
       <NavBar />
       
-      {/* Main Content */}
-      <main className="pt-24 pb-16 px-4 sm:px-6">
-        {/* Solar System Section - Only visible on large screens */}
-        <section id="solar-system" className="relative py-20 sm:py-28 px-4 sm:px-8 hidden lg:block">
+      {/* Main Content - reduced top spacing */}
+      <main className="pt-6 pb-16 px-4 sm:px-6">
+        {/* Solar System Section - reduced vertical padding */}
+        <section id="solar-system" className="relative py-6 sm:py-8 px-4 sm:px-8 hidden lg:block">
           {/* Star background layers with parallax */}
           <motion.div 
             className="absolute inset-0 bg-star-field opacity-30"
@@ -87,25 +87,37 @@ export default function ProductsPortal() {
             }}
           />
           
-          <div className="text-center mb-16 relative z-10">
-            <motion.h2 
-              className="text-4xl sm:text-5xl font-extrabold text-white"
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7 }}
-            >
-              Our Product Solar System
-            </motion.h2>
-            <motion.p 
-              className="text-lg text-gray-400 mt-4 max-w-2xl mx-auto"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.3, duration: 0.7 }}
-            >
+          {/* Title overlay on top left */}
+          <motion.div 
+            className="absolute top-24 left-10 z-20 max-w-xs"
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8 }}
+          >
+            <div className="flex flex-col text-left">
+              <span className="text-2xl sm:text-3xl font-bold text-white tracking-wider mb-1" 
+                style={{ 
+                  letterSpacing: '0.05em',
+                  textShadow: '0 0 10px rgba(255, 255, 255, 0.4), 0 0 15px rgba(255, 255, 255, 0.2)'
+                }}>
+                Our Product
+              </span>
+              <span className="text-3xl sm:text-4xl font-bold tracking-wider uppercase"
+                style={{ 
+                  letterSpacing: '0.08em',
+                  background: 'linear-gradient(to right, #f97316, #fb923c)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent'
+                }}>
+                Solar System
+              </span>
+            </div>
+            <p className="text-base text-gray-300 mt-3 max-w-xs">
               Every CuriousLabs product orbits around Aegis — our runtime core.
-            </motion.p>
-          </div>
+            </p>
+          </motion.div>
           
+          {/* Solar System visualization */}
           <SolarSystemLayout />
         </section>
         
@@ -156,19 +168,19 @@ export default function ProductsPortal() {
           </div>
         </section>
         
-        {/* Space divider with nebula effect before CTA */}
-        <div className="relative mt-24 mb-16">
+        {/* Enhanced space divider with aurora effect before CTA */}
+        <div className="relative mt-48 mb-16">
           <div className="absolute inset-x-0 h-px bg-gradient-to-r from-transparent via-purple-500/30 to-transparent"></div>
           <motion.div 
-            className="absolute inset-x-0 h-8 -mt-4"
+            className="absolute inset-x-0 h-12 -mt-6"
             style={{ 
-              background: "radial-gradient(ellipse at center, rgba(139, 92, 246, 0.15) 0%, rgba(30, 27, 75, 0.01) 70%)" 
+              background: "radial-gradient(ellipse at center, rgba(139, 92, 246, 0.2) 0%, rgba(30, 27, 75, 0.01) 70%)" 
             }}
             animate={{ 
               opacity: [0.5, 0.8, 0.5] 
             }}
             transition={{ 
-              duration: 4, 
+              duration: 6, 
               repeat: Infinity, 
               repeatType: "reverse" 
             }}
@@ -176,7 +188,7 @@ export default function ProductsPortal() {
         </div>
         
         {/* Enhanced CTA Section with Box */}
-        <div className="pt-8 pb-20 sm:pb-32">
+        <div className="pt-8 pb-32 sm:pb-40">
           <motion.div 
             className="max-w-2xl mx-auto bg-[#1E1A42] border border-purple-600/30 rounded-xl p-6 shadow-lg shadow-purple-900/20"
             initial={{ opacity: 0, y: 20 }}

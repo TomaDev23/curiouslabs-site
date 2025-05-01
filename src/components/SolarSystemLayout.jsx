@@ -403,10 +403,10 @@ export default function SolarSystemLayout() {
               >
                 <Link
                   to={path}
-                  className={`w-full h-full p-4 rounded-xl bg-gradient-to-br ${productColors[title]} border border-purple-400/20 backdrop-blur-md flex flex-col items-start justify-between transition-all duration-300 hover:scale-105 hover:-translate-y-1 hover:shadow-lg`}
+                  className={`w-full h-full p-3 rounded-xl bg-gradient-to-br ${productColors[title]} border border-purple-400/20 backdrop-blur-md flex flex-col items-start justify-between transition-all duration-300 hover:scale-105 hover:-translate-y-1 hover:shadow-lg`}
                 >
                   <motion.div 
-                    className="text-2xl mb-2"
+                    className="text-xl mb-1.5"
                     animate={{ 
                       y: prefersReducedMotion ? 0 : [0, -5, 0] 
                     }}
