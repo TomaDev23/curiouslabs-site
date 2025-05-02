@@ -1,0 +1,17 @@
+<svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle with gradient -->
+  <circle cx="100" cy="100" r="90" fill="url(#codelab-gradient)" />
+  
+  <!-- Code brackets symbol -->
+  <path d="M70 60L40 100L70 140" stroke="white" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M130 60L160 100L130 140" stroke="white" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M90 155L110 45" stroke="white" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" />
+  
+  <!-- Define the gradient -->
+  <defs>
+    <linearGradient id="codelab-gradient" x1="0" y1="0" x2="200" y2="200" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#6366F1" />
+      <stop offset="1" stop-color="#8B5CF6" />
+    </linearGradient>
+  </defs>
+</svg> 

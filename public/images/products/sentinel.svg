@@ -1,0 +1,28 @@
+<svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle with gradient -->
+  <circle cx="100" cy="100" r="90" fill="url(#sentinel-gradient)" />
+  
+  <!-- Sentinel eye symbol -->
+  <circle cx="100" cy="100" r="30" stroke="white" stroke-width="10" fill="none" />
+  <circle cx="100" cy="100" r="10" fill="white" />
+  
+  <!-- Radar/scanning lines -->
+  <path d="M100 30C60 30 30 60 30 100C30 140 60 170 100 170" 
+        stroke="white" stroke-width="8" stroke-linecap="round" fill="none" />
+  <path d="M100 50C70 50 50 70 50 100C50 130 70 150 100 150" 
+        stroke="white" stroke-width="8" stroke-linecap="round" fill="none" />
+  
+  <!-- Opposite scanning lines -->
+  <path d="M100 30C140 30 170 60 170 100C170 140 140 170 100 170" 
+        stroke="white" stroke-width="4" stroke-linecap="round" fill="none" stroke-dasharray="10 5" />
+  <path d="M100 50C130 50 150 70 150 100C150 130 130 150 100 150" 
+        stroke="white" stroke-width="4" stroke-linecap="round" fill="none" stroke-dasharray="10 5" />
+  
+  <!-- Define the gradient -->
+  <defs>
+    <linearGradient id="sentinel-gradient" x1="0" y1="0" x2="200" y2="200" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#1E40AF" />
+      <stop offset="1" stop-color="#06B6D4" />
+    </linearGradient>
+  </defs>
+</svg> 

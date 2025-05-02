@@ -1,0 +1,25 @@
+<svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle with gradient -->
+  <circle cx="100" cy="100" r="90" fill="url(#dataforge-gradient)" />
+  
+  <!-- Data/forge symbol - diamond with connections -->
+  <path d="M100 50L140 100L100 150L60 100L100 50Z" 
+        stroke="white" stroke-width="8" stroke-linejoin="round" fill="none" />
+  
+  <!-- Data connections/lines -->
+  <line x1="100" y1="50" x2="100" y2="30" stroke="white" stroke-width="8" stroke-linecap="round" />
+  <line x1="140" y1="100" x2="160" y2="100" stroke="white" stroke-width="8" stroke-linecap="round" />
+  <line x1="100" y1="150" x2="100" y2="170" stroke="white" stroke-width="8" stroke-linecap="round" />
+  <line x1="60" y1="100" x2="40" y2="100" stroke="white" stroke-width="8" stroke-linecap="round" />
+  
+  <!-- Center dot -->
+  <circle cx="100" cy="100" r="10" fill="white" />
+  
+  <!-- Define the gradient -->
+  <defs>
+    <linearGradient id="dataforge-gradient" x1="0" y1="0" x2="200" y2="200" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0EA5E9" />
+      <stop offset="1" stop-color="#14B8A6" />
+    </linearGradient>
+  </defs>
+</svg> 
