@@ -128,7 +128,27 @@ const HeroSection = () => {
                     }
                   }}
                 >
-                  Run by Agents
+                  <motion.span 
+                    className="bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-300 inline-block"
+                    animate={shouldReduceMotion ? {} : {
+                      y: shouldReduceMotion ? 0 : [0, -8, 0],
+                      transition: {
+                        duration: 5,
+                        repeat: Infinity,
+                        repeatType: "reverse",
+                        ease: "easeInOut",
+                        delay: 1
+                      }
+                    }}
+                    style={{
+                      lineHeight: "1.2",
+                      paddingBottom: "8px",
+                      marginBottom: "16px",
+                      overflow: "visible"
+                    }}
+                  >
+                    Run by Agents
+                  </motion.span>
                 </motion.span>
               </motion.h1>
             </div>

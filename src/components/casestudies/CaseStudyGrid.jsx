@@ -3,15 +3,15 @@ import CaseStudyCard from './CaseStudyCard';
 
 const caseStudyData = [
   {
-    title: "CLI Parser Repair",
-    problem: "Broken OCR pipelines with async edge cases.",
-    solution: "Dynamic agent fallback tree rebuilt with 100% test pass.",
+    title: "Parser Agent Revival",
+    problem: "Broken parser for a production CLI tool.",
+    solution: "Debugged and refactored agents, validated against live inputs.",
     link: "/case/cli-parser-repair"
   },
   {
-    title: "Security Config Recovery",
-    problem: "Leaking token through public headers.",
-    solution: "Token rotation and HMAC guards implemented.",
+    title: "Security Config: Live Patch",
+    problem: "Client failed cloud security audit.",
+    solution: "Diagnosed misconfig, patched critical routes, and passed verification in 36 hours.",
     link: "/case/security-config-recovery"
   }
 ];
