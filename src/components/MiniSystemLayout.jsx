@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion, useScroll, useTransform, useMotionValue, useAnimationControls } from "framer-motion";
 
 // Mini orbit configuration (compact)
 const orbitData = [
@@ -27,46 +27,96 @@ const cometPaths = [
   { x: [300, 0, -300], y: [0, 150, 0] },
 ];
 
-// Enhanced comet component with colored trails
+// MiniComet with improved curved paths
 const MiniComet = ({ delay, angle, duration, pathIndex }) => {
-  const sizeClass = "w-16 h-0.5";
-  const path = cometPaths[pathIndex % cometPaths.length];
-  
-  // Enhanced colors for comets
-  const colors = [
-    "bg-gradient-to-r from-white/0 via-white/40 to-white/80",
-    "bg-gradient-to-r from-blue-400/0 via-blue-400/40 to-blue-400/80",
-    "bg-gradient-to-r from-purple-400/0 via-purple-400/40 to-purple-400/80"
+  const paths = [
+    { // Curved path option 1
+      start: { x: -10, y: -10 },
+      end: { x: window.innerWidth + 10, y: window.innerHeight + 10 },
+      control: { x: window.innerWidth * 0.7, y: window.innerHeight * 0.3 }
+    },
+    { // Curved path option 2
+      start: { x: window.innerWidth + 10, y: -10 },
+      end: { x: -10, y: window.innerHeight + 10 },
+      control: { x: window.innerWidth * 0.3, y: window.innerHeight * 0.3 }
+    },
+    { // Shallow arc path
+      start: { x: -10, y: window.innerHeight * 0.4 },
+      end: { x: window.innerWidth + 10, y: window.innerHeight * 0.6 },
+      control: { x: window.innerWidth * 0.5, y: window.innerHeight * 0.2 }
+    }
   ];
+
+  const path = paths[pathIndex % paths.length];
+  const rad = (angle * Math.PI) / 180;
   
-  const colorClass = colors[Math.floor(Math.random() * colors.length)];
+  // Calculate position based on curved path
+  const x = useTransform(
+    useMotionValue(0),
+    [0, 1],
+    [path.start.x, path.end.x]
+  );
+  
+  const y = useTransform(
+    useMotionValue(0),
+    [0, 1],
+    [path.start.y, path.end.y]
+  );
+
+  const controls = useAnimationControls();
+  
+  useEffect(() => {
+    const startAnimation = async () => {
+      await new Promise(resolve => setTimeout(resolve, delay * 1000));
+      
+      controls.start({
+        x: [path.start.x, path.control.x, path.end.x],
+        y: [path.start.y, path.control.y, path.end.y],
+        transition: {
+          duration: duration,
+          ease: "easeInOut",
+          times: [0, 0.5, 1]
+        }
+      });
+    };
+    
+    startAnimation();
+    
+    const interval = setInterval(startAnimation, (duration + delay) * 1000);
+    return () => clearInterval(interval);
+  }, [controls, delay, duration, path]);
   
   return (
     <motion.div
-      className="absolute pointer-events-none"
-      style={{ 
-        transformOrigin: "center center",
-        transform: `rotate(${angle}deg)`,
-        left: '52%',
-        top: '45%',
-        zIndex: 5
-      }}
-      initial={{ opacity: 0, scale: 0 }}
-      animate={{ 
-        opacity: [0, 0.8, 0],
-        scale: [0.2, 1, 0.2],
-        x: path.x,
-        y: path.y
-      }}
-      transition={{
-        duration: duration,
-        delay: delay,
-        repeat: Infinity,
-        repeatDelay: 15,
-        ease: "easeInOut"
-      }}
+      className="absolute top-0 left-0 w-2 h-2 z-20"
+      style={{ x, y }}
+      animate={controls}
     >
-      <div className={`${sizeClass} ${colorClass} rounded-full blur-sm`} />
+      <motion.div 
+        className="w-2 h-2 rounded-full bg-white/90"
+        animate={{
+          boxShadow: [
+            "0 0 2px 1px rgba(255, 255, 255, 0.5), 0 0 4px 2px rgba(200, 200, 255, 0.3)",
+            "0 0 3px 2px rgba(255, 255, 255, 0.6), 0 0 6px 3px rgba(200, 200, 255, 0.4)",
+            "0 0 2px 1px rgba(255, 255, 255, 0.5), 0 0 4px 2px rgba(200, 200, 255, 0.3)"
+          ]
+        }}
+        transition={{
+          duration: 1.5,
+          repeat: Infinity,
+          repeatType: "reverse"
+        }}
+      />
+      
+      {/* Comet tail */}
+      <motion.div
+        className="absolute top-1/2 right-1/2 w-12 h-[1.5px] origin-right"
+        style={{
+          background: "linear-gradient(to left, rgba(255, 255, 255, 0.8), transparent)",
+          transform: `rotate(${angle + 180}deg)`,
+          transformOrigin: "right center"
+        }}
+      />
     </motion.div>
   );
 };
@@ -84,7 +134,7 @@ const productColors = {
 };
 
 export default function MiniSystemLayout() {
-  const radius = 140; // Smaller radius for compact display
+  const radius = 200; // Increased from 140 for better spacing
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
   const { scrollY } = useScroll();
   
@@ -96,6 +146,10 @@ export default function MiniSystemLayout() {
   // Add subtle drift effect based on scroll
   const yOffset = useTransform(scrollY, [0, 500], [30, -30]);
   const xOffset = useTransform(scrollY, [0, 500], [-15, 15]);
+  
+  // Earth reveal on scroll
+  const earthOpacity = useTransform(scrollY, [100, 250], [0, 1]);
+  const earthYOffset = useTransform(scrollY, [100, 300], [50, 0]);
   
   // Check for reduced motion preference
   useEffect(() => {
@@ -110,141 +164,17 @@ export default function MiniSystemLayout() {
     };
   }, []);
 
-  // Generate mini comets with staggered timing
+  // Generate mini comets with staggered timing and constrained angles - reduced by 50%
   const comets = useMemo(() => [
     { delay: 5, angle: 30, duration: 3, pathIndex: 0 },
-    { delay: 25, angle: 150, duration: 4, pathIndex: 1 },
-    { delay: 45, angle: 270, duration: 3.5, pathIndex: 2 },
+    { delay: 45, angle: 155, duration: 4.2, pathIndex: 1 },
   ], []);
 
   return (
-    <motion.div 
-      className="relative w-full h-[600px] sm:h-[500px] md:h-[600px] overflow-visible"
-      style={{ 
-        opacity, 
-        scale,
-        y: yOffset,
-        x: xOffset
-      }}
-    >
-      {/* Full viewport cosmic background - extends beyond boundaries */}
-      <div className="absolute inset-0 w-[150%] h-[150%] left-[-25%] top-[-25%] overflow-visible">
-        <motion.div
-          className="absolute inset-0 w-full h-full opacity-60"
-          style={{
-            backgroundImage: "radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.15) 1px, transparent 1px), radial-gradient(circle at 30% 40%, rgba(255, 255, 255, 0.1) 1px, transparent 1px)",
-            backgroundSize: "120px 120px, 90px 90px"
-          }}
-          animate={{
-            backgroundPosition: prefersReducedMotion ? "0% 0%" : ["0% 0%", "5% 5%"]
-          }}
-          transition={{
-            duration: 60,
-            repeat: Infinity,
-            ease: "linear"
-          }}
-        />
-      </div>
-
-      {/* Enhanced background nebula effects */}
-      <div className="absolute inset-0 w-[150%] h-[150%] left-[-25%] top-[-25%]" style={{ zIndex: 0 }}>
-        {/* Base nebula glow - more colorful and vibrant */}
-        <div className="absolute inset-0 w-full h-full opacity-50" 
-          style={{
-            background: 'radial-gradient(circle at 30% 40%, rgba(139, 92, 246, 0.15), transparent 70%), radial-gradient(circle at 70% 60%, rgba(244, 114, 182, 0.12), transparent 70%), radial-gradient(circle at 50% 50%, rgba(56, 189, 248, 0.1), transparent 70%)'
-          }}
-        />
-        
-        {/* Pulsating central nebula cloud */}
-        <motion.div 
-          className="absolute top-0 left-0 w-full h-full opacity-30"
-          style={{
-            background: 'radial-gradient(circle at 50% 45%, rgba(147, 51, 234, 0.2) 0%, rgba(139, 92, 246, 0.1) 50%, transparent 70%)',
-          }}
-          animate={{ 
-            scale: prefersReducedMotion ? 1 : [1, 1.05, 1],
-            opacity: prefersReducedMotion ? 0.3 : [0.2, 0.35, 0.2],
-          }}
-          transition={{ 
-            duration: 15, 
-            repeat: Infinity, 
-            repeatType: "reverse", 
-            ease: "easeInOut" 
-          }}
-        />
-        
-        {/* Additional cosmic dust layers with parallax effects */}
-        <motion.div
-          className="absolute inset-0 w-full h-full opacity-25"
-          style={{
-            background: 'radial-gradient(ellipse at 30% 40%, rgba(186, 230, 253, 0.15) 0%, transparent 70%), radial-gradient(ellipse at 70% 60%, rgba(216, 180, 254, 0.15) 0%, transparent 70%)'
-          }}
-          animate={{
-            scale: prefersReducedMotion ? 1 : [1, 1.1, 1]
-          }}
-          transition={{
-            duration: 20,
-            repeat: Infinity,
-            repeatType: "reverse",
-            ease: "easeInOut"
-          }}
-        />
-        
-        {/* Orange-pink nebula for warm accents */}
-        <motion.div
-          className="absolute inset-0 w-full h-full opacity-15"
-          style={{
-            background: 'radial-gradient(ellipse at 20% 30%, rgba(254, 215, 170, 0.15) 0%, transparent 70%), radial-gradient(ellipse at 80% 70%, rgba(251, 113, 133, 0.15) 0%, transparent 70%)'
-          }}
-          animate={{
-            scale: prefersReducedMotion ? 1 : [1.05, 1, 1.05]
-          }}
-          transition={{
-            duration: 25,
-            repeat: Infinity,
-            repeatType: "reverse",
-            ease: "easeInOut",
-            delay: 5
-          }}
-        />
-        
-        {/* Bottom gradient transition to blend with solutions section */}
-        <div 
-          className="absolute bottom-[-5%] left-0 w-full h-[30%]"
-          style={{
-            background: 'linear-gradient(to bottom, transparent 0%, rgba(22, 33, 62, 0.3) 70%, rgba(22, 33, 62, 0.5) 100%)',
-            zIndex: 2
-          }}
-        />
-      </div>
-      
-      {/* Mini comets */}
-      {!prefersReducedMotion && comets.map((comet, i) => (
-        <MiniComet
-          key={`comet-${i}`}
-          delay={comet.delay}
-          angle={comet.angle}
-          duration={comet.duration}
-          pathIndex={comet.pathIndex}
-        />
-      ))}
-      
-      {/* Background cosmic image */}
+    <div className="relative">
+      {/* Top transition line with dynamic hue - positioned at section top border */}
       <motion.div 
-        className="absolute w-[100%] h-[110%] left-0 top-[-5%] overflow-hidden z-0 pointer-events-none"
-        style={{
-          backgroundImage: "url('/images/earthscape-bg.jpg')",
-          backgroundPosition: "center center",
-          backgroundSize: "cover",
-          backgroundRepeat: "no-repeat",
-          filter: "brightness(0.95) contrast(1.05)",
-          isolation: "isolate"
-        }}
-      />
-      
-      {/* Top transition line with dynamic hue */}
-      <motion.div 
-        className="absolute top-0 left-0 w-full h-[2px] z-20 overflow-hidden pointer-events-none"
+        className="absolute top-0 left-0 w-full h-[2px] z-50 overflow-hidden pointer-events-none"
         style={{
           boxShadow: "0 0 10px rgba(139, 92, 246, 0.3)"
         }}
@@ -264,207 +194,273 @@ export default function MiniSystemLayout() {
         }}
       />
       
-      {/* Bottom transition line with dynamic hue */}
       <motion.div 
-        className="absolute bottom-0 left-0 w-full h-[2px] z-20 overflow-hidden pointer-events-none"
-        style={{
-          boxShadow: "0 0 10px rgba(234, 179, 8, 0.3)"
+        className="relative w-full h-[800px] sm:h-[700px] md:h-[800px] overflow-visible"
+        style={{ 
+          opacity: 1,
+          scale: 1
         }}
-        animate={{
-          background: [
-            "linear-gradient(90deg, transparent 0%, rgba(234, 179, 8, 0.8) 50%, transparent 100%)",
-            "linear-gradient(90deg, transparent 0%, rgba(139, 92, 246, 0.8) 50%, transparent 100%)",
-            "linear-gradient(90deg, transparent 0%, rgba(56, 189, 248, 0.8) 50%, transparent 100%)",
-            "linear-gradient(90deg, transparent 0%, rgba(234, 179, 8, 0.8) 50%, transparent 100%)"
-          ]
-        }}
-        transition={{
-          duration: 8,
-          repeat: Infinity,
-          repeatType: "loop",
-          ease: "linear",
-          delay: 2
-        }}
-      />
-      
-      {/* Z-index hierarchy matching SolarSystemLayout */}
-      
-      {/* Orbit visualization - only visible on larger screens */}
-      <div className="hidden lg:block relative h-full">
-        {/* Animated star backdrop - enhanced with CSS-based stars */}
-        <motion.div 
-          className="absolute inset-0 z-1 opacity-60"
+      >
+        {/* Cleaned up cosmic background - contained within proper bounds */}
+        <div className="absolute inset-0 w-full h-full overflow-hidden">
+          <motion.div
+            className="absolute inset-0 w-full h-full opacity-60"
+            style={{
+              backgroundImage: "radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.15) 1px, transparent 1px), radial-gradient(circle at 30% 40%, rgba(255, 255, 255, 0.1) 1px, transparent 1px)",
+              backgroundSize: "120px 120px, 90px 90px"
+            }}
+            animate={{
+              backgroundPosition: prefersReducedMotion ? "0% 0%" : ["0% 0%", "5% 5%"]
+            }}
+            transition={{
+              duration: 60,
+              repeat: Infinity,
+              ease: "linear"
+            }}
+          />
+        </div>
+
+        {/* Cleaned up nebula effects - contained properly */}
+        <div className="absolute inset-0 w-full h-full overflow-hidden" style={{ zIndex: 0 }}>
+          {/* Base nebula glow - more colorful and vibrant */}
+          <div className="absolute inset-0 w-full h-full opacity-50" 
+            style={{
+              background: 'radial-gradient(circle at 30% 40%, rgba(139, 92, 246, 0.15), transparent 70%), radial-gradient(circle at 70% 60%, rgba(244, 114, 182, 0.12), transparent 70%), radial-gradient(circle at 50% 50%, rgba(56, 189, 248, 0.1), transparent 70%)'
+            }}
+          />
+          
+          {/* Removed other nebula effects to clean up appearance */}
+        </div>
+        
+        {/* Earth image - FULL SIZE, perfectly centered */}
+        <motion.img 
+          src="/images/earthscape-bg.jpg"
+          className="absolute object-cover z-30 pointer-events-none select-none"
           style={{
-            background: 'radial-gradient(1px circle at 20% 40%, white, transparent), radial-gradient(1px circle at 40% 20%, white, transparent), radial-gradient(2px circle at 60% 30%, white, transparent), radial-gradient(1px circle at 70% 60%, white, transparent), radial-gradient(1px circle at 30% 80%, white, transparent), radial-gradient(1px circle at 80% 90%, white, transparent)',
-            backgroundSize: '200px 200px'
+            filter: 'brightness(1.05) saturate(1.2)',
+            width: '150%',
+            height: '150%', 
+            left: '50%',
+            top: '75%',
+            transform: 'translate(-50%, -50%)'
           }}
-          animate={{ 
-            backgroundPosition: prefersReducedMotion ? "0% 0%" : ["0% 0%", "5% 5%"]
-          }}
-          transition={{ 
-            duration: 120, 
-            repeat: Infinity, 
-            repeatType: "reverse", 
-            ease: "linear" 
-          }}
-        />
-        
-        {/* Enhanced orbital rings with better colors */}
-        <svg 
-          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px]"
-          viewBox="0 0 500 500" 
-          style={{ zIndex: 10 }}
-        >
-          {/* Inner orbit ring - enhanced purple color */}
-          <motion.circle
-            cx="250"
-            cy="250" 
-            r={radius + 20}
-            fill="none"
-            stroke="rgba(139, 92, 246, 0.25)"
-            strokeWidth="1.5"
-            strokeDasharray="1,3"
-            initial={{ rotate: 0 }}
-            animate={{ 
-              rotate: prefersReducedMotion ? 0 : 360 
-            }}
-            transition={{ 
-              duration: 180, 
-              repeat: Infinity, 
-              ease: "linear" 
-            }}
-          />
-          
-          {/* Outer orbit ring - enhanced cyan color */}
-          <motion.circle
-            cx="250"
-            cy="250" 
-            r={radius + 70}
-            fill="none"
-            stroke="rgba(56, 189, 248, 0.2)"
-            strokeWidth="1"
-            strokeDasharray="1,5"
-            initial={{ rotate: 0 }}
-            animate={{ 
-              rotate: prefersReducedMotion ? 0 : -360 
-            }}
-            transition={{ 
-              duration: 240, 
-              repeat: Infinity, 
-              ease: "linear" 
-            }}
-          />
-        </svg>
-        
-        {/* Aegis glow effect - enhanced warm glow */}
-        <motion.div
-          className="absolute left-1/2 top-[85%] -translate-x-1/2 -translate-y-full w-32 h-32 rounded-full bg-gradient-radial from-orange-500/20 to-amber-500/5 blur-xl z-20"
           initial={{ opacity: 0 }}
-          animate={{ 
-            opacity: [0.4, 0.7, 0.4],
-            scale: [0.9, 1.1, 0.9]
-          }}
-          transition={{ 
-            duration: 8,
-            repeat: Infinity,
-            repeatType: "reverse",
-            ease: "easeInOut"
-          }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 2 }}
         />
         
-        {/* Aegis core - enhanced with better gradients */}
-        <Link
-          to="/products/aegis"
-          className="absolute left-1/2 top-[85%] -translate-x-1/2 -translate-y-full z-40"
-        >
+        {/* Mini comets with updated angle constraints */}
+        {!prefersReducedMotion && comets.map((comet, i) => (
+          <MiniComet
+            key={`comet-${i}`}
+            delay={comet.delay}
+            angle={comet.angle}
+            duration={comet.duration}
+            pathIndex={comet.pathIndex}
+          />
+        ))}
+        
+        {/* Orbit visualization - only visible on larger screens */}
+        <div className="hidden lg:block relative h-full">
+          {/* Animated star backdrop - enhanced with CSS-based stars */}
           <motion.div 
-            className="w-20 h-20 bg-gradient-to-br from-yellow-500/40 to-orange-600/30 flex items-center justify-center rounded-full border border-yellow-500/30 shadow-lg shadow-orange-500/30 backdrop-blur-sm"
-            whileHover={{ scale: 1.1 }}
+            className="absolute inset-0 z-1 opacity-60"
+            style={{
+              background: 'radial-gradient(1px circle at 20% 40%, white, transparent), radial-gradient(1px circle at 40% 20%, white, transparent), radial-gradient(2px circle at 60% 30%, white, transparent), radial-gradient(1px circle at 70% 60%, white, transparent), radial-gradient(1px circle at 30% 80%, white, transparent), radial-gradient(1px circle at 80% 90%, white, transparent)',
+              backgroundSize: '200px 200px'
+            }}
             animate={{ 
-              boxShadow: prefersReducedMotion ? 
-                "0 0 15px rgba(234, 179, 8, 0.4)" : 
-                ["0 0 10px rgba(234, 179, 8, 0.3)", "0 0 25px rgba(234, 179, 8, 0.5)", "0 0 10px rgba(234, 179, 8, 0.3)"]
+              backgroundPosition: prefersReducedMotion ? "0% 0%" : ["0% 0%", "5% 5%"]
             }}
             transition={{ 
-              duration: 3, 
+              duration: 120, 
               repeat: Infinity, 
-              repeatType: "reverse" 
+              repeatType: "reverse", 
+              ease: "linear" 
             }}
+          />
+          
+          {/* Enhanced orbital rings with better colors */}
+          <svg 
+            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px]"
+            viewBox="0 0 500 500" 
+            style={{ zIndex: 10 }}
           >
-            <span className="text-3xl">⚛️</span>
-          </motion.div>
-        </Link>
-        
-        {/* Orbital products - original layout with enhanced colors */}
-        {orbitData.map((item, i) => {
-          // Calculate orbital position
-          const angle = item.angle * (Math.PI / 180);
-          const orbitRadius = item.size === "xs" ? radius + 70 : radius + 20; // Outer radius for new orbitals
+            {/* Inner orbit ring - enhanced purple color */}
+            <motion.circle
+              cx="250"
+              cy="250" 
+              r={radius + 20}
+              fill="none"
+              stroke="rgba(139, 92, 246, 0.25)"
+              strokeWidth="1.5"
+              strokeDasharray="1,3"
+              initial={{ rotate: 0 }}
+              animate={{ 
+                rotate: prefersReducedMotion ? 0 : 360 
+              }}
+              transition={{ 
+                duration: 180, 
+                repeat: Infinity, 
+                ease: "linear" 
+              }}
+            />
+            
+            {/* Outer orbit ring - enhanced cyan color */}
+            <motion.circle
+              cx="250"
+              cy="250" 
+              r={radius + 70}
+              fill="none"
+              stroke="rgba(56, 189, 248, 0.2)"
+              strokeWidth="1"
+              strokeDasharray="1,5"
+              initial={{ rotate: 0 }}
+              animate={{ 
+                rotate: prefersReducedMotion ? 0 : -360 
+              }}
+              transition={{ 
+                duration: 240, 
+                repeat: Infinity, 
+                ease: "linear" 
+              }}
+            />
+          </svg>
           
-          // Base position on the orbit
-          const x = Math.cos(angle) * orbitRadius;
-          const y = Math.sin(angle) * orbitRadius;
+          {/* Aegis glow effect - enhanced warm glow */}
+          <motion.div
+            className="absolute left-1/2 top-[85%] -translate-x-1/2 -translate-y-full w-32 h-32 rounded-full bg-gradient-radial from-orange-500/20 to-amber-500/5 blur-xl z-20"
+            initial={{ opacity: 0 }}
+            animate={{ 
+              opacity: [0.4, 0.7, 0.4],
+              scale: [0.9, 1.1, 0.9]
+            }}
+            transition={{ 
+              duration: 8,
+              repeat: Infinity,
+              repeatType: "reverse",
+              ease: "easeInOut"
+            }}
+          />
           
-          // Apply adjustments for visual balance (left-heavy bias)
-          const adjustedX = x + (item.adjustX || 0);
-          const adjustedY = y + (item.adjustY || 0);
-          
-          // Size classes based on importance
-          const sizeClasses = {
-            xs: "w-10 h-10 text-sm",
-            sm: "w-12 h-12 text-base",
-          };
-          
-          return (
-            <Link 
-              key={`orbit-${i}`}
-              to={item.path}
-              className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-30"
-              style={{
-                transform: `translate(calc(-50% + ${adjustedX}px), calc(-50% + ${adjustedY}px))`
+          {/* Aegis core - enhanced with better gradients */}
+          <Link
+            to="/products/aegis"
+            className="absolute left-1/2 top-[85%] -translate-x-1/2 -translate-y-full z-40"
+          >
+            <motion.div 
+              className="w-20 h-20 bg-gradient-to-br from-yellow-500/40 to-orange-600/30 flex items-center justify-center rounded-full border border-yellow-500/30 shadow-lg shadow-orange-500/30 backdrop-blur-sm"
+              whileHover={{ scale: 1.1 }}
+              animate={{ 
+                boxShadow: prefersReducedMotion ? 
+                  "0 0 15px rgba(234, 179, 8, 0.4)" : 
+                  ["0 0 10px rgba(234, 179, 8, 0.3)", "0 0 25px rgba(234, 179, 8, 0.5)", "0 0 10px rgba(234, 179, 8, 0.3)"]
+              }}
+              transition={{ 
+                duration: 3, 
+                repeat: Infinity, 
+                repeatType: "reverse" 
               }}
             >
-              <motion.div 
-                className={`${sizeClasses[item.size || "sm"]} bg-gradient-to-br ${productColors[item.title]} border border-purple-400/20 backdrop-blur-md flex items-center justify-center rounded-full shadow-md transition-all duration-300 hover:scale-110`}
-                animate={{ 
-                  y: prefersReducedMotion ? 0 : [0, -5, 0] 
-                }}
-                transition={{ 
-                  duration: 2 + i, 
-                  repeat: Infinity, 
-                  ease: "easeInOut" 
-                }}
-                whileHover={{
-                  boxShadow: "0 0 20px rgba(139, 92, 246, 0.4)"
+              <span className="text-3xl">⚛️</span>
+            </motion.div>
+          </Link>
+          
+          {/* Orbital products - original layout with enhanced colors */}
+          {orbitData.map((item, i) => {
+            // Calculate orbital position
+            const angle = item.angle * (Math.PI / 180);
+            const orbitRadius = item.size === "xs" ? radius + 70 : radius + 20; // Outer radius for new orbitals
+            
+            // Base position on the orbit
+            const x = Math.cos(angle) * orbitRadius;
+            const y = Math.sin(angle) * orbitRadius;
+            
+            // Apply adjustments for visual balance (left-heavy bias)
+            const adjustedX = x + (item.adjustX || 0);
+            const adjustedY = y + (item.adjustY || 0);
+            
+            // Size classes based on importance
+            const sizeClasses = {
+              xs: "w-10 h-10 text-sm",
+              sm: "w-12 h-12 text-base",
+            };
+            
+            return (
+              <Link 
+                key={`orbit-${i}`}
+                to={item.path}
+                className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-30"
+                style={{
+                  transform: `translate(calc(-50% + ${adjustedX}px), calc(-50% + ${adjustedY}px))`
                 }}
               >
-                <span>{item.icon}</span>
-              </motion.div>
-            </Link>
-          );
-        })}
-      </div>
-      
-      {/* Mobile fallback - nebula background with centered Aegis */}
-      <div className="lg:hidden block h-full relative">
-        <div className="h-full flex items-center justify-center">
-          <motion.div 
-            className="w-20 h-20 bg-gradient-to-br from-yellow-500/40 to-orange-600/30 flex items-center justify-center rounded-full shadow-lg shadow-orange-500/20"
-            animate={{ 
-              scale: [1, 1.1, 1],
-              opacity: [0.7, 1, 0.7],
-              boxShadow: ["0 0 10px rgba(234, 179, 8, 0.3)", "0 0 20px rgba(234, 179, 8, 0.5)", "0 0 10px rgba(234, 179, 8, 0.3)"]
-            }}
-            transition={{ 
-              duration: 4, 
-              repeat: Infinity, 
-              repeatType: "reverse" 
-            }}
-          >
-            <span className="text-2xl">⚛️</span>
-          </motion.div>
+                <motion.div 
+                  className={`${sizeClasses[item.size || "sm"]} bg-gradient-to-br ${productColors[item.title]} border border-purple-400/20 backdrop-blur-md flex items-center justify-center rounded-full shadow-md transition-all duration-300 hover:scale-110`}
+                  animate={{ 
+                    y: prefersReducedMotion ? 0 : [0, -5, 0] 
+                  }}
+                  transition={{ 
+                    duration: 2 + i, 
+                    repeat: Infinity, 
+                    ease: "easeInOut" 
+                  }}
+                  whileHover={{
+                    boxShadow: "0 0 20px rgba(139, 92, 246, 0.4)"
+                  }}
+                >
+                  <span>{item.icon}</span>
+                </motion.div>
+              </Link>
+            );
+          })}
         </div>
+        
+        {/* Mobile fallback - nebula background with centered Aegis */}
+        <div className="lg:hidden block h-full relative">
+          <div className="h-full flex items-center justify-center">
+            <motion.div 
+              className="w-20 h-20 bg-gradient-to-br from-yellow-500/40 to-orange-600/30 flex items-center justify-center rounded-full shadow-lg shadow-orange-500/20"
+              animate={{ 
+                scale: [1, 1.1, 1],
+                opacity: [0.7, 1, 0.7],
+                boxShadow: ["0 0 10px rgba(234, 179, 8, 0.3)", "0 0 20px rgba(234, 179, 8, 0.5)", "0 0 10px rgba(234, 179, 8, 0.3)"]
+              }}
+              transition={{ 
+                duration: 4, 
+                repeat: Infinity, 
+                repeatType: "reverse" 
+              }}
+            >
+              <span className="text-2xl">⚛️</span>
+            </motion.div>
+          </div>
+        </div>
+      </motion.div>
+      
+      {/* Bottom transition line with dynamic hue */}
+      <div className="absolute bottom-0 left-0 w-full" style={{ zIndex: 999 }}>
+        <motion.div 
+          className="w-full h-[2px] overflow-hidden pointer-events-none"
+          style={{
+            boxShadow: "0 0 10px rgba(234, 179, 8, 0.3)"
+          }}
+          animate={{
+            background: [
+              "linear-gradient(90deg, transparent 0%, rgba(234, 179, 8, 0.8) 50%, transparent 100%)",
+              "linear-gradient(90deg, transparent 0%, rgba(139, 92, 246, 0.8) 50%, transparent 100%)",
+              "linear-gradient(90deg, transparent 0%, rgba(56, 189, 248, 0.8) 50%, transparent 100%)",
+              "linear-gradient(90deg, transparent 0%, rgba(234, 179, 8, 0.8) 50%, transparent 100%)"
+            ]
+          }}
+          transition={{
+            duration: 8,
+            repeat: Infinity,
+            repeatType: "loop",
+            ease: "linear"
+          }}
+        />
       </div>
-    </motion.div>
+    </div>
   );
 } 

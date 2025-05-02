@@ -117,3 +117,35 @@ To be clear:
 - I will adhere strictly to the documentation and rules you've provided
 
 My previous attempt at creating new SVG files and modifying components without proper understanding of the existing structure was incorrect and counterproductive. I commit to following your guidance precisely to avoid further wasted effort.
+
+
+# CRITICAL RULE: DO NOT OVERCOMPLICATE SIMPLE TASKS
+
+When a user requests a specific, targeted change:
+
+1. **IMPLEMENT ONLY WHAT IS EXPLICITLY REQUESTED**
+   - Do not add "improvements" or "enhancements" that weren't requested
+   - Do not touch code unrelated to the specific request
+   - Do not remove or replace existing functionality that works
+
+2. **PRESERVE EXISTING CODE**
+   - Assume the codebase is working as intended
+   - Make minimal changes necessary to achieve the requested outcome
+   - Never delete large sections of code without explicit permission
+
+3. **LISTEN TO FEEDBACK IMMEDIATELY**
+   - When the user says something isn't working, STOP and REASSESS
+   - If the user reiterates their request, implement it EXACTLY as specified
+   - Do not persist with a failed approach after receiving negative feedback
+
+4. **WHEN IN DOUBT, ASK DON'T ASSUME**
+   - Request clarification rather than guessing intent
+   - Show proposed changes before implementing complex solutions
+   - If the request seems simple, it probably is - don't overcomplicate it
+
+5. **RESPECT USER EXPERTISE**
+   - The user knows their project better than you do
+   - When they provide a specific solution, implement it as specified
+   - Don't substitute your judgment for the user's explicit instructions
+
+**EXAMPLE OF FAILURE**: User repeatedly asks for a simple line to be added at the bottom of an image with specific styling. Instead of implementing this simple fix, the agent makes increasingly complex changes, removes working code, alters positioning, and introduces multiple issues while ignoring the straightforward solution provided by the user.

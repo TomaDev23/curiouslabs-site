@@ -1,53 +1,13 @@
 import React, { useEffect, useState } from "react";
-
-// Define the service blobs data
-const serviceBlobs = [
-  {
-    title: "Code Rescue",
-    subtitle: "Repair broken pipelines, unlock frozen builds",
-    animationType: "pulse",
-    icon: "🛠️",
-    color: "purple"
-  },
-  {
-    title: "Security Hardening",
-    subtitle: "Lock down your app & tokens",
-    animationType: "glow",
-    icon: "🔒",
-    color: "blue"
-  },
-  {
-    title: "Automation Boost",
-    subtitle: "Tests, pipelines, and deployments",
-    animationType: "rotate",
-    icon: "⚙️",
-    color: "purple"
-  },
-  {
-    title: "Documentation Engine",
-    subtitle: "Generate real traceable logs",
-    animationType: "trail",
-    icon: "📝",
-    color: "blue"
-  },
-  {
-    title: "Recovery Systems",
-    subtitle: "Fallbacks, Guardrails, Failover design",
-    animationType: "scale",
-    icon: "🔄",
-    color: "purple"
-  },
-  {
-    title: "LEGIT Compliance",
-    subtitle: "Elite contract-level code practices",
-    animationType: "float",
-    icon: "✓",
-    color: "blue"
-  }
-];
+import ServiceModal from "./ServiceModal.jsx";
+import { services } from "../data/services.js";
 
 export default function DynamicExpansion({ scrollProgress }) {
+  console.log("[DEBUG] DynamicExpansion rendering with scrollProgress:", scrollProgress);
+  console.log("[LOADED services.js]", services);
+  
   const [isMobile, setIsMobile] = useState(false);
+  const [activeService, setActiveService] = useState(null);
   
   // Detect mobile devices for responsive adjustments
   useEffect(() => {
@@ -113,15 +73,16 @@ export default function DynamicExpansion({ scrollProgress }) {
   };
 
   // Card component with optimized styling
-  const Card = ({ children, scrollTrigger, columnSpan = 1 }) => {
+  const Card = ({ children, scrollTrigger, columnSpan = 1, onClick }) => {
     const style = calculateCardStyle(scrollTrigger);
     
     return (
       <div 
         className={`bg-[#312D4B] border border-[#473F7B]/60 rounded-xl shadow-xl overflow-hidden 
                    backdrop-blur-sm col-span-1 md:col-span-${columnSpan}
-                   transition-all duration-500 ease-out`}
+                   transition-all duration-500 ease-out ${onClick ? 'cursor-pointer hover:bg-[#3A3559]' : ''}`}
         style={style}
+        onClick={onClick}
       >
         <div className="p-6">
           {children}
@@ -184,31 +145,96 @@ export default function DynamicExpansion({ scrollProgress }) {
           </p>
         </div>
 
-        {/* First row - Two cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-          <Card scrollTrigger={0.04}>
-            <h3 className="text-xl font-semibold text-indigo-300 mb-3">Chaotic Code Debt</h3>
-            <p className="text-gray-300">
-              Unstructured development leading to technical debt, bugs, and delayed releases. A disorganized approach to software engineering that creates long-term problems.
-            </p>
-          </Card>
-          
-          <Card scrollTrigger={0.04}>
-            <h3 className="text-xl font-semibold text-indigo-300 mb-3">Error-Prone Processes</h3>
-            <p className="text-gray-300">
-              Manual deployments and lack of testing lead to frequent production issues and customer complaints. Without automated safeguards, risks multiply.
-            </p>
-          </Card>
+        {/* Service cards grid - first row */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6 mt-12">
+          {services.slice(0, 2).map((service) => {
+            const style = calculateCardStyle(0.04);
+            
+            return (
+              <div
+                key={service.id}
+                onClick={() => setActiveService(service.id)}
+                onKeyDown={(e) => e.key === 'Enter' && setActiveService(service.id)}
+                tabIndex={0}
+                role="button"
+                className="bg-[#312D4B] border border-[#473F7B]/60 rounded-xl shadow-xl overflow-hidden 
+                         backdrop-blur-sm col-span-1
+                         transition-all duration-500 ease-out cursor-pointer hover:bg-[#3A3559] outline-none"
+                style={style}
+              >
+                <div className="p-6 space-y-3">
+                  {/* Top Row Tags */}
+                  <div className="flex justify-between text-[10px] font-semibold uppercase tracking-wide">
+                    {service.categoryTag && (
+                      <span className="bg-indigo-700/80 text-white px-2 py-[2px] rounded-md">
+                        {service.categoryTag}
+                      </span>
+                    )}
+                    {service.trustTag && (
+                      <span className="bg-green-700/80 text-white px-2 py-[2px] rounded-md">
+                        {service.trustTag}
+                      </span>
+                    )}
+                  </div>
+                  
+                  {/* Title & Subtitle */}
+                  <h3 className="text-base font-bold text-indigo-300">{service.title}</h3>
+                  <p className="text-xs text-gray-400 leading-snug">{service.subtitle}</p>
+                  
+                  {/* CTA Nudge */}
+                  <p className="text-[11px] text-purple-400 mt-3 font-medium">
+                    → Click for service details
+                  </p>
+                </div>
+              </div>
+            );
+          })}
         </div>
         
-        {/* Second row - Centered card */}
+        {/* Service cards grid - center card */}
         <div className="grid grid-cols-1 mb-6">
-          <Card scrollTrigger={0.08} columnSpan={2}>
-            <h3 className="text-xl font-semibold text-blue-300 mb-3">Transformation Zone</h3>
-            <p className="text-gray-300">
-              The critical transition phase where teams adopt new practices, tools, and mindsets to bridge the gap between chaos and structure. This is where OpsPipe's guidance becomes most valuable.
-            </p>
-          </Card>
+          {services.slice(2, 3).map((service) => {
+            const style = calculateCardStyle(0.08);
+            
+            return (
+              <div
+                key={service.id}
+                onClick={() => setActiveService(service.id)}
+                onKeyDown={(e) => e.key === 'Enter' && setActiveService(service.id)}
+                tabIndex={0}
+                role="button"
+                className="bg-[#312D4B] border border-[#473F7B]/60 rounded-xl shadow-xl overflow-hidden 
+                         backdrop-blur-sm col-span-1 md:col-span-2
+                         transition-all duration-500 ease-out cursor-pointer hover:bg-[#3A3559] outline-none"
+                style={style}
+              >
+                <div className="p-6 space-y-3">
+                  {/* Top Row Tags */}
+                  <div className="flex justify-between text-[10px] font-semibold uppercase tracking-wide">
+                    {service.categoryTag && (
+                      <span className="bg-indigo-700/80 text-white px-2 py-[2px] rounded-md">
+                        {service.categoryTag}
+                      </span>
+                    )}
+                    {service.trustTag && (
+                      <span className="bg-green-700/80 text-white px-2 py-[2px] rounded-md">
+                        {service.trustTag}
+                      </span>
+                    )}
+                  </div>
+                  
+                  {/* Title & Subtitle */}
+                  <h3 className="text-base font-bold text-blue-300">{service.title}</h3>
+                  <p className="text-xs text-gray-400 leading-snug">{service.subtitle}</p>
+                  
+                  {/* CTA Nudge */}
+                  <p className="text-[11px] text-purple-400 mt-3 font-medium">
+                    → Click for service details
+                  </p>
+                </div>
+              </div>
+            );
+          })}
         </div>
         
         {/* Second Title - To Clarity */}
@@ -231,33 +257,115 @@ export default function DynamicExpansion({ scrollProgress }) {
           </p>
         </div>
         
-        {/* Third row - Two cards */}
+        {/* Service cards grid - third row */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-          <Card scrollTrigger={0.16}>
-            <h3 className="text-xl font-semibold text-blue-300 mb-3">Clean Architecture</h3>
-            <p className="text-gray-300">
-              Well-structured, maintainable code with clear separation of concerns. Every component has a single responsibility, making the system more reliable and easier to extend.
-            </p>
-          </Card>
-          
-          <Card scrollTrigger={0.16}>
-            <h3 className="text-xl font-semibold text-blue-300 mb-3">Automated Pipelines</h3>
-            <p className="text-gray-300">
-              Continuous integration and delivery with comprehensive testing and validation gates. This automation ensures consistent quality and dramatically reduces deployment risks.
-            </p>
-          </Card>
+          {services.slice(3, 5).map((service) => {
+            const style = calculateCardStyle(0.16);
+            
+            return (
+              <div
+                key={service.id}
+                onClick={() => setActiveService(service.id)}
+                onKeyDown={(e) => e.key === 'Enter' && setActiveService(service.id)}
+                tabIndex={0}
+                role="button"
+                className="bg-[#312D4B] border border-[#473F7B]/60 rounded-xl shadow-xl overflow-hidden 
+                         backdrop-blur-sm col-span-1
+                         transition-all duration-500 ease-out cursor-pointer hover:bg-[#3A3559] outline-none"
+                style={style}
+              >
+                <div className="p-6 space-y-3">
+                  {/* Top Row Tags */}
+                  <div className="flex justify-between text-[10px] font-semibold uppercase tracking-wide">
+                    {service.categoryTag && (
+                      <span className="bg-indigo-700/80 text-white px-2 py-[2px] rounded-md">
+                        {service.categoryTag}
+                      </span>
+                    )}
+                    {service.trustTag && (
+                      <span className="bg-green-700/80 text-white px-2 py-[2px] rounded-md">
+                        {service.trustTag}
+                      </span>
+                    )}
+                  </div>
+                  
+                  {/* Title & Subtitle */}
+                  <h3 className="text-base font-bold text-blue-300">{service.title}</h3>
+                  <p className="text-xs text-gray-400 leading-snug">{service.subtitle}</p>
+                  
+                  {/* CTA Nudge */}
+                  <p className="text-[11px] text-purple-400 mt-3 font-medium">
+                    → Click for service details
+                  </p>
+                </div>
+              </div>
+            );
+          })}
         </div>
         
-        {/* Fourth row - Centered card */}
-        <div className="grid grid-cols-1">
-          <Card scrollTrigger={0.20} columnSpan={2}>
-            <h3 className="text-xl font-semibold text-cyan-300 mb-3">Predictable Delivery</h3>
-            <p className="text-gray-300">
-              Reliable release schedules with minimal disruption and maximum business value. Teams can now confidently commit to deadlines and deliver new features at a sustainable pace.
-            </p>
-          </Card>
+        {/* Service cards grid - last card */}
+        <div className="grid grid-cols-1 mb-16">
+          {services.slice(5, 6).map((service) => {
+            const style = calculateCardStyle(0.19);
+            
+            return (
+              <div
+                key={service.id}
+                onClick={() => setActiveService(service.id)}
+                onKeyDown={(e) => e.key === 'Enter' && setActiveService(service.id)}
+                tabIndex={0}
+                role="button"
+                className="bg-[#312D4B] border border-[#473F7B]/60 rounded-xl shadow-xl overflow-hidden 
+                         backdrop-blur-sm col-span-1 md:col-span-2
+                         transition-all duration-500 ease-out cursor-pointer hover:bg-[#3A3559] outline-none"
+                style={style}
+              >
+                <div className="p-6 space-y-3">
+                  {/* Top Row Tags */}
+                  <div className="flex justify-between text-[10px] font-semibold uppercase tracking-wide">
+                    {service.categoryTag && (
+                      <span className="bg-indigo-700/80 text-white px-2 py-[2px] rounded-md">
+                        {service.categoryTag}
+                      </span>
+                    )}
+                    {service.trustTag && (
+                      <span className="bg-green-700/80 text-white px-2 py-[2px] rounded-md">
+                        {service.trustTag}
+                      </span>
+                    )}
+                  </div>
+                  
+                  {/* Title & Subtitle */}
+                  <h3 className="text-base font-bold text-green-300">{service.title}</h3>
+                  <p className="text-xs text-gray-400 leading-snug">{service.subtitle}</p>
+                  
+                  {/* CTA Nudge */}
+                  <p className="text-[11px] text-purple-400 mt-3 font-medium">
+                    → Click for service details
+                  </p>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
+      
+      {/* Service Modals */}
+      {services.map((service) => (
+        <ServiceModal
+          key={service.id}
+          isOpen={activeService === service.id}
+          onClose={() => setActiveService(null)}
+          title={service.title}
+          subtitle={service.subtitle}
+          bullets={service.bullets}
+          trustTag={service.trustTag}
+          categoryTag={service.categoryTag}
+          outcome={service.outcome}
+          cta={service.cta}
+          onCtaClick={() => console.log(`Requested from DynamicExpansion: ${service.id}`)}
+        />
+      ))}
     </section>
   );
 } 

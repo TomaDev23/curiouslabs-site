@@ -1,13 +1,13 @@
 const testimonials = [
   {
-    quote: "CuriousLabs saved us weeks of debugging — a real tactical advantage.",
-    name: "Alex R.",
-    company: "Indie SaaS Founder",
+    quote: "Sometimes we get yelled at... but mostly we deliver miracles under pressure.",
+    name: "Cursor",
+    company: "",
   },
   {
-    quote: "The trace logs alone are worth it. Complete operational clarity.",
-    name: "Maya T.",
-    company: "Startup CTO",
+    quote: "He rewrote our whole architecture... and gave us personalities.",
+    name: "Claude & CGPT",
+    company: "",
   },
 ];
 
@@ -66,7 +66,7 @@ export default function Testimonials() {
                   
                   <div>
                     <div className="font-bold text-white text-md">{testimonial.name}</div>
-                    <div className="text-xs text-curious-purple-400">{testimonial.company}</div>
+                    {testimonial.company && <div className="text-xs text-curious-purple-400">{testimonial.company}</div>}
                   </div>
                   
                   {/* Subtle corner decoration */}
@@ -86,6 +86,11 @@ export default function Testimonials() {
             </div>
           ))}
         </div>
+        
+        {/* Caption about real testimonials */}
+        <p className="text-center text-sm text-gray-400 mt-8">
+          Real testimonials from human clients coming soon. For now, just ask our agents.
+        </p>
         
         {/* Bottom accent */}
         <div className="max-w-xs mx-auto mt-16 h-[1px] bg-gradient-to-r from-transparent via-curious-purple-700/30 to-transparent"></div>

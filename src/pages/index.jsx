@@ -21,7 +21,9 @@ export default function Home() {
         <MiniSystemLayout />
       </div>
       
+      {/* SolutionsPreview with proper spacing already built in */}
       <SolutionsPreview />
+      
       <FeedbackBlock />
       <FooterMain />
     </>

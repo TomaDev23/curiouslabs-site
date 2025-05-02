@@ -108,6 +108,10 @@ export default {
           '0%, 100%': { opacity: '1' },
           '50%': { opacity: '0.8' },
         },
+        'fadeIn': {
+          '0%': { opacity: '0', transform: 'scale(0.98)' },
+          '100%': { opacity: '1', transform: 'scale(1)' },
+        },
       },
       animation: {
         'float': 'float 6s ease-in-out infinite',
@@ -126,6 +130,7 @@ export default {
         'orbit-spin': 'orbit-spin 45s linear infinite',
         'orbit-spin-reverse': 'orbit-spin-reverse 60s linear infinite',
         'twinkle': 'twinkle 3s ease-in-out infinite',
+        'fadeIn': 'fadeIn 0.3s ease-out',
       },
       backgroundImage: {
         'circuit-pattern': "url('/images/circuit-pattern.svg')",

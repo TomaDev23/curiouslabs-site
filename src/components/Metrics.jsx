@@ -1,9 +1,4 @@
-const metrics = [
-  { label: "AI Tiles Shipped", value: "22+" },
-  { label: "Test Pass Rate", value: "100%" },
-  { label: "CLI Logs Delivered", value: "100%" },
-  { label: "Documented Fixes", value: "Every Mission" },
-];
+import { metrics } from "../data/metrics";
 
 export default function Metrics() {
   return (

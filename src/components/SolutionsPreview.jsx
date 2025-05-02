@@ -46,8 +46,10 @@ export default function SolutionsPreview() {
   ];
 
   return (
-    <section className="bg-gradient-to-b from-[#16213E] via-[#16213E] to-[#0F172A] pb-16 sm:pb-24 -mt-1">
-      <div className="container mx-auto px-4 text-center mb-12 sm:mb-16 pt-16 sm:pt-20">
+    <section className="bg-gradient-to-b from-[#16213E] via-[#16213E] to-[#0F172A] pb-16 sm:pb-24 mt-96 relative">
+      {/* Remove the gradient fade at the top that was causing overlap */}
+      
+      <div className="container mx-auto px-4 text-center mb-12 sm:mb-16 pt-24 relative z-20">
         <h2 className="text-3xl sm:text-4xl font-bold text-white mb-6">
           Our Creations
         </h2>

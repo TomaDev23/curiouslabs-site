@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import NavBar from '../components/NavBar';
@@ -7,8 +7,13 @@ import ScrollToTop from '../components/ScrollToTop';
 import Metrics from '../components/Metrics';
 import CaseStudies from '../components/CaseStudies';
 import Testimonials from '../components/Testimonials';
+import ServiceModal from '../components/ServiceModal.jsx';
+import { services } from '../data/services.js';
+import { useReveal } from '../utils/useReveal.js';
 
 export default function CodeLab() {
+  const [activeService, setActiveService] = useState(null);
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#1A1A2E] via-[#16213E] to-[#0F172A] text-white flex flex-col">
       <Helmet>
@@ -28,7 +33,7 @@ export default function CodeLab() {
         <section className="text-center mb-16">
           <h1 className="text-4xl sm:text-5xl font-extrabold text-white mb-4">The CuriousLabs CodeLab</h1>
           <p className="text-lg sm:text-xl text-gray-300 max-w-3xl mx-auto">
-            Behind the scenes — tools, patterns, and AI logic we built to support production-grade systems. Everything you see here is LEGIT-compliant and running in the wild.
+            Elite AI CodeOps missions, run by agents — not amateurs. Submit your bugs, and we return clean, test-passing, CLI-traced code.
           </p>
           <div className="text-xs text-purple-400 uppercase tracking-wide mt-4 mb-6 text-center">
             LEGIT Traced · Agent-Tested · Production-Proven
@@ -53,53 +58,46 @@ export default function CodeLab() {
           <h2 className="text-2xl sm:text-3xl font-bold text-white text-left sm:text-center mb-6">Featured Lab Tools</h2>
           
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8">
-            {[
-              {
-                icon: "🧹",
-                category: "CLI Tool",
-                title: "SweepHammer",
-                description: "A CLI-ready linter and hygiene tool for operational codebases. Designed for Git CI flows."
-              },
-              {
-                icon: "🧠",
-                category: "Document Processing",
-                title: "OpsPipe Parser",
-                description: "FSM-driven document parser with CLI ingestion and agent slot selection."
-              },
-              {
-                icon: "📊",
-                category: "Telemetry",
-                title: "Telemetry Trace Pack",
-                description: "Sample outputs for trace.json, recovery.json, and state.json — used for audit visibility."
-              },
-              {
-                icon: "🧪",
-                category: "Test Framework",
-                title: "LEGIT CLI Runner",
-                description: "Contract-driven test runner with structured logging, session tracebacks, and fallback verification."
-              },
-              {
-                icon: "🔌",
-                category: "Agent Integration",
-                title: "Agent Bus",
-                description: "Unified wrapper for GPT, Claude, Gemini — supports slot fallback and runtime logging."
-              },
-              {
-                icon: "🌧️",
-                category: "UI Component",
-                title: "CodeRain Terminal",
-                description: "UI effect to simulate CLI drip animations. Used on dev portals and trace dashboards."
-              }
-            ].map((tool, index) => (
-              <div key={index} className="bg-gradient-to-br from-[#1C1C2C]/60 to-[#12121C]/60 border border-purple-300/10 hover:border-purple-400/40 shadow-md shadow-purple-900/20 p-6 rounded-xl min-h-[220px] flex flex-col">
-                <div className="flex items-center gap-2 text-purple-400 text-sm mb-2">
-                  <span className="text-lg">{tool.icon}</span>
-                  <span>{tool.category}</span>
+            {services.map((service, idx) => {
+              const [ref, visible] = useReveal();
+              return (
+                <div
+                  key={service.id}
+                  ref={ref}
+                  onClick={() => setActiveService(service.id)}
+                  onKeyDown={(e) => e.key === "Enter" && setActiveService(service.id)}
+                  tabIndex={0}
+                  role="button"
+                  className={`transition-all duration-700 ease-out transform ${
+                    visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
+                  } bg-[#121212] border border-purple-900/30 rounded-2xl shadow-sm hover:shadow-purple-800/40 hover:bg-[#1a1a1a] cursor-pointer p-5 space-y-2 outline-none focus:ring-2 focus:ring-purple-700`}
+                  style={{ transitionDelay: `${idx * 75}ms` }}
+                >
+                  {/* Tags */}
+                  <div className="flex justify-between text-[10px] font-semibold uppercase tracking-wide mb-2">
+                    {service.categoryTag && (
+                      <span className="bg-indigo-700 text-white px-2 py-[2px] rounded-md">
+                        {service.categoryTag}
+                      </span>
+                    )}
+                    {service.trustTag && (
+                      <span className="bg-green-700 text-white px-2 py-[2px] rounded-md">
+                        {service.trustTag}
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Title & Subtitle */}
+                  <h3 className="text-base font-bold text-white">{service.title}</h3>
+                  <p className="text-xs text-gray-400 leading-snug">{service.subtitle}</p>
+
+                  {/* CTA Nudge */}
+                  <p className="text-[11px] text-purple-400 mt-4 font-medium">
+                    → Click for service details
+                  </p>
                 </div>
-                <h3 className="text-lg sm:text-xl font-semibold text-white mb-2">{tool.title}</h3>
-                <p className="text-sm text-purple-200/80">{tool.description}</p>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </section>
         
@@ -233,6 +231,23 @@ export default function CodeLab() {
           </div>
         </section>
       </main>
+      
+      {/* Service Modals */}
+      {services.map((service) => (
+        <ServiceModal
+          key={service.id}
+          isOpen={activeService === service.id}
+          onClose={() => setActiveService(null)}
+          title={service.title}
+          subtitle={service.subtitle}
+          bullets={service.bullets}
+          trustTag={service.trustTag}
+          categoryTag={service.categoryTag}
+          outcome={service.outcome}
+          cta={service.cta}
+          onCtaClick={() => console.log(`Requested: ${service.id}`)}
+        />
+      ))}
       
       <Footer />
       <ScrollToTop />

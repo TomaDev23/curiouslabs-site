@@ -190,3 +190,63 @@ This is how we maintain visual and code quality.
 - Images must be referenced using centralized asset paths from `src/utils/assets.js`.
 
 **– Commander Authorization Required for Exceptions**
+
+=========================================================================================================
+
+After reading the attached files, I understand the critical rules for working on the CuriousLabs Landing Page project:
+
+# 🚨 DO_NOT_DEVIATE.md – CuriousLabs Landing Page (v2.0)
+
+## 🔐 Rules of Engagement
+These policies are absolute and may not be violated without Commander override.
+
+### 1. 📚 Docs Are Law
+- All implementation must trace to documented specifications
+- If it's not in a doc, it doesn't exist
+
+### 2. 🧱 Sacred Structure
+- Folders must not be renamed or relocated
+- Component structure must follow declared architecture
+- The specified folder structure is immutable
+
+### 3. ⚙️ Stack Lock
+- React for components
+- React Router for navigation
+- TailwindCSS for styling (no CSS modules, Styled Components)
+- No external component libraries
+
+### 4. 🎨 Style Discipline
+- TailwindCSS utility classes only
+- Custom colors from tailwind.config.js
+- Responsive styling via Tailwind breakpoints
+- Colors must match defined palette
+
+### 5. 🔄 Component Rules
+- Components must be standalone modules
+- Responsive across breakpoints
+- Free of backend integrations (visual/stub only)
+- Rendered from respective page files
+
+### 6. 📦 Asset Management
+- Assets centralized in src/utils/assets.js
+- Images from specific directories only
+- No external CDN links or inline base64
+
+### 7. 🛑 Hard Stops
+- No additional npm packages without approval
+- No additional page routes without declaration
+- No performance-impacting animations
+- No templates or external component libraries
+- No hook implementation modifications
+- No routing implementation changes
+
+## Additional Critical Rules
+- DO NOT OVERCOMPLICATE SIMPLE TASKS
+- Implement only what is explicitly requested
+- Preserve existing code
+- Listen to feedback immediately
+- Ask for clarification rather than assuming
+- Respect user expertise
+
+I will adhere strictly to these rules in all future work on this project.
+
