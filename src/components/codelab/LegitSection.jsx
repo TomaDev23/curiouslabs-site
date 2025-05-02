@@ -1,57 +1,67 @@
 import React from "react";
 import { motion, useReducedMotion } from "framer-motion";
 
-const LegitSection = () => {
+const LegitSection = ({ isLowPerf }) => {
   const shouldReduceMotion = useReducedMotion();
+  const simplifiedAnimation = shouldReduceMotion || isLowPerf;
 
-  // Animation variants
+  // Simplified animation variants
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.2,
-        delayChildren: 0.1
+        when: "beforeChildren",
+        staggerChildren: simplifiedAnimation ? 0.1 : 0.2,
+        duration: 0.3
       }
     }
   };
 
-  const textVariants = {
+  const textVariants = simplifiedAnimation ? {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        duration: 0.4
+      }
+    }
+  } : {
     hidden: { opacity: 0, y: 30 },
     visible: {
       opacity: 1,
       y: 0,
       transition: {
-        duration: 0.7,
+        duration: 0.5,
         ease: [0.25, 1, 0.5, 1]
       }
     }
   };
 
-  // Animation for floating items
+  // Animation for floating items - simplified when needed
   const floatingVariants = {
     hidden: { opacity: 0, scale: 0.8 },
     visible: custom => ({
       opacity: 1,
       scale: 1,
       transition: {
-        duration: 0.6,
+        duration: 0.5,
         delay: custom * 0.1,
         ease: [0.25, 1, 0.5, 1]
       }
     }),
-    floating: custom => ({
-      y: shouldReduceMotion ? 0 : [0, -8, 0],
-      rotate: shouldReduceMotion ? 0 : [0, custom % 2 === 0 ? 3 : -3, 0],
+    floating: custom => (simplifiedAnimation ? {} : {
+      y: [0, -8, 0],
+      rotate: [0, custom % 2 === 0 ? 2 : -2, 0],
       transition: {
         y: {
-          duration: 3 + custom * 0.5,
+          duration: 3 + custom * 0.3,
           repeat: Infinity,
           repeatType: "reverse",
           ease: "easeInOut"
         },
         rotate: {
-          duration: 4 + custom * 0.5,
+          duration: 4 + custom * 0.3,
           repeat: Infinity,
           repeatType: "reverse",
           ease: "easeInOut"
@@ -91,22 +101,26 @@ const LegitSection = () => {
 
   return (
     <motion.section
-      className="py-20 relative z-20"
+      className="py-20 relative z-20 legitSection"
       initial="hidden"
       whileInView="visible"
       viewport={{ once: true, margin: "-100px" }}
       variants={containerVariants}
+      style={{ 
+        transform: "translateZ(0)",
+        backfaceVisibility: "hidden"
+      }}
     >
-      {/* Background glow effects */}
-      <div className="absolute top-1/4 left-1/3 w-72 h-72 bg-purple-600/10 rounded-full filter blur-3xl z-0"></div>
-      <div className="absolute bottom-1/3 right-1/4 w-96 h-96 bg-blue-600/10 rounded-full filter blur-3xl z-0"></div>
+      {/* Background glow effects - simplified blur */}
+      <div className="absolute top-1/4 left-1/3 w-72 h-72 bg-purple-600/10 rounded-full filter blur-2xl z-0"></div>
+      <div className="absolute bottom-1/3 right-1/4 w-96 h-96 bg-blue-600/10 rounded-full filter blur-2xl z-0"></div>
 
-      {/* Particle background */}
+      {/* Particle background - reduced count for performance */}
       <div className="absolute inset-0 z-0">
-        {[...Array(30)].map((_, i) => (
+        {!simplifiedAnimation && [...Array(15)].map((_, i) => (
           <motion.div
             key={i}
-            className="absolute bg-purple-500/10 rounded-full"
+            className="absolute bg-purple-500/10 rounded-full motion-div"
             style={{
               width: Math.random() * 4 + 1 + "px",
               height: Math.random() * 4 + 1 + "px",
@@ -114,8 +128,7 @@ const LegitSection = () => {
               left: Math.random() * 100 + "%"
             }}
             animate={{
-              opacity: [0.2, 0.5, 0.2],
-              scale: [1, 1.5, 1]
+              opacity: [0.2, 0.5, 0.2]
             }}
             transition={{
               duration: Math.random() * 3 + 2,
@@ -146,22 +159,29 @@ const LegitSection = () => {
           {legitItems.map((item, index) => (
             <motion.div
               key={index}
-              className="bg-gradient-to-br from-gray-900/60 to-black/60 backdrop-blur-md p-6 rounded-xl border border-purple-500/20 w-full sm:w-[240px] shadow-xl hover:shadow-purple-900/20 transition-shadow duration-300 relative z-10"
+              className="bg-gradient-to-br from-gray-900/60 to-black/60 backdrop-blur-sm p-6 rounded-xl border border-purple-500/20 w-full sm:w-[240px] shadow-md hover:shadow-purple-900/10 transition-shadow duration-300 relative z-10 motion-div"
               variants={floatingVariants}
               custom={index}
               initial="hidden"
               animate={["visible", "floating"]}
-              whileHover={{ 
-                scale: 1.05, 
-                boxShadow: "0 10px 25px -5px rgba(124, 58, 237, 0.3)",
-                borderColor: "rgba(124, 58, 237, 0.4)" 
+              whileHover={simplifiedAnimation ? { scale: 1.02 } : { 
+                scale: 1.03, 
+                boxShadow: "0 8px 20px -5px rgba(124, 58, 237, 0.2)",
+                borderColor: "rgba(124, 58, 237, 0.3)" 
+              }}
+              style={{ 
+                transform: "translateZ(0)",
+                willChange: "transform",
+                backfaceVisibility: "hidden"
               }}
             >
-              {/* Icon with glow effect */}
+              {/* Icon with simplified glow effect */}
               <div className="mb-5 text-center">
                 <div className="inline-flex items-center justify-center w-16 h-16 rounded-xl bg-gradient-to-br from-purple-900/30 to-indigo-900/30 border border-purple-500/20 text-3xl relative">
                   {item.icon}
-                  <div className="absolute inset-0 bg-purple-500/20 rounded-xl filter blur-xl opacity-50"></div>
+                  {!simplifiedAnimation && (
+                    <div className="absolute inset-0 bg-purple-500/10 rounded-xl filter blur-lg opacity-40"></div>
+                  )}
                 </div>
               </div>
               
@@ -174,8 +194,12 @@ const LegitSection = () => {
 
         {/* Technical LEGIT Meaning Section */}
         <motion.div 
-          className="max-w-4xl mx-auto bg-gradient-to-br from-gray-900/40 to-black/40 backdrop-blur-md p-8 rounded-2xl border border-purple-500/20 shadow-xl"
+          className="max-w-4xl mx-auto bg-gradient-to-br from-gray-900/40 to-black/40 backdrop-blur-sm p-8 rounded-2xl border border-purple-500/20 shadow-md"
           variants={textVariants}
+          style={{ 
+            transform: "translateZ(0)",
+            backfaceVisibility: "hidden"
+          }}
         >
           <motion.h3 
             className="text-2xl font-bold text-white mb-6 text-center"
@@ -209,10 +233,10 @@ const LegitSection = () => {
             ].map((item, index) => (
               <motion.div 
                 key={index}
-                className="flex gap-4 items-start"
+                className="flex gap-4 items-start motion-div"
                 variants={textVariants}
                 custom={index}
-                whileHover={{ x: 5 }}
+                whileHover={simplifiedAnimation ? {} : { x: 3 }}
               >
                 <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-900/30 to-indigo-900/30 border border-purple-500/20 flex items-center justify-center flex-shrink-0 text-sm font-semibold">
                   {item.title.charAt(0)}
@@ -230,4 +254,22 @@ const LegitSection = () => {
   );
 };
 
-export default LegitSection; 
+// Add animation cleanup on unmount
+const LegitSectionWithCleanup = (props) => {
+  React.useEffect(() => {
+    return () => {
+      // Find and cancel ongoing animations on unmount
+      if (typeof document !== 'undefined') {
+        document.querySelectorAll('.legitSection .motion-div').forEach(el => {
+          if (el.getAnimations) {
+            el.getAnimations().forEach(anim => anim.cancel());
+          }
+        });
+      }
+    };
+  }, []);
+
+  return <LegitSection {...props} />;
+};
+
+export default LegitSectionWithCleanup; 

@@ -1,12 +1,13 @@
 import React, { useRef, useState, useEffect } from "react";
 import { motion, useInView, useReducedMotion } from "framer-motion";
 
-// Simple hook for animating number counting
+// Simple hook for animating number counting with performance optimizations
 const useCountAnimation = (targetValue, duration = 2, start = 0) => {
   const [count, setCount] = useState(start);
   const shouldReduceMotion = useReducedMotion();
   const countRef = useRef(targetValue);
   const [isInView, setIsInView] = useState(false);
+  const frameRef = useRef(null);
   
   useEffect(() => {
     countRef.current = targetValue;
@@ -19,7 +20,6 @@ const useCountAnimation = (targetValue, duration = 2, start = 0) => {
     }
     
     let startTime;
-    let animationFrame;
     
     const updateCount = (timestamp) => {
       if (!startTime) startTime = timestamp;
@@ -28,20 +28,26 @@ const useCountAnimation = (targetValue, duration = 2, start = 0) => {
       setCount(Math.floor(progress * (countRef.current - start) + start));
       
       if (progress < 1) {
-        animationFrame = requestAnimationFrame(updateCount);
+        frameRef.current = requestAnimationFrame(updateCount);
       }
     };
     
-    animationFrame = requestAnimationFrame(updateCount);
+    frameRef.current = requestAnimationFrame(updateCount);
     
-    return () => cancelAnimationFrame(animationFrame);
+    return () => {
+      if (frameRef.current) {
+        cancelAnimationFrame(frameRef.current);
+      }
+    };
   }, [isInView, duration, start, shouldReduceMotion, targetValue]);
   
   return [count, setIsInView];
 };
 
-const MetricsLogsSection = () => {
+const MetricsLogsSection = ({ isLowPerf }) => {
   const shouldReduceMotion = useReducedMotion();
+  const simplifiedAnimation = shouldReduceMotion || isLowPerf;
+  
   const sectionRef = useRef(null);
   const isInView = useInView(sectionRef, { once: true, margin: "-100px" });
   
@@ -85,33 +91,42 @@ const MetricsLogsSection = () => {
     }
   ];
   
-  // Animation variants
+  // Simplified animation variants
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.1,
-        delayChildren: 0.2
+        when: "beforeChildren",
+        staggerChildren: 0.08,
+        duration: 0.3
       }
     }
   };
   
-  const itemVariants = {
+  const itemVariants = simplifiedAnimation ? {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        duration: 0.4
+      }
+    }
+  } : {
     hidden: { opacity: 0, y: 20 },
     visible: {
       opacity: 1,
       y: 0,
       transition: {
-        duration: 0.6,
+        duration: 0.5,
         ease: [0.22, 1, 0.36, 1]
       }
     }
   };
   
-  // Initialize count animations for each metric
+  // Initialize count animations for each metric with cleanup
   const metricCounters = metrics.map(metric => {
-    const [count, setIsInView] = useCountAnimation(metric.value);
+    const [count, setIsInView] = useCountAnimation(metric.value, simplifiedAnimation ? 1 : 2);
     
     // When the section comes into view, trigger the counting animation
     useEffect(() => {
@@ -121,15 +136,33 @@ const MetricsLogsSection = () => {
     return count;
   });
 
+  // Early return for placeholder when not in view
+  if (!isInView) {
+    return (
+      <section 
+        ref={sectionRef}
+        className="py-20 relative metricsSection min-h-[400px]"
+        aria-label="Metrics and logs section"
+      >
+        {/* Minimal placeholder with gradient background */}
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-purple-900/5 to-transparent opacity-30"></div>
+      </section>
+    );
+  }
+
   return (
     <motion.section
       ref={sectionRef}
-      className="py-20 relative"
+      className="py-20 relative metricsSection"
       initial="hidden"
       animate={isInView ? "visible" : "hidden"}
       variants={containerVariants}
+      style={{ 
+        transform: "translateZ(0)",
+        backfaceVisibility: "hidden"
+      }}
     >
-      {/* Background gradient effect */}
+      {/* Background gradient effect - simplified */}
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-purple-900/5 to-transparent"></div>
       
       {/* Section header */}
@@ -147,19 +180,26 @@ const MetricsLogsSection = () => {
         </motion.div>
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16">
-          {/* Metrics Panel */}
-          <motion.div variants={itemVariants}>
-            <div className="bg-gradient-to-br from-gray-900/50 to-black/50 backdrop-blur-md rounded-2xl border border-purple-500/20 p-6 md:p-8 shadow-xl">
+          {/* Metrics Panel - Reduced shadow */}
+          <motion.div 
+            variants={itemVariants}
+            style={{ 
+              transform: "translateZ(0)",
+              willChange: "opacity, transform",
+              backfaceVisibility: "hidden"
+            }}
+          >
+            <div className="bg-gradient-to-br from-gray-900/50 to-black/50 backdrop-blur-sm rounded-2xl border border-purple-500/20 p-6 md:p-8 shadow-md">
               <h3 className="text-xl md:text-2xl font-semibold text-white mb-8">Performance Metrics</h3>
               
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
                 {metrics.map((metric, index) => (
                   <motion.div 
                     key={metric.id}
-                    className="flex flex-col"
+                    className="flex flex-col motion-div"
                     variants={itemVariants}
                     custom={index}
-                    whileHover={{ y: -5 }}
+                    whileHover={{ y: simplifiedAnimation ? 0 : -3 }}
                   >
                     <div className="mb-2 h-1.5 bg-gradient-to-r from-purple-600/30 to-transparent rounded-full"></div>
                     <div className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-indigo-300">
@@ -172,22 +212,29 @@ const MetricsLogsSection = () => {
             </div>
           </motion.div>
           
-          {/* Logs Panel */}
-          <motion.div variants={itemVariants}>
-            <div className="bg-gradient-to-br from-gray-900/50 to-black/50 backdrop-blur-md rounded-2xl border border-purple-500/20 p-6 md:p-8 shadow-xl">
+          {/* Logs Panel - Reduced shadow */}
+          <motion.div 
+            variants={itemVariants}
+            style={{ 
+              transform: "translateZ(0)",
+              willChange: "opacity",
+              backfaceVisibility: "hidden"
+            }}
+          >
+            <div className="bg-gradient-to-br from-gray-900/50 to-black/50 backdrop-blur-sm rounded-2xl border border-purple-500/20 p-6 md:p-8 shadow-md">
               <h3 className="text-xl md:text-2xl font-semibold text-white mb-8">Recent Activity</h3>
               
               <div className="space-y-4">
                 {recentLogs.map((log, index) => (
                   <motion.div 
                     key={log.id}
-                    className="bg-black/30 border border-purple-500/10 hover:border-purple-500/30 rounded-xl p-4 transition-all duration-300"
+                    className="bg-black/30 border border-purple-500/10 hover:border-purple-500/30 rounded-xl p-4 transition-all duration-300 motion-div"
                     variants={itemVariants}
                     custom={index}
-                    whileHover={{ 
+                    whileHover={simplifiedAnimation ? {} : { 
                       x: 5,
                       borderColor: "rgba(139, 92, 246, 0.3)",
-                      boxShadow: "0 4px 12px -4px rgba(139, 92, 246, 0.2)"
+                      boxShadow: "0 4px 12px -4px rgba(139, 92, 246, 0.15)"
                     }}
                   >
                     <div className="flex justify-between items-center mb-2">
@@ -214,4 +261,22 @@ const MetricsLogsSection = () => {
   );
 };
 
-export default MetricsLogsSection; 
+// Add animation cleanup on unmount
+const MetricsLogsSectionWithCleanup = (props) => {
+  React.useEffect(() => {
+    return () => {
+      // Cleanup animations on unmount
+      if (typeof document !== 'undefined') {
+        document.querySelectorAll('.metricsSection .motion-div').forEach(el => {
+          if (el.getAnimations) {
+            el.getAnimations().forEach(anim => anim.cancel());
+          }
+        });
+      }
+    };
+  }, []);
+
+  return <MetricsLogsSection {...props} />;
+};
+
+export default MetricsLogsSectionWithCleanup; 
