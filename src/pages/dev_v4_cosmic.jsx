@@ -16,6 +16,9 @@ import ContactTerminal from '../components/home/v4/ContactTerminal';
 import CuriousBotEnhanced from '../components/home/v4/CuriousBotEnhanced';
 import FooterMain from '../components/FooterMain';
 
+// Import SectionHeader component
+import SectionHeader from '../components/ui/SectionHeader';
+
 /**
  * Dev page for testing all v4 components
  * Includes navigation to easily access different components
@@ -42,7 +45,7 @@ const DevV4CosmicPage = () => {
   };
 
   return (
-    <div className="min-h-screen relative bg-gray-900 text-white">
+    <div className="min-h-screen relative bg-black text-white">
       {/* Space Canvas Background */}
       <SpaceCanvas />
       
@@ -71,29 +74,162 @@ const DevV4CosmicPage = () => {
         </header>
         
         {/* Main content with all components */}
-        <main className="pt-28 pb-20">
-          {/* NavBar Component from main homepage */}
-          <div className="mb-16">
-            <div className="container mx-auto px-4">
+        <main>
+          {/* NavBar Component from main homepage - fixed position, doesn't need padding */}
+          <div className="pt-28">
+            <div className="container mx-auto px-4 mb-8">
               <ComponentWrapper title="NavBar" id="navbar">
                 <NavBar />
               </ComponentWrapper>
             </div>
           </div>
           
-          {/* Render all sections */}
-          {sections.map((section) => {
-            const Component = section.component;
-            return (
-              <div key={section.id} id={section.id} className="mb-32 scroll-mt-28">
-                <Component />
+          {/* Hero Section - Full black background */}
+          <div className="bg-black">
+            <section 
+              id="hero"
+              className="pt-12 pb-24 md:pt-16 md:pb-32 scroll-mt-28 relative"
+            >
+              <HeroPortal />
+            </section>
+          </div>
+          
+          {/* About Section - Gradient from black to gray-900 */}
+          <div className="bg-gradient-to-b from-black to-gray-900 relative">
+            <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/10 z-0"></div>
+            <section 
+              id="about"
+              className="py-24 md:py-32 scroll-mt-28 relative z-10"
+            >
+              <div className="container mx-auto px-4">
+                <SectionHeader 
+                  title="OUR MISSION" 
+                  subtitle="Transforming development through AI innovation and community collaboration."
+                />
+                <AboutMission />
               </div>
-            );
-          })}
+            </section>
+          </div>
+          
+          {/* Agent-Powered Development - Gray-900 background */}
+          <div className="bg-gray-900">
+            <section 
+              id="agent-powered"
+              className="scroll-mt-28"
+            >
+              <div className="container mx-auto px-4 pt-12">
+                <SectionHeader 
+                  title="WHY AI-POWERED DEV?" 
+                  subtitle="Harnessing intelligent agents to solve complex coding challenges with speed and precision."
+                />
+              </div>
+              <ServicesFloatLayer />
+            </section>
+          </div>
+          
+          {/* Services Orbital - Gradient to darker */}
+          <div className="bg-gradient-to-b from-gray-900 to-[#0d0d12]">
+            <section 
+              id="services"
+              className="py-24 md:py-32 scroll-mt-28"
+            >
+              <div className="container mx-auto px-4">
+                <SectionHeader 
+                  title="OUR SERVICES" 
+                  subtitle="A constellation of solutions to power your development workflow."
+                />
+                <ServicesOrbital />
+              </div>
+            </section>
+          </div>
+          
+          {/* Projects Section - Darker background */}
+          <div className="bg-[#0d0d12]">
+            <section 
+              id="projects"
+              className="py-24 md:py-32 scroll-mt-28"
+            >
+              <div className="container mx-auto px-4">
+                <SectionHeader 
+                  title="FEATURED PROJECTS" 
+                  subtitle="Discover our latest innovations and client success stories."
+                />
+                <ProjectsSection />
+              </div>
+            </section>
+          </div>
+          
+          {/* Projects Logbook - Continue with darker background */}
+          <div className="bg-[#0d0d12]">
+            <section 
+              id="projects-logbook"
+              className="py-24 md:py-32 scroll-mt-28"
+            >
+              <div className="container mx-auto px-4">
+                <SectionHeader 
+                  title="MISSION LOGBOOK" 
+                  subtitle="Documenting our journey through the code universe."
+                />
+                <ProjectsLogbook />
+              </div>
+            </section>
+          </div>
+          
+          {/* Community Hub - Gradient back to gray-900 */}
+          <div className="bg-gradient-to-b from-[#0d0d12] to-gray-900">
+            <section 
+              id="community"
+              className="py-24 md:py-32 scroll-mt-28"
+            >
+              <div className="container mx-auto px-4">
+                <SectionHeader 
+                  title="JOIN OUR WORLD" 
+                  subtitle="Be part of a growing community of developers, innovators, and creators."
+                />
+                <CommunityHub />
+              </div>
+            </section>
+          </div>
+          
+          {/* AI Testimonials - Gray-900 background */}
+          <div className="bg-gray-900">
+            <section 
+              id="testimonials"
+              className="py-24 md:py-32 scroll-mt-28"
+            >
+              <div className="container mx-auto px-4">
+                <SectionHeader 
+                  title="HEAR FROM OUR AI" 
+                  subtitle="What our artificial teammates have to say about working with us."
+                />
+                <AITestimonials />
+              </div>
+            </section>
+          </div>
+          
+          {/* Contact Terminal - Gradient to black for footer */}
+          <div className="bg-gradient-to-b from-gray-900 to-black">
+            <section 
+              id="contact"
+              className="py-24 md:py-32 scroll-mt-28"
+            >
+              <div className="container mx-auto px-4">
+                <SectionHeader 
+                  title="REACH OUT" 
+                  subtitle="Let's build something amazing together."
+                />
+                <ContactTerminal />
+              </div>
+            </section>
+          </div>
+          
+          {/* Footer Section - Black background */}
+          <div className="bg-black">
+            <section className="pt-24 md:pt-32">
+              <FooterMain />
+            </section>
+          </div>
         </main>
-        
-        {/* Footer from main homepage */}
-        <FooterMain />
         
         {/* CuriousBot - stays fixed */}
         <CuriousBotEnhanced />
