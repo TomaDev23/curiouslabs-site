@@ -1,31 +1,35 @@
-import React from 'react';
-import { motion } from 'framer-motion';
+import { motion } from "framer-motion";
 
 /**
- * Mission Status Component - Phase 1 Placeholder
- * Will be fully implemented in Phase 5
+ * MissionStatus component - floating level indicator in the top-left corner
+ * Self-contained with no external dependencies
  */
-const MissionStatus = ({ isLowPerf = false }) => {
+export default function MissionStatus() {
   return (
     <motion.div 
       className="fixed top-24 left-6 z-40"
       initial={{ opacity: 0, x: -50 }}
       animate={{ opacity: 1, x: 0 }}
-      transition={{ delay: 1.5, duration: 0.5 }}
+      transition={{ delay: 2, duration: 0.5 }}
     >
-      <div className="bg-gray-900/50 backdrop-blur-md rounded-lg border border-gray-700/50 p-2 shadow-lg">
-        <div className="flex items-center space-x-2">
-          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-yellow-400 to-orange-600 flex items-center justify-center text-xs font-bold">
+      <div className="bg-gray-900/50 backdrop-blur-md rounded-lg border border-gray-700/50 p-3 shadow-lg">
+        <div className="flex items-center space-x-3">
+          <motion.div 
+            className="w-10 h-10 rounded-full bg-gradient-to-br from-yellow-400 to-orange-600 flex items-center justify-center text-sm font-bold"
+            whileHover={{ scale: 1.1, rotate: 360 }}
+            transition={{ duration: 0.8 }}
+          >
             42
-          </div>
+          </motion.div>
+          
           <div>
-            <div className="text-xs text-gray-400">Mission Level</div>
-            <div className="h-1.5 w-20 bg-gray-700 rounded-full mt-1">
+            <div className="text-xs text-gray-400 mb-1">Mission Level</div>
+            <div className="h-2 w-24 bg-gray-700 rounded-full">
               <motion.div 
                 className="h-full bg-gradient-to-r from-yellow-400 to-orange-600 rounded-full" 
-                style={{ width: '0%' }}
-                animate={{ width: '65%' }}
-                transition={{ delay: 2, duration: isLowPerf ? 0.3 : 1 }}
+                initial={{ width: 0 }}
+                animate={{ width: "65%" }}
+                transition={{ delay: 2.5, duration: 1 }}
               />
             </div>
           </div>
@@ -33,6 +37,4 @@ const MissionStatus = ({ isLowPerf = false }) => {
       </div>
     </motion.div>
   );
-};
-
-export default MissionStatus; 
+} 
