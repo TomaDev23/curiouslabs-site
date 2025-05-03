@@ -17,7 +17,7 @@ import CuriousBotEnhanced from '../components/home/v4/CuriousBotEnhanced';
 import FooterMain from '../components/FooterMain';
 
 // Import SectionHeader component
-import SectionHeader from '../components/ui/SectionHeader';
+import SectionHeader from '../components/ui/SectionHeader.jsx';
 
 /**
  * Dev page for testing all v4 components
