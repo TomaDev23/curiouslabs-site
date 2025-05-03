@@ -83,19 +83,6 @@ const ServicesOrbital = () => {
       <div className="absolute inset-0 bg-gradient-to-b from-gray-900/0 via-purple-900/10 to-gray-900/0"></div>
       
       <div className="container mx-auto px-4 relative z-10">
-        <motion.div 
-          className="text-center mb-20"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.7 }}
-        >
-          <h2 className="text-4xl font-bold mb-4">Our Services Orbit</h2>
-          <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-            Explore our range of specialized services designed to elevate your development process.
-          </p>
-        </motion.div>
-        
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
           {/* Orbital System - Left side */}
           <motion.div 

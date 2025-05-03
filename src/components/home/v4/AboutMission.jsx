@@ -74,16 +74,6 @@ const AboutMission = () => {
             whileInView="visible"
             viewport={{ once: true }}
           >
-            <motion.h2 
-              variants={itemVariants} 
-              className="text-4xl font-bold mb-6"
-            >
-              Our Mission to the
-              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-500 mt-1">
-                Code Frontier
-              </span>
-            </motion.h2>
-            
             <motion.p 
               variants={itemVariants} 
               className="text-gray-300 text-lg mb-6 leading-relaxed"

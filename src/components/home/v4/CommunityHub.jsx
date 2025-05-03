@@ -114,19 +114,6 @@ const CommunityHub = () => {
       ))}
       
       <div className="container mx-auto px-4 relative z-10">
-        <motion.div 
-          className="text-center mb-16"
-          initial={{ opacity: 0, y: -20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
-        >
-          <h2 className="text-4xl font-bold mb-4">Join Our Curious Community</h2>
-          <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-            Connect with developers, share your projects, and learn from real success stories. Our community is where innovation happens.
-          </p>
-        </motion.div>
-        
         {/* Community board with tabs */}
         <div className="max-w-5xl mx-auto">
           {/* Tab navigation */}
