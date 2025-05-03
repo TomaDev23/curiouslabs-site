@@ -1,3 +1,7 @@
+/* Import cosmic styles first */
+@import './styles/cosmic.css';
+
+/* Tailwind directives */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

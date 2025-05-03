@@ -1,0 +1,122 @@
+/* COSMIC HARMONY VISUAL ENHANCEMENTS */
+
+/* Advanced Gradient System */
+.cosmic-gradient-primary {
+  @apply bg-gradient-to-r from-purple-500 to-blue-500;
+}
+
+.cosmic-gradient-secondary {
+  @apply bg-gradient-to-r from-blue-500 to-cyan-500;
+}
+
+.cosmic-gradient-tertiary {
+  @apply bg-gradient-to-r from-purple-500 to-pink-600;
+}
+
+.cosmic-gradient-text-primary {
+  @apply text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400;
+}
+
+.cosmic-gradient-text-secondary {
+  @apply text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-400;
+}
+
+.cosmic-gradient-text-tertiary {
+  @apply text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-500;
+}
+
+.cosmic-gradient-radial {
+  background: radial-gradient(
+    circle at center,
+    rgba(124, 58, 237, 0.2) 0%,
+    rgba(17, 24, 39, 0) 70%
+  );
+}
+
+.cosmic-gradient-subtle {
+  background: linear-gradient(135deg, 
+    rgba(15, 118, 110, 0.1) 0%,
+    rgba(59, 130, 246, 0.2) 50%,
+    rgba(167, 139, 250, 0.1) 100%
+  );
+}
+
+/* Glow Text Effects */
+.glow-text {
+  @apply cosmic-gradient-text-primary;
+  text-shadow: 0 0 30px rgba(168, 85, 247, 0.3),
+               0 0 60px rgba(59, 130, 246, 0.2),
+               0 0 90px rgba(167, 139, 250, 0.1);
+}
+
+.glow-text-subtle {
+  @apply cosmic-gradient-text-primary;
+  text-shadow: 0 0 20px rgba(168, 85, 247, 0.2),
+               0 0 40px rgba(59, 130, 246, 0.1);
+}
+
+.cosmic-title {
+  @apply text-4xl md:text-5xl lg:text-6xl font-bold glow-text;
+}
+
+.cosmic-subtitle {
+  @apply text-xl md:text-2xl text-purple-300 font-medium;
+}
+
+/* Texture Classes */
+.bg-noise {
+  @apply bg-noise-texture;
+  background-size: 200px 200px;
+}
+
+.bg-noise-subtle {
+  @apply bg-noise-texture opacity-30 mix-blend-overlay;
+  background-size: 200px 200px;
+}
+
+/* Element Styling */
+.cosmic-card {
+  @apply relative bg-gray-800/70 backdrop-blur-md rounded-xl border border-gray-700 overflow-hidden;
+}
+
+.cosmic-card-glow {
+  @apply absolute inset-0 -z-10 opacity-0 transition-opacity duration-300 blur-xl;
+}
+
+.cosmic-card:hover .cosmic-card-glow {
+  @apply opacity-30;
+}
+
+/* Gradient Text Effects - Very Subtle */
+.cosmic-text-glow {
+  text-shadow: 0 0 15px rgba(168, 85, 247, 0.15),
+               0 0 30px rgba(59, 130, 246, 0.1);
+}
+
+.cosmic-text-gradient {
+  background: linear-gradient(135deg, #a78bfa 0%, #3b82f6 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Subtle Background Enhancements */
+.cosmic-bg-radial {
+  background: radial-gradient(
+    circle at center,
+    rgba(124, 58, 237, 0.07) 0%,
+    rgba(17, 24, 39, 0) 70%
+  );
+}
+
+.cosmic-subtle-glow {
+  box-shadow: 0 0 15px rgba(124, 58, 237, 0.07);
+}
+
+/* Texture Enhancement */
+.cosmic-noise-overlay {
+  background-image: url('/images/noise-texture.svg');
+  background-size: 200px 200px;
+  opacity: 0.02;
+  mix-blend-mode: overlay;
+} 

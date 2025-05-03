@@ -45,61 +45,41 @@ const DevV4CosmicPage = () => {
   };
 
   return (
-    <div className="min-h-screen relative bg-black text-white">
-      {/* Space Canvas Background */}
+    <div className="min-h-screen relative bg-black text-white overflow-hidden">
+      {/* Extended SpaceCanvas with fade to darker color */}
       <SpaceCanvas />
       
+      {/* Extended gradient overlay for smoother transition from stars to dark background */}
+      <div className="absolute inset-0 pointer-events-none z-[1]">
+        {/* Start transparent at the top, gradually fade to dark at bottom */}
+        <div className="absolute w-full h-full bg-gradient-to-b from-transparent via-transparent to-[#0d0d12]" style={{ top: '150vh', height: '100vh' }}></div>
+      </div>
+      
       <div className="relative z-10 min-h-screen">
-        {/* Fixed header with component navigation */}
-        <header className="fixed top-0 left-0 w-full bg-gray-900/80 backdrop-blur-md z-40 border-b border-gray-800">
-          <div className="container mx-auto px-4">
-            <div className="flex flex-col md:flex-row items-center justify-between py-4">
-              <h1 className="text-xl font-bold mb-4 md:mb-0">
-                <span className="text-purple-500">V4</span> Cosmic Components
-              </h1>
-              
-              <nav className="flex flex-wrap justify-center gap-2">
-                {sections.map((section) => (
-                  <button
-                    key={section.id}
-                    onClick={() => scrollToSection(section.id)}
-                    className="px-3 py-1 text-sm bg-gray-800 hover:bg-purple-700 rounded-full transition-colors"
-                  >
-                    {section.name}
-                  </button>
-                ))}
-              </nav>
-            </div>
-          </div>
+        {/* Fixed header with component navigation - Hidden in Cosmic mode */}
+        <header className="fixed top-0 left-0 w-full bg-transparent z-40">
+          {/* Navbar without borders */}
+          <NavBar />
         </header>
         
         {/* Main content with all components */}
         <main>
-          {/* NavBar Component from main homepage - fixed position, doesn't need padding */}
-          <div className="pt-28">
-            <div className="container mx-auto px-4 mb-8">
-              <ComponentWrapper title="NavBar" id="navbar">
-                <NavBar />
-              </ComponentWrapper>
-            </div>
-          </div>
-          
-          {/* Hero Section - Full black background */}
-          <div className="bg-black">
+          {/* Hero Section - Transparent background to show stars */}
+          <div className="bg-transparent">
             <section 
               id="hero"
-              className="pt-12 pb-24 md:pt-16 md:pb-32 scroll-mt-28 relative"
+              className="relative"
             >
               <HeroPortal />
             </section>
           </div>
           
-          {/* About Section - Gradient from black to gray-900 */}
-          <div className="bg-gradient-to-b from-black to-gray-900 relative">
+          {/* About Section - Transparent to show stars */}
+          <div className="bg-transparent relative">
             <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/10 z-0"></div>
             <section 
               id="about"
-              className="py-24 md:py-32 scroll-mt-28 relative z-10"
+              className="py-16 md:py-20 scroll-mt-20 relative z-10"
             >
               <div className="container mx-auto px-4">
                 <SectionHeader 
@@ -111,27 +91,29 @@ const DevV4CosmicPage = () => {
             </section>
           </div>
           
-          {/* Agent-Powered Development - Gray-900 background */}
-          <div className="bg-gray-900">
+          {/* Agent-Powered Development - Very subtle gradient overlay on stars */}
+          <div className="bg-transparent relative">
+            <div className="absolute inset-0 bg-gradient-to-b from-black/10 to-black/20 z-0"></div>
             <section 
               id="agent-powered"
-              className="scroll-mt-28"
+              className="scroll-mt-20 py-16 md:py-20 relative z-10"
             >
-              <div className="container mx-auto px-4 pt-12">
+              <div className="container mx-auto px-4">
                 <SectionHeader 
                   title="WHY AI-POWERED DEV?" 
                   subtitle="Harnessing intelligent agents to solve complex coding challenges with speed and precision."
                 />
+                <ServicesFloatLayer />
               </div>
-              <ServicesFloatLayer />
             </section>
           </div>
           
-          {/* Services Orbital - Gradient to darker */}
-          <div className="bg-gradient-to-b from-gray-900 to-[#0d0d12]">
+          {/* Services Orbital - Subtle gradient overlay on stars with increasing opacity */}
+          <div className="bg-transparent relative">
+            <div className="absolute inset-0 bg-gradient-to-b from-black/20 to-black/30 z-0"></div>
             <section 
               id="services"
-              className="py-24 md:py-32 scroll-mt-28"
+              className="py-16 md:py-20 scroll-mt-20 relative z-10"
             >
               <div className="container mx-auto px-4">
                 <SectionHeader 
@@ -143,11 +125,12 @@ const DevV4CosmicPage = () => {
             </section>
           </div>
           
-          {/* Projects Section - Darker background */}
-          <div className="bg-[#0d0d12]">
+          {/* Projects Section - Further transition to dark background */}
+          <div className="bg-transparent relative">
+            <div className="absolute inset-0 bg-gradient-to-b from-black/30 to-[#0d0d12]/70 z-0"></div>
             <section 
               id="projects"
-              className="py-24 md:py-32 scroll-mt-28"
+              className="py-16 md:py-20 scroll-mt-20 relative z-10"
             >
               <div className="container mx-auto px-4">
                 <SectionHeader 
@@ -159,11 +142,11 @@ const DevV4CosmicPage = () => {
             </section>
           </div>
           
-          {/* Projects Logbook - Continue with darker background */}
+          {/* Projects Logbook - Complete transition to solid dark background */}
           <div className="bg-[#0d0d12]">
             <section 
               id="projects-logbook"
-              className="py-24 md:py-32 scroll-mt-28"
+              className="py-16 md:py-20 scroll-mt-20"
             >
               <div className="container mx-auto px-4">
                 <SectionHeader 
@@ -179,7 +162,7 @@ const DevV4CosmicPage = () => {
           <div className="bg-gradient-to-b from-[#0d0d12] to-gray-900">
             <section 
               id="community"
-              className="py-24 md:py-32 scroll-mt-28"
+              className="py-16 md:py-20 scroll-mt-20"
             >
               <div className="container mx-auto px-4">
                 <SectionHeader 
@@ -195,7 +178,7 @@ const DevV4CosmicPage = () => {
           <div className="bg-gray-900">
             <section 
               id="testimonials"
-              className="py-24 md:py-32 scroll-mt-28"
+              className="py-16 md:py-20 scroll-mt-20"
             >
               <div className="container mx-auto px-4">
                 <SectionHeader 
@@ -211,7 +194,7 @@ const DevV4CosmicPage = () => {
           <div className="bg-gradient-to-b from-gray-900 to-black">
             <section 
               id="contact"
-              className="py-24 md:py-32 scroll-mt-28"
+              className="py-16 md:py-20 scroll-mt-20"
             >
               <div className="container mx-auto px-4">
                 <SectionHeader 
@@ -225,7 +208,7 @@ const DevV4CosmicPage = () => {
           
           {/* Footer Section - Black background */}
           <div className="bg-black">
-            <section className="pt-24 md:pt-32">
+            <section className="pt-16 md:pt-20">
               <FooterMain />
             </section>
           </div>

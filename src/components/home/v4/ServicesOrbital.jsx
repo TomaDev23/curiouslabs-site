@@ -1,5 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { useScrollReveal, sectionVariants, itemVariants } from '../../../utils/animation';
+import MagneticButton from '../../ui/MagneticButton';
+import CosmicNoiseOverlay from '../../ui/CosmicNoiseOverlay';
+import useBreakpoint from '../../../hooks/useBreakpoint';
 
 /**
  * ServicesOrbital - Services section with orbiting service cards
@@ -8,6 +12,8 @@ import { motion } from 'framer-motion';
 const ServicesOrbital = () => {
   const [activeService, setActiveService] = useState(0);
   const [isAutorotating, setIsAutorotating] = useState(true);
+  const { ref, inView } = useScrollReveal(0.2);
+  const { isMobile, isMd, isLg } = useBreakpoint();
   
   // Services data
   const services = [
@@ -55,14 +61,14 @@ const ServicesOrbital = () => {
   
   // Auto-rotate services
   useEffect(() => {
-    if (!isAutorotating) return;
+    if (!isAutorotating || !inView) return;
     
     const interval = setInterval(() => {
       setActiveService((prev) => (prev + 1) % services.length);
     }, 5000);
     
     return () => clearInterval(interval);
-  }, [isAutorotating, services.length]);
+  }, [isAutorotating, services.length, inView]);
   
   // Stop auto-rotate when user interacts
   const handleServiceClick = (index) => {
@@ -70,32 +76,39 @@ const ServicesOrbital = () => {
     setIsAutorotating(false);
   };
   
+  // Calculate radius based on screen size
+  const radius = isMobile ? 140 : 200;
+  
+  // Calculate the center point for SVG coordinates based on screen size
+  const centerPoint = isMobile ? 175 : 250;
+  
   return (
     <motion.section 
-      className="relative py-24 pb-32 overflow-hidden"
-      initial={{ opacity: 0, y: 50 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6 }}
+      ref={ref}
+      className="relative py-12 md:py-16 overflow-hidden"
+      variants={sectionVariants}
+      initial="hidden"
+      animate={inView ? "visible" : "hidden"}
       viewport={{ once: true }}
     >
       {/* Background gradients */}
       <div className="absolute inset-0 bg-gray-900/80"></div>
       <div className="absolute inset-0 bg-gradient-to-b from-gray-900/0 via-purple-900/10 to-gray-900/0"></div>
       
+      {/* Subtle noise texture */}
+      <CosmicNoiseOverlay opacity={0.01} />
+      
       <div className="container mx-auto px-4 relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-12 items-center">
           {/* Orbital System - Left side */}
           <motion.div 
-            className="relative"
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.7 }}
+            className="relative order-2 lg:order-1"
+            variants={itemVariants}
           >
-            <div className="aspect-square max-w-lg mx-auto relative">
+            <div className="aspect-square max-w-sm md:max-w-lg mx-auto relative">
               {/* Central core */}
               <motion.div 
-                className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[120px] h-[120px] rounded-full bg-gradient-to-br from-purple-900/80 to-blue-900/80 border border-purple-500/50 backdrop-blur-md z-20 flex items-center justify-center"
+                className={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 ${isMobile ? 'w-[80px] h-[80px]' : 'w-[120px] h-[120px]'} rounded-full bg-gradient-to-br from-purple-900/80 to-blue-900/80 border border-purple-500/50 backdrop-blur-md z-20 flex items-center justify-center cosmic-subtle-glow`}
                 animate={{ 
                   boxShadow: ['0 0 20px 5px rgba(124, 58, 237, 0.3)', '0 0 30px 10px rgba(124, 58, 237, 0.4)', '0 0 20px 5px rgba(124, 58, 237, 0.3)']
                 }}
@@ -106,13 +119,12 @@ const ServicesOrbital = () => {
               </motion.div>
               
               {/* Orbital paths */}
-              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full h-full rounded-full border border-gray-500/20"></div>
+              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full h-full rounded-full border border-gray-500/20 cosmic-subtle-glow"></div>
               
               {/* Service orbitals */}
               {services.map((service, index) => {
                 const angle = (index / services.length) * Math.PI * 2;
                 const isActive = activeService === index;
-                const radius = 200; // Orbit radius
                 
                 const orbitX = Math.cos(angle) * radius;
                 const orbitY = Math.sin(angle) * radius;
@@ -120,7 +132,7 @@ const ServicesOrbital = () => {
                 return (
                   <motion.div
                     key={service.id}
-                    className={`absolute top-1/2 left-1/2 w-14 h-14 -ml-7 -mt-7 flex items-center justify-center rounded-full cursor-pointer z-10 ${isActive ? 'z-30' : 'z-10'}`}
+                    className={`absolute top-1/2 left-1/2 ${isMobile ? 'w-10 h-10 -ml-5 -mt-5' : 'w-14 h-14 -ml-7 -mt-7'} flex items-center justify-center rounded-full cursor-pointer z-10 ${isActive ? 'z-30' : 'z-10'}`}
                     style={{ 
                       x: orbitX, 
                       y: orbitY 
@@ -133,13 +145,13 @@ const ServicesOrbital = () => {
                     }}
                     transition={{ duration: 0.3 }}
                   >
-                    <div className={`w-full h-full rounded-full bg-gradient-to-br ${service.color} flex items-center justify-center text-xl shadow-lg`}>
+                    <div className={`w-full h-full rounded-full bg-gradient-to-br ${service.color} flex items-center justify-center ${isMobile ? 'text-base' : 'text-xl'} shadow-lg`}>
                       <span>{service.icon}</span>
                     </div>
                     
-                    {isActive && (
+                    {isActive && !isMobile && (
                       <motion.span 
-                        className="absolute -top-8 whitespace-nowrap font-medium text-white"
+                        className="absolute -top-8 whitespace-nowrap font-medium text-white cosmic-text-glow"
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: 10 }}
@@ -155,15 +167,14 @@ const ServicesOrbital = () => {
               <svg className="absolute inset-0 w-full h-full z-0">
                 {services.map((service, index) => {
                   const angle = (index / services.length) * Math.PI * 2;
-                  const radius = 200;
-                  const x = Math.cos(angle) * radius + 250;
-                  const y = Math.sin(angle) * radius + 250;
+                  const x = Math.cos(angle) * radius + centerPoint;
+                  const y = Math.sin(angle) * radius + centerPoint;
                   
                   return (
                     <motion.line
                       key={`line-${service.id}`}
-                      x1="250"
-                      y1="250"
+                      x1={centerPoint.toString()}
+                      y1={centerPoint.toString()}
                       x2={x}
                       y2={y}
                       stroke={`url(#gradient-${service.id})`}
@@ -191,43 +202,47 @@ const ServicesOrbital = () => {
           </motion.div>
           
           {/* Service Details - Right side */}
-          <div>
+          <motion.div variants={itemVariants} className="order-1 lg:order-2">
+            {isMobile && (
+              <h3 className="text-xl font-bold text-center mb-4 cosmic-text-glow">
+                {services[activeService].title}
+              </h3>
+            )}
+          
             <motion.div
               key={services[activeService].id}
-              className="bg-gray-800/30 backdrop-blur-sm border border-gray-700 rounded-xl p-8"
+              className="bg-gray-800/30 backdrop-blur-sm border border-gray-700 rounded-xl p-4 md:p-6"
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
               transition={{ duration: 0.5 }}
             >
-              <div className="flex items-center mb-6">
-                <div className={`w-16 h-16 rounded-full bg-gradient-to-br ${services[activeService].color} flex items-center justify-center text-3xl mr-4 shadow-lg`} style={{ boxShadow: `0 10px 25px -5px ${services[activeService].shadowColor}` }}>
+              <div className="flex items-center mb-4 md:mb-6">
+                <div className={`${isMobile ? 'w-12 h-12' : 'w-16 h-16'} rounded-full bg-gradient-to-br ${services[activeService].color} flex items-center justify-center ${isMobile ? 'text-2xl' : 'text-3xl'} mr-4 shadow-lg`} style={{ boxShadow: `0 10px 25px -5px ${services[activeService].shadowColor}` }}>
                   {services[activeService].icon}
                 </div>
-                <h3 className="text-2xl font-bold">{services[activeService].title}</h3>
+                <h3 className={`${isMobile ? 'text-lg' : 'text-2xl'} font-bold cosmic-text-glow`}>{services[activeService].title}</h3>
               </div>
               
-              <p className="text-gray-300 text-lg mb-8 leading-relaxed">
+              <p className={`text-gray-300 ${isMobile ? 'text-sm' : 'text-lg'} mb-4 md:mb-6 leading-relaxed`}>
                 {services[activeService].description}
               </p>
               
-              <div className="flex flex-wrap gap-3 mb-8">
+              <div className="flex flex-wrap gap-2 md:gap-3 mb-4 md:mb-6">
                 {['Python', 'JavaScript', 'TypeScript', 'React', 'Node.js'].map((tech) => (
-                  <span key={tech} className="px-3 py-1 bg-gray-700/50 rounded-full text-sm text-gray-300">
+                  <span key={tech} className={`px-2 md:px-3 py-1 bg-gray-700/50 rounded-full ${isMobile ? 'text-xs' : 'text-sm'} text-gray-300`}>
                     {tech}
                   </span>
                 ))}
               </div>
               
-              <motion.button
-                className={`px-6 py-3 bg-gradient-to-r ${services[activeService].color} rounded-lg text-white font-medium`}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.98 }}
+              <MagneticButton
+                className={`px-6 py-3 bg-gradient-to-r ${services[activeService].color} rounded-lg text-white font-medium ${isMobile ? 'w-full text-center' : ''}`}
               >
                 Request Service
-              </motion.button>
+              </MagneticButton>
             </motion.div>
-          </div>
+          </motion.div>
         </div>
       </div>
     </motion.section>

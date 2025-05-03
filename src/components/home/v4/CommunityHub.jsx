@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
+import { useScrollReveal, sectionVariants, itemVariants } from '../../../utils/animation';
+import MagneticButton from '../../ui/MagneticButton';
+import useBreakpoint from '../../../hooks/useBreakpoint';
 
 /**
  * CommunityHub - Community section showcasing forum-like discussion and activity
@@ -7,6 +10,8 @@ import { motion } from 'framer-motion';
  */
 const CommunityHub = () => {
   const [activeTab, setActiveTab] = useState('trending');
+  const { ref, inView } = useScrollReveal(0.2);
+  const { isMobile } = useBreakpoint();
   
   // Mock community posts data
   const posts = [
@@ -56,32 +61,16 @@ const CommunityHub = () => {
     }
   ];
   
-  // Animation variants
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1
-      }
-    }
-  };
-  
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { 
-      opacity: 1, 
-      y: 0,
-      transition: { duration: 0.5 }
-    }
-  };
+  // Show fewer posts on mobile for better performance
+  const displayPosts = isMobile ? posts.slice(0, 3) : posts;
   
   return (
     <motion.section 
-      className="relative py-24 overflow-hidden"
-      initial={{ opacity: 0, y: 40 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6 }}
+      ref={ref}
+      className="relative py-8 md:py-12 overflow-hidden"
+      variants={sectionVariants}
+      initial="hidden"
+      animate={inView ? "visible" : "hidden"}
       viewport={{ once: true }}
     >
       {/* Background elements */}
@@ -91,8 +80,8 @@ const CommunityHub = () => {
         <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-blue-500/10 to-transparent"></div>
       </div>
       
-      {/* Floating particles */}
-      {[...Array(20)].map((_, i) => (
+      {/* Floating particles - fewer on mobile for better performance */}
+      {[...Array(isMobile ? 8 : 15)].map((_, i) => (
         <motion.div
           key={i}
           className="absolute w-1 h-1 rounded-full bg-purple-500/40"
@@ -116,18 +105,15 @@ const CommunityHub = () => {
       <div className="container mx-auto px-4 relative z-10">
         {/* Community board with tabs */}
         <div className="max-w-5xl mx-auto">
-          {/* Tab navigation */}
+          {/* Tab navigation - scrollable on mobile */}
           <motion.div 
-            className="flex mb-6 bg-gray-800/50 rounded-lg p-1 backdrop-blur-sm"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
+            className={`${isMobile ? 'flex overflow-x-auto pb-2' : 'flex'} mb-4 bg-gray-800/50 rounded-lg p-1 backdrop-blur-sm`}
+            variants={itemVariants}
           >
             {['trending', 'recent', 'projects', 'discussions'].map((tab) => (
               <button
                 key={tab}
-                className={`flex-1 py-2 px-4 rounded-md transition-all ${
+                className={`${isMobile ? 'flex-none' : 'flex-1'} py-2 px-4 rounded-md transition-all whitespace-nowrap ${
                   activeTab === tab 
                     ? 'bg-purple-600 text-white shadow-lg' 
                     : 'text-gray-300 hover:bg-gray-700/50'
@@ -141,36 +127,42 @@ const CommunityHub = () => {
           
           {/* Posts list */}
           <motion.div
-            className="space-y-6 trending-posts"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            viewport={{ once: true }}
+            className="space-y-3 md:space-y-4 trending-posts"
+            variants={itemVariants}
           >
-            {posts.map((post) => (
-              <CommunityPost key={post.id} post={post} variants={itemVariants} />
+            {displayPosts.map((post, index) => (
+              <CommunityPost 
+                key={post.id} 
+                post={post} 
+                custom={index} 
+                isMobile={isMobile}
+              />
             ))}
           </motion.div>
           
+          {/* Show "View More" button on mobile when posts are truncated */}
+          {isMobile && posts.length > displayPosts.length && (
+            <motion.div 
+              className="text-center mt-3"
+              variants={itemVariants}
+            >
+              <button className="text-purple-400 hover:text-purple-300 underline text-sm">
+                View More Posts
+              </button>
+            </motion.div>
+          )}
+          
           {/* Join button */}
           <motion.div 
-            className="text-center mt-12"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.3 }}
+            className="text-center mt-6 md:mt-8"
+            variants={itemVariants}
           >
-            <motion.button
-              className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-bold py-3 px-8 rounded-full shadow-lg shadow-purple-500/20"
-              whileHover={{ 
-                scale: 1.05, 
-                boxShadow: "0 10px 25px -5px rgba(147, 51, 234, 0.3)"
-              }}
-              whileTap={{ scale: 0.98 }}
+            <MagneticButton
+              className={`bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-bold py-3 px-8 rounded-full shadow-lg shadow-purple-500/20 ${isMobile ? 'w-full' : ''}`}
             >
               Join The Community
-            </motion.button>
-            <p className="text-gray-400 mt-4">
+            </MagneticButton>
+            <p className="text-gray-400 mt-2 text-sm md:text-base">
               Already 2,500+ curious devs sharing their knowledge
             </p>
           </motion.div>
@@ -180,73 +172,69 @@ const CommunityHub = () => {
   );
 };
 
-// Community post component
-const CommunityPost = ({ post, variants }) => {
+// Community post component with responsive design
+const CommunityPost = ({ post, custom, isMobile }) => {
   return (
     <motion.div 
-      className="bg-gray-800/60 backdrop-blur-sm rounded-xl p-6 border border-gray-700 hover:border-purple-500/30 transition-all"
-      variants={variants}
+      className="bg-gray-800/60 backdrop-blur-sm rounded-xl p-4 md:p-6 border border-gray-700 hover:border-purple-500/30 transition-all"
+      variants={itemVariants}
+      custom={custom}
       whileHover={{ y: -5, boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.3)" }}
     >
       <div className="flex items-start">
-        {/* Author avatar */}
-        <div className="flex-shrink-0 mr-4">
-          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-xl">
+        {/* Author avatar - smaller on mobile */}
+        <div className="flex-shrink-0 mr-3 md:mr-4">
+          <div className={`${isMobile ? 'w-10 h-10' : 'w-12 h-12'} rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center ${isMobile ? 'text-lg' : 'text-xl'}`}>
             {post.avatar}
           </div>
         </div>
         
         {/* Post content */}
-        <div className="flex-1">
+        <div className="flex-1 min-w-0">
           <div className="flex justify-between items-start mb-2">
-            <div>
-              <h3 className="font-bold text-lg">{post.title}</h3>
-              <p className="text-gray-400 text-sm">
+            <div className="min-w-0 pr-2">
+              <h3 className={`font-bold ${isMobile ? 'text-base' : 'text-lg'} truncate`}>{post.title}</h3>
+              <p className="text-gray-400 text-xs md:text-sm">
                 Posted by <span className="text-purple-400">{post.author}</span> • {post.timeAgo}
               </p>
             </div>
             <motion.button 
-              className="text-gray-400 hover:text-white"
+              className="text-gray-400 hover:text-white flex-shrink-0"
               whileHover={{ scale: 1.1 }}
             >
               ⋮
             </motion.button>
           </div>
           
-          <p className="text-gray-300 mb-4">{post.content}</p>
+          {/* Content - truncated on mobile */}
+          <p className={`text-gray-300 mb-4 ${isMobile ? 'text-sm line-clamp-2' : ''}`}>{post.content}</p>
           
-          {/* Tags */}
-          <div className="flex flex-wrap gap-2 mb-4">
+          {/* Tags - smaller on mobile */}
+          <div className="flex flex-wrap gap-1 md:gap-2 mb-4">
             {post.tags.map(tag => (
               <span 
                 key={tag} 
-                className="bg-gray-700/60 text-blue-300 text-xs py-1 px-2 rounded-full"
+                className={`bg-gray-700/60 text-blue-300 ${isMobile ? 'text-xs py-0.5 px-1.5' : 'text-xs py-1 px-2'} rounded-full`}
               >
                 #{tag}
               </span>
             ))}
           </div>
           
-          {/* Actions */}
-          <div className="flex items-center text-sm text-gray-400">
-            <motion.button 
-              className="flex items-center mr-6 hover:text-purple-400"
-              whileHover={{ scale: 1.05 }}
-            >
-              <span className="mr-1">👍</span> {post.likes} Likes
-            </motion.button>
-            <motion.button 
-              className="flex items-center mr-6 hover:text-purple-400"
-              whileHover={{ scale: 1.05 }}
-            >
-              <span className="mr-1">💬</span> {post.comments} Comments
-            </motion.button>
-            <motion.button 
-              className="flex items-center hover:text-purple-400"
-              whileHover={{ scale: 1.05 }}
-            >
-              <span className="mr-1">↗️</span> Share
-            </motion.button>
+          {/* Interaction buttons - with responsive text size */}
+          <div className="flex items-center space-x-4 text-gray-400">
+            <button className="flex items-center space-x-1 hover:text-purple-300">
+              <span>❤️</span>
+              <span className={isMobile ? 'text-xs' : 'text-sm'}>{post.likes}</span>
+            </button>
+            <button className="flex items-center space-x-1 hover:text-blue-300">
+              <span>💬</span>
+              <span className={isMobile ? 'text-xs' : 'text-sm'}>{post.comments}</span>
+            </button>
+            <button className="flex items-center space-x-1 hover:text-green-300">
+              <span>🔄</span>
+              <span className={isMobile ? 'text-xs' : 'text-sm'}>Share</span>
+            </button>
           </div>
         </div>
       </div>

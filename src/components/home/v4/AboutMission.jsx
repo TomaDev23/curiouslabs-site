@@ -1,31 +1,14 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { useScrollReveal, sectionVariants, itemVariants } from '../../../utils/animation';
 
 /**
  * AboutMission - "About Our Mission" section
  * Features animated mission statement with space-themed design elements
  */
 const AboutMission = () => {
-  // Animation variants
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.2,
-        delayChildren: 0.3
-      }
-    }
-  };
-  
-  const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
-    visible: {
-      y: 0,
-      opacity: 1,
-      transition: { duration: 0.6 }
-    }
-  };
+  // Get scroll reveal functionality
+  const { ref, inView } = useScrollReveal(0.2);
   
   // Mission stats
   const stats = [
@@ -37,10 +20,11 @@ const AboutMission = () => {
   
   return (
     <motion.section 
+      ref={ref}
       className="relative pt-32 pb-32 overflow-hidden"
-      initial={{ opacity: 0, y: 50 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6 }}
+      variants={sectionVariants}
+      initial="hidden"
+      animate={inView ? "visible" : "hidden"}
       viewport={{ once: true }}
     >
       {/* Background elements */}
@@ -68,12 +52,7 @@ const AboutMission = () => {
       <div className="container mx-auto px-4 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
           {/* Left Column - Text Content */}
-          <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-          >
+          <motion.div variants={itemVariants}>
             <motion.p 
               variants={itemVariants} 
               className="text-gray-300 text-lg mb-6 leading-relaxed"
@@ -102,6 +81,8 @@ const AboutMission = () => {
                   key={stat.label}
                   className="bg-gray-800/50 backdrop-blur-sm p-4 rounded-xl border border-gray-700/50"
                   whileHover={{ y: -5, borderColor: "rgba(147, 51, 234, 0.5)" }}
+                  variants={itemVariants}
+                  custom={index}
                 >
                   <div className="text-3xl font-bold bg-gradient-to-r from-purple-400 to-blue-500 bg-clip-text text-transparent">
                     {stat.value}
@@ -117,10 +98,7 @@ const AboutMission = () => {
           {/* Right Column - Space Station Illustration */}
           <motion.div
             className="relative"
-            initial={{ opacity: 0, scale: 0.9 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
+            variants={itemVariants}
           >
             <div className="relative aspect-square max-w-md mx-auto">
               {/* Space station design using CSS */}

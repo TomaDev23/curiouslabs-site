@@ -1,18 +1,34 @@
 import React from "react";
+import { motion } from "framer-motion";
+import useBreakpoint from "../../hooks/useBreakpoint";
 
 /**
  * SectionHeader component
  * Provides consistent styling for section titles with animations
  */
 export default function SectionHeader({ title, subtitle }) {
+  const { isMobile } = useBreakpoint();
+  
   return (
-    <div className="mb-12 text-center opacity-0 animate-fade-in-up">
-      <h2 className="text-4xl md:text-5xl font-bold text-white drop-shadow-md tracking-tight">
+    <motion.div 
+      className="mb-6 md:mb-10 text-center"
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-50px" }}
+      transition={{ duration: 0.5 }}
+    >
+      <motion.h2 
+        className={`${isMobile ? 'text-3xl' : 'text-4xl md:text-5xl'} font-bold text-white drop-shadow-md tracking-tight`}
+      >
         {title}
-      </h2>
+      </motion.h2>
       {subtitle && (
-        <p className="text-lg mt-2 text-purple-300 font-medium">{subtitle}</p>
+        <motion.p 
+          className={`${isMobile ? 'text-base' : 'text-lg'} mt-2 text-purple-300 font-medium max-w-2xl mx-auto`}
+        >
+          {subtitle}
+        </motion.p>
       )}
-    </div>
+    </motion.div>
   );
 } 
