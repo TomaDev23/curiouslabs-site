@@ -68,8 +68,8 @@ const ProjectsLogbook = () => {
   
   return (
     <motion.section 
-      className="relative py-24 overflow-hidden"
-      initial={{ opacity: 0, y: 50 }}
+      className="relative pt-32 pb-32 overflow-hidden"
+      initial={{ opacity: 0, y: 40 }}
       whileInView={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
       viewport={{ once: true }}
@@ -98,8 +98,16 @@ const ProjectsLogbook = () => {
           whileInView="visible"
           viewport={{ once: true }}
         >
-          {projects.map((project) => (
-            <ProjectCard key={project.id} project={project} variants={cardVariants} />
+          {projects.map((project, index) => (
+            <motion.div
+              key={project.id}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: index * 0.1 }}
+              viewport={{ once: true }}
+            >
+              <ProjectCard project={project} variants={cardVariants} />
+            </motion.div>
           ))}
         </motion.div>
         

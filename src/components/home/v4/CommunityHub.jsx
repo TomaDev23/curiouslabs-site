@@ -79,7 +79,7 @@ const CommunityHub = () => {
   return (
     <motion.section 
       className="relative py-24 overflow-hidden"
-      initial={{ opacity: 0, y: 50 }}
+      initial={{ opacity: 0, y: 40 }}
       whileInView={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
       viewport={{ once: true }}
@@ -154,10 +154,10 @@ const CommunityHub = () => {
           
           {/* Posts list */}
           <motion.div
-            className="space-y-6"
-            variants={containerVariants}
-            initial="hidden"
-            whileInView="visible"
+            className="space-y-6 trending-posts"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
             viewport={{ once: true }}
           >
             {posts.map((post) => (

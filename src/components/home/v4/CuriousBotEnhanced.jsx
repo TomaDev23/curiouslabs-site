@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
  * Features animated bot movements, voice lines, and interactive elements
  */
 const CuriousBotEnhanced = () => {
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
   const [currentMessage, setCurrentMessage] = useState(0);
   const [isHovering, setIsHovering] = useState(false);
   
@@ -18,20 +18,23 @@ const CuriousBotEnhanced = () => {
     "Curious about our services? I'm here to help."
   ];
   
+  // Toggle bot open/close
+  const toggleBot = () => setIsOpen(prev => !prev);
+  
   // Auto-rotate through messages
   useEffect(() => {
-    if (isExpanded) {
+    if (isOpen) {
       const interval = setInterval(() => {
         setCurrentMessage((prev) => (prev + 1) % messages.length);
       }, 6000);
       
       return () => clearInterval(interval);
     }
-  }, [isExpanded, messages.length]);
+  }, [isOpen, messages.length]);
   
   return (
     <motion.div
-      className="fixed bottom-6 right-6 z-50 flex flex-col items-end"
+      className="fixed bottom-24 right-6 z-60 flex flex-col items-end"
       initial={{ scale: 0, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
       transition={{ 
@@ -43,7 +46,7 @@ const CuriousBotEnhanced = () => {
     >
       {/* Bot Messages Bubble */}
       <AnimatePresence>
-        {isExpanded && (
+        {isOpen && (
           <motion.div
             className="bg-gray-900/90 backdrop-blur-md rounded-2xl p-4 mb-4 max-w-xs border border-purple-500/30 shadow-lg shadow-purple-500/20"
             initial={{ opacity: 0, y: 20, scale: 0.8 }}
@@ -89,7 +92,7 @@ const CuriousBotEnhanced = () => {
       {/* Bot Avatar Button */}
       <motion.button
         className="relative bg-gray-900 rounded-full w-16 h-16 flex items-center justify-center shadow-lg shadow-purple-500/20 border-2 border-purple-500/50 overflow-hidden"
-        onClick={() => setIsExpanded(!isExpanded)}
+        onClick={toggleBot}
         whileHover={{ scale: 1.05, borderColor: "rgba(147, 51, 234, 0.8)" }}
         whileTap={{ scale: 0.95 }}
         onMouseEnter={() => setIsHovering(true)}
@@ -117,11 +120,11 @@ const CuriousBotEnhanced = () => {
             <motion.div 
               className="w-2 h-2 rounded-full bg-gray-900"
               animate={{ 
-                scaleY: isExpanded ? [1, 0.1, 1] : 1,
-                x: isExpanded ? [0, 0.5, 0] : 0
+                scaleY: isOpen ? [1, 0.1, 1] : 1,
+                x: isOpen ? [0, 0.5, 0] : 0
               }}
               transition={{ 
-                repeat: isExpanded ? Infinity : 0, 
+                repeat: isOpen ? Infinity : 0, 
                 repeatDelay: 2,
                 duration: 0.3 
               }}
@@ -129,11 +132,11 @@ const CuriousBotEnhanced = () => {
             <motion.div 
               className="w-2 h-2 rounded-full bg-gray-900"
               animate={{ 
-                scaleY: isExpanded ? [1, 0.1, 1] : 1,
-                x: isExpanded ? [0, -0.5, 0] : 0
+                scaleY: isOpen ? [1, 0.1, 1] : 1,
+                x: isOpen ? [0, -0.5, 0] : 0
               }}
               transition={{ 
-                repeat: isExpanded ? Infinity : 0, 
+                repeat: isOpen ? Infinity : 0, 
                 repeatDelay: 2,
                 duration: 0.3 
               }}
@@ -144,11 +147,11 @@ const CuriousBotEnhanced = () => {
           <motion.div 
             className="absolute bottom-2 left-1/2 transform -translate-x-1/2 w-4 h-1 rounded-full bg-gray-900"
             animate={{ 
-              width: isExpanded ? [16, 10, 16] : 16,
-              height: isExpanded ? [4, 6, 4] : 4
+              width: isOpen ? [16, 10, 16] : 16,
+              height: isOpen ? [4, 6, 4] : 4
             }}
             transition={{ 
-              repeat: isExpanded ? Infinity : 0, 
+              repeat: isOpen ? Infinity : 0, 
               repeatDelay: 1,
               duration: 0.5 
             }}
@@ -157,32 +160,50 @@ const CuriousBotEnhanced = () => {
         
         {/* Glowing Notification */}
         <AnimatePresence>
-          {!isExpanded && (
+          {!isOpen && (
             <motion.div 
               className="absolute top-0 right-0 w-4 h-4 rounded-full bg-green-400"
               initial={{ scale: 0 }}
               animate={{ scale: [1, 1.2, 1] }}
               exit={{ scale: 0 }}
               transition={{ repeat: Infinity, duration: 2 }}
+              style={{ willChange: 'transform, opacity' }}
             />
           )}
         </AnimatePresence>
       </motion.button>
       
       {/* Radial pulses when expanded */}
-      {isExpanded && (
-        <div className="absolute inset-0">
+      {isOpen && (
+        <div className="absolute inset-0 pointer-events-none">
           <motion.div 
             className="w-full h-full rounded-full border-2 border-purple-500 absolute"
-            initial={{ opacity: 0.8, scale: 1 }}
-            animate={{ opacity: 0, scale: 1.5 }}
-            transition={{ repeat: Infinity, duration: 1.5, ease: "easeOut" }}
+            animate={{ 
+              scale: [1, 1.2, 1],
+              opacity: [0.5, 0.2, 0.5]
+            }}
+            transition={{ 
+              repeat: Infinity, 
+              duration: 3, 
+              ease: "easeInOut",
+              repeatType: "mirror"
+            }}
+            style={{ willChange: 'transform, opacity' }}
           />
           <motion.div 
             className="w-full h-full rounded-full border-2 border-purple-500 absolute"
-            initial={{ opacity: 0.8, scale: 1 }}
-            animate={{ opacity: 0, scale: 1.5 }}
-            transition={{ repeat: Infinity, duration: 1.5, ease: "easeOut", delay: 0.5 }}
+            animate={{ 
+              scale: [1, 1.2, 1],
+              opacity: [0.5, 0.2, 0.5]
+            }}
+            transition={{ 
+              repeat: Infinity, 
+              duration: 3, 
+              ease: "easeInOut", 
+              delay: 1.5,
+              repeatType: "mirror"
+            }}
+            style={{ willChange: 'transform, opacity' }}
           />
         </div>
       )}

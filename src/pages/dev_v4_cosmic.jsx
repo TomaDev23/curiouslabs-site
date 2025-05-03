@@ -36,8 +36,11 @@ const DevV4CosmicPage = () => {
   };
 
   return (
-    <SpaceCanvas>
-      <div className="min-h-screen">
+    <div className="min-h-screen relative bg-gray-900 text-white">
+      {/* Space Canvas Background */}
+      <SpaceCanvas />
+      
+      <div className="relative z-10 min-h-screen">
         {/* Fixed header with component navigation */}
         <header className="fixed top-0 left-0 w-full bg-gray-900/80 backdrop-blur-md z-40 border-b border-gray-800">
           <div className="container mx-auto px-4">
@@ -86,7 +89,7 @@ const DevV4CosmicPage = () => {
         {/* CuriousBot - stays fixed */}
         <CuriousBotEnhanced />
       </div>
-    </SpaceCanvas>
+    </div>
   );
 };
 

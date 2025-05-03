@@ -8,8 +8,8 @@ import { motion } from 'framer-motion';
 const ContactTerminal = () => {
   return (
     <motion.section 
-      className="relative py-24"
-      initial={{ opacity: 0, y: 50 }}
+      className="relative py-24 pb-40"
+      initial={{ opacity: 0, y: 40 }}
       whileInView={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
       viewport={{ once: true }}
@@ -19,11 +19,11 @@ const ContactTerminal = () => {
       
       <div className="container mx-auto px-4">
         <motion.div
-          className="bg-gray-800/40 backdrop-blur-md rounded-2xl border border-gray-700 overflow-hidden shadow-xl max-w-4xl mx-auto"
-          initial={{ opacity: 0, y: 50 }}
+          className="bg-gray-800/40 backdrop-blur-md rounded-2xl border border-gray-700 overflow-hidden shadow-xl max-w-4xl mx-auto cta-block"
+          initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
         >
           {/* Terminal Header */}
           <div className="bg-gray-900 p-4 flex items-center">

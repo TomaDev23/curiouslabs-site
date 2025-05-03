@@ -37,7 +37,7 @@ const AboutMission = () => {
   
   return (
     <motion.section 
-      className="relative py-24 overflow-hidden"
+      className="relative pt-32 pb-32 overflow-hidden"
       initial={{ opacity: 0, y: 50 }}
       whileInView={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
