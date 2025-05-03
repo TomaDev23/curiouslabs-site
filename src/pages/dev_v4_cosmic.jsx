@@ -14,15 +14,19 @@ import CommunityHub from '../components/home/v4/CommunityHub';
 import AITestimonials from '../components/home/v4/AITestimonials';
 import ContactTerminal from '../components/home/v4/ContactTerminal';
 import CuriousBotEnhanced from '../components/home/v4/CuriousBotEnhanced';
-import FooterMain from '../components/FooterMain';
+import FooterExperience from '../components/home/v4/FooterExperience';
 
 // Import SectionHeader component
 import SectionHeader from '../components/ui/SectionHeader.jsx';
+
+// Import ParticleField for floating particles
+import ParticleField from '../components/ui/ParticleField';
 
 /**
  * Dev page for testing all v4 components
  * Includes navigation to easily access different components
  * Merged with components from main homepage
+ * Enhanced with cosmic theme elements
  */
 const DevV4CosmicPage = () => {
   const sections = [
@@ -46,8 +50,11 @@ const DevV4CosmicPage = () => {
 
   return (
     <div className="min-h-screen relative bg-black text-white overflow-hidden">
-      {/* Extended SpaceCanvas with fade to darker color */}
+      {/* Enhanced SpaceCanvas with fade to darker color */}
       <SpaceCanvas />
+      
+      {/* Add ParticleField component for floating particles - Medium density for main areas */}
+      <ParticleField density="medium" zIndex={2} />
       
       {/* Extended gradient overlay for smoother transition from stars to dark background */}
       <div className="absolute inset-0 pointer-events-none z-[1]">
@@ -144,6 +151,9 @@ const DevV4CosmicPage = () => {
           
           {/* Projects Logbook - Complete transition to solid dark background */}
           <div className="bg-[#0d0d12]">
+            {/* Add downward-moving particles for the lower sections */}
+            <ParticleField density="low" yDirection="down" zIndex={1} />
+            
             <section 
               id="projects-logbook"
               className="py-16 md:py-20 scroll-mt-20"
@@ -206,10 +216,10 @@ const DevV4CosmicPage = () => {
             </section>
           </div>
           
-          {/* Footer Section - Black background */}
+          {/* Footer Section - Using the new enhanced FooterExperience */}
           <div className="bg-black">
-            <section className="pt-16 md:pt-20">
-              <FooterMain />
+            <section className="pt-0">
+              <FooterExperience />
             </section>
           </div>
         </main>
