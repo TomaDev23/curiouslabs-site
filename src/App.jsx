@@ -18,6 +18,8 @@ import Contact from './pages/contact.jsx';
 import Documentation from './pages/docs.jsx';
 import NotFound from './pages/404.jsx';
 import UniverseExperience from './pages/UniverseExperience.jsx';
+import DevPage from './pages/dev.jsx';
+import DevV4CosmicPage from './pages/dev_v4_cosmic.jsx';
 
 export default function App() {
   return (
@@ -39,6 +41,8 @@ export default function App() {
         <Route path="/docs" element={<Documentation />} />
         <Route path="/docs/*" element={<Documentation />} />
         <Route path="/universe" element={<UniverseExperience />} />
+        <Route path="/dev" element={<DevPage />} />
+        <Route path="/dev/v4-cosmic" element={<DevV4CosmicPage />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </>
