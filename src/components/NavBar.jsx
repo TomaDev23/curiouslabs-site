@@ -3,6 +3,9 @@ import { Link, useLocation } from 'react-router-dom';
 import { IMAGES } from '../utils/assets';
 import useBreakpoint from '../hooks/useBreakpoint';
 
+// Simple environment check for development mode
+const isDevelopment = process.env.NODE_ENV === 'development';
+
 export default function NavBar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -151,6 +154,16 @@ export default function NavBar() {
           >
             Contact
           </Link>
+          
+          {/* V4 Cosmic Preview link - only visible in development */}
+          {isDevelopment && (
+            <Link 
+              to="/v4" 
+              className={`text-xs text-purple-400 opacity-60 hover:opacity-100 hover:text-purple-300 transition ${location.pathname === '/v4' ? 'text-purple-300 opacity-100' : ''}`}
+            >
+              V4 Preview
+            </Link>
+          )}
         </div>
         
         {/* Mobile menu button */}
@@ -271,6 +284,16 @@ export default function NavBar() {
             >
               Contact
             </Link>
+            
+            {/* V4 Cosmic Preview link for mobile - only visible in development */}
+            {isDevelopment && (
+              <Link 
+                to="/v4" 
+                className={`block py-2 text-purple-400 text-sm opacity-60 hover:opacity-100 hover:text-purple-300 ${location.pathname === '/v4' ? 'text-purple-300 opacity-100' : ''}`}
+              >
+                V4 Preview
+              </Link>
+            )}
           </div>
         </div>
       )}

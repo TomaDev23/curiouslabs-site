@@ -3,26 +3,32 @@ import { motion } from 'framer-motion';
 
 // Import all v4 components
 import SpaceCanvas from '../components/home/v4/SpaceCanvas';
-import NavBarCosmic from '../components/home/v4/NavBarCosmic';
+import NavBar from '../components/NavBar';
 import HeroPortal from '../components/home/v4/HeroPortal';
 import AboutMission from '../components/home/v4/AboutMission';
+import ServicesFloatLayer from '../components/home/ServicesFloatLayer';
+import ProjectsSection from '../components/home/ProjectsSection';
 import ServicesOrbital from '../components/home/v4/ServicesOrbital';
 import ProjectsLogbook from '../components/home/v4/ProjectsLogbook';
 import CommunityHub from '../components/home/v4/CommunityHub';
 import AITestimonials from '../components/home/v4/AITestimonials';
 import ContactTerminal from '../components/home/v4/ContactTerminal';
 import CuriousBotEnhanced from '../components/home/v4/CuriousBotEnhanced';
+import FooterMain from '../components/FooterMain';
 
 /**
  * Dev page for testing all v4 components
  * Includes navigation to easily access different components
+ * Merged with components from main homepage
  */
 const DevV4CosmicPage = () => {
   const sections = [
     { id: 'hero', name: 'Hero Portal', component: HeroPortal },
     { id: 'about', name: 'About Mission', component: AboutMission },
+    { id: 'agent-powered', name: 'Agent-Powered Development', component: ServicesFloatLayer },
     { id: 'services', name: 'Services Orbital', component: ServicesOrbital },
-    { id: 'projects', name: 'Projects Logbook', component: ProjectsLogbook },
+    { id: 'projects', name: 'Projects Section', component: ProjectsSection },
+    { id: 'projects-logbook', name: 'Projects Logbook', component: ProjectsLogbook },
     { id: 'community', name: 'Community Hub', component: CommunityHub },
     { id: 'testimonials', name: 'AI Testimonials', component: AITestimonials },
     { id: 'contact', name: 'Contact Terminal', component: ContactTerminal }
@@ -66,11 +72,11 @@ const DevV4CosmicPage = () => {
         
         {/* Main content with all components */}
         <main className="pt-28 pb-20">
-          {/* NavBar Component */}
+          {/* NavBar Component from main homepage */}
           <div className="mb-16">
             <div className="container mx-auto px-4">
-              <ComponentWrapper title="NavBar Cosmic" id="navbar">
-                <NavBarCosmic />
+              <ComponentWrapper title="NavBar" id="navbar">
+                <NavBar />
               </ComponentWrapper>
             </div>
           </div>
@@ -85,6 +91,9 @@ const DevV4CosmicPage = () => {
             );
           })}
         </main>
+        
+        {/* Footer from main homepage */}
+        <FooterMain />
         
         {/* CuriousBot - stays fixed */}
         <CuriousBotEnhanced />

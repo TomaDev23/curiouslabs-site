@@ -43,6 +43,7 @@ export default function App() {
         <Route path="/universe" element={<UniverseExperience />} />
         <Route path="/dev" element={<DevPage />} />
         <Route path="/dev/v4-cosmic" element={<DevV4CosmicPage />} />
+        <Route path="/v4" element={<DevV4CosmicPage />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </>
