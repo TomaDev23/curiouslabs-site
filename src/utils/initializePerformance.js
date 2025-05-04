@@ -12,7 +12,7 @@ import {
  * Initialize all performance monitoring features
  * Call this at app startup or page load
  */
-const initializePerformance = () => {
+function initializePerformanceFunc() {
   if (typeof window === 'undefined') return;
   
   // Start FPS monitoring
@@ -83,6 +83,6 @@ function logPerformanceInfo() {
 // Log initialization
 console.log('[Performance] Monitoring initialized');
 
-// Export both named and default export to support different import styles
-export { initializePerformance };
-export default initializePerformance; 
+// Export both named and default export for compatibility
+export const initializePerformance = initializePerformanceFunc;
+export default initializePerformanceFunc; 

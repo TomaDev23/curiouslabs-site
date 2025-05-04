@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
  * Hook to detect current breakpoint based on Tailwind's breakpoint system
  * @returns {Object} breakpoints - Object with boolean values for each breakpoint
  */
-function useBreakpoint() {
+function useBreakpointHook() {
   // Initial state based on window width
   const [breakpoints, setBreakpoints] = useState({
     isMobile: false,    // < 640px
@@ -42,6 +42,6 @@ function useBreakpoint() {
   return breakpoints;
 }
 
-// Export both named and default export for backwards compatibility
-export { useBreakpoint };
-export default useBreakpoint; 
+// For compatibility with both import styles
+export const useBreakpoint = useBreakpointHook;
+export default useBreakpointHook; 
