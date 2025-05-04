@@ -1,35 +1,29 @@
-import React from 'react';
+import React, { lazy, Suspense } from 'react';
 import { motion } from 'framer-motion';
 
-// Import all v4 components
+// Import critical components directly
 import SpaceCanvas from '../components/home/v4/SpaceCanvas';
 import NavBarCosmic from '../components/home/v4/NavBarCosmic';
 import HeroPortal from '../components/home/v4/HeroPortal';
-import AboutMission from '../components/home/v4/AboutMission';
-import ServicesFloatLayer from '../components/home/ServicesFloatLayer';
-import ProjectsSection from '../components/home/ProjectsSection';
-import ServicesOrbital from '../components/home/v4/ServicesOrbital';
-import ProjectsLogbook from '../components/home/v4/ProjectsLogbook';
-import CommunityHub from '../components/home/v4/CommunityHub';
-import AITestimonials from '../components/home/v4/AITestimonials';
-import ContactTerminal from '../components/home/v4/ContactTerminal';
-import CuriousBotEnhanced from '../components/home/v4/CuriousBotEnhanced';
-import FooterExperience from '../components/home/v4/FooterExperience';
-
-// Import SectionHeader component
 import SectionHeader from '../components/ui/SectionHeader.jsx';
-
-// Import SectionAnchor for section IDs and scroll margins
 import SectionAnchor from '../components/ui/SectionAnchor';
-
-// Import ParticleField for floating particles
-import ParticleField from '../components/ui/ParticleField';
-
-// Import CosmicHUD for scroll position and section tracking
 import CosmicHUD from '../components/ui/CosmicHUD';
-
-// Import ScrollToTop component
 import ScrollToTop from '../components/ScrollToTop';
+
+// Lazy load non-critical components for better initial load performance
+const AboutMission = lazy(() => import('../components/home/v4/AboutMission'));
+const ServicesFloatLayer = lazy(() => import('../components/home/ServicesFloatLayer'));
+const ProjectsSection = lazy(() => import('../components/home/ProjectsSection'));
+const ServicesOrbital = lazy(() => import('../components/home/v4/ServicesOrbital'));
+const ProjectsLogbook = lazy(() => import('../components/home/v4/ProjectsLogbook'));
+const CommunityHub = lazy(() => import('../components/home/v4/CommunityHub'));
+const AITestimonials = lazy(() => import('../components/home/v4/AITestimonials'));
+const ContactTerminal = lazy(() => import('../components/home/v4/ContactTerminal'));
+const CuriousBotEnhanced = lazy(() => import('../components/home/v4/CuriousBotEnhanced'));
+const FooterExperience = lazy(() => import('../components/home/v4/FooterExperience'));
+
+// Lazy load ParticleField (heavy animation component)
+const ParticleField = lazy(() => import('../components/ui/ParticleField'));
 
 // Import scroll utilities
 import { registerSmoothScrolling } from '../utils/scrollUtils';
@@ -43,11 +37,19 @@ import {
   childVariants 
 } from '../utils/animation';
 
+// Loading fallback for suspended components
+const LoadingFallback = () => (
+  <div className="flex items-center justify-center py-16 min-h-[300px]">
+    <div className="w-12 h-12 rounded-full border-t-2 border-l-2 border-purple-500 animate-spin"></div>
+  </div>
+);
+
 /**
  * Dev page for testing all v4 components
  * Includes navigation to easily access different components
  * Merged with components from main homepage
  * Enhanced with cosmic theme elements and scroll synchronization
+ * Optimized for performance with lazy loading
  */
 const DevV4CosmicPage = () => {
   const { activeSection } = useScroll();
@@ -73,12 +75,39 @@ const DevV4CosmicPage = () => {
       <SpaceCanvas />
       
       {/* Add ParticleField component for floating particles - Medium density for main areas */}
-      <ParticleField density="medium" zIndex={2} />
+      <Suspense fallback={null}>
+        <ParticleField density="medium" zIndex={2} />
+      </Suspense>
       
-      {/* Extended gradient overlay for smoother transition from stars to dark background */}
-      <div className="absolute inset-0 pointer-events-none z-[1]">
-        {/* Start transparent at the top, gradually fade to dark at bottom */}
-        <div className="absolute w-full h-full bg-gradient-to-b from-transparent via-transparent to-[#0d0d12]" style={{ top: '150vh', height: '100vh' }}></div>
+      {/* Unified cosmic gradient background system */}
+      <div className="fixed inset-0 pointer-events-none z-[1]">
+        {/* Top hero area - fully transparent to show stars */}
+        <div className="absolute w-full h-screen bg-transparent"></div>
+        
+        {/* First transition layer - subtle cosmic purple glow */}
+        <div className="absolute w-full h-[150vh] bg-gradient-to-b from-transparent via-purple-900/5 to-indigo-900/10" 
+             style={{ top: '80vh' }}></div>
+        
+        {/* Middle transition - deep space feel */}
+        <div className="absolute w-full h-[200vh] bg-gradient-to-b from-transparent via-indigo-950/20 to-[#0d0d12]/60" 
+             style={{ top: '150vh' }}></div>
+        
+        {/* Bottom sections - full cosmic dark */}
+        <div className="absolute w-full h-[300vh] bg-gradient-to-b from-[#0d0d12]/60 via-[#0a0a12]/80 to-[#080810]" 
+             style={{ top: '300vh' }}></div>
+        
+        {/* Cosmic accent gradients - add ethereal glow */}
+        <div className="absolute w-full h-[120vh] opacity-40 mix-blend-soft-light"
+             style={{ 
+               background: 'radial-gradient(circle at 75% 30%, rgba(124, 58, 237, 0.15) 0%, rgba(139, 92, 246, 0.05) 50%, transparent 70%)',
+               top: '100vh'
+             }}></div>
+        
+        <div className="absolute w-full h-[150vh] opacity-30 mix-blend-soft-light"
+             style={{ 
+               background: 'radial-gradient(circle at 20% 70%, rgba(79, 70, 229, 0.2) 0%, rgba(67, 56, 202, 0.05) 50%, transparent 70%)',
+               top: '180vh'
+             }}></div>
       </div>
       
       <div className="relative z-10 min-h-screen">
@@ -104,9 +133,8 @@ const DevV4CosmicPage = () => {
             </SectionAnchor>
           </div>
           
-          {/* About Section - Transparent to show stars */}
+          {/* About Section - Now uses unified cosmic gradient */}
           <div className="bg-transparent relative">
-            <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/10 z-0"></div>
             <SectionAnchor 
               id="about"
               className="py-16 md:py-20 relative z-10"
@@ -123,15 +151,16 @@ const DevV4CosmicPage = () => {
                   animate={aboutVisible ? "visible" : "hidden"}
                   variants={revealVariants}
                 >
-                  <AboutMission />
+                  <Suspense fallback={<LoadingFallback />}>
+                    <AboutMission />
+                  </Suspense>
                 </motion.div>
               </div>
             </SectionAnchor>
           </div>
           
-          {/* Agent-Powered Development - Very subtle gradient overlay on stars */}
+          {/* Agent-Powered Development - Now uses unified cosmic gradient */}
           <div className="bg-transparent relative">
-            <div className="absolute inset-0 bg-gradient-to-b from-black/10 to-black/20 z-0"></div>
             <SectionAnchor 
               id="agent-powered"
               className="py-16 md:py-20 relative z-10"
@@ -148,15 +177,16 @@ const DevV4CosmicPage = () => {
                   animate={agentVisible ? "visible" : "hidden"}
                   variants={revealVariants}
                 >
-                  <ServicesFloatLayer />
+                  <Suspense fallback={<LoadingFallback />}>
+                    <ServicesFloatLayer />
+                  </Suspense>
                 </motion.div>
               </div>
             </SectionAnchor>
           </div>
           
-          {/* Services Orbital - Subtle gradient overlay on stars with increasing opacity */}
+          {/* Services Orbital - Now uses unified cosmic gradient */}
           <div className="bg-transparent relative">
-            <div className="absolute inset-0 bg-gradient-to-b from-black/20 to-black/30 z-0"></div>
             <SectionAnchor 
               id="services"
               className="py-16 md:py-20 relative z-10"
@@ -173,15 +203,16 @@ const DevV4CosmicPage = () => {
                   animate={servicesVisible ? "visible" : "hidden"}
                   variants={revealVariants}
                 >
-                  <ServicesOrbital />
+                  <Suspense fallback={<LoadingFallback />}>
+                    <ServicesOrbital />
+                  </Suspense>
                 </motion.div>
               </div>
             </SectionAnchor>
           </div>
           
-          {/* Projects Section - Further transition to dark background */}
+          {/* Projects Section - Now uses unified cosmic gradient */}
           <div className="bg-transparent relative">
-            <div className="absolute inset-0 bg-gradient-to-b from-black/30 to-[#0d0d12]/70 z-0"></div>
             <SectionAnchor 
               id="projects"
               className="py-16 md:py-20 relative z-10"
@@ -198,98 +229,103 @@ const DevV4CosmicPage = () => {
                   animate={projectsVisible ? "visible" : "hidden"}
                   variants={revealVariants}
                 >
-                  <ProjectsSection />
+                  <Suspense fallback={<LoadingFallback />}>
+                    <ProjectsSection />
+                  </Suspense>
                 </motion.div>
               </div>
             </SectionAnchor>
           </div>
           
-          {/* Projects Logbook - Complete transition to solid dark background */}
-          <div className="bg-[#0d0d12]">
-            {/* Add downward-moving particles for the lower sections */}
-            <ParticleField density="low" yDirection="down" zIndex={1} />
-            
+          {/* Project Logbook - Now uses unified cosmic gradient */}
+          <div className="bg-transparent relative">
             <SectionAnchor 
-              id="projects-logbook"
-              className="py-16 md:py-20"
+              id="project-logbook"
+              className="py-16 md:py-20 relative z-10"
               scrollMargin={8}
             >
               <div className="container mx-auto px-4">
                 <SectionHeader 
-                  title="MISSION LOGBOOK" 
-                  subtitle="Documenting our journey through the code universe."
+                  title="PROJECT LOGBOOK" 
+                  subtitle="Browse our mission logs and completed development expeditions."
                 />
                 <motion.div
                   ref={logbookRef}
                   initial="hidden"
                   animate={logbookVisible ? "visible" : "hidden"}
-                  variants={revealWithChildrenVariants}
+                  variants={revealVariants}
                 >
-                  <ProjectsLogbook />
+                  <Suspense fallback={<LoadingFallback />}>
+                    <ProjectsLogbook />
+                  </Suspense>
                 </motion.div>
               </div>
             </SectionAnchor>
           </div>
           
-          {/* Community Hub - Gradient back to gray-900 */}
-          <div className="bg-gradient-to-b from-[#0d0d12] to-gray-900">
+          {/* Community Hub - Now uses unified cosmic gradient */}
+          <div className="bg-transparent relative">
             <SectionAnchor 
               id="community"
-              className="py-16 md:py-20"
+              className="py-16 md:py-20 relative z-10"
               scrollMargin={8}
             >
               <div className="container mx-auto px-4">
                 <SectionHeader 
-                  title="JOIN OUR WORLD" 
-                  subtitle="Be part of a growing community of developers, innovators, and creators."
+                  title="JOIN OUR COMMUNITY" 
+                  subtitle="Connect with fellow developers, share insights, and grow together."
                 />
                 <motion.div
                   ref={communityRef}
                   initial="hidden"
                   animate={communityVisible ? "visible" : "hidden"}
-                  variants={revealWithChildrenVariants}
+                  variants={revealVariants}
                 >
-                  <CommunityHub />
+                  <Suspense fallback={<LoadingFallback />}>
+                    <CommunityHub />
+                  </Suspense>
                 </motion.div>
               </div>
             </SectionAnchor>
           </div>
           
-          {/* AI Testimonials - Gray-900 background */}
-          <div className="bg-gray-900">
+          {/* AI Testimonials - Now uses unified cosmic gradient */}
+          <div className="bg-transparent relative">
             <SectionAnchor 
               id="testimonials"
-              className="py-16 md:py-20"
+              className="py-16 md:py-20 relative z-10"
               scrollMargin={8}
             >
               <div className="container mx-auto px-4">
                 <SectionHeader 
-                  title="HEAR FROM OUR AI" 
-                  subtitle="What our artificial teammates have to say about working with us."
+                  title="MISSION REPORTS" 
+                  subtitle="Hear what our clients say about their development journeys with us."
                 />
                 <motion.div
                   ref={testimonialsRef}
                   initial="hidden"
                   animate={testimonialsVisible ? "visible" : "hidden"}
-                  variants={revealWithChildrenVariants}
+                  variants={revealVariants}
                 >
-                  <AITestimonials />
+                  <Suspense fallback={<LoadingFallback />}>
+                    <AITestimonials />
+                  </Suspense>
                 </motion.div>
               </div>
             </SectionAnchor>
           </div>
           
-          {/* Contact Terminal - Gradient to black for footer */}
-          <div className="bg-gradient-to-b from-gray-900 to-black">
+          {/* Contact Terminal - Now uses unified cosmic gradient */}
+          <div className="bg-transparent relative">
             <SectionAnchor 
               id="contact"
-              className="py-16 md:py-20 pb-32"
+              className="py-16 md:py-20 relative z-10"
               scrollMargin={8}
             >
               <div className="container mx-auto px-4">
                 <SectionHeader 
                   title="REACH OUT" 
-                  subtitle="Let's build something amazing together."
+                  subtitle="Launch a conversation with our team. We're ready to help your project take flight."
                 />
                 <motion.div
                   ref={contactRef}
@@ -297,47 +333,43 @@ const DevV4CosmicPage = () => {
                   animate={contactVisible ? "visible" : "hidden"}
                   variants={revealVariants}
                 >
-                  <ContactTerminal />
+                  <Suspense fallback={<LoadingFallback />}>
+                    <ContactTerminal />
+                  </Suspense>
                 </motion.div>
               </div>
             </SectionAnchor>
           </div>
           
-          {/* Footer Section - Using the new enhanced FooterExperience */}
-          <div className="bg-black">
-            <section className="pt-0">
+          {/* Footer with mission stats and links */}
+          <div className="bg-transparent relative">
+            <Suspense fallback={<LoadingFallback />}>
               <FooterExperience />
-            </section>
+            </Suspense>
           </div>
         </main>
         
-        {/* ScrollToTop Button */}
-        <ScrollToTop />
-        
-        {/* CuriousBot - stays fixed */}
-        <CuriousBotEnhanced />
+        {/* Floating Assistant */}
+        <Suspense fallback={null}>
+          <CuriousBotEnhanced />
+        </Suspense>
       </div>
+      
+      {/* ScrollToTop component */}
+      <ScrollToTop />
     </div>
   );
 };
 
-// Helper component to display component name and info
+// Helper component for wrapping development components for easy navigation
 const ComponentWrapper = ({ title, id, children }) => {
   return (
-    <motion.div 
-      className="relative rounded-xl overflow-hidden border border-dashed border-gray-700 mb-6"
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.5 }}
-      id={id}
-    >
-      <div className="absolute top-2 left-2 z-10 bg-gray-900/80 backdrop-blur-sm px-3 py-1 rounded-lg text-sm font-mono flex items-center">
-        <span className="h-2 w-2 rounded-full bg-purple-500 mr-2"></span>
-        {title}
+    <section id={id} className="py-10 border-b border-gray-800">
+      <h2 className="text-2xl font-bold mb-6 text-purple-400">{title}</h2>
+      <div className="relative">
+        {children}
       </div>
-      {children}
-    </motion.div>
+    </section>
   );
 };
 
