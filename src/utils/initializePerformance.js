@@ -83,4 +83,6 @@ function logPerformanceInfo() {
 // Log initialization
 console.log('[Performance] Monitoring initialized');
 
+// Export both named and default export to support different import styles
+export { initializePerformance };
 export default initializePerformance; 
