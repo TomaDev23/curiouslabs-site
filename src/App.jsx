@@ -1,25 +1,34 @@
-import React from 'react';
+import React, { Suspense, lazy } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import ScrollToTop from './components/ScrollToTop';
 
-// Main Pages
+// Main Page (critical, keep eager loaded)
 import Home from './pages/index.jsx';
-import ProductsPortal from './pages/products/index.jsx';
-import Aegis from './pages/products/aegis.jsx';
-import OpsPipe from './pages/products/opspipe.jsx';
-import MoonSignal from './pages/products/moonsignal.jsx';
-import Curious from './pages/products/curious.jsx';
-import Guardian from './pages/products/guardian.jsx';
-import Tools from './pages/tools.jsx';
-import CodeLab from './pages/codelab.jsx';
-import Blog from './pages/blog.jsx';
-import About from './pages/about.jsx';
-import Contact from './pages/contact.jsx';
-import Documentation from './pages/docs.jsx';
-import NotFound from './pages/404.jsx';
-import UniverseExperience from './pages/UniverseExperience.jsx';
-import DevPage from './pages/dev.jsx';
-import DevV4CosmicPage from './pages/dev_v4_cosmic.jsx';
+
+// Lazy-loaded pages for better performance
+const ProductsPortal = lazy(() => import('./pages/products/index.jsx'));
+const Aegis = lazy(() => import('./pages/products/aegis.jsx'));
+const OpsPipe = lazy(() => import('./pages/products/opspipe.jsx'));
+const MoonSignal = lazy(() => import('./pages/products/moonsignal.jsx'));
+const Curious = lazy(() => import('./pages/products/curious.jsx'));
+const Guardian = lazy(() => import('./pages/products/guardian.jsx'));
+const Tools = lazy(() => import('./pages/tools.jsx'));
+const CodeLab = lazy(() => import('./pages/codelab.jsx'));
+const Blog = lazy(() => import('./pages/blog.jsx'));
+const About = lazy(() => import('./pages/about.jsx'));
+const Contact = lazy(() => import('./pages/contact.jsx'));
+const Documentation = lazy(() => import('./pages/docs.jsx'));
+const NotFound = lazy(() => import('./pages/404.jsx'));
+const UniverseExperience = lazy(() => import('./pages/UniverseExperience.jsx'));
+const DevPage = lazy(() => import('./pages/dev.jsx'));
+const DevV4CosmicPage = lazy(() => import('./pages/dev_v4_cosmic.jsx'));
+
+// Loading fallback component
+const LoadingFallback = () => (
+  <div className="flex items-center justify-center min-h-screen bg-curious-dark-900">
+    <div className="w-16 h-16 border-4 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
+  </div>
+);
 
 export default function App() {
   return (
@@ -27,24 +36,96 @@ export default function App() {
       <ScrollToTop />
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/products" element={<ProductsPortal />} />
-        <Route path="/products/aegis" element={<Aegis />} />
-        <Route path="/products/opspipe" element={<OpsPipe />} />
-        <Route path="/products/moonsignal" element={<MoonSignal />} />
-        <Route path="/products/curious" element={<Curious />} />
-        <Route path="/products/guardian" element={<Guardian />} />
-        <Route path="/tools" element={<Tools />} />
-        <Route path="/codelab" element={<CodeLab />} />
-        <Route path="/blog" element={<Blog />} />
-        <Route path="/about" element={<About />} />
-        <Route path="/contact" element={<Contact />} />
-        <Route path="/docs" element={<Documentation />} />
-        <Route path="/docs/*" element={<Documentation />} />
-        <Route path="/universe" element={<UniverseExperience />} />
-        <Route path="/dev" element={<DevPage />} />
-        <Route path="/dev/v4-cosmic" element={<DevV4CosmicPage />} />
-        <Route path="/v4" element={<DevV4CosmicPage />} />
-        <Route path="*" element={<NotFound />} />
+        <Route path="/products" element={
+          <Suspense fallback={<LoadingFallback />}>
+            <ProductsPortal />
+          </Suspense>
+        } />
+        <Route path="/products/aegis" element={
+          <Suspense fallback={<LoadingFallback />}>
+            <Aegis />
+          </Suspense>
+        } />
+        <Route path="/products/opspipe" element={
+          <Suspense fallback={<LoadingFallback />}>
+            <OpsPipe />
+          </Suspense>
+        } />
+        <Route path="/products/moonsignal" element={
+          <Suspense fallback={<LoadingFallback />}>
+            <MoonSignal />
+          </Suspense>
+        } />
+        <Route path="/products/curious" element={
+          <Suspense fallback={<LoadingFallback />}>
+            <Curious />
+          </Suspense>
+        } />
+        <Route path="/products/guardian" element={
+          <Suspense fallback={<LoadingFallback />}>
+            <Guardian />
+          </Suspense>
+        } />
+        <Route path="/tools" element={
+          <Suspense fallback={<LoadingFallback />}>
+            <Tools />
+          </Suspense>
+        } />
+        <Route path="/codelab" element={
+          <Suspense fallback={<LoadingFallback />}>
+            <CodeLab />
+          </Suspense>
+        } />
+        <Route path="/blog" element={
+          <Suspense fallback={<LoadingFallback />}>
+            <Blog />
+          </Suspense>
+        } />
+        <Route path="/about" element={
+          <Suspense fallback={<LoadingFallback />}>
+            <About />
+          </Suspense>
+        } />
+        <Route path="/contact" element={
+          <Suspense fallback={<LoadingFallback />}>
+            <Contact />
+          </Suspense>
+        } />
+        <Route path="/docs" element={
+          <Suspense fallback={<LoadingFallback />}>
+            <Documentation />
+          </Suspense>
+        } />
+        <Route path="/docs/*" element={
+          <Suspense fallback={<LoadingFallback />}>
+            <Documentation />
+          </Suspense>
+        } />
+        <Route path="/universe" element={
+          <Suspense fallback={<LoadingFallback />}>
+            <UniverseExperience />
+          </Suspense>
+        } />
+        <Route path="/dev" element={
+          <Suspense fallback={<LoadingFallback />}>
+            <DevPage />
+          </Suspense>
+        } />
+        <Route path="/dev/v4-cosmic" element={
+          <Suspense fallback={<LoadingFallback />}>
+            <DevV4CosmicPage />
+          </Suspense>
+        } />
+        <Route path="/v4" element={
+          <Suspense fallback={<LoadingFallback />}>
+            <DevV4CosmicPage />
+          </Suspense>
+        } />
+        <Route path="*" element={
+          <Suspense fallback={<LoadingFallback />}>
+            <NotFound />
+          </Suspense>
+        } />
       </Routes>
     </>
   );

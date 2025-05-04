@@ -98,10 +98,19 @@ const FooterExperience = () => {
         <motion.div variants={itemVariants}>
           <MagneticButton
             className="px-8 py-3 bg-gradient-to-r from-purple-600 to-blue-600 rounded-xl text-white font-medium relative overflow-hidden group shadow-[0_0_15px_rgba(139,92,246,0.5)] hover:shadow-[0_0_25px_rgba(139,92,246,0.7)] transition-shadow duration-300"
+            aria-label="Start Your Journey - Begin your AI-driven development journey"
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                e.currentTarget.click();
+              }
+            }}
           >
             <span className="relative z-10 animate-glow-text">Start Your Journey</span>
-            <div className="absolute inset-0 opacity-0 bg-gradient-to-r from-purple-700 to-blue-700 transition-opacity duration-300 group-hover:opacity-100"></div>
-            <div className="absolute -inset-1 rounded-xl opacity-0 group-hover:opacity-70 blur-md bg-gradient-to-r from-purple-600/50 via-blue-500/50 to-purple-600/50 group-hover:animate-pulse-subtle transition-opacity duration-300"></div>
+            <div className="absolute inset-0 opacity-0 bg-gradient-to-r from-purple-700 to-blue-700 transition-opacity duration-300 group-hover:opacity-100 group-focus:opacity-100"></div>
+            <div className="absolute -inset-1 rounded-xl opacity-0 group-hover:opacity-70 group-focus:opacity-70 blur-md bg-gradient-to-r from-purple-600/50 via-blue-500/50 to-purple-600/50 group-hover:animate-pulse-subtle group-focus:animate-pulse-subtle transition-opacity duration-300"></div>
           </MagneticButton>
         </motion.div>
       </motion.div>
@@ -127,11 +136,13 @@ const FooterExperience = () => {
                 <motion.a 
                   key={link.name}
                   href="#" 
-                  aria-label={link.name}
-                  className="text-gray-400 hover:text-purple-400 transition-colors"
+                  aria-label={`Visit our ${link.name} page`}
+                  className="text-gray-400 hover:text-purple-400 focus:text-purple-400 transition-colors focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-gray-900 rounded-full p-1"
                   whileHover={{ y: -3 }}
+                  whileFocus={{ y: -3 }}
+                  tabIndex={0}
                 >
-                  <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
                     <path d={link.icon} />
                   </svg>
                 </motion.a>
@@ -142,17 +153,20 @@ const FooterExperience = () => {
           {/* Products */}
           <motion.div variants={itemVariants}>
             <h3 className="text-xl font-bold text-white mb-6">Products</h3>
-            <ul className="space-y-3">
+            <ul className="space-y-3" role="list">
               {links.products.map((link) => (
                 <li key={link.name}>
                   <Link 
                     to={link.path} 
-                    className="text-gray-400 hover:text-purple-400 transition-colors flex items-center"
+                    className="text-gray-400 hover:text-purple-400 focus:text-purple-400 transition-colors flex items-center focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-gray-900 rounded-md px-2 py-1 -ml-2"
+                    aria-label={`${link.name} product page`}
                   >
                     <motion.span 
                       className="block w-1 h-1 rounded-full bg-purple-500 mr-2"
                       whileHover={{ scale: 2 }}
+                      whileFocus={{ scale: 2 }}
                       transition={{ duration: 0.2 }}
+                      aria-hidden="true"
                     />
                     {link.name}
                   </Link>
@@ -164,17 +178,20 @@ const FooterExperience = () => {
           {/* Resources */}
           <motion.div variants={itemVariants}>
             <h3 className="text-xl font-bold text-white mb-6">Resources</h3>
-            <ul className="space-y-3">
+            <ul className="space-y-3" role="list">
               {links.resources.map((link) => (
                 <li key={link.name}>
                   <Link 
                     to={link.path} 
-                    className="text-gray-400 hover:text-purple-400 transition-colors flex items-center"
+                    className="text-gray-400 hover:text-purple-400 focus:text-purple-400 transition-colors flex items-center focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-gray-900 rounded-md px-2 py-1 -ml-2"
+                    aria-label={`${link.name} resource page`}
                   >
                     <motion.span 
                       className="block w-1 h-1 rounded-full bg-blue-500 mr-2"
                       whileHover={{ scale: 2 }}
+                      whileFocus={{ scale: 2 }}
                       transition={{ duration: 0.2 }}
+                      aria-hidden="true"
                     />
                     {link.name}
                   </Link>
@@ -186,17 +203,20 @@ const FooterExperience = () => {
           {/* Company */}
           <motion.div variants={itemVariants}>
             <h3 className="text-xl font-bold text-white mb-6">Company</h3>
-            <ul className="space-y-3">
+            <ul className="space-y-3" role="list">
               {links.company.map((link) => (
                 <li key={link.name}>
                   <Link 
                     to={link.path} 
-                    className="text-gray-400 hover:text-purple-400 transition-colors flex items-center"
+                    className="text-gray-400 hover:text-purple-400 focus:text-purple-400 transition-colors flex items-center focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-gray-900 rounded-md px-2 py-1 -ml-2"
+                    aria-label={`${link.name} company page`}
                   >
                     <motion.span 
                       className="block w-1 h-1 rounded-full bg-purple-500 mr-2"
                       whileHover={{ scale: 2 }}
+                      whileFocus={{ scale: 2 }}
                       transition={{ duration: 0.2 }}
+                      aria-hidden="true"
                     />
                     {link.name}
                   </Link>
