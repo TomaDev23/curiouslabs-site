@@ -6,7 +6,7 @@ import { useScroll } from '../../context/ScrollContext';
  * CosmicHUD - A space-themed heads-up display showing scroll position and active section
  * Designed to complement the cosmic theme of the site
  */
-const CosmicHUD = ({ showSectionLabel = true, showProgress = true, position = 'bottom-right' }) => {
+const CosmicHUD = ({ showSectionLabel = true, showProgress = true, position = 'bottom-left' }) => {
   const { scrollY, scrollProgress, activeSection, isAtTop, isAtBottom } = useScroll();
   
   // Define position classes based on the position prop
@@ -16,11 +16,11 @@ const CosmicHUD = ({ showSectionLabel = true, showProgress = true, position = 'b
         return 'top-4 left-4';
       case 'top-right':
         return 'top-4 right-4';
-      case 'bottom-left':
-        return 'bottom-4 left-4';
       case 'bottom-right':
-      default:
         return 'bottom-4 right-4';
+      case 'bottom-left':
+      default:
+        return 'bottom-4 left-4';
     }
   }, [position]);
   
@@ -45,7 +45,7 @@ const CosmicHUD = ({ showSectionLabel = true, showProgress = true, position = 'b
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.3 }}
     >
-      <div className="bg-gray-900/80 backdrop-blur-md p-2 rounded-lg border border-purple-500/30 shadow-lg shadow-purple-500/10 flex flex-col items-center">
+      <div className="bg-black/30 backdrop-blur-md p-2 rounded-lg border border-purple-500/30 shadow-lg shadow-purple-500/10 flex flex-col items-center">
         {/* Section label */}
         {showSectionLabel && (
           <AnimatePresence mode="wait">

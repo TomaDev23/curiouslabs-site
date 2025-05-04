@@ -60,7 +60,7 @@ const FooterExperience = () => {
   };
 
   return (
-    <footer className="relative pt-32 bg-gradient-to-t from-black via-gray-900/90 to-transparent overflow-hidden">
+    <footer className="relative pt-12 bg-gradient-to-t from-black via-gray-900/90 to-transparent overflow-hidden pb-12">
       {/* Background enhancements */}
       <CosmicNoiseOverlay opacity={0.03} blendMode="overlay" />
       <ParticleField density="low" yDirection="down" zIndex={0} />
@@ -97,10 +97,11 @@ const FooterExperience = () => {
         
         <motion.div variants={itemVariants}>
           <MagneticButton
-            className="px-8 py-3 bg-gradient-to-r from-purple-600 to-blue-600 rounded-xl text-white font-medium relative overflow-hidden group"
+            className="px-8 py-3 bg-gradient-to-r from-purple-600 to-blue-600 rounded-xl text-white font-medium relative overflow-hidden group shadow-[0_0_15px_rgba(139,92,246,0.5)] hover:shadow-[0_0_25px_rgba(139,92,246,0.7)] transition-shadow duration-300"
           >
-            <span className="relative z-10">Start Your Journey</span>
+            <span className="relative z-10 animate-glow-text">Start Your Journey</span>
             <div className="absolute inset-0 opacity-0 bg-gradient-to-r from-purple-700 to-blue-700 transition-opacity duration-300 group-hover:opacity-100"></div>
+            <div className="absolute -inset-1 rounded-xl opacity-0 group-hover:opacity-70 blur-md bg-gradient-to-r from-purple-600/50 via-blue-500/50 to-purple-600/50 group-hover:animate-pulse-subtle transition-opacity duration-300"></div>
           </MagneticButton>
         </motion.div>
       </motion.div>
@@ -207,7 +208,7 @@ const FooterExperience = () => {
         
         {/* Copyright */}
         <motion.div 
-          className="text-center text-gray-500 mt-16 pt-8 border-t border-gray-800"
+          className="text-center text-gray-500 mt-16 pt-8 pb-8 border-t border-gray-800"
           variants={itemVariants}
         >
           <p>© {new Date().getFullYear()} CuriousLabs. All rights reserved.</p>

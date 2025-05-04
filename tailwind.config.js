@@ -112,6 +112,16 @@ export default {
           '0%': { opacity: '0', transform: 'scale(0.98)' },
           '100%': { opacity: '1', transform: 'scale(1)' },
         },
+        'cosmic-pulse': {
+          '0%, 100%': { 
+            opacity: '1',
+            boxShadow: '0 0 15px 5px rgba(139, 92, 246, 0.7)'
+          },
+          '50%': { 
+            opacity: '0.9',
+            boxShadow: '0 0 25px 12px rgba(139, 92, 246, 0.5)'
+          },
+        },
       },
       animation: {
         'float': 'float 6s ease-in-out infinite',
@@ -131,6 +141,7 @@ export default {
         'orbit-spin-reverse': 'orbit-spin-reverse 60s linear infinite',
         'twinkle': 'twinkle 3s ease-in-out infinite',
         'fadeIn': 'fadeIn 0.3s ease-out',
+        'cosmic-pulse': 'cosmic-pulse 3s ease-in-out infinite',
       },
       backgroundImage: {
         'circuit-pattern': "url('/images/circuit-pattern.svg')",

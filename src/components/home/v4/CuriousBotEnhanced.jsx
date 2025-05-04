@@ -34,7 +34,7 @@ const CuriousBotEnhanced = () => {
   
   return (
     <motion.div
-      className="fixed bottom-24 right-6 z-60 flex flex-col items-end"
+      className="fixed bottom-4 right-4 z-30 flex flex-col items-end"
       initial={{ scale: 0, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
       transition={{ 
@@ -179,33 +179,41 @@ const CuriousBotEnhanced = () => {
           <motion.div 
             className="w-full h-full rounded-full border-2 border-purple-500 absolute"
             animate={{ 
-              scale: [1, 1.2, 1],
-              opacity: [0.5, 0.2, 0.5]
+              scale: [1, 1.5, 1],
+              opacity: [0.7, 0.2, 0.7]
             }}
             transition={{ 
               repeat: Infinity, 
-              duration: 3, 
-              ease: "easeInOut",
-              repeatType: "mirror"
-            }}
-            style={{ willChange: 'transform, opacity' }}
-          />
-          <motion.div 
-            className="w-full h-full rounded-full border-2 border-purple-500 absolute"
-            animate={{ 
-              scale: [1, 1.2, 1],
-              opacity: [0.5, 0.2, 0.5]
-            }}
-            transition={{ 
-              repeat: Infinity, 
-              duration: 3, 
-              ease: "easeInOut", 
-              delay: 1.5,
-              repeatType: "mirror"
+              duration: 2, 
+              ease: "easeInOut"
             }}
             style={{ willChange: 'transform, opacity' }}
           />
         </div>
+      )}
+
+      {/* Hover ripple effect */}
+      {isHovering && !isOpen && (
+        <motion.div 
+          className="absolute inset-0 pointer-events-none"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+        >
+          <motion.div 
+            className="w-full h-full rounded-full border-2 border-purple-400 absolute"
+            animate={{ 
+              scale: [1, 2],
+              opacity: [0.7, 0] 
+            }}
+            transition={{ 
+              repeat: Infinity, 
+              duration: 1.5, 
+              ease: "easeOut" 
+            }}
+            style={{ willChange: 'transform, opacity' }}
+          />
+        </motion.div>
       )}
     </motion.div>
   );

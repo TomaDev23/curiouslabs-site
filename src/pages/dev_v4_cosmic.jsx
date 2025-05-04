@@ -28,6 +28,9 @@ import ParticleField from '../components/ui/ParticleField';
 // Import CosmicHUD for scroll position and section tracking
 import CosmicHUD from '../components/ui/CosmicHUD';
 
+// Import ScrollToTop component
+import ScrollToTop from '../components/ScrollToTop';
+
 // Import scroll utilities
 import { registerSmoothScrolling } from '../utils/scrollUtils';
 import { useScroll } from '../context/ScrollContext';
@@ -86,7 +89,7 @@ const DevV4CosmicPage = () => {
         </header>
         
         {/* Cosmic HUD for position tracking */}
-        <CosmicHUD position="bottom-right" />
+        <CosmicHUD position="bottom-left" />
         
         {/* Main content with all components */}
         <main>
@@ -280,7 +283,7 @@ const DevV4CosmicPage = () => {
           <div className="bg-gradient-to-b from-gray-900 to-black">
             <SectionAnchor 
               id="contact"
-              className="py-16 md:py-20"
+              className="py-16 md:py-20 pb-32"
               scrollMargin={8}
             >
               <div className="container mx-auto px-4">
@@ -307,6 +310,9 @@ const DevV4CosmicPage = () => {
             </section>
           </div>
         </main>
+        
+        {/* ScrollToTop Button */}
+        <ScrollToTop />
         
         {/* CuriousBot - stays fixed */}
         <CuriousBotEnhanced />
