@@ -5,7 +5,7 @@ import { sectionVariants, itemVariants } from '../../../utils/animation';
 import MagneticButton from '../../ui/MagneticButton';
 import CosmicNoiseOverlay from '../../ui/CosmicNoiseOverlay';
 import ResponsiveContainer from '../../ui/ResponsiveContainer';
-import useBreakpoint from '../../../hooks/useBreakpoint';
+import { useBreakpoint } from '../../../hooks/useBreakpoint.js';
 import ResponsiveButton from '../../ui/ResponsiveButton';
 import ErrorBoundary from '../../ui/ErrorBoundary';
 import { startComponentRender, endComponentRender } from '../../../utils/performanceMonitor';
@@ -28,7 +28,9 @@ const HeroPortal = () => {
   
   // Refs for animation elements
   const starFieldRef = useRef(null);
-  const { isMobile, isTablet } = useBreakpoint();
+  const breakpoint = useBreakpoint();
+  const isMobile = breakpoint === 'mobile';
+  const isTablet = breakpoint === 'tablet';
   const [hasScrolled, setHasScrolled] = useState(false);
   const [typedText, setTypedText] = useState('');
   const fullText = "Explore the frontiers of code with our AI-powered development missions";

@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useScrollReveal, sectionVariants, itemVariants } from '../../../utils/animation';
 import MagneticButton from '../../ui/MagneticButton';
 import CosmicNoiseOverlay from '../../ui/CosmicNoiseOverlay';
-import useBreakpoint from '../../../hooks/useBreakpoint';
+import { useBreakpoint, useLegacyBreakpoint } from '../../../hooks/useBreakpoint.js';
 import { startComponentRender, endComponentRender } from '../../../utils/performanceMonitor';
 import { useLazyLoad } from '../../../hooks/useLazyLoad';
 import { useScroll } from '../../../context/ScrollContext';
@@ -21,7 +21,8 @@ const ServicesOrbital = () => {
   const [activeService, setActiveService] = useState(0);
   const [isAutorotating, setIsAutorotating] = useState(true);
   const { ref, inView } = useScrollReveal(0.2);
-  const { isMobile, isMd, isLg } = useBreakpoint();
+  const breakpoint = useBreakpoint();
+  const { isMobile, isMd, isLg } = useLegacyBreakpoint();
   const prevServiceRef = useRef(0);
   
   // Lazy loading for the orbital visualization

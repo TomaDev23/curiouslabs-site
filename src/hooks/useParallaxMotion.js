@@ -1,112 +1,109 @@
 import { useState, useEffect, useRef } from 'react';
-import { useBreakpoint } from './useBreakpoint';
+import { useBreakpoint } from './useBreakpoint.js';
 
 /**
- * Enhanced useParallaxMotion hook with optimized performance
- * Creates smooth parallax effects based on scroll position with
- * performance optimizations and respect for accessibility preferences
- * 
- * @param {Object} options - Parallax configuration options
- * @param {number} options.speed - Vertical movement speed (default: 0.15)
- * @param {number} options.xSpeed - Horizontal movement speed (default: 0)
- * @param {boolean} options.reverse - Reverse the direction (default: false)
- * @param {number} options.maxMovement - Maximum movement in pixels (default: 100)
- * @param {boolean} options.enableOnMobile - Whether to enable on mobile (default: false)
- * @param {Function} options.transformFn - Custom transform function
- * @returns {Object} - Ref to attach and style object
+ * Custom hook for creating parallax motion effects based on scroll position
+ * @param {Object} options - Configuration options for the parallax effect
+ * @param {number} options.speed - Speed of the parallax effect (default: 0.5)
+ * @param {boolean} options.horizontal - Whether to apply parallax horizontally (default: false)
+ * @param {boolean} options.reverse - Whether to reverse the direction of the parallax effect (default: false)
+ * @param {number} options.xRange - Range of horizontal movement in pixels (default: 20)
+ * @param {number} options.yRange - Range of vertical movement in pixels (default: 20)
+ * @param {string} options.easing - CSS easing function to use (default: 'cubic-bezier(0.5, 0, 0.5, 1)')
+ * @param {boolean} options.disabled - Whether to disable the parallax effect (default: false)
+ * @returns {Object} - The style object to apply to the element
  */
 export function useParallaxMotion({
-  speed = 0.15, 
-  xSpeed = 0,
+  speed = 0.5,
+  horizontal = false,
   reverse = false,
-  maxMovement = 100,
-  enableOnMobile = false,
-  transformFn = null
+  xRange = 20,
+  yRange = 20,
+  easing = 'cubic-bezier(0.5, 0, 0.5, 1)',
+  disabled = false,
 } = {}) {
   const [style, setStyle] = useState({});
-  const ref = useRef(null);
   const frameRef = useRef(null);
-  const lastScrollY = useRef(0);
-  const isMobile = useBreakpoint('md');
+  const elementRef = useRef(null);
+  const lastScrollY = useRef(window.scrollY);
   
-  // Check for reduced motion preference
-  const prefersReducedMotion = typeof window !== 'undefined' 
-    ? window.matchMedia('(prefers-reduced-motion: reduce)').matches 
-    : false;
+  // Get current breakpoint
+  const breakpoint = useBreakpoint();
   
-  // Skip effect if motion is reduced or on mobile (unless enabled)
-  const skipEffect = prefersReducedMotion || (isMobile && !enableOnMobile);
+  // Check if user prefers reduced motion
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  
+  // Disable on mobile and for users who prefer reduced motion
+  const isDisabled = disabled || prefersReducedMotion || breakpoint === 'mobile';
 
   useEffect(() => {
-    // Return early if we should skip the effect
-    if (skipEffect) {
+    if (isDisabled) {
       setStyle({});
-      return () => {};
+      return;
     }
 
-    // Get initial position of the element
-    const element = ref.current;
-    if (!element) return;
-
-    // Calculate initial position
-    const rect = element.getBoundingClientRect();
-    const initialY = rect.top + window.scrollY;
-
-    const calculateParallax = () => {
-      // Skip if no longer connected to DOM
-      if (!element.isConnected) return;
-      
-      // Performance optimization: only update when scroll changed
-      if (lastScrollY.current === window.scrollY) {
-        frameRef.current = requestAnimationFrame(calculateParallax);
-        return;
-      }
-      
-      lastScrollY.current = window.scrollY;
-      
-      // Calculate how far element is from the viewport center
-      const viewportHeight = window.innerHeight;
-      const elementMiddle = initialY + rect.height / 2;
-      const scrollCenter = window.scrollY + viewportHeight / 2;
-      const distance = scrollCenter - elementMiddle;
-      
-      // Calculate parallax offsets with direction control
-      const directionMod = reverse ? -1 : 1;
-      let yOffset = distance * speed * directionMod;
-      let xOffset = distance * xSpeed * directionMod;
-      
-      // Limit maximum movement
-      yOffset = Math.max(Math.min(yOffset, maxMovement), -maxMovement);
-      xOffset = Math.max(Math.min(xOffset, maxMovement), -maxMovement);
-      
-      // Apply transform (using custom function if provided)
-      if (typeof transformFn === 'function') {
-        setStyle(transformFn(xOffset, yOffset));
-      } else {
-        setStyle({
-          transform: `translate3D(${xOffset}px, ${yOffset}px, 0)`,
-          transition: 'transform 0.1s linear'
-        });
-      }
-      
-      frameRef.current = requestAnimationFrame(calculateParallax);
-    };
-
-    // Start animation frame and calculate initial position
-    frameRef.current = requestAnimationFrame(calculateParallax);
-    
-    // Add scroll event listener with passive flag for better performance
-    window.addEventListener('scroll', calculateParallax, { passive: true });
-    window.addEventListener('resize', calculateParallax, { passive: true });
-    
-    return () => {
-      window.removeEventListener('scroll', calculateParallax);
-      window.removeEventListener('resize', calculateParallax);
+    const handleScroll = () => {
       if (frameRef.current) {
         cancelAnimationFrame(frameRef.current);
       }
-    };
-  }, [speed, xSpeed, reverse, maxMovement, skipEffect, transformFn]);
 
-  return { ref, style };
-} 
+      frameRef.current = requestAnimationFrame(() => {
+        if (!elementRef.current) return;
+
+        const scrollY = window.scrollY;
+        const rect = elementRef.current.getBoundingClientRect();
+        const scrollPosition = rect.top + scrollY;
+        const windowHeight = window.innerHeight;
+        
+        // Calculate how far the element is from the center of the viewport
+        const distanceFromCenter = scrollPosition - scrollY - windowHeight / 2 + rect.height / 2;
+        
+        // Normalize the distance to a value between -1 and 1
+        const normalizedDistance = Math.max(-1, Math.min(1, distanceFromCenter / (windowHeight / 2)));
+        
+        // Apply the parallax effect with the specified speed and direction
+        const moveDirection = reverse ? -1 : 1;
+        const translateY = horizontal ? 0 : normalizedDistance * yRange * speed * moveDirection;
+        const translateX = horizontal ? normalizedDistance * xRange * speed * moveDirection : 0;
+
+        setStyle({
+          transform: `translate3d(${translateX}px, ${translateY}px, 0)`,
+          transition: `transform 0.2s ${easing}`,
+        });
+
+        lastScrollY.current = scrollY;
+      });
+    };
+
+    const handleResize = () => {
+      if (frameRef.current) {
+        cancelAnimationFrame(frameRef.current);
+      }
+      
+      frameRef.current = requestAnimationFrame(handleScroll);
+    };
+
+    // Initial calculation
+    handleScroll();
+
+    // Add event listeners
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('resize', handleResize, { passive: true });
+
+    // Cleanup
+    return () => {
+      if (frameRef.current) {
+        cancelAnimationFrame(frameRef.current);
+      }
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', handleResize);
+    };
+  }, [speed, horizontal, reverse, isDisabled, xRange, yRange, easing]);
+
+  return {
+    style,
+    ref: elementRef,
+  };
+}
+
+export default useParallaxMotion; 

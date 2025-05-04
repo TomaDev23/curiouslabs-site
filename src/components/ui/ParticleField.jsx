@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
-import useBreakpoint from '../../hooks/useBreakpoint';
+import { useBreakpoint } from '../../hooks/useBreakpoint.js';
 
 /**
  * ParticleField - Creates ambient floating particles with random movement patterns
@@ -15,7 +15,8 @@ const ParticleField = ({
   zIndex = 0,
   yDirection = 'up'
 }) => {
-  const { isMobile } = useBreakpoint();
+  const breakpoint = useBreakpoint();
+  const isMobile = breakpoint === 'mobile';
   
   // Determine number of particles based on density and device
   const getParticleCount = () => {

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { IMAGES } from '../utils/assets';
-import useBreakpoint from '../hooks/useBreakpoint';
+import { useBreakpoint } from '../hooks/useBreakpoint.js';
 
 // Simple environment check for development mode
 const isDevelopment = process.env.NODE_ENV === 'development';
@@ -11,7 +11,8 @@ export default function NavBar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProductsDropdownOpen, setIsProductsDropdownOpen] = useState(false);
   const location = useLocation();
-  const { isMobile } = useBreakpoint();
+  const breakpoint = useBreakpoint();
+  const isMobile = breakpoint === 'mobile';
   
   // Track scroll for navbar styling
   useEffect(() => {

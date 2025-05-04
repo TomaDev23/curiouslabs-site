@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useScrollReveal, sectionVariants, itemVariants } from '../../../utils/animation';
 import MagneticButton from '../../ui/MagneticButton';
-import useBreakpoint from '../../../hooks/useBreakpoint';
+import { useBreakpoint } from '../../../hooks/useBreakpoint.js';
 
 /**
  * CommunityHub - Community section showcasing forum-like discussion and activity
@@ -11,7 +11,8 @@ import useBreakpoint from '../../../hooks/useBreakpoint';
 const CommunityHub = () => {
   const [activeTab, setActiveTab] = useState('trending');
   const { ref, inView } = useScrollReveal(0.2);
-  const { isMobile } = useBreakpoint();
+  const breakpoint = useBreakpoint();
+  const isMobile = breakpoint === 'mobile';
   
   // Mock community posts data
   const posts = [

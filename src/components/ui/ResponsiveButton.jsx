@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import useBreakpoint from '../../hooks/useBreakpoint';
+import { useBreakpoint } from '../../hooks/useBreakpoint.js';
 import { getTouchTargetClass } from '../../utils/responsive';
 
 /**
@@ -23,7 +23,8 @@ const ResponsiveButton = ({
   type = 'button',
   ariaLabel,
 }) => {
-  const { isMobile } = useBreakpoint();
+  const breakpoint = useBreakpoint();
+  const isMobile = breakpoint === 'mobile';
   
   // Calculate size classes based on the desired size and viewport
   const getSizeClasses = () => {

@@ -1,13 +1,14 @@
 import React from "react";
 import { motion } from "framer-motion";
-import useBreakpoint from "../../hooks/useBreakpoint";
+import { useBreakpoint } from "../../hooks/useBreakpoint.js";
 
 /**
  * SectionHeader component
  * Provides consistent styling for section titles with animations
  */
 export default function SectionHeader({ title, subtitle }) {
-  const { isMobile } = useBreakpoint();
+  const breakpoint = useBreakpoint();
+  const isMobile = breakpoint === 'mobile';
   
   return (
     <motion.div 

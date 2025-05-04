@@ -1,11 +1,33 @@
 import { useState, useEffect } from 'react';
 
 /**
- * Hook to detect current breakpoint based on Tailwind's breakpoint system
- * @returns {Object} breakpoints - Object with boolean values for each breakpoint
+ * Hook to detect current breakpoint based on screen width
+ * @returns {string} Current breakpoint ('mobile', 'tablet', or 'desktop')
  */
-function useBreakpointHook() {
-  // Initial state based on window width
+export function useBreakpoint() {
+  const [breakpoint, setBreakpoint] = useState('desktop');
+
+  useEffect(() => {
+    const update = () => {
+      const width = window.innerWidth;
+      if (width < 640) return setBreakpoint('mobile');
+      if (width < 1024) return setBreakpoint('tablet');
+      return setBreakpoint('desktop');
+    };
+
+    update();
+    window.addEventListener('resize', update);
+    return () => window.removeEventListener('resize', update);
+  }, []);
+
+  return breakpoint;
+}
+
+/**
+ * Legacy hook for compatibility with existing code
+ * @returns {Object} Object with boolean values for each breakpoint
+ */
+export function useLegacyBreakpoint() {
   const [breakpoints, setBreakpoints] = useState({
     isMobile: false,    // < 640px
     isSm: false,        // >= 640px
@@ -16,7 +38,6 @@ function useBreakpointHook() {
   });
 
   useEffect(() => {
-    // Function to update breakpoints based on window size
     const updateBreakpoints = () => {
       const width = window.innerWidth;
       setBreakpoints({
@@ -29,19 +50,10 @@ function useBreakpointHook() {
       });
     };
 
-    // Run once on mount
     updateBreakpoints();
-
-    // Add event listener
     window.addEventListener('resize', updateBreakpoints);
-
-    // Cleanup
     return () => window.removeEventListener('resize', updateBreakpoints);
   }, []);
 
   return breakpoints;
-}
-
-// For compatibility with both import styles
-export const useBreakpoint = useBreakpointHook;
-export default useBreakpointHook; 
+} 
