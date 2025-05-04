@@ -1,110 +1,171 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 /**
- * SkeletonLoader - Provides loading placeholders
- * Used to improve perceived performance during async loading
+ * SkeletonLoader - Displays placeholder loading states for different content types
  * 
- * @param {Object} props
- * @param {string} props.type - Type of skeleton: 'text', 'card', 'image', 'button', 'avatar'
- * @param {number} props.lines - Number of text lines (for text type)
+ * @param {Object} props - Component props
+ * @param {string} props.type - Type of skeleton to display (text, card, image, etc.)
  * @param {string} props.width - Width of the skeleton
  * @param {string} props.height - Height of the skeleton
+ * @param {number} props.lines - Number of lines for text skeleton
  * @param {string} props.className - Additional CSS classes
+ * @param {boolean} props.animated - Whether to animate the skeleton
+ * @param {string} props.color - Base color for the skeleton
  */
 const SkeletonLoader = ({
   type = 'text',
-  lines = 1,
-  width = 'auto',
-  height = 'auto',
+  width = '100%',
+  height,
+  lines = 3,
   className = '',
-  baseColor = 'bg-gray-700'
+  animated = true,
+  color = 'bg-gray-200 dark:bg-gray-700'
 }) => {
-  // Shared styles
-  const baseClasses = `${baseColor} rounded-md overflow-hidden ${className} animate-pulse`;
+  const animationClass = animated ? 'animate-pulse' : '';
   
-  // Helper to render text lines
-  const renderTextLines = () => {
-    return Array.from({ length: lines }).map((_, index) => {
-      // Make last line shorter if multiple lines
-      const lineWidth = index === lines - 1 && lines > 1 
-        ? `${70 + Math.random() * 20}%` 
-        : width;
+  const renderSkeleton = () => {
+    switch (type) {
+      case 'text':
+        return (
+          <div className={`${className}`}>
+            {Array.from({ length: lines }).map((_, i) => (
+              <div 
+                key={i}
+                className={`${color} rounded-md my-2 ${animationClass}`}
+                style={{ 
+                  height: '1rem',
+                  width: i === lines - 1 && lines > 1 ? '75%' : '100%'
+                }}
+              />
+            ))}
+          </div>
+        );
         
-      return (
-        <div
-          key={`text-line-${index}`}
-          className={`${baseClasses} h-4 mb-2`}
-          style={{ width: lineWidth }}
-        />
-      );
-    });
+      case 'card':
+        return (
+          <div 
+            className={`${color} ${animationClass} rounded-lg overflow-hidden ${className}`}
+            style={{ width, height: height || '12rem' }}
+          >
+            <div className="bg-gray-300 dark:bg-gray-600" style={{ height: '60%' }} />
+            <div className="p-4">
+              <div className="bg-gray-300 dark:bg-gray-600 rounded h-4 mb-2 w-3/4" />
+              <div className="bg-gray-300 dark:bg-gray-600 rounded h-3 mb-2" />
+              <div className="bg-gray-300 dark:bg-gray-600 rounded h-3 w-1/2" />
+            </div>
+          </div>
+        );
+        
+      case 'image':
+        return (
+          <div 
+            className={`${color} ${animationClass} rounded-md ${className}`}
+            style={{ width, height: height || '200px' }}
+            aria-hidden="true"
+          />
+        );
+        
+      case 'avatar':
+        const size = height || '3rem';
+        return (
+          <div 
+            className={`${color} ${animationClass} rounded-full ${className}`}
+            style={{ width: size, height: size }}
+            aria-hidden="true"
+          />
+        );
+        
+      case 'button':
+        return (
+          <div 
+            className={`${color} ${animationClass} rounded-md ${className}`}
+            style={{ width: width || '100px', height: height || '40px' }}
+            aria-hidden="true"
+          />
+        );
+        
+      case 'orbital':
+        // Special skeleton for the ServicesOrbital component
+        return (
+          <div 
+            className={`${className} relative ${animationClass}`}
+            style={{ width, height: height || '500px' }}
+          >
+            {/* Center core */}
+            <div className={`absolute ${color} rounded-full`} 
+              style={{ 
+                width: '80px', 
+                height: '80px',
+                left: 'calc(50% - 40px)',
+                top: 'calc(50% - 40px)'
+              }} 
+            />
+            
+            {/* Orbital rings */}
+            {[120, 200, 280].map((size, i) => (
+              <div 
+                key={i}
+                className={`absolute border-2 ${color} opacity-25 rounded-full`}
+                style={{ 
+                  width: `${size}px`, 
+                  height: `${size}px`,
+                  left: `calc(50% - ${size/2}px)`,
+                  top: `calc(50% - ${size/2}px)`,
+                }} 
+              />
+            ))}
+            
+            {/* Orbital points */}
+            {Array.from({ length: 6 }).map((_, i) => {
+              const angle = (i * 60) % 360;
+              const radius = 100 + (i % 3) * 80;
+              const x = Math.cos(angle * Math.PI / 180) * radius;
+              const y = Math.sin(angle * Math.PI / 180) * radius;
+              
+              return (
+                <div 
+                  key={i}
+                  className={`absolute ${color} rounded-full`}
+                  style={{ 
+                    width: '30px', 
+                    height: '30px',
+                    left: `calc(50% + ${x - 15}px)`,
+                    top: `calc(50% + ${y - 15}px)`,
+                  }} 
+                />
+              );
+            })}
+          </div>
+        );
+        
+      default:
+        return (
+          <div 
+            className={`${color} ${animationClass} ${className}`}
+            style={{ width, height }}
+            aria-hidden="true"
+          />
+        );
+    }
   };
   
-  // Render different types of skeletons
-  switch (type) {
-    case 'text':
-      return <div>{renderTextLines()}</div>;
-      
-    case 'card':
-      return (
-        <div 
-          className={`${baseClasses}`}
-          style={{ width, height: height || '200px' }}
-        >
-          {/* Card header */}
-          <div className="p-4">
-            <div className={`${baseColor} h-6 rounded-md w-3/4 mb-4`} />
-            <div className={`${baseColor} h-4 rounded-md w-full mb-2`} />
-            <div className={`${baseColor} h-4 rounded-md w-5/6`} />
-          </div>
-        </div>
-      );
-      
-    case 'image':
-      return (
-        <div 
-          className={`${baseClasses} flex items-center justify-center`}
-          style={{ width, height: height || '200px' }}
-        >
-          <svg 
-            className="w-12 h-12 text-gray-600" 
-            fill="none" 
-            stroke="currentColor" 
-            viewBox="0 0 24 24" 
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path 
-              strokeLinecap="round" 
-              strokeLinejoin="round" 
-              strokeWidth="2" 
-              d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-            />
-          </svg>
-        </div>
-      );
-      
-    case 'button':
-      return (
-        <div 
-          className={`${baseClasses} h-10 rounded-lg`}
-          style={{ width: width || '120px' }}
-        />
-      );
-      
-    case 'avatar':
-      return (
-        <div 
-          className={`${baseClasses} rounded-full`}
-          style={{ 
-            width: width || '40px', 
-            height: height || width || '40px' 
-          }}
-        />
-      );
-      
-    default:
-      return <div>Invalid skeleton type</div>;
-  }
+  return (
+    <div aria-label="Loading" role="status" aria-live="polite">
+      {renderSkeleton()}
+      <span className="sr-only">Loading...</span>
+    </div>
+  );
+};
+
+SkeletonLoader.propTypes = {
+  type: PropTypes.oneOf(['text', 'card', 'image', 'avatar', 'button', 'orbital']),
+  width: PropTypes.string,
+  height: PropTypes.string,
+  lines: PropTypes.number,
+  className: PropTypes.string,
+  animated: PropTypes.bool,
+  color: PropTypes.string
 };
 
 export default SkeletonLoader; 

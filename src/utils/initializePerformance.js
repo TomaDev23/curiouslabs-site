@@ -1,9 +1,16 @@
-import { startFPSMonitoring } from './performanceMonitor';
+/**
+ * Performance Monitoring Initialization
+ * Bootstraps all performance monitoring features when the application starts
+ */
+
+import { 
+  startFPSMonitoring, 
+  recordPageLoad 
+} from './performanceMonitor';
 
 /**
- * Initialize performance monitoring for the application
- * Sets up FPS monitoring and registers with the app
- * Should be called once during app initialization
+ * Initialize all performance monitoring features
+ * Call this at app startup or page load
  */
 const initializePerformance = () => {
   if (typeof window === 'undefined') return;
@@ -11,81 +18,69 @@ const initializePerformance = () => {
   // Start FPS monitoring
   startFPSMonitoring();
   
-  // Add performance observer for long tasks if available
+  // Record initial page load metrics
+  if (typeof recordPageLoad === 'function') {
+    recordPageLoad(window.location.pathname);
+  }
+
+  // Monitor route changes if using client-side routing
+  if (typeof window !== 'undefined') {
+    // Set up monitoring for long tasks
+    setupLongTasksMonitoring();
+    
+    // Log performance info to console in development
+    if (process.env.NODE_ENV === 'development') {
+      logPerformanceInfo();
+    }
+  }
+};
+
+/**
+ * Set up monitoring for long tasks that block the main thread
+ */
+function setupLongTasksMonitoring() {
   if (typeof PerformanceObserver !== 'undefined') {
     try {
-      const longTaskObserver = new PerformanceObserver((list) => {
-        const entries = list.getEntries();
-        
-        entries.forEach((entry) => {
+      // Create observer for long tasks
+      const observer = new PerformanceObserver((list) => {
+        list.getEntries().forEach((entry) => {
+          // Log long tasks in development
           if (process.env.NODE_ENV === 'development') {
             console.warn(`[Performance] Long task detected: ${entry.duration.toFixed(2)}ms`);
           }
         });
       });
       
-      longTaskObserver.observe({ entryTypes: ['longtask'] });
+      // Start observing long tasks
+      observer.observe({ entryTypes: ['longtask'] });
     } catch (e) {
-      console.warn('Long task observation not supported', e);
+      console.error('[Performance] Long tasks monitoring not supported', e);
     }
   }
-  
-  // Set up layout shift monitoring
-  if (typeof PerformanceObserver !== 'undefined') {
-    try {
-      const layoutShiftObserver = new PerformanceObserver((list) => {
-        const entries = list.getEntries();
-        let cumulativeLayoutShift = 0;
-        
-        entries.forEach((entry) => {
-          // Only include shifts without user input and within 500ms of load
-          if (!entry.hadRecentInput) {
-            cumulativeLayoutShift += entry.value;
-          }
-        });
-        
-        if (cumulativeLayoutShift > 0.1 && process.env.NODE_ENV === 'development') {
-          console.warn(`[Performance] High Cumulative Layout Shift detected: ${cumulativeLayoutShift.toFixed(3)}`);
-        }
-      });
-      
-      layoutShiftObserver.observe({ entryTypes: ['layout-shift'] });
-    } catch (e) {
-      console.warn('Layout shift observation not supported', e);
-    }
+}
+
+/**
+ * Log performance information to console in development mode
+ */
+function logPerformanceInfo() {
+  // Log basic navigation timing
+  if (window.performance && window.performance.timing) {
+    const timing = window.performance.timing;
+    const pageLoadTime = timing.loadEventEnd - timing.navigationStart;
+    
+    console.log(`[Performance] Page loaded in ${pageLoadTime}ms`);
+    console.log(`[Performance] DOM ready in ${timing.domComplete - timing.domLoading}ms`);
+    console.log(`[Performance] Network latency: ${timing.responseEnd - timing.requestStart}ms`);
   }
   
-  // Initialize paint timing observation
-  if (typeof PerformanceObserver !== 'undefined') {
-    try {
-      const paintObserver = new PerformanceObserver((list) => {
-        const entries = list.getEntries();
-        
-        entries.forEach((entry) => {
-          const metricName = entry.name === 'first-paint' ? 'FP' : 'FCP';
-          const time = Math.round(entry.startTime);
-          
-          if (process.env.NODE_ENV === 'development') {
-            console.log(`[Performance] ${metricName}: ${time}ms`);
-          }
-        });
-      });
-      
-      paintObserver.observe({ entryTypes: ['paint'] });
-    } catch (e) {
-      console.warn('Paint timing observation not supported', e);
-    }
+  // Report memory usage if available
+  if (window.performance && window.performance.memory) {
+    const memory = window.performance.memory;
+    console.log(`[Performance] Memory usage: ${(memory.usedJSHeapSize / (1024 * 1024)).toFixed(2)}MB / ${(memory.jsHeapSizeLimit / (1024 * 1024)).toFixed(2)}MB`);
   }
-  
-  // Report performance information when the page is unloaded
-  window.addEventListener('unload', () => {
-    // This could send analytics in the future, but we're just logging for now
-    if (process.env.NODE_ENV === 'development') {
-      console.log('[Performance] Page unloaded, performance data collected');
-    }
-  });
-  
-  console.log('[Performance] Monitoring initialized');
-};
+}
+
+// Log initialization
+console.log('[Performance] Monitoring initialized');
 
 export default initializePerformance; 

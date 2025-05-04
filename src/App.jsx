@@ -22,6 +22,7 @@ const NotFound = lazy(() => import('./pages/404.jsx'));
 const UniverseExperience = lazy(() => import('./pages/UniverseExperience.jsx'));
 const DevPage = lazy(() => import('./pages/dev.jsx'));
 const DevV4CosmicPage = lazy(() => import('./pages/dev_v4_cosmic.jsx'));
+const DevV4CosmicOptimizedPage = lazy(() => import('./pages/dev_v4_cosmic_optimized.jsx'));
 
 // Loading fallback component
 const LoadingFallback = () => (
@@ -116,9 +117,19 @@ export default function App() {
             <DevV4CosmicPage />
           </Suspense>
         } />
+        <Route path="/dev/v4-cosmic-optimized" element={
+          <Suspense fallback={<LoadingFallback />}>
+            <DevV4CosmicOptimizedPage />
+          </Suspense>
+        } />
         <Route path="/v4" element={
           <Suspense fallback={<LoadingFallback />}>
             <DevV4CosmicPage />
+          </Suspense>
+        } />
+        <Route path="/v4-optimized" element={
+          <Suspense fallback={<LoadingFallback />}>
+            <DevV4CosmicOptimizedPage />
           </Suspense>
         } />
         <Route path="*" element={

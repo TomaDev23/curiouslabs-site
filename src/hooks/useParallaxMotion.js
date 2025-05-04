@@ -1,60 +1,112 @@
-import { useEffect, useState } from 'react';
-import { useScroll } from '../context/ScrollContext';
-import useBreakpoint from './useBreakpoint';
+import { useState, useEffect, useRef } from 'react';
+import { useBreakpoint } from './useBreakpoint';
 
 /**
- * Custom hook for creating parallax motion effects
- * Uses the scroll position to create subtle movement
- * Optimized for performance with requestAnimationFrame
- * Respects reduced motion preferences and disables on mobile
+ * Enhanced useParallaxMotion hook with optimized performance
+ * Creates smooth parallax effects based on scroll position with
+ * performance optimizations and respect for accessibility preferences
  * 
- * @param {number} speed - Speed multiplier for the parallax effect
- * @param {boolean} horizontal - Whether to apply horizontal parallax
- * @returns {Object} - Style object with transform property
+ * @param {Object} options - Parallax configuration options
+ * @param {number} options.speed - Vertical movement speed (default: 0.15)
+ * @param {number} options.xSpeed - Horizontal movement speed (default: 0)
+ * @param {boolean} options.reverse - Reverse the direction (default: false)
+ * @param {number} options.maxMovement - Maximum movement in pixels (default: 100)
+ * @param {boolean} options.enableOnMobile - Whether to enable on mobile (default: false)
+ * @param {Function} options.transformFn - Custom transform function
+ * @returns {Object} - Ref to attach and style object
  */
-export function useParallaxMotion(speed = 0.2, horizontal = false) {
-  const { scrollY } = useScroll();
-  const [transform, setTransform] = useState('');
-  const breakpoints = useBreakpoint();
+export function useParallaxMotion({
+  speed = 0.15, 
+  xSpeed = 0,
+  reverse = false,
+  maxMovement = 100,
+  enableOnMobile = false,
+  transformFn = null
+} = {}) {
+  const [style, setStyle] = useState({});
+  const ref = useRef(null);
+  const frameRef = useRef(null);
+  const lastScrollY = useRef(0);
+  const isMobile = useBreakpoint('md');
   
-  // Skip parallax on mobile for performance
-  const isMobile = !breakpoints.isMd;
+  // Check for reduced motion preference
+  const prefersReducedMotion = typeof window !== 'undefined' 
+    ? window.matchMedia('(prefers-reduced-motion: reduce)').matches 
+    : false;
   
+  // Skip effect if motion is reduced or on mobile (unless enabled)
+  const skipEffect = prefersReducedMotion || (isMobile && !enableOnMobile);
+
   useEffect(() => {
-    // Check for reduced motion preference
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    
-    if (prefersReducedMotion || isMobile) {
-      setTransform('');
-      return;
+    // Return early if we should skip the effect
+    if (skipEffect) {
+      setStyle({});
+      return () => {};
     }
-    
-    // Use requestAnimationFrame for smoother animation
-    let rafId;
-    
-    const updateTransform = () => {
-      if (horizontal) {
-        setTransform(`translateX(${scrollY * speed}px)`);
-      } else {
-        setTransform(`translateY(${scrollY * speed}px)`);
+
+    // Get initial position of the element
+    const element = ref.current;
+    if (!element) return;
+
+    // Calculate initial position
+    const rect = element.getBoundingClientRect();
+    const initialY = rect.top + window.scrollY;
+
+    const calculateParallax = () => {
+      // Skip if no longer connected to DOM
+      if (!element.isConnected) return;
+      
+      // Performance optimization: only update when scroll changed
+      if (lastScrollY.current === window.scrollY) {
+        frameRef.current = requestAnimationFrame(calculateParallax);
+        return;
       }
-      rafId = requestAnimationFrame(updateTransform);
+      
+      lastScrollY.current = window.scrollY;
+      
+      // Calculate how far element is from the viewport center
+      const viewportHeight = window.innerHeight;
+      const elementMiddle = initialY + rect.height / 2;
+      const scrollCenter = window.scrollY + viewportHeight / 2;
+      const distance = scrollCenter - elementMiddle;
+      
+      // Calculate parallax offsets with direction control
+      const directionMod = reverse ? -1 : 1;
+      let yOffset = distance * speed * directionMod;
+      let xOffset = distance * xSpeed * directionMod;
+      
+      // Limit maximum movement
+      yOffset = Math.max(Math.min(yOffset, maxMovement), -maxMovement);
+      xOffset = Math.max(Math.min(xOffset, maxMovement), -maxMovement);
+      
+      // Apply transform (using custom function if provided)
+      if (typeof transformFn === 'function') {
+        setStyle(transformFn(xOffset, yOffset));
+      } else {
+        setStyle({
+          transform: `translate3D(${xOffset}px, ${yOffset}px, 0)`,
+          transition: 'transform 0.1s linear'
+        });
+      }
+      
+      frameRef.current = requestAnimationFrame(calculateParallax);
     };
+
+    // Start animation frame and calculate initial position
+    frameRef.current = requestAnimationFrame(calculateParallax);
     
-    rafId = requestAnimationFrame(updateTransform);
+    // Add scroll event listener with passive flag for better performance
+    window.addEventListener('scroll', calculateParallax, { passive: true });
+    window.addEventListener('resize', calculateParallax, { passive: true });
     
     return () => {
-      if (rafId) {
-        cancelAnimationFrame(rafId);
+      window.removeEventListener('scroll', calculateParallax);
+      window.removeEventListener('resize', calculateParallax);
+      if (frameRef.current) {
+        cancelAnimationFrame(frameRef.current);
       }
     };
-  }, [scrollY, speed, horizontal, isMobile]);
-  
-  if (isMobile) {
-    return { style: {} };
-  }
-  
-  return {
-    style: transform ? { transform } : {}
-  };
+  }, [speed, xSpeed, reverse, maxMovement, skipEffect, transformFn]);
+
+  return { ref, style };
 } 
