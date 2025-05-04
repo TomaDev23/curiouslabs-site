@@ -5,6 +5,7 @@ import { HelmetProvider } from 'react-helmet-async'
 import App from './App.jsx'
 import './index.css'
 import initializePerformance from './utils/initializePerformance'
+import { ScrollProvider } from './context/ScrollContext'
 
 // Initialize performance monitoring
 if (process.env.NODE_ENV === 'development') {
@@ -15,7 +16,9 @@ ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <HelmetProvider>
       <BrowserRouter>
-        <App />
+        <ScrollProvider>
+          <App />
+        </ScrollProvider>
       </BrowserRouter>
     </HelmetProvider>
   </React.StrictMode>,

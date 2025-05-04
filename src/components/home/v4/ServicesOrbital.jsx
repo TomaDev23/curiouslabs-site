@@ -5,11 +5,14 @@ import MagneticButton from '../../ui/MagneticButton';
 import CosmicNoiseOverlay from '../../ui/CosmicNoiseOverlay';
 import useBreakpoint from '../../../hooks/useBreakpoint';
 import { startComponentRender, endComponentRender } from '../../../utils/performanceMonitor';
+import { useLazyLoad } from '../../../hooks/useLazyLoad';
+import { useScroll } from '../../../context/ScrollContext';
 
 /**
  * ServicesOrbital - Enhanced services section with orbiting service cards
  * Features improved orbital system with glow effects, connection trails, and animated service details
  * Optimized with React.memo, useCallback, and useMemo for better performance
+ * Enhanced with lazy loading for improved performance
  */
 const ServicesOrbital = () => {
   // Performance monitoring
@@ -20,6 +23,12 @@ const ServicesOrbital = () => {
   const { ref, inView } = useScrollReveal(0.2);
   const { isMobile, isMd, isLg } = useBreakpoint();
   const prevServiceRef = useRef(0);
+  
+  // Lazy loading for the orbital visualization
+  const [lazyRef, isOrbitalVisible] = useLazyLoad({ rootMargin: '200px' });
+  
+  // Get scroll position for subtle effects
+  const { scrollY } = useScroll();
   
   // Services data - memoized to prevent recreation on each render
   const services = useMemo(() => [
@@ -167,213 +176,218 @@ const ServicesOrbital = () => {
           <motion.div 
             className="relative order-2 lg:order-1"
             variants={itemVariants}
+            ref={lazyRef}
           >
             <div className="aspect-square max-w-sm md:max-w-lg mx-auto relative">
-              {/* Enhanced central core with improved glow */}
-              <motion.div 
-                className={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 ${isMobile ? 'w-[90px] h-[90px]' : 'w-[120px] h-[120px]'} rounded-full bg-gradient-to-br from-purple-900/80 to-blue-900/80 border border-purple-500/50 backdrop-blur-md z-20 flex items-center justify-center`}
-                animate={{ 
-                  boxShadow: [
-                    '0 0 20px 5px rgba(124, 58, 237, 0.3)', 
-                    '0 0 40px 15px rgba(124, 58, 237, 0.4)', 
-                    '0 0 20px 5px rgba(124, 58, 237, 0.3)'
-                  ]
-                }}
-                transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-              >
-                <div className="text-3xl">🧠</div>
-                <motion.div 
-                  className="absolute w-full h-full rounded-full border-2 border-dashed border-purple-500/30"
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-                ></motion.div>
-                
-                {/* Core inner glow */}
-                <motion.div 
-                  className="absolute inset-0 rounded-full bg-purple-500/10"
-                  animate={{ 
-                    opacity: [0.3, 0.6, 0.3]
-                  }}
-                  transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                ></motion.div>
-              </motion.div>
-              
-              {/* Enhanced orbital paths with inner and outer glow */}
-              <motion.div 
-                className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full h-full rounded-full border border-gray-500/30"
-                style={createOrbitalGlow('rgba(124, 58, 237, ')}
-                animate={{
-                  opacity: [0.6, 0.8, 0.6]
-                }}
-                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-              ></motion.div>
-              
-              {/* Secondary orbital path for depth */}
-              <motion.div 
-                className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 rounded-full border border-purple-500/10"
-                style={{ 
-                  width: '85%', 
-                  height: '85%',
-                  boxShadow: 'inset 0 0 20px rgba(124, 58, 237, 0.1)'
-                }}
-              ></motion.div>
-              
-              {/* Pulsing rings emanating from center */}
-              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full h-full">
-                <motion.div
-                  className="absolute inset-0 rounded-full border border-purple-500/5"
-                  animate={{
-                    scale: [1, 1.5],
-                    opacity: [0.5, 0]
-                  }}
-                  transition={{
-                    duration: 3,
-                    repeat: Infinity,
-                    ease: "easeOut"
-                  }}
-                />
-                <motion.div
-                  className="absolute inset-0 rounded-full border border-purple-500/5"
-                  animate={{
-                    scale: [1, 1.5],
-                    opacity: [0.5, 0]
-                  }}
-                  transition={{
-                    duration: 3,
-                    repeat: Infinity,
-                    ease: "easeOut",
-                    delay: 1
-                  }}
-                />
-              </div>
-              
-              {/* Enhanced service orbitals with trails */}
-              {services.map((service, index) => {
-                const angle = (index / services.length) * Math.PI * 2;
-                const isActive = activeService === index;
-                
-                const orbitX = Math.cos(angle) * radius;
-                const orbitY = Math.sin(angle) * radius;
-                
-                return (
-                  <React.Fragment key={service.id}>
-                    {/* Enhanced service orbital with glow effect */}
-                    <motion.div
-                      className={`absolute top-1/2 left-1/2 ${isMobile ? 'w-10 h-10 -ml-5 -mt-5' : 'w-14 h-14 -ml-7 -mt-7'} flex items-center justify-center rounded-full cursor-pointer z-10 ${isActive ? 'z-30' : 'z-10'}`}
-                      style={{ 
-                        x: orbitX, 
-                        y: orbitY 
+              {isOrbitalVisible && (
+                <>
+                  {/* Enhanced central core with improved glow */}
+                  <motion.div 
+                    className={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 ${isMobile ? 'w-[90px] h-[90px]' : 'w-[120px] h-[120px]'} rounded-full bg-gradient-to-br from-purple-900/80 to-blue-900/80 border border-purple-500/50 backdrop-blur-md z-20 flex items-center justify-center`}
+                    animate={{ 
+                      boxShadow: [
+                        '0 0 20px 5px rgba(124, 58, 237, 0.3)', 
+                        '0 0 40px 15px rgba(124, 58, 237, 0.4)', 
+                        '0 0 20px 5px rgba(124, 58, 237, 0.3)'
+                      ]
+                    }}
+                    transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                  >
+                    <div className="text-3xl">🧠</div>
+                    <motion.div 
+                      className="absolute w-full h-full rounded-full border-2 border-dashed border-purple-500/30"
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                    ></motion.div>
+                    
+                    {/* Core inner glow */}
+                    <motion.div 
+                      className="absolute inset-0 rounded-full bg-purple-500/10"
+                      animate={{ 
+                        opacity: [0.3, 0.6, 0.3]
                       }}
-                      onClick={() => handleServiceClick(index)}
-                      whileHover={{ scale: 1.2 }}
-                      animate={{
-                        scale: isActive ? 1.2 : 1,
-                        boxShadow: isActive ? `0 0 25px 8px ${service.shadowColor}` : 'none',
-                      }}
-                      transition={{ duration: 0.3 }}
-                    >
-                      {/* Animated light trail following the active service */}
-                      {isActive && (
-                        <motion.div
-                          className="absolute inset-0 rounded-full"
-                          style={{
-                            background: `radial-gradient(circle, ${service.shadowColor} 0%, transparent 70%)`,
-                          }}
-                          animate={{
-                            opacity: [0.6, 0.8, 0.6]
-                          }}
-                          transition={{ duration: 2, repeat: Infinity }}
-                        />
-                      )}
-                      
-                      <div className={`w-full h-full rounded-full bg-gradient-to-br ${service.color} flex items-center justify-center ${isMobile ? 'text-base' : 'text-xl'} shadow-lg`}>
-                        <span>{service.icon}</span>
-                      </div>
-                      
-                      {isActive && !isMobile && (
-                        <motion.span 
-                          className="absolute -top-8 whitespace-nowrap font-medium text-white cosmic-text-glow"
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: 10 }}
-                        >
-                          {service.title}
-                        </motion.span>
-                      )}
-                    </motion.div>
-                  </React.Fragment>
-                );
-              })}
-              
-              {/* Connection lines with enhanced gradients */}
-              <svg className="absolute inset-0 w-full h-full z-0">
-                {/* Single rotating connection line that moves between services */}
-                <motion.line
-                  key="rotating-connection-line"
-                  x1={centerPoint}
-                  y1={centerPoint}
-                  x2={currentPos.x}
-                  y2={currentPos.y}
-                  stroke="url(#line-gradient)"
-                  strokeWidth="2"
-                  initial={{ opacity: 0.9 }}
-                  animate={{ 
-                    x2: currentPos.x,
-                    y2: currentPos.y,
-                    opacity: 0.9
-                  }}
-                  transition={{ 
-                    type: "spring",
-                    stiffness: 60,
-                    damping: 15,
-                    mass: 1
-                  }}
-                />
-
-                {/* Jolting lights that travel along the active connection line */}
-                {[...Array(3)].map((_, i) => (
-                  <motion.circle
-                    key={`jolt-${i}`}
-                    r={3 - i * 0.5}
-                    fill={i === 0 ? "#a855f7" : i === 1 ? "#818cf8" : "#38bdf8"}
-                    initial={{ 
-                      cx: centerPoint,
-                      cy: centerPoint,
-                      opacity: 0
-                    }}
-                    animate={{
-                      cx: [centerPoint, currentPos.x],
-                      cy: [centerPoint, currentPos.y],
-                      opacity: [0, 0.8, 0]
-                    }}
-                    transition={{
-                      duration: 1 + (i * 0.2),
-                      ease: "easeInOut",
-                      repeat: Infinity,
-                      repeatDelay: 0.2 * i,
-                      delay: 0.1 * i
-                    }}
-                  />
-                ))}
-                
-                {/* Enhanced gradients for lines */}
-                <defs>
-                  {/* Main gradient for the rotating line */}
-                  <linearGradient id="line-gradient" gradientUnits="userSpaceOnUse"
-                    x1={centerPoint} y1={centerPoint} x2={currentPos.x} y2={currentPos.y}>
-                    <stop offset="0%" stopColor="#6D28D9" stopOpacity="0.1" />
-                    <stop offset="100%" stopColor="#6D28D9" stopOpacity="0.8" />
-                  </linearGradient>
+                      transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                    ></motion.div>
+                  </motion.div>
                   
-                  {/* Service-specific gradients */}
-                  {services.map((service) => (
-                    <linearGradient key={`gradient-${service.id}`} id={`gradient-${service.id}`} gradientTransform="rotate(90)">
-                      <stop offset="0%" stopColor="#6D28D9" stopOpacity="0.1" />
-                      <stop offset="100%" stopColor="#6D28D9" stopOpacity="0.8" />
-                    </linearGradient>
-                  ))}
-                </defs>
-              </svg>
+                  {/* Enhanced orbital paths with inner and outer glow */}
+                  <motion.div 
+                    className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full h-full rounded-full border border-gray-500/30"
+                    style={createOrbitalGlow('rgba(124, 58, 237, ')}
+                    animate={{
+                      opacity: [0.6, 0.8, 0.6]
+                    }}
+                    transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                  ></motion.div>
+                  
+                  {/* Secondary orbital path for depth */}
+                  <motion.div 
+                    className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 rounded-full border border-purple-500/10"
+                    style={{ 
+                      width: '85%', 
+                      height: '85%',
+                      boxShadow: 'inset 0 0 20px rgba(124, 58, 237, 0.1)'
+                    }}
+                  ></motion.div>
+                  
+                  {/* Pulsing rings emanating from center */}
+                  <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full h-full">
+                    <motion.div
+                      className="absolute inset-0 rounded-full border border-purple-500/5"
+                      animate={{
+                        scale: [1, 1.5],
+                        opacity: [0.5, 0]
+                      }}
+                      transition={{
+                        duration: 3,
+                        repeat: Infinity,
+                        ease: "easeOut"
+                      }}
+                    />
+                    <motion.div
+                      className="absolute inset-0 rounded-full border border-purple-500/5"
+                      animate={{
+                        scale: [1, 1.5],
+                        opacity: [0.5, 0]
+                      }}
+                      transition={{
+                        duration: 3,
+                        repeat: Infinity,
+                        ease: "easeOut",
+                        delay: 1
+                      }}
+                    />
+                  </div>
+                  
+                  {/* Enhanced service orbitals with trails */}
+                  {services.map((service, index) => {
+                    const angle = (index / services.length) * Math.PI * 2;
+                    const isActive = activeService === index;
+                    
+                    const orbitX = Math.cos(angle) * radius;
+                    const orbitY = Math.sin(angle) * radius;
+                    
+                    return (
+                      <React.Fragment key={service.id}>
+                        {/* Enhanced service orbital with glow effect */}
+                        <motion.div
+                          className={`absolute top-1/2 left-1/2 ${isMobile ? 'w-10 h-10 -ml-5 -mt-5' : 'w-14 h-14 -ml-7 -mt-7'} flex items-center justify-center rounded-full cursor-pointer z-10 ${isActive ? 'z-30' : 'z-10'}`}
+                          style={{ 
+                            x: orbitX, 
+                            y: orbitY 
+                          }}
+                          onClick={() => handleServiceClick(index)}
+                          whileHover={{ scale: 1.2 }}
+                          animate={{
+                            scale: isActive ? 1.2 : 1,
+                            boxShadow: isActive ? `0 0 25px 8px ${service.shadowColor}` : 'none',
+                          }}
+                          transition={{ duration: 0.3 }}
+                        >
+                          {/* Animated light trail following the active service */}
+                          {isActive && (
+                            <motion.div
+                              className="absolute inset-0 rounded-full"
+                              style={{
+                                background: `radial-gradient(circle, ${service.shadowColor} 0%, transparent 70%)`,
+                              }}
+                              animate={{
+                                opacity: [0.6, 0.8, 0.6]
+                              }}
+                              transition={{ duration: 2, repeat: Infinity }}
+                            />
+                          )}
+                          
+                          <div className={`w-full h-full rounded-full bg-gradient-to-br ${service.color} flex items-center justify-center ${isMobile ? 'text-base' : 'text-xl'} shadow-lg`}>
+                            <span>{service.icon}</span>
+                          </div>
+                          
+                          {isActive && !isMobile && (
+                            <motion.span 
+                              className="absolute -top-8 whitespace-nowrap font-medium text-white cosmic-text-glow"
+                              initial={{ opacity: 0, y: 10 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              exit={{ opacity: 0, y: 10 }}
+                            >
+                              {service.title}
+                            </motion.span>
+                          )}
+                        </motion.div>
+                      </React.Fragment>
+                    );
+                  })}
+                  
+                  {/* Connection lines with enhanced gradients */}
+                  <svg className="absolute inset-0 w-full h-full z-0">
+                    {/* Single rotating connection line that moves between services */}
+                    <motion.line
+                      key="rotating-connection-line"
+                      x1={centerPoint}
+                      y1={centerPoint}
+                      x2={currentPos.x}
+                      y2={currentPos.y}
+                      stroke="url(#line-gradient)"
+                      strokeWidth="2"
+                      initial={{ opacity: 0.9 }}
+                      animate={{ 
+                        x2: currentPos.x,
+                        y2: currentPos.y,
+                        opacity: 0.9
+                      }}
+                      transition={{ 
+                        type: "spring",
+                        stiffness: 60,
+                        damping: 15,
+                        mass: 1
+                      }}
+                    />
+
+                    {/* Jolting lights that travel along the active connection line */}
+                    {[...Array(3)].map((_, i) => (
+                      <motion.circle
+                        key={`jolt-${i}`}
+                        r={3 - i * 0.5}
+                        fill={i === 0 ? "#a855f7" : i === 1 ? "#818cf8" : "#38bdf8"}
+                        initial={{ 
+                          cx: centerPoint,
+                          cy: centerPoint,
+                          opacity: 0
+                        }}
+                        animate={{
+                          cx: [centerPoint, currentPos.x],
+                          cy: [centerPoint, currentPos.y],
+                          opacity: [0, 0.8, 0]
+                        }}
+                        transition={{
+                          duration: 1 + (i * 0.2),
+                          ease: "easeInOut",
+                          repeat: Infinity,
+                          repeatDelay: 0.2 * i,
+                          delay: 0.1 * i
+                        }}
+                      />
+                    ))}
+                    
+                    {/* Enhanced gradients for lines */}
+                    <defs>
+                      {/* Main gradient for the rotating line */}
+                      <linearGradient id="line-gradient" gradientUnits="userSpaceOnUse"
+                        x1={centerPoint} y1={centerPoint} x2={currentPos.x} y2={currentPos.y}>
+                        <stop offset="0%" stopColor="#6D28D9" stopOpacity="0.1" />
+                        <stop offset="100%" stopColor="#6D28D9" stopOpacity="0.8" />
+                      </linearGradient>
+                      
+                      {/* Service-specific gradients */}
+                      {services.map((service) => (
+                        <linearGradient key={`gradient-${service.id}`} id={`gradient-${service.id}`} gradientTransform="rotate(90)">
+                          <stop offset="0%" stopColor="#6D28D9" stopOpacity="0.1" />
+                          <stop offset="100%" stopColor="#6D28D9" stopOpacity="0.8" />
+                        </linearGradient>
+                      ))}
+                    </defs>
+                  </svg>
+                </>
+              )}
             </div>
           </motion.div>
           

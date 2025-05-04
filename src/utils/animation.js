@@ -25,6 +25,63 @@ export const itemVariants = {
   }
 };
 
+/**
+ * Reveal animation variants for sections
+ * Used with the useSectionReveal hook for scroll-triggered animations
+ */
+export const revealVariants = {
+  hidden: { 
+    opacity: 0, 
+    y: 40 
+  },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.6,
+      ease: 'easeOut'
+    }
+  }
+};
+
+/**
+ * Reveal animation variants with staggered children
+ * Good for sections with multiple elements that should animate in sequence
+ */
+export const revealWithChildrenVariants = {
+  hidden: { 
+    opacity: 0, 
+    y: 40 
+  },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.6,
+      ease: 'easeOut',
+      staggerChildren: 0.15
+    }
+  }
+};
+
+/**
+ * Child item variants for use inside staggered parent containers
+ */
+export const childVariants = {
+  hidden: { 
+    opacity: 0, 
+    y: 20 
+  },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.5,
+      ease: 'easeOut'
+    }
+  }
+};
+
 // Parallax Micro-Interactions
 export const useParallax = () => {
   const [scrollY, setScrollY] = useState(0);

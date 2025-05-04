@@ -1,32 +1,35 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useScroll } from '../../../context/ScrollContext';
+import { scrollToSection } from '../../../utils/scrollUtils';
 
 /**
  * NavBarCosmic - Space-themed navigation bar
  * Features hover animations and responsive design
+ * Enhanced with scroll context integration for active section highlighting
  */
 const NavBarCosmic = () => {
-  const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { scrollY, activeSection, isAtTop } = useScroll();
+  const isScrolled = !isAtTop;
   
   // Navigation items
   const navItems = [
-    { name: 'Mission', href: '#about' },
-    { name: 'Services', href: '#services' },
-    { name: 'Projects', href: '#projects' },
-    { name: 'Community', href: '#community' },
-    { name: 'Contact', href: '#contact' }
+    { name: 'Mission', href: '#about', id: 'about' },
+    { name: 'Services', href: '#services', id: 'services' },
+    { name: 'Projects', href: '#projects', id: 'projects' },
+    { name: 'Community', href: '#community', id: 'community' },
+    { name: 'Contact', href: '#contact', id: 'contact' }
   ];
   
-  // Handle scroll effect
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
-    };
-    
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  // Handle click on navigation items
+  const handleNavClick = (e, id) => {
+    e.preventDefault();
+    scrollToSection(id);
+    if (isMobileMenuOpen) {
+      setIsMobileMenuOpen(false);
+    }
+  };
   
   return (
     <motion.nav
@@ -56,7 +59,12 @@ const NavBarCosmic = () => {
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-6">
             {navItems.map((item) => (
-              <NavItem key={item.name} item={item} />
+              <NavItem 
+                key={item.name} 
+                item={item} 
+                isActive={activeSection === item.id}
+                onClick={(e) => handleNavClick(e, item.id)}
+              />
             ))}
             
             <motion.button
@@ -116,8 +124,12 @@ const NavBarCosmic = () => {
                   <a
                     key={item.name}
                     href={item.href}
-                    className="text-gray-300 hover:text-white py-2 px-3 rounded-md hover:bg-gray-800 transition-colors"
-                    onClick={() => setIsMobileMenuOpen(false)}
+                    className={`transition-colors py-2 px-3 rounded-md hover:bg-gray-800 ${
+                      activeSection === item.id 
+                        ? 'text-purple-400 border-l-2 border-purple-500 pl-2' 
+                        : 'text-gray-300 hover:text-white'
+                    }`}
+                    onClick={(e) => handleNavClick(e, item.id)}
                   >
                     {item.name}
                   </a>
@@ -139,17 +151,23 @@ const NavBarCosmic = () => {
 };
 
 // Individual nav item with hover effects
-const NavItem = ({ item }) => {
+const NavItem = ({ item, isActive, onClick }) => {
   return (
     <motion.a
       href={item.href}
-      className="relative text-gray-300 hover:text-white transition-colors"
+      className={`relative transition-colors ${
+        isActive ? 'text-purple-400' : 'text-gray-300 hover:text-white'
+      }`}
       whileHover="hover"
+      onClick={onClick}
     >
       {item.name}
       <motion.span
-        className="absolute bottom-0 left-0 w-full h-0.5 bg-purple-500"
-        initial={{ scaleX: 0, originX: 0 }}
+        className={`absolute bottom-0 left-0 w-full h-0.5 ${
+          isActive ? 'bg-purple-500' : 'bg-purple-500/70'
+        }`}
+        initial={{ scaleX: isActive ? 1 : 0, originX: 0 }}
+        animate={{ scaleX: isActive ? 1 : 0 }}
         variants={{
           hover: { scaleX: 1 }
         }}

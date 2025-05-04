@@ -10,12 +10,14 @@ import ResponsiveButton from '../../ui/ResponsiveButton';
 import ErrorBoundary from '../../ui/ErrorBoundary';
 import { startComponentRender, endComponentRender } from '../../../utils/performanceMonitor';
 import useAccessibilityCheck from '../../../hooks/useAccessibilityCheck';
+import { useLazyLoad } from '../../../hooks/useLazyLoad';
+import LazyImage from '../../ui/LazyImage';
 
 /**
  * HeroPortal - Space-themed hero section
  * Features animated portal effect and particle systems with responsive excellence
  * Now includes typing animation and enhanced visual effects
- * Optimized with React.memo, useMemo and useCallback
+ * Optimized with React.memo, useMemo, useCallback and lazy loading
  */
 const HeroPortal = () => {
   // Performance monitoring
@@ -30,6 +32,10 @@ const HeroPortal = () => {
   const [hasScrolled, setHasScrolled] = useState(false);
   const [typedText, setTypedText] = useState('');
   const fullText = "Explore the frontiers of code with our AI-powered development missions";
+  
+  // Lazy load elements as they come into view
+  const [effectsRef, shouldRenderEffects] = useLazyLoad({ rootMargin: '100px' });
+  const [particlesRef, shouldRenderParticles] = useLazyLoad({ rootMargin: '100px' });
   
   // Typing animation effect
   useEffect(() => {
@@ -87,7 +93,7 @@ const HeroPortal = () => {
   
   // Generate stars for the parallax star field - memoized
   const parallaxStars = useMemo(() => {
-    return [...Array(isMobile ? 100 : 200)].map((_, i) => ({
+    return [...Array(isMobile ? 60 : 150)].map((_, i) => ({
       id: i,
       top: `${Math.random() * 100}%`,
       left: `${Math.random() * 100}%`,
@@ -100,7 +106,7 @@ const HeroPortal = () => {
   
   // Generate floating particles - memoized
   const floatingParticles = useMemo(() => {
-    return [...Array(isMobile ? 10 : 20)].map((_, i) => ({
+    return [...Array(isMobile ? 8 : 15)].map((_, i) => ({
       id: i,
       left: `${10 + Math.random() * 80}%`,
       top: `${10 + Math.random() * 80}%`,
@@ -136,14 +142,19 @@ const HeroPortal = () => {
         {/* Enhanced cosmic radial background for stronger purple glow */}
         <div className="absolute inset-0 bg-gradient-radial from-purple-900/30 via-gray-900/20 to-black opacity-60"></div>
         
-        {/* Enhanced Interactive Parallax Star Field */}
+        {/* Enhanced Interactive Parallax Star Field - lazy loaded */}
         <div 
-          ref={starFieldRef}
+          ref={(node) => {
+            starFieldRef.current = node;
+            if (particlesRef && typeof particlesRef === 'function') {
+              particlesRef(node);
+            }
+          }}
           className="absolute inset-0 transition-transform duration-300 ease-out"
           style={{ willChange: 'transform' }}
         >
           {/* Dynamic star particles with different sizes and animations - optimized with useMemo */}
-          {parallaxStars.map(star => (
+          {shouldRenderParticles && parallaxStars.map(star => (
             <motion.div
               key={`star-${star.id}`}
               className="absolute rounded-full bg-white"
@@ -169,92 +180,99 @@ const HeroPortal = () => {
           ))}
         </div>
         
-        {/* Enhanced Light beams with more intensity and animation */}
-        <motion.div 
-          className="absolute w-1 h-[600px] bg-purple-500/15 blur-xl rotate-[15deg] left-1/4 top-1/3"
-          variants={beamVariants}
-          animate="animate"
-        ></motion.div>
-        
-        <motion.div 
-          className="absolute w-1 h-[500px] bg-blue-500/15 blur-xl -rotate-[20deg] right-1/4 top-2/3"
-          variants={beamVariants}
-          animate="animate"
-          style={{ animationDelay: '2s' }}
-        ></motion.div>
-        
-        {/* New additional light beam */}
-        <motion.div 
-          className="absolute w-1 h-[400px] bg-purple-400/10 blur-xl rotate-[45deg] right-1/3 top-1/4"
-          variants={beamVariants}
-          animate="animate"
-          style={{ animationDelay: '4s' }}
-        ></motion.div>
-        
-        {/* Enhanced Background bloom effects with more intensity */}
-        <motion.div 
-          className="absolute z-10 w-80 h-80 md:w-96 md:h-96 rounded-full bg-gradient-to-bl from-purple-500/20 to-blue-500/20 blur-3xl top-[30%] left-[50%] -translate-x-1/2 -translate-y-1/2"
-          animate={{ 
-            opacity: [0.3, 0.7, 0.3],
-            scale: [1, 1.05, 1]
-          }}
-          transition={{
-            duration: 8,
-            repeat: Infinity,
-            ease: "easeInOut"
-          }}
-        ></motion.div>
-        
-        {/* New nebula effects */}
-        <motion.div 
-          className="absolute h-[400px] w-[400px] rounded-full opacity-10 blur-3xl"
-          style={{ 
-            background: 'radial-gradient(circle, rgba(139, 92, 246, 0.5) 0%, rgba(16, 185, 129, 0) 70%)',
-            top: '20%',
-            left: '20%',
-          }}
-          animate={{ 
-            scale: [1, 1.1, 1],
-            opacity: [0.05, 0.1, 0.05] 
-          }}
-          transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
-        />
-        
-        <motion.div 
-          className="absolute h-[300px] w-[300px] rounded-full opacity-10 blur-3xl"
-          style={{ 
-            background: 'radial-gradient(circle, rgba(59, 130, 246, 0.5) 0%, rgba(16, 185, 129, 0) 70%)',
-            bottom: '20%',
-            right: '20%',
-          }}
-          animate={{ 
-            scale: [1, 1.15, 1],
-            opacity: [0.05, 0.15, 0.05] 
-          }}
-          transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
-        />
-        
-        {/* Subtle floating particles - enhanced with more particles and optimized with useMemo */}
-        {floatingParticles.map(particle => (
-          <motion.div
-            key={`particle-${particle.id}`}
-            className="absolute w-1 h-1 rounded-full bg-white/40"
-            style={{
-              left: particle.left,
-              top: particle.top,
-            }}
-            animate={{
-              y: [0, -15, 0],
-              opacity: [0.2, 0.7, 0.2]
-            }}
-            transition={{
-              duration: particle.duration,
-              repeat: Infinity,
-              ease: "easeInOut",
-              delay: particle.delay
-            }}
-          />
-        ))}
+        {/* Visual effects container - lazy loaded */}
+        <div ref={effectsRef} className="absolute inset-0 pointer-events-none">
+          {shouldRenderEffects && (
+            <>
+              {/* Enhanced Light beams with more intensity and animation */}
+              <motion.div 
+                className="absolute w-1 h-[600px] bg-purple-500/15 blur-xl rotate-[15deg] left-1/4 top-1/3"
+                variants={beamVariants}
+                animate="animate"
+              ></motion.div>
+              
+              <motion.div 
+                className="absolute w-1 h-[500px] bg-blue-500/15 blur-xl -rotate-[20deg] right-1/4 top-2/3"
+                variants={beamVariants}
+                animate="animate"
+                style={{ animationDelay: '2s' }}
+              ></motion.div>
+              
+              {/* New additional light beam */}
+              <motion.div 
+                className="absolute w-1 h-[400px] bg-purple-400/10 blur-xl rotate-[45deg] right-1/3 top-1/4"
+                variants={beamVariants}
+                animate="animate"
+                style={{ animationDelay: '4s' }}
+              ></motion.div>
+              
+              {/* Enhanced Background bloom effects with more intensity */}
+              <motion.div 
+                className="absolute z-10 w-80 h-80 md:w-96 md:h-96 rounded-full bg-gradient-to-bl from-purple-500/20 to-blue-500/20 blur-3xl top-[30%] left-[50%] -translate-x-1/2 -translate-y-1/2"
+                animate={{ 
+                  opacity: [0.3, 0.7, 0.3],
+                  scale: [1, 1.05, 1]
+                }}
+                transition={{
+                  duration: 8,
+                  repeat: Infinity,
+                  ease: "easeInOut"
+                }}
+              ></motion.div>
+              
+              {/* New nebula effects */}
+              <motion.div 
+                className="absolute h-[400px] w-[400px] rounded-full opacity-10 blur-3xl"
+                style={{ 
+                  background: 'radial-gradient(circle, rgba(139, 92, 246, 0.5) 0%, rgba(16, 185, 129, 0) 70%)',
+                  top: '20%',
+                  left: '20%',
+                }}
+                animate={{ 
+                  scale: [1, 1.1, 1],
+                  opacity: [0.05, 0.1, 0.05] 
+                }}
+                transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
+              />
+              
+              <motion.div 
+                className="absolute h-[300px] w-[300px] rounded-full opacity-10 blur-3xl"
+                style={{ 
+                  background: 'radial-gradient(circle, rgba(59, 130, 246, 0.5) 0%, rgba(16, 185, 129, 0) 70%)',
+                  bottom: '20%',
+                  right: '20%',
+                }}
+                animate={{ 
+                  scale: [1, 1.15, 1],
+                  opacity: [0.05, 0.15, 0.05] 
+                }}
+                transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
+              />
+              
+              {/* Subtle floating particles - enhanced with more particles and optimized with useMemo */}
+              {floatingParticles.map(particle => (
+                <motion.div
+                  key={`particle-${particle.id}`}
+                  className="absolute w-1 h-1 rounded-full bg-white/40"
+                  style={{
+                    left: particle.left,
+                    top: particle.top,
+                  }}
+                  animate={{
+                    y: [0, -15, 0],
+                    opacity: [0.2, 0.7, 0.2]
+                  }}
+                  transition={{
+                    duration: particle.duration,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                    delay: particle.delay
+                  }}
+                />
+              ))}
+            </>
+          )}
+        </div>
         
         {/* Extremely subtle noise texture */}
         <CosmicNoiseOverlay opacity={0.02} />

@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 
 // Import all v4 components
 import SpaceCanvas from '../components/home/v4/SpaceCanvas';
-import NavBar from '../components/NavBar';
+import NavBarCosmic from '../components/home/v4/NavBarCosmic';
 import HeroPortal from '../components/home/v4/HeroPortal';
 import AboutMission from '../components/home/v4/AboutMission';
 import ServicesFloatLayer from '../components/home/ServicesFloatLayer';
@@ -19,35 +19,51 @@ import FooterExperience from '../components/home/v4/FooterExperience';
 // Import SectionHeader component
 import SectionHeader from '../components/ui/SectionHeader.jsx';
 
+// Import SectionAnchor for section IDs and scroll margins
+import SectionAnchor from '../components/ui/SectionAnchor';
+
 // Import ParticleField for floating particles
 import ParticleField from '../components/ui/ParticleField';
+
+// Import CosmicHUD for scroll position and section tracking
+import CosmicHUD from '../components/ui/CosmicHUD';
+
+// Import scroll utilities
+import { registerSmoothScrolling } from '../utils/scrollUtils';
+import { useScroll } from '../context/ScrollContext';
+
+// Import section reveal hook and animation variants
+import { useSectionReveal } from '../hooks/useSectionReveal';
+import { 
+  revealVariants, 
+  revealWithChildrenVariants, 
+  childVariants 
+} from '../utils/animation';
 
 /**
  * Dev page for testing all v4 components
  * Includes navigation to easily access different components
  * Merged with components from main homepage
- * Enhanced with cosmic theme elements
+ * Enhanced with cosmic theme elements and scroll synchronization
  */
 const DevV4CosmicPage = () => {
-  const sections = [
-    { id: 'hero', name: 'Hero Portal', component: HeroPortal },
-    { id: 'about', name: 'About Mission', component: AboutMission },
-    { id: 'agent-powered', name: 'Agent-Powered Development', component: ServicesFloatLayer },
-    { id: 'services', name: 'Services Orbital', component: ServicesOrbital },
-    { id: 'projects', name: 'Projects Section', component: ProjectsSection },
-    { id: 'projects-logbook', name: 'Projects Logbook', component: ProjectsLogbook },
-    { id: 'community', name: 'Community Hub', component: CommunityHub },
-    { id: 'testimonials', name: 'AI Testimonials', component: AITestimonials },
-    { id: 'contact', name: 'Contact Terminal', component: ContactTerminal }
-  ];
-
-  const scrollToSection = (id) => {
-    const element = document.getElementById(id);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
-
+  const { activeSection } = useScroll();
+  
+  // Section reveal hooks for each section
+  const { ref: aboutRef, isVisible: aboutVisible } = useSectionReveal();
+  const { ref: agentRef, isVisible: agentVisible } = useSectionReveal();
+  const { ref: servicesRef, isVisible: servicesVisible } = useSectionReveal();
+  const { ref: projectsRef, isVisible: projectsVisible } = useSectionReveal();
+  const { ref: logbookRef, isVisible: logbookVisible } = useSectionReveal();
+  const { ref: communityRef, isVisible: communityVisible } = useSectionReveal();
+  const { ref: testimonialsRef, isVisible: testimonialsVisible } = useSectionReveal();
+  const { ref: contactRef, isVisible: contactVisible } = useSectionReveal();
+  
+  // Register smooth scrolling for all hash links
+  React.useEffect(() => {
+    registerSmoothScrolling();
+  }, []);
+  
   return (
     <div className="min-h-screen relative bg-black text-white overflow-hidden">
       {/* Enhanced SpaceCanvas with fade to darker color */}
@@ -65,88 +81,124 @@ const DevV4CosmicPage = () => {
       <div className="relative z-10 min-h-screen">
         {/* Fixed header with component navigation - Hidden in Cosmic mode */}
         <header className="fixed top-0 left-0 w-full bg-transparent z-40">
-          {/* Navbar without borders */}
-          <NavBar />
+          {/* Using NavBarCosmic component with scroll sync */}
+          <NavBarCosmic />
         </header>
+        
+        {/* Cosmic HUD for position tracking */}
+        <CosmicHUD position="bottom-right" />
         
         {/* Main content with all components */}
         <main>
           {/* Hero Section - Transparent background to show stars */}
           <div className="bg-transparent">
-            <section 
+            <SectionAnchor 
               id="hero"
               className="relative"
+              scrollMargin={0}
             >
               <HeroPortal />
-            </section>
+            </SectionAnchor>
           </div>
           
           {/* About Section - Transparent to show stars */}
           <div className="bg-transparent relative">
             <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/10 z-0"></div>
-            <section 
+            <SectionAnchor 
               id="about"
-              className="py-16 md:py-20 scroll-mt-20 relative z-10"
+              className="py-16 md:py-20 relative z-10"
+              scrollMargin={8}
             >
               <div className="container mx-auto px-4">
                 <SectionHeader 
                   title="OUR MISSION" 
                   subtitle="Transforming development through AI innovation and community collaboration."
                 />
-                <AboutMission />
+                <motion.div
+                  ref={aboutRef}
+                  initial="hidden"
+                  animate={aboutVisible ? "visible" : "hidden"}
+                  variants={revealVariants}
+                >
+                  <AboutMission />
+                </motion.div>
               </div>
-            </section>
+            </SectionAnchor>
           </div>
           
           {/* Agent-Powered Development - Very subtle gradient overlay on stars */}
           <div className="bg-transparent relative">
             <div className="absolute inset-0 bg-gradient-to-b from-black/10 to-black/20 z-0"></div>
-            <section 
+            <SectionAnchor 
               id="agent-powered"
-              className="scroll-mt-20 py-16 md:py-20 relative z-10"
+              className="py-16 md:py-20 relative z-10"
+              scrollMargin={8}
             >
               <div className="container mx-auto px-4">
                 <SectionHeader 
                   title="WHY AI-POWERED DEV?" 
                   subtitle="Harnessing intelligent agents to solve complex coding challenges with speed and precision."
                 />
-                <ServicesFloatLayer />
+                <motion.div
+                  ref={agentRef}
+                  initial="hidden"
+                  animate={agentVisible ? "visible" : "hidden"}
+                  variants={revealVariants}
+                >
+                  <ServicesFloatLayer />
+                </motion.div>
               </div>
-            </section>
+            </SectionAnchor>
           </div>
           
           {/* Services Orbital - Subtle gradient overlay on stars with increasing opacity */}
           <div className="bg-transparent relative">
             <div className="absolute inset-0 bg-gradient-to-b from-black/20 to-black/30 z-0"></div>
-            <section 
+            <SectionAnchor 
               id="services"
-              className="py-16 md:py-20 scroll-mt-20 relative z-10"
+              className="py-16 md:py-20 relative z-10"
+              scrollMargin={8}
             >
               <div className="container mx-auto px-4">
                 <SectionHeader 
                   title="OUR SERVICES" 
                   subtitle="A constellation of solutions to power your development workflow."
                 />
-                <ServicesOrbital />
+                <motion.div
+                  ref={servicesRef}
+                  initial="hidden"
+                  animate={servicesVisible ? "visible" : "hidden"}
+                  variants={revealVariants}
+                >
+                  <ServicesOrbital />
+                </motion.div>
               </div>
-            </section>
+            </SectionAnchor>
           </div>
           
           {/* Projects Section - Further transition to dark background */}
           <div className="bg-transparent relative">
             <div className="absolute inset-0 bg-gradient-to-b from-black/30 to-[#0d0d12]/70 z-0"></div>
-            <section 
+            <SectionAnchor 
               id="projects"
-              className="py-16 md:py-20 scroll-mt-20 relative z-10"
+              className="py-16 md:py-20 relative z-10"
+              scrollMargin={8}
             >
               <div className="container mx-auto px-4">
                 <SectionHeader 
                   title="FEATURED PROJECTS" 
                   subtitle="Discover our latest innovations and client success stories."
                 />
-                <ProjectsSection />
+                <motion.div
+                  ref={projectsRef}
+                  initial="hidden"
+                  animate={projectsVisible ? "visible" : "hidden"}
+                  variants={revealVariants}
+                >
+                  <ProjectsSection />
+                </motion.div>
               </div>
-            </section>
+            </SectionAnchor>
           </div>
           
           {/* Projects Logbook - Complete transition to solid dark background */}
@@ -154,66 +206,98 @@ const DevV4CosmicPage = () => {
             {/* Add downward-moving particles for the lower sections */}
             <ParticleField density="low" yDirection="down" zIndex={1} />
             
-            <section 
+            <SectionAnchor 
               id="projects-logbook"
-              className="py-16 md:py-20 scroll-mt-20"
+              className="py-16 md:py-20"
+              scrollMargin={8}
             >
               <div className="container mx-auto px-4">
                 <SectionHeader 
                   title="MISSION LOGBOOK" 
                   subtitle="Documenting our journey through the code universe."
                 />
-                <ProjectsLogbook />
+                <motion.div
+                  ref={logbookRef}
+                  initial="hidden"
+                  animate={logbookVisible ? "visible" : "hidden"}
+                  variants={revealWithChildrenVariants}
+                >
+                  <ProjectsLogbook />
+                </motion.div>
               </div>
-            </section>
+            </SectionAnchor>
           </div>
           
           {/* Community Hub - Gradient back to gray-900 */}
           <div className="bg-gradient-to-b from-[#0d0d12] to-gray-900">
-            <section 
+            <SectionAnchor 
               id="community"
-              className="py-16 md:py-20 scroll-mt-20"
+              className="py-16 md:py-20"
+              scrollMargin={8}
             >
               <div className="container mx-auto px-4">
                 <SectionHeader 
                   title="JOIN OUR WORLD" 
                   subtitle="Be part of a growing community of developers, innovators, and creators."
                 />
-                <CommunityHub />
+                <motion.div
+                  ref={communityRef}
+                  initial="hidden"
+                  animate={communityVisible ? "visible" : "hidden"}
+                  variants={revealWithChildrenVariants}
+                >
+                  <CommunityHub />
+                </motion.div>
               </div>
-            </section>
+            </SectionAnchor>
           </div>
           
           {/* AI Testimonials - Gray-900 background */}
           <div className="bg-gray-900">
-            <section 
+            <SectionAnchor 
               id="testimonials"
-              className="py-16 md:py-20 scroll-mt-20"
+              className="py-16 md:py-20"
+              scrollMargin={8}
             >
               <div className="container mx-auto px-4">
                 <SectionHeader 
                   title="HEAR FROM OUR AI" 
                   subtitle="What our artificial teammates have to say about working with us."
                 />
-                <AITestimonials />
+                <motion.div
+                  ref={testimonialsRef}
+                  initial="hidden"
+                  animate={testimonialsVisible ? "visible" : "hidden"}
+                  variants={revealWithChildrenVariants}
+                >
+                  <AITestimonials />
+                </motion.div>
               </div>
-            </section>
+            </SectionAnchor>
           </div>
           
           {/* Contact Terminal - Gradient to black for footer */}
           <div className="bg-gradient-to-b from-gray-900 to-black">
-            <section 
+            <SectionAnchor 
               id="contact"
-              className="py-16 md:py-20 scroll-mt-20"
+              className="py-16 md:py-20"
+              scrollMargin={8}
             >
               <div className="container mx-auto px-4">
                 <SectionHeader 
                   title="REACH OUT" 
                   subtitle="Let's build something amazing together."
                 />
-                <ContactTerminal />
+                <motion.div
+                  ref={contactRef}
+                  initial="hidden"
+                  animate={contactVisible ? "visible" : "hidden"}
+                  variants={revealVariants}
+                >
+                  <ContactTerminal />
+                </motion.div>
               </div>
-            </section>
+            </SectionAnchor>
           </div>
           
           {/* Footer Section - Using the new enhanced FooterExperience */}
