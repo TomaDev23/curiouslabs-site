@@ -159,10 +159,10 @@ export default function NavBar() {
           {/* V4 Cosmic Preview link - only visible in development */}
           {isDevelopment && (
             <Link 
-              to="/v4" 
-              className={`text-xs text-purple-400 opacity-60 hover:opacity-100 hover:text-purple-300 transition ${location.pathname === '/v4' ? 'text-purple-300 opacity-100' : ''}`}
+              to="/legacy-home" 
+              className={`text-xs text-purple-400 opacity-60 hover:opacity-100 hover:text-purple-300 transition ${location.pathname === '/legacy-home' ? 'text-purple-300 opacity-100' : ''}`}
             >
-              V4 Preview
+              Legacy Home
             </Link>
           )}
         </div>
@@ -289,10 +289,10 @@ export default function NavBar() {
             {/* V4 Cosmic Preview link for mobile - only visible in development */}
             {isDevelopment && (
               <Link 
-                to="/v4" 
-                className={`block py-2 text-purple-400 text-sm opacity-60 hover:opacity-100 hover:text-purple-300 ${location.pathname === '/v4' ? 'text-purple-300 opacity-100' : ''}`}
+                to="/legacy-home" 
+                className={`block py-2 text-purple-400 text-sm opacity-60 hover:opacity-100 hover:text-purple-300 ${location.pathname === '/legacy-home' ? 'text-purple-300 opacity-100' : ''}`}
               >
-                V4 Preview
+                Legacy Home
               </Link>
             )}
           </div>

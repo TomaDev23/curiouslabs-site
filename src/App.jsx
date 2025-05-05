@@ -36,7 +36,17 @@ export default function App() {
     <>
       <ScrollToTop />
       <Routes>
-        <Route path="/" element={<Home />} />
+        {/* Promote DevV4CosmicPage as the main homepage */}
+        <Route path="/" element={
+          <Suspense fallback={<LoadingFallback />}>
+            <DevV4CosmicPage />
+          </Suspense>
+        } />
+        
+        {/* Legacy home route - moved to /legacy-home to preserve access */}
+        {/* <Route path="/" element={<Home />} /> */}
+        <Route path="/legacy-home" element={<Home />} />
+        
         <Route path="/products" element={
           <Suspense fallback={<LoadingFallback />}>
             <ProductsPortal />

@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 
 // Import all v4 components
 import SpaceCanvas from '../components/home/v4/SpaceCanvas';
-import NavBarCosmic from '../components/home/v4/NavBarCosmic';
+// import NavBarCosmic from '../components/home/v4/NavBarCosmic';
 import HeroPortal from '../components/home/v4/HeroPortal';
 import AboutMission from '../components/home/v4/AboutMission';
 import ServicesFloatLayer from '../components/home/ServicesFloatLayer';
@@ -15,6 +15,9 @@ import AITestimonials from '../components/home/v4/AITestimonials';
 import ContactTerminal from '../components/home/v4/ContactTerminal';
 import CuriousBotEnhanced from '../components/home/v4/CuriousBotEnhanced';
 import FooterExperience from '../components/home/v4/FooterExperience';
+
+// Import global NavBar for consistent site navigation
+import NavBar from '../components/NavBar';
 
 // Import SectionHeader component
 import SectionHeader from '../components/ui/SectionHeader.jsx';
@@ -82,11 +85,8 @@ const DevV4CosmicPage = () => {
       </div>
       
       <div className="relative z-10 min-h-screen">
-        {/* Fixed header with component navigation - Hidden in Cosmic mode */}
-        <header className="fixed top-0 left-0 w-full bg-transparent z-40">
-          {/* Using NavBarCosmic component with scroll sync */}
-          <NavBarCosmic />
-        </header>
+        {/* Fixed header with site-wide navigation */}
+        <NavBar />
         
         {/* Cosmic HUD for position tracking */}
         <CosmicHUD position="bottom-left" />
@@ -97,8 +97,8 @@ const DevV4CosmicPage = () => {
           <div className="bg-transparent">
             <SectionAnchor 
               id="hero"
-              className="relative"
-              scrollMargin={0}
+              className="relative pt-16 md:pt-18"
+              scrollMargin={60}
             >
               <HeroPortal />
             </SectionAnchor>
