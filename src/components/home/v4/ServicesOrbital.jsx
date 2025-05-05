@@ -143,35 +143,38 @@ const ServicesOrbital = () => {
     >
       {/* Enhanced background gradients with more atmospheric effect */}
       <div className="absolute inset-0 bg-gray-900/90"></div>
-      <div className="absolute inset-0 bg-gradient-to-b from-gray-900/0 via-purple-900/20 to-gray-900/0"></div>
+      <div className="absolute inset-0 bg-gradient-to-b from-gray-900/0 via-curious-purple-900/20 to-gray-900/0"></div>
       
-      {/* Ambient floating particles */}
-      {[...Array(15)].map((_, i) => (
-        <motion.div
-          key={`ambient-particle-${i}`}
-          className="absolute w-1 h-1 rounded-full bg-purple-400/30"
-          style={{
-            left: `${Math.random() * 100}%`,
-            top: `${Math.random() * 100}%`,
-          }}
-          animate={{
-            y: [0, -30, 0],
-            opacity: [0.1, 0.3, 0.1],
-            scale: [1, 1.5, 1]
-          }}
-          transition={{
-            duration: 8 + Math.random() * 10,
-            repeat: Infinity,
-            ease: "easeInOut",
-            delay: Math.random() * 5
-          }}
-        />
-      ))}
+      {/* Standardized nebula positioning - one top-right */}
+      <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-curious-purple-600/20 via-curious-blue-400/10 to-transparent rounded-full filter blur-[80px] opacity-30"></div>
+      
+      {/* Standardized nebula positioning - one bottom-left */}
+      <div className="absolute bottom-0 left-0 w-96 h-96 bg-gradient-to-tr from-curious-blue-600/20 via-curious-purple-400/10 to-transparent rounded-full filter blur-[80px] opacity-30"></div>
+      
+      {/* Ambient floating particles - standardized */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {[...Array(12)].map((_, i) => (
+          <div 
+            key={i}
+            className="absolute w-[2px] h-[2px] rounded-full bg-white opacity-40"
+            style={{
+              top: `${Math.random() * 100}%`,
+              left: `${Math.random() * 100}%`,
+              animation: `float-y ${2 + Math.random() * 3}s ease-in-out infinite alternate`
+            }}
+          ></div>
+        ))}
+      </div>
       
       {/* Enhanced noise texture */}
       <CosmicNoiseOverlay opacity={0.02} blendMode="overlay" />
       
       <div className="container mx-auto px-4 relative z-10">
+        {/* Standardized primary heading */}
+        <h2 className="text-4xl md:text-5xl font-extrabold bg-gradient-to-r from-curious-purple-400 to-curious-blue-400 bg-clip-text text-transparent text-center mb-12">
+          Our Services
+        </h2>
+        
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-12 items-center">
           {/* Orbital System - Left side */}
           <motion.div 
@@ -184,7 +187,7 @@ const ServicesOrbital = () => {
                 <>
                   {/* Enhanced central core with improved glow */}
                   <motion.div 
-                    className={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 ${isMobile ? 'w-[90px] h-[90px]' : 'w-[120px] h-[120px]'} rounded-full bg-gradient-to-br from-purple-900/80 to-blue-900/80 border border-purple-500/50 backdrop-blur-md z-20 flex items-center justify-center`}
+                    className={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 ${isMobile ? 'w-[90px] h-[90px]' : 'w-[120px] h-[120px]'} rounded-full bg-gradient-to-br from-curious-purple-900/80 to-curious-blue-900/80 border border-curious-purple-500/50 backdrop-blur-md z-20 flex items-center justify-center`}
                     animate={{ 
                       boxShadow: [
                         '0 0 20px 5px rgba(124, 58, 237, 0.3)', 
@@ -192,22 +195,34 @@ const ServicesOrbital = () => {
                         '0 0 20px 5px rgba(124, 58, 237, 0.3)'
                       ]
                     }}
-                    transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                    transition={{ 
+                      duration: 1.5,
+                      repeat: Infinity, 
+                      ease: [0.33, 1, 0.68, 1]
+                    }}
                   >
                     <div className="text-3xl">🧠</div>
                     <motion.div 
-                      className="absolute w-full h-full rounded-full border-2 border-dashed border-purple-500/30"
+                      className="absolute w-full h-full rounded-full border-2 border-dashed border-curious-purple-500/30"
                       animate={{ rotate: 360 }}
-                      transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                      transition={{ 
+                        duration: 10,
+                        repeat: Infinity, 
+                        ease: "linear" 
+                      }}
                     ></motion.div>
                     
                     {/* Core inner glow */}
                     <motion.div 
-                      className="absolute inset-0 rounded-full bg-purple-500/10"
+                      className="absolute inset-0 rounded-full bg-curious-purple-500/10"
                       animate={{ 
                         opacity: [0.3, 0.6, 0.3]
                       }}
-                      transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                      transition={{ 
+                        duration: 1,
+                        repeat: Infinity, 
+                        ease: [0.33, 1, 0.68, 1]
+                      }}
                     ></motion.div>
                   </motion.div>
                   
@@ -223,7 +238,7 @@ const ServicesOrbital = () => {
                   
                   {/* Secondary orbital path for depth */}
                   <motion.div 
-                    className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 rounded-full border border-purple-500/10"
+                    className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 rounded-full border border-curious-purple-500/10"
                     style={{ 
                       width: '85%', 
                       height: '85%',
@@ -234,28 +249,28 @@ const ServicesOrbital = () => {
                   {/* Pulsing rings emanating from center */}
                   <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full h-full">
                     <motion.div
-                      className="absolute inset-0 rounded-full border border-purple-500/5"
+                      className="absolute inset-0 rounded-full border border-curious-purple-500/5"
                       animate={{
                         scale: [1, 1.5],
                         opacity: [0.5, 0]
                       }}
                       transition={{
-                        duration: 3,
+                        duration: 1.5,
                         repeat: Infinity,
-                        ease: "easeOut"
+                        ease: [0.33, 1, 0.68, 1]
                       }}
                     />
                     <motion.div
-                      className="absolute inset-0 rounded-full border border-purple-500/5"
+                      className="absolute inset-0 rounded-full border border-curious-purple-500/5"
                       animate={{
                         scale: [1, 1.5],
                         opacity: [0.5, 0]
                       }}
                       transition={{
-                        duration: 3,
+                        duration: 1.5,
                         repeat: Infinity,
-                        ease: "easeOut",
-                        delay: 1
+                        ease: [0.33, 1, 0.68, 1],
+                        delay: 0.5
                       }}
                     />
                   </div>
@@ -360,11 +375,11 @@ const ServicesOrbital = () => {
                           opacity: [0, 0.8, 0]
                         }}
                         transition={{
-                          duration: 1 + (i * 0.2),
-                          ease: "easeInOut",
+                          duration: 0.5 + (i * 0.1),
+                          ease: [0.33, 1, 0.68, 1],
                           repeat: Infinity,
-                          repeatDelay: 0.2 * i,
-                          delay: 0.1 * i
+                          repeatDelay: 0.1 * i,
+                          delay: 0.05 * i
                         }}
                       />
                     ))}
@@ -374,15 +389,15 @@ const ServicesOrbital = () => {
                       {/* Main gradient for the rotating line */}
                       <linearGradient id="line-gradient" gradientUnits="userSpaceOnUse"
                         x1={centerPoint} y1={centerPoint} x2={currentPos.x} y2={currentPos.y}>
-                        <stop offset="0%" stopColor="#6D28D9" stopOpacity="0.1" />
-                        <stop offset="100%" stopColor="#6D28D9" stopOpacity="0.8" />
+                        <stop offset="0%" stopColor="#7C3AED" stopOpacity="0.1" />
+                        <stop offset="100%" stopColor="#7C3AED" stopOpacity="0.8" />
                       </linearGradient>
                       
                       {/* Service-specific gradients */}
                       {services.map((service) => (
                         <linearGradient key={`gradient-${service.id}`} id={`gradient-${service.id}`} gradientTransform="rotate(90)">
-                          <stop offset="0%" stopColor="#6D28D9" stopOpacity="0.1" />
-                          <stop offset="100%" stopColor="#6D28D9" stopOpacity="0.8" />
+                          <stop offset="0%" stopColor="#7C3AED" stopOpacity="0.1" />
+                          <stop offset="100%" stopColor="#7C3AED" stopOpacity="0.8" />
                         </linearGradient>
                       ))}
                     </defs>
@@ -413,41 +428,57 @@ const ServiceDetailsPanel = memo(({ services, activeService, handleServiceClick 
       className="order-1 lg:order-2"
       variants={itemVariants}
     >
-      <div className="bg-gray-900/50 backdrop-blur-md border border-gray-700/50 rounded-2xl p-6 md:p-8">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={`service-${service.id}`}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.4, ease: "easeOut" }}
-            className="flex flex-col h-full"
-          >
-            <div className="flex items-center mb-6">
-              <div className={`flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br ${service.color} mr-4`}>
-                <span className="text-2xl">{service.icon}</span>
+      <div className="bg-gray-800/70 backdrop-blur-md border border-gray-700 rounded-xl group relative overflow-hidden">
+        {/* Glow layer */}
+        <div className="absolute inset-0 -z-10 bg-curious-purple-500 blur-xl opacity-0 group-hover:opacity-30 transition-opacity duration-300"></div>
+        
+        {/* Terminal header */}
+        <div className="bg-gray-900 py-2 px-4 flex items-center">
+          <div className="flex space-x-2 mr-4">
+            <div className="w-2 h-2 rounded-full bg-red-500"></div>
+            <div className="w-2 h-2 rounded-full bg-yellow-500"></div>
+            <div className="w-2 h-2 rounded-full bg-green-500"></div>
+          </div>
+          <div className="font-mono text-xs text-gray-400">./services/{service.title.toLowerCase()}</div>
+        </div>
+        
+        <div className="p-6 md:p-8">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={`service-${service.id}`}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.5, ease: "easeOut" }}
+              className="flex flex-col h-full"
+              whileHover={{ y: -10 }}
+            >
+              <div className="flex items-center mb-6">
+                <div className={`flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br ${service.color} mr-4`}>
+                  <span className="text-2xl">{service.icon}</span>
+                </div>
+                <h3 className="text-2xl md:text-3xl font-semibold text-gray-100">{service.title}</h3>
               </div>
-              <h3 className="text-2xl font-bold">{service.title}</h3>
-            </div>
-            
-            <p className="text-gray-300 mb-8 flex-grow">{service.description}</p>
-            
-            <div className="flex flex-wrap gap-3 mt-auto">
-              {services.map((s, i) => (
-                <button
-                  key={s.id}
-                  onClick={() => handleServiceClick(i)}
-                  className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                    i === activeService 
-                      ? `bg-gradient-to-r ${s.color} w-6` 
-                      : 'bg-gray-600 hover:bg-gray-500'
-                  }`}
-                  aria-label={`View ${s.title}`}
-                />
-              ))}
-            </div>
-          </motion.div>
-        </AnimatePresence>
+              
+              <p className="text-base md:text-lg text-gray-300 leading-relaxed mb-8 flex-grow">{service.description}</p>
+              
+              <div className="flex flex-wrap gap-3 mt-auto">
+                {services.map((s, i) => (
+                  <button
+                    key={s.id}
+                    onClick={() => handleServiceClick(i)}
+                    className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                      i === activeService 
+                        ? `bg-gradient-to-r ${s.color} w-6` 
+                        : 'bg-gray-600 hover:bg-gray-500'
+                    }`}
+                    aria-label={`View ${s.title}`}
+                  />
+                ))}
+              </div>
+            </motion.div>
+          </AnimatePresence>
+        </div>
       </div>
     </motion.div>
   );

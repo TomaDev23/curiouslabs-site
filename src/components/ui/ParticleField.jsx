@@ -21,10 +21,12 @@ const ParticleField = ({
   // Canvas references
   const canvasRef = useRef(null);
   const animationRef = useRef(null);
+  const frameCountRef = useRef(0); // Track frame count for throttling
   
   // State for tracking visibility and errors
   const [isVisible, setIsVisible] = useState(true);
   const [hasError, setHasError] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false); // Track if user has scrolled
   
   // Check if we're on the client side
   const isClient = typeof window !== 'undefined';
@@ -118,6 +120,18 @@ const ParticleField = ({
     if (!canvasRef.current || !isVisible || !isClient) return;
     
     try {
+      // Throttle rendering on initial load to reduce DOM pressure
+      if (!isScrolled && frameCountRef.current < 60) {
+        // Only render every other frame during initial load
+        if (frameCountRef.current % 2 !== 0) {
+          frameCountRef.current++;
+          animationRef.current = requestAnimationFrame(animate);
+          return;
+        }
+      }
+      
+      frameCountRef.current++;
+      
       const canvas = canvasRef.current;
       const ctx = canvas.getContext('2d');
       const width = canvas.width;
@@ -210,6 +224,17 @@ const ParticleField = ({
     try {
       handleResize();
       window.addEventListener('resize', handleResize);
+      
+      // Add scroll listener to detect when user has scrolled
+      const handleScroll = () => {
+        if (!isScrolled && window.scrollY > 50) {
+          setIsScrolled(true);
+        }
+      };
+      
+      window.addEventListener('scroll', handleScroll, { passive: true });
+      
+      // Start animation loop
       animate();
       
       // Observer to pause animation when not visible
@@ -242,6 +267,7 @@ const ParticleField = ({
     return () => {
       isMounted = false;
       window.removeEventListener('resize', handleResize);
+      window.removeEventListener('scroll', handleScroll);
       if (animationRef.current) {
         cancelAnimationFrame(animationRef.current);
       }

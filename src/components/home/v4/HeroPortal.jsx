@@ -18,6 +18,7 @@ import LazyImage from '../../ui/LazyImage';
  * Features animated portal effect and particle systems with responsive excellence
  * Now includes typing animation and enhanced visual effects
  * Optimized with React.memo, useMemo, useCallback and lazy loading
+ * Animation durations reduced by ~50% for improved performance
  */
 const HeroPortal = () => {
   // Performance monitoring
@@ -80,13 +81,13 @@ const HeroPortal = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [handleScroll]);
   
-  // Light beam animation variants
+  // Light beam animation variants with reduced duration
   const beamVariants = useMemo(() => ({
     animate: {
       opacity: [0.2, 0.4, 0.2],
       scale: [1, 1.1, 1],
       transition: {
-        duration: 8,
+        duration: 4, // Reduced from 8s
         repeat: Infinity,
         ease: "easeInOut"
       }
@@ -101,8 +102,8 @@ const HeroPortal = () => {
       left: `${Math.random() * 100}%`,
       opacity: Math.random() * 0.7 + 0.3,
       size: Math.random() * 2 + 1,
-      duration: 3 + Math.random() * 5,
-      delay: Math.random() * 2
+      duration: 1.5 + Math.random() * 2.5, // Reduced from 3-8s to 1.5-4s
+      delay: Math.random() * 1 // Reduced delay
     }));
   }, [isMobile]);
   
@@ -112,8 +113,8 @@ const HeroPortal = () => {
       id: i,
       left: `${10 + Math.random() * 80}%`,
       top: `${10 + Math.random() * 80}%`,
-      duration: 3 + Math.random() * 5,
-      delay: Math.random() * 2
+      duration: 1.5 + Math.random() * 2.5, // Reduced from 3-8s to 1.5-4s
+      delay: Math.random() * 1 // Reduced delay
     }));
   }, [isMobile]);
   
@@ -186,7 +187,7 @@ const HeroPortal = () => {
         <div ref={effectsRef} className="absolute inset-0 pointer-events-none">
           {shouldRenderEffects && (
             <>
-              {/* Enhanced Light beams with more intensity and animation */}
+              {/* Enhanced Light beams with more intensity and animation - durations reduced */}
               <motion.div 
                 className="absolute w-1 h-[600px] bg-purple-500/15 blur-xl rotate-[15deg] left-1/4 top-1/3"
                 variants={beamVariants}
@@ -197,7 +198,7 @@ const HeroPortal = () => {
                 className="absolute w-1 h-[500px] bg-blue-500/15 blur-xl -rotate-[20deg] right-1/4 top-2/3"
                 variants={beamVariants}
                 animate="animate"
-                style={{ animationDelay: '2s' }}
+                style={{ animationDelay: '1s' }}
               ></motion.div>
               
               {/* New additional light beam */}
@@ -205,7 +206,7 @@ const HeroPortal = () => {
                 className="absolute w-1 h-[400px] bg-purple-400/10 blur-xl rotate-[45deg] right-1/3 top-1/4"
                 variants={beamVariants}
                 animate="animate"
-                style={{ animationDelay: '4s' }}
+                style={{ animationDelay: '2s' }}
               ></motion.div>
               
               {/* Enhanced Background bloom effects with more intensity */}
@@ -216,13 +217,13 @@ const HeroPortal = () => {
                   scale: [1, 1.05, 1]
                 }}
                 transition={{
-                  duration: 8,
+                  duration: 4, // Reduced from 8s
                   repeat: Infinity,
-                  ease: "easeInOut"
+                  ease: [0.33, 1, 0.68, 1] // Standardized cubic-bezier
                 }}
               ></motion.div>
               
-              {/* New nebula effects */}
+              {/* New nebula effects with reduced durations */}
               <motion.div 
                 className="absolute h-[400px] w-[400px] rounded-full opacity-10 blur-3xl"
                 style={{ 
@@ -234,7 +235,11 @@ const HeroPortal = () => {
                   scale: [1, 1.1, 1],
                   opacity: [0.05, 0.1, 0.05] 
                 }}
-                transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
+                transition={{ 
+                  duration: 8, // Reduced from 15s
+                  repeat: Infinity, 
+                  ease: [0.33, 1, 0.68, 1] // Standardized cubic-bezier
+                }}
               />
               
               <motion.div 
@@ -248,7 +253,11 @@ const HeroPortal = () => {
                   scale: [1, 1.15, 1],
                   opacity: [0.05, 0.15, 0.05] 
                 }}
-                transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
+                transition={{ 
+                  duration: 10, // Reduced from 20s
+                  repeat: Infinity, 
+                  ease: [0.33, 1, 0.68, 1] // Standardized cubic-bezier
+                }}
               />
               
               {/* Subtle floating particles - enhanced with more particles and optimized with useMemo */}
@@ -267,7 +276,7 @@ const HeroPortal = () => {
                   transition={{
                     duration: particle.duration,
                     repeat: Infinity,
-                    ease: "easeInOut",
+                    ease: [0.33, 1, 0.68, 1], // Standardized cubic-bezier
                     delay: particle.delay
                   }}
                 />
@@ -395,14 +404,22 @@ const HeroPortal = () => {
             className="absolute bottom-10 left-1/2 transform -translate-x-1/2"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 0.7, y: 0 }}
-            transition={{ duration: 1, delay: 2 }}
+            transition={{ 
+              duration: 0.5, // Reduced from 1s
+              delay: 1, // Reduced from 2s
+              ease: [0.33, 1, 0.68, 1] // Standardized cubic-bezier
+            }}
             aria-label="Scroll down"
             role="button"
             tabIndex={0}
           >
             <motion.div
               animate={{ y: [0, -10, 0] }}
-              transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+              transition={{ 
+                duration: 1, // Reduced from 2s
+                repeat: Infinity, 
+                ease: "easeInOut" 
+              }}
             >
               <svg className="w-8 h-8 text-white opacity-80" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
                 <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />

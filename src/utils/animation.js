@@ -7,10 +7,10 @@ export const sectionVariants = {
     opacity: 1, 
     y: 0,
     transition: { 
-      duration: 0.8,
-      ease: "easeOut",
+      duration: 0.5,
+      ease: [0.33, 1, 0.68, 1],
       when: "beforeChildren",
-      staggerChildren: 0.1
+      staggerChildren: 0.05
     }
   }
 };
@@ -21,7 +21,10 @@ export const itemVariants = {
   visible: { 
     opacity: 1, 
     y: 0,
-    transition: { duration: 0.5 }
+    transition: { 
+      duration: 0.4,
+      ease: [0.33, 1, 0.68, 1]
+    }
   }
 };
 
@@ -38,8 +41,8 @@ export const revealVariants = {
     opacity: 1,
     y: 0,
     transition: {
-      duration: 0.6,
-      ease: 'easeOut'
+      duration: 0.5,
+      ease: [0.33, 1, 0.68, 1]
     }
   }
 };
@@ -57,9 +60,9 @@ export const revealWithChildrenVariants = {
     opacity: 1,
     y: 0,
     transition: {
-      duration: 0.6,
-      ease: 'easeOut',
-      staggerChildren: 0.15
+      duration: 0.4,
+      ease: [0.33, 1, 0.68, 1],
+      staggerChildren: 0.1
     }
   }
 };
@@ -76,8 +79,8 @@ export const childVariants = {
     opacity: 1,
     y: 0,
     transition: {
-      duration: 0.5,
-      ease: 'easeOut'
+      duration: 0.4,
+      ease: [0.33, 1, 0.68, 1]
     }
   }
 };

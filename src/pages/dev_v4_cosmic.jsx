@@ -1,38 +1,30 @@
-import React from 'react';
+import React, { Suspense, lazy, useEffect } from 'react';
 import { motion } from 'framer-motion';
 
-// Import all v4 components
+// Always import SpaceCanvas eagerly for critical visual first paint
 import SpaceCanvas from '../components/home/v4/SpaceCanvas';
-// import NavBarCosmic from '../components/home/v4/NavBarCosmic';
-import HeroPortal from '../components/home/v4/HeroPortal';
-import AboutMission from '../components/home/v4/AboutMission';
-import ServicesFloatLayer from '../components/home/ServicesFloatLayer';
-import ProjectsSection from '../components/home/ProjectsSection';
-import ServicesOrbital from '../components/home/v4/ServicesOrbital';
-import ProjectsLogbook from '../components/home/v4/ProjectsLogbook';
-import CommunityHub from '../components/home/v4/CommunityHub';
-import AITestimonials from '../components/home/v4/AITestimonials';
-import ContactTerminal from '../components/home/v4/ContactTerminal';
-import CuriousBotEnhanced from '../components/home/v4/CuriousBotEnhanced';
-import FooterExperience from '../components/home/v4/FooterExperience';
-
-// Import global NavBar for consistent site navigation
+// Eagerly load NavBar for navigation
 import NavBar from '../components/NavBar';
-
-// Import SectionHeader component
+// Eagerly load HeroPortal for immediate visible content
+import HeroPortal from '../components/home/v4/HeroPortal';
+// Eagerly load UI components essential for layout
 import SectionHeader from '../components/ui/SectionHeader.jsx';
-
-// Import SectionAnchor for section IDs and scroll margins
 import SectionAnchor from '../components/ui/SectionAnchor';
-
-// Import ParticleField for floating particles
 import ParticleField from '../components/ui/ParticleField';
-
-// Import CosmicHUD for scroll position and section tracking
 import CosmicHUD from '../components/ui/CosmicHUD';
-
-// Import ScrollToTop component
 import ScrollToTop from '../components/ScrollToTop';
+
+// Lazy load all other components which aren't needed for initial paint
+const AboutMission = lazy(() => import('../components/home/v4/AboutMission'));
+const ServicesFloatLayer = lazy(() => import('../components/home/ServicesFloatLayer'));
+const ProjectsSection = lazy(() => import('../components/home/ProjectsSection'));
+const ServicesOrbital = lazy(() => import('../components/home/v4/ServicesOrbital'));
+const ProjectsLogbook = lazy(() => import('../components/home/v4/ProjectsLogbook'));
+const CommunityHub = lazy(() => import('../components/home/v4/CommunityHub'));
+const AITestimonials = lazy(() => import('../components/home/v4/AITestimonials'));
+const ContactTerminal = lazy(() => import('../components/home/v4/ContactTerminal'));
+const CuriousBotEnhanced = lazy(() => import('../components/home/v4/CuriousBotEnhanced'));
+const FooterExperience = lazy(() => import('../components/home/v4/FooterExperience'));
 
 // Import scroll utilities
 import { registerSmoothScrolling } from '../utils/scrollUtils';
@@ -66,7 +58,7 @@ const DevV4CosmicPage = () => {
   const { ref: contactRef, isVisible: contactVisible } = useSectionReveal();
   
   // Register smooth scrolling for all hash links
-  React.useEffect(() => {
+  useEffect(() => {
     registerSmoothScrolling();
   }, []);
   
@@ -109,7 +101,7 @@ const DevV4CosmicPage = () => {
             <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/10 z-0"></div>
             <SectionAnchor 
               id="about"
-              className="py-16 md:py-20 relative z-10"
+              className="py-16 md:py-20 relative z-10 min-h-[400px]"
               scrollMargin={8}
             >
               <div className="container mx-auto px-4">
@@ -117,14 +109,16 @@ const DevV4CosmicPage = () => {
                   title="OUR MISSION" 
                   subtitle="Transforming development through AI innovation and community collaboration."
                 />
-                <motion.div
-                  ref={aboutRef}
-                  initial="hidden"
-                  animate={aboutVisible ? "visible" : "hidden"}
-                  variants={revealVariants}
-                >
-                  <AboutMission />
-                </motion.div>
+                <Suspense fallback={<div className="h-[300px] w-full bg-transparent"></div>}>
+                  <motion.div
+                    ref={aboutRef}
+                    initial="hidden"
+                    animate={aboutVisible ? "visible" : "hidden"}
+                    variants={revealVariants}
+                  >
+                    <AboutMission />
+                  </motion.div>
+                </Suspense>
               </div>
             </SectionAnchor>
           </div>
@@ -134,7 +128,7 @@ const DevV4CosmicPage = () => {
             <div className="absolute inset-0 bg-gradient-to-b from-black/10 to-black/20 z-0"></div>
             <SectionAnchor 
               id="agent-powered"
-              className="py-16 md:py-20 relative z-10"
+              className="py-16 md:py-20 relative z-10 min-h-[500px]"
               scrollMargin={8}
             >
               <div className="container mx-auto px-4">
@@ -142,14 +136,16 @@ const DevV4CosmicPage = () => {
                   title="WHY AI-POWERED DEV?" 
                   subtitle="Harnessing intelligent agents to solve complex coding challenges with speed and precision."
                 />
-                <motion.div
-                  ref={agentRef}
-                  initial="hidden"
-                  animate={agentVisible ? "visible" : "hidden"}
-                  variants={revealVariants}
-                >
-                  <ServicesFloatLayer />
-                </motion.div>
+                <Suspense fallback={<div className="h-[400px] w-full bg-transparent"></div>}>
+                  <motion.div
+                    ref={agentRef}
+                    initial="hidden"
+                    animate={agentVisible ? "visible" : "hidden"}
+                    variants={revealVariants}
+                  >
+                    <ServicesFloatLayer />
+                  </motion.div>
+                </Suspense>
               </div>
             </SectionAnchor>
           </div>
@@ -159,7 +155,7 @@ const DevV4CosmicPage = () => {
             <div className="absolute inset-0 bg-gradient-to-b from-black/20 to-black/30 z-0"></div>
             <SectionAnchor 
               id="services"
-              className="py-16 md:py-20 relative z-10"
+              className="py-16 md:py-20 relative z-10 min-h-[600px]"
               scrollMargin={8}
             >
               <div className="container mx-auto px-4">
@@ -167,14 +163,16 @@ const DevV4CosmicPage = () => {
                   title="OUR SERVICES" 
                   subtitle="A constellation of solutions to power your development workflow."
                 />
-                <motion.div
-                  ref={servicesRef}
-                  initial="hidden"
-                  animate={servicesVisible ? "visible" : "hidden"}
-                  variants={revealVariants}
-                >
-                  <ServicesOrbital />
-                </motion.div>
+                <Suspense fallback={<div className="h-[500px] w-full bg-transparent"></div>}>
+                  <motion.div
+                    ref={servicesRef}
+                    initial="hidden"
+                    animate={servicesVisible ? "visible" : "hidden"}
+                    variants={revealVariants}
+                  >
+                    <ServicesOrbital />
+                  </motion.div>
+                </Suspense>
               </div>
             </SectionAnchor>
           </div>
@@ -184,7 +182,7 @@ const DevV4CosmicPage = () => {
             <div className="absolute inset-0 bg-gradient-to-b from-black/30 to-[#0d0d12]/70 z-0"></div>
             <SectionAnchor 
               id="projects"
-              className="py-16 md:py-20 relative z-10"
+              className="py-16 md:py-20 relative z-10 min-h-[700px]"
               scrollMargin={8}
             >
               <div className="container mx-auto px-4">
@@ -192,14 +190,16 @@ const DevV4CosmicPage = () => {
                   title="FEATURED PROJECTS" 
                   subtitle="Discover our latest innovations and client success stories."
                 />
-                <motion.div
-                  ref={projectsRef}
-                  initial="hidden"
-                  animate={projectsVisible ? "visible" : "hidden"}
-                  variants={revealVariants}
-                >
-                  <ProjectsSection />
-                </motion.div>
+                <Suspense fallback={<div className="h-[600px] w-full bg-transparent"></div>}>
+                  <motion.div
+                    ref={projectsRef}
+                    initial="hidden"
+                    animate={projectsVisible ? "visible" : "hidden"}
+                    variants={revealVariants}
+                  >
+                    <ProjectsSection />
+                  </motion.div>
+                </Suspense>
               </div>
             </SectionAnchor>
           </div>
@@ -211,7 +211,7 @@ const DevV4CosmicPage = () => {
             
             <SectionAnchor 
               id="projects-logbook"
-              className="py-16 md:py-20"
+              className="py-16 md:py-20 min-h-[500px]"
               scrollMargin={8}
             >
               <div className="container mx-auto px-4">
@@ -219,14 +219,16 @@ const DevV4CosmicPage = () => {
                   title="MISSION LOGBOOK" 
                   subtitle="Documenting our journey through the code universe."
                 />
-                <motion.div
-                  ref={logbookRef}
-                  initial="hidden"
-                  animate={logbookVisible ? "visible" : "hidden"}
-                  variants={revealWithChildrenVariants}
-                >
-                  <ProjectsLogbook />
-                </motion.div>
+                <Suspense fallback={<div className="h-[400px] w-full bg-transparent"></div>}>
+                  <motion.div
+                    ref={logbookRef}
+                    initial="hidden"
+                    animate={logbookVisible ? "visible" : "hidden"}
+                    variants={revealWithChildrenVariants}
+                  >
+                    <ProjectsLogbook />
+                  </motion.div>
+                </Suspense>
               </div>
             </SectionAnchor>
           </div>
@@ -235,7 +237,7 @@ const DevV4CosmicPage = () => {
           <div className="bg-gradient-to-b from-[#0d0d12] to-gray-900">
             <SectionAnchor 
               id="community"
-              className="py-16 md:py-20"
+              className="py-16 md:py-20 min-h-[450px]"
               scrollMargin={8}
             >
               <div className="container mx-auto px-4">
@@ -243,14 +245,16 @@ const DevV4CosmicPage = () => {
                   title="JOIN OUR WORLD" 
                   subtitle="Be part of a growing community of developers, innovators, and creators."
                 />
-                <motion.div
-                  ref={communityRef}
-                  initial="hidden"
-                  animate={communityVisible ? "visible" : "hidden"}
-                  variants={revealWithChildrenVariants}
-                >
-                  <CommunityHub />
-                </motion.div>
+                <Suspense fallback={<div className="h-[350px] w-full bg-transparent"></div>}>
+                  <motion.div
+                    ref={communityRef}
+                    initial="hidden"
+                    animate={communityVisible ? "visible" : "hidden"}
+                    variants={revealWithChildrenVariants}
+                  >
+                    <CommunityHub />
+                  </motion.div>
+                </Suspense>
               </div>
             </SectionAnchor>
           </div>
@@ -259,7 +263,7 @@ const DevV4CosmicPage = () => {
           <div className="bg-gray-900">
             <SectionAnchor 
               id="testimonials"
-              className="py-16 md:py-20"
+              className="py-16 md:py-20 min-h-[450px]"
               scrollMargin={8}
             >
               <div className="container mx-auto px-4">
@@ -267,14 +271,16 @@ const DevV4CosmicPage = () => {
                   title="HEAR FROM OUR AI" 
                   subtitle="What our artificial teammates have to say about working with us."
                 />
-                <motion.div
-                  ref={testimonialsRef}
-                  initial="hidden"
-                  animate={testimonialsVisible ? "visible" : "hidden"}
-                  variants={revealWithChildrenVariants}
-                >
-                  <AITestimonials />
-                </motion.div>
+                <Suspense fallback={<div className="h-[350px] w-full bg-transparent"></div>}>
+                  <motion.div
+                    ref={testimonialsRef}
+                    initial="hidden"
+                    animate={testimonialsVisible ? "visible" : "hidden"}
+                    variants={revealWithChildrenVariants}
+                  >
+                    <AITestimonials />
+                  </motion.div>
+                </Suspense>
               </div>
             </SectionAnchor>
           </div>
@@ -283,7 +289,7 @@ const DevV4CosmicPage = () => {
           <div className="bg-gradient-to-b from-gray-900 to-black">
             <SectionAnchor 
               id="contact"
-              className="py-16 md:py-20 pb-32"
+              className="py-16 md:py-20 pb-32 min-h-[400px]"
               scrollMargin={8}
             >
               <div className="container mx-auto px-4">
@@ -291,14 +297,16 @@ const DevV4CosmicPage = () => {
                   title="REACH OUT" 
                   subtitle="Let's build something amazing together."
                 />
-                <motion.div
-                  ref={contactRef}
-                  initial="hidden"
-                  animate={contactVisible ? "visible" : "hidden"}
-                  variants={revealVariants}
-                >
-                  <ContactTerminal />
-                </motion.div>
+                <Suspense fallback={<div className="h-[300px] w-full bg-transparent"></div>}>
+                  <motion.div
+                    ref={contactRef}
+                    initial="hidden"
+                    animate={contactVisible ? "visible" : "hidden"}
+                    variants={revealVariants}
+                  >
+                    <ContactTerminal />
+                  </motion.div>
+                </Suspense>
               </div>
             </SectionAnchor>
           </div>
@@ -306,7 +314,9 @@ const DevV4CosmicPage = () => {
           {/* Footer Section - Using the new enhanced FooterExperience */}
           <div className="bg-black">
             <section className="pt-0">
-              <FooterExperience />
+              <Suspense fallback={<div className="h-[100px] w-full bg-transparent"></div>}>
+                <FooterExperience />
+              </Suspense>
             </section>
           </div>
         </main>
@@ -315,7 +325,9 @@ const DevV4CosmicPage = () => {
         <ScrollToTop />
         
         {/* CuriousBot - stays fixed */}
-        <CuriousBotEnhanced />
+        <Suspense fallback={<div className="fixed bottom-4 right-4 h-16 w-16 bg-transparent"></div>}>
+          <CuriousBotEnhanced />
+        </Suspense>
       </div>
     </div>
   );
