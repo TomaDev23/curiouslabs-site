@@ -22,7 +22,6 @@ const NotFound = lazy(() => import('./pages/404.jsx'));
 const UniverseExperience = lazy(() => import('./pages/UniverseExperience.jsx'));
 const DevPage = lazy(() => import('./pages/dev.jsx'));
 const DevV4CosmicPage = lazy(() => import('./pages/dev_v4_cosmic.jsx'));
-const TestCanvasPage = lazy(() => import('./pages/test_canvas.jsx'));
 
 // Loading fallback component
 const LoadingFallback = () => (
