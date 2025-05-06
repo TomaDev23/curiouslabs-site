@@ -62,6 +62,21 @@ const DevV4CosmicPage = () => {
   // Register smooth scrolling for all hash links
   useEffect(() => {
     registerSmoothScrolling();
+    
+    // Add diagnostic logging
+    console.log('DevV4CosmicPage mounted');
+    console.log('Imported components check:');
+    
+    // Check each component is imported correctly
+    try {
+      console.log('SpaceCanvas is available');
+    } catch(e) {
+      console.error('SpaceCanvas import failed:', e);
+    }
+    
+    return () => {
+      console.log('DevV4CosmicPage unmounted');
+    };
   }, []);
   
   return (

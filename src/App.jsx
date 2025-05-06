@@ -1,9 +1,11 @@
-import React, { Suspense, lazy } from 'react';
-import { Routes, Route } from 'react-router-dom';
+import React, { Suspense, lazy, useEffect, useState } from 'react';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import ScrollToTop from './components/ScrollToTop';
+import ErrorBoundary from './components/ErrorBoundary';
 
 // Main Page (critical, keep eager loaded)
 import Home from './pages/index.jsx';
+import SafeV4CosmicPage from './pages/safe_v4_cosmic.jsx';
 
 // Lazy-loaded pages for better performance
 const ProductsPortal = lazy(() => import('./pages/products/index.jsx'));
@@ -22,13 +24,36 @@ const NotFound = lazy(() => import('./pages/404.jsx'));
 const UniverseExperience = lazy(() => import('./pages/UniverseExperience.jsx'));
 const DevPage = lazy(() => import('./pages/dev.jsx'));
 const DevV4CosmicPage = lazy(() => import('./pages/dev_v4_cosmic.jsx'));
+const TestCanvasPage = lazy(() => import('./pages/test_canvas.jsx'));
 
-// Loading fallback component
-const LoadingFallback = () => (
-  <div className="flex items-center justify-center min-h-screen bg-curious-dark-900">
-    <div className="w-16 h-16 border-4 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
-  </div>
-);
+// Loading fallback component with timeout redirect
+const LoadingFallback = () => {
+  const [redirectToLegacy, setRedirectToLegacy] = useState(false);
+  
+  useEffect(() => {
+    // If loading takes too long, redirect to legacy site
+    const timeoutId = setTimeout(() => {
+      console.log('Loading timeout reached, redirecting to legacy site');
+      setRedirectToLegacy(true);
+    }, 10000); // 10 seconds timeout
+    
+    return () => clearTimeout(timeoutId);
+  }, []);
+  
+  if (redirectToLegacy) {
+    return <Navigate to="/legacy" replace />;
+  }
+  
+  return (
+    <div className="flex flex-col items-center justify-center min-h-screen bg-curious-dark-900">
+      <div className="w-16 h-16 border-4 border-purple-500 border-t-transparent rounded-full animate-spin mb-8"></div>
+      <p className="text-white text-center max-w-md px-4">
+        Loading the cosmic experience... <br />
+        <span className="text-gray-400 text-sm">If it takes too long, you'll be redirected to the legacy site.</span>
+      </p>
+    </div>
+  );
+};
 
 export default function App() {
   return (
@@ -38,9 +63,16 @@ export default function App() {
         {/* Promote V4 Cosmic experience as the main homepage */}
         <Route path="/" element={
           <Suspense fallback={<LoadingFallback />}>
-            <DevV4CosmicPage />
+            <React.StrictMode>
+              <ErrorBoundary fallback={<SafeV4CosmicPage />}>
+                <DevV4CosmicPage />
+              </ErrorBoundary>
+            </React.StrictMode>
           </Suspense>
         } />
+        
+        {/* Safe fallback version that can be accessed directly */}
+        <Route path="/safe" element={<SafeV4CosmicPage />} />
         
         {/* Legacy Solar System route - accessible via /legacy as an Easter egg */}
         <Route path="/legacy" element={
