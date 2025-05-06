@@ -87,7 +87,7 @@ const HeroPortal = () => {
       opacity: [0.2, 0.4, 0.2],
       scale: [1, 1.1, 1],
       transition: {
-        duration: 4, // Reduced from 8s
+        duration: 2, // Reduced from 8s
         repeat: Infinity,
         ease: "easeInOut"
       }
@@ -109,12 +109,12 @@ const HeroPortal = () => {
   
   // Generate floating particles - memoized
   const floatingParticles = useMemo(() => {
-    return [...Array(isMobile ? 8 : 15)].map((_, i) => ({
+    return [...Array(isMobile ? 5 : 15)].map((_, i) => ({
       id: i,
       left: `${10 + Math.random() * 80}%`,
       top: `${10 + Math.random() * 80}%`,
-      duration: 1.5 + Math.random() * 2.5, // Reduced from 3-8s to 1.5-4s
-      delay: Math.random() * 1 // Reduced delay
+      duration: isMobile ? 1.2 + Math.random() * 1.8 : 1.5 + Math.random() * 2.5, // Faster on mobile
+      delay: isMobile ? Math.random() * 0.5 : Math.random() * 1 // Less delay on mobile
     }));
   }, [isMobile]);
   

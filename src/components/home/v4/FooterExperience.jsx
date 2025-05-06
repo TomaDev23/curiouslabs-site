@@ -237,6 +237,24 @@ const FooterExperience = () => {
           </p>
         </motion.div>
       </div>
+
+      {/* Add Legacy View Easter Egg */}
+      <motion.div 
+        className="fixed bottom-8 left-8 z-50"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 2, duration: 0.5 }}
+        whileHover={{ scale: 1.1 }}
+      >
+        <Link 
+          to="/legacy" 
+          className="flex items-center space-x-2 bg-black/80 backdrop-blur-sm text-xs text-gray-400 hover:text-purple-400 px-3 py-2 rounded-full border border-gray-800 hover:border-purple-500 transition-all duration-300"
+          aria-label="View legacy solar system"
+        >
+          <span className="text-xl">🪐</span>
+          <span className="font-mono">Solar Preview</span>
+        </Link>
+      </motion.div>
     </footer>
   );
 };

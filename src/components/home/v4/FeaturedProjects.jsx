@@ -1,14 +1,14 @@
-import { metrics } from "../data/metrics";
+import { metrics } from "../../../data/metrics";
 import { motion, useReducedMotion } from "framer-motion";
-import { useBreakpoint } from "../hooks/useBreakpoint.js";
+import { useBreakpoint } from "../../../hooks/useBreakpoint.js";
 
-export default function Metrics() {
+export default function FeaturedProjects() {
   const prefersReducedMotion = useReducedMotion();
   const breakpoint = useBreakpoint();
   const isMobile = breakpoint === 'mobile';
   
   return (
-    <section id="metrics" className="relative py-24 bg-gradient-to-b from-curious-dark-900 via-curious-dark-800 to-curious-dark-900 overflow-hidden">
+    <section id="featured-projects" className="relative py-24 bg-gradient-to-b from-curious-dark-900 via-curious-dark-800 to-curious-dark-900 overflow-hidden">
       {/* Standardized nebula positioning - one top-right */}
       <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-curious-purple-600/20 via-curious-blue-400/10 to-transparent rounded-full filter blur-sm md:blur-[80px] opacity-20 md:opacity-30"></div>
       
@@ -17,7 +17,7 @@ export default function Metrics() {
       
       <div className="relative z-10 max-w-7xl mx-auto px-4">
         <h2 className="text-4xl md:text-5xl font-extrabold bg-gradient-to-r from-curious-purple-400 to-curious-blue-400 bg-clip-text text-transparent text-center mb-12">
-          Mission Metrics
+          Featured Projects
         </h2>
         
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 text-center">
@@ -60,4 +60,4 @@ export default function Metrics() {
       </div>
     </section>
   );
-}
+} 

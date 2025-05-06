@@ -34,9 +34,9 @@ const ParticleField = ({
   // Determine number of particles based on density and device - REDUCED COUNT BY 40%
   const getParticleCount = () => {
     const counts = {
-      low: isMobile ? 9 : 15,     // Reduced from 15/25
-      medium: isMobile ? 15 : 24, // Reduced from 25/40
-      high: isMobile ? 21 : 36    // Reduced from 35/60
+      low: isMobile ? 6 : 15,     // Reduced for mobile only
+      medium: isMobile ? 10 : 24, // Reduced for mobile only
+      high: isMobile ? 15 : 36    // Reduced for mobile only
     };
     return counts[density] || counts.medium;
   };

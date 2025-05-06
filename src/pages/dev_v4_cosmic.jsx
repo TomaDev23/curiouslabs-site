@@ -15,15 +15,17 @@ import CosmicHUD from '../components/ui/CosmicHUD';
 import ScrollToTop from '../components/ScrollToTop';
 
 // Lazy load all other components which aren't needed for initial paint
-const AboutMission = lazy(() => import('../components/home/v4/AboutMission'));
+const LogoStrip = lazy(() => import('../components/LogoStrip'));
+const MissionStatement = lazy(() => import('../components/home/v4/MissionStatement'));
+const WhyAIDevCards = lazy(() => import('../components/home/v4/WhyAIDevCards'));
 const ServicesFloatLayer = lazy(() => import('../components/home/ServicesFloatLayer'));
-const ProjectsSection = lazy(() => import('../components/home/ProjectsSection'));
+const FeaturedProjects = lazy(() => import('../components/home/v4/FeaturedProjects'));
 const ServicesOrbital = lazy(() => import('../components/home/v4/ServicesOrbital'));
 const ProjectsLogbook = lazy(() => import('../components/home/v4/ProjectsLogbook'));
 const CommunityHub = lazy(() => import('../components/home/v4/CommunityHub'));
-const AITestimonials = lazy(() => import('../components/home/v4/AITestimonials'));
+const HearFromAI = lazy(() => import('../components/home/v4/HearFromAI'));
 const ContactTerminal = lazy(() => import('../components/home/v4/ContactTerminal'));
-const CuriousBotEnhanced = lazy(() => import('../components/home/v4/CuriousBotEnhanced'));
+const BotFunZone = lazy(() => import('../components/home/v4/BotFunZone'));
 const FooterExperience = lazy(() => import('../components/home/v4/FooterExperience'));
 
 // Import scroll utilities
@@ -96,6 +98,13 @@ const DevV4CosmicPage = () => {
             </SectionAnchor>
           </div>
           
+          {/* Logo Strip Section - Just below Hero */}
+          <div className="bg-transparent relative">
+            <Suspense fallback={<div className="h-[60px] w-full bg-transparent"></div>}>
+              <LogoStrip />
+            </Suspense>
+          </div>
+          
           {/* About Section - Transparent to show stars */}
           <div className="bg-transparent relative">
             <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/10 z-0"></div>
@@ -116,7 +125,7 @@ const DevV4CosmicPage = () => {
                     animate={aboutVisible ? "visible" : "hidden"}
                     variants={revealVariants}
                   >
-                    <AboutMission />
+                    <MissionStatement />
                   </motion.div>
                 </Suspense>
               </div>
@@ -143,7 +152,7 @@ const DevV4CosmicPage = () => {
                     animate={agentVisible ? "visible" : "hidden"}
                     variants={revealVariants}
                   >
-                    <ServicesFloatLayer />
+                    <WhyAIDevCards />
                   </motion.div>
                 </Suspense>
               </div>
@@ -197,7 +206,7 @@ const DevV4CosmicPage = () => {
                     animate={projectsVisible ? "visible" : "hidden"}
                     variants={revealVariants}
                   >
-                    <ProjectsSection />
+                    <FeaturedProjects />
                   </motion.div>
                 </Suspense>
               </div>
@@ -278,7 +287,7 @@ const DevV4CosmicPage = () => {
                     animate={testimonialsVisible ? "visible" : "hidden"}
                     variants={revealWithChildrenVariants}
                   >
-                    <AITestimonials />
+                    <HearFromAI />
                   </motion.div>
                 </Suspense>
               </div>
@@ -326,7 +335,7 @@ const DevV4CosmicPage = () => {
         
         {/* CuriousBot - stays fixed */}
         <Suspense fallback={<div className="fixed bottom-4 right-4 h-16 w-16 bg-transparent"></div>}>
-          <CuriousBotEnhanced />
+          <BotFunZone />
         </Suspense>
       </div>
     </div>

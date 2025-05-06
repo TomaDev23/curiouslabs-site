@@ -1,11 +1,16 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
+import { useBreakpoint } from '../../../hooks/useBreakpoint.js';
 
 /**
  * ProjectsLogbook - "Mission Logbook" section for displaying projects
  * Features terminal-style interface with CLI aesthetic for project display
  */
 const ProjectsLogbook = () => {
+  const prefersReducedMotion = useReducedMotion();
+  const breakpoint = useBreakpoint();
+  const isMobile = breakpoint === 'mobile';
+  
   // Project data
   const projects = [
     {
@@ -43,13 +48,13 @@ const ProjectsLogbook = () => {
     }
   ];
   
-  // Animation variants
+  // Animation variants - optimized for mobile
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.2
+        staggerChildren: 0.1
       }
     }
   };
@@ -60,7 +65,8 @@ const ProjectsLogbook = () => {
       opacity: 1,
       y: 0,
       transition: {
-        duration: 0.6,
+        duration: 0.3,
+        delay: 0.1,
         ease: "easeOut"
       }
     }
@@ -71,8 +77,12 @@ const ProjectsLogbook = () => {
       className="relative pt-32 pb-32 overflow-hidden"
       initial={{ opacity: 0, y: 40 }}
       whileInView={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6 }}
-      viewport={{ once: true }}
+      transition={{ 
+        duration: 0.3,
+        delay: 0.1,
+        ease: "easeOut"
+      }}
+      viewport={{ once: true, margin: '0px 0px -20% 0px' }}
     >
       {/* Background elements */}
       <div className="absolute inset-0 bg-gradient-to-b from-gray-900/0 via-gray-900/50 to-gray-900/0"></div>
@@ -83,14 +93,18 @@ const ProjectsLogbook = () => {
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true }}
+          viewport={{ once: true, margin: '0px 0px -20% 0px' }}
         >
           {projects.map((project, index) => (
             <motion.div
               key={project.id}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
+              transition={{ 
+                duration: 0.3,
+                delay: 0.1,
+                ease: "easeOut"
+              }}
               viewport={{ once: true }}
             >
               <ProjectCard project={project} variants={cardVariants} />
@@ -103,11 +117,21 @@ const ProjectsLogbook = () => {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.5, delay: 0.3 }}
+          transition={{ 
+            duration: 0.3,
+            delay: 0.1,
+            ease: "easeOut"
+          }}
         >
           <motion.button
             className="px-8 py-3 border border-gray-700 rounded-lg text-gray-300 hover:text-white hover:border-purple-500/50 transition-colors"
-            whileHover={{ y: -5 }}
+            whileHover={{ 
+              y: -5,
+              transition: {
+                duration: 0.3,
+                ease: "easeOut"
+              }
+            }}
             whileTap={{ y: 0 }}
           >
             View All Projects
@@ -127,7 +151,10 @@ const ProjectCard = ({ project, variants }) => {
       whileHover={{ 
         y: -10,
         zIndex: 10,
-        transition: { duration: 0.2 }
+        transition: { 
+          duration: 0.3,
+          ease: "easeOut"
+        }
       }}
     >
       {/* Card */}
@@ -167,7 +194,13 @@ const ProjectCard = ({ project, variants }) => {
           <motion.a 
             href="#"
             className="inline-flex items-center text-purple-400 hover:text-purple-300 font-medium text-sm mt-2"
-            whileHover={{ x: 5 }}
+            whileHover={{ 
+              x: 5,
+              transition: {
+                duration: 0.3,
+                ease: "easeOut"
+              }
+            }}
           >
             <span>View project</span>
             <svg className="w-4 h-4 ml-1" viewBox="0 0 20 20" fill="currentColor">

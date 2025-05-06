@@ -84,10 +84,10 @@ const ServicesOrbital = () => {
         prevServiceRef.current = prev;
         return (prev + 1) % services.length;
       });
-    }, 5000);
+    }, isMobile ? 4000 : 5000); // Slightly faster rotation on mobile
     
     return () => clearInterval(interval);
-  }, [isAutorotating, services.length, inView]);
+  }, [isAutorotating, services.length, inView, isMobile]);
   
   // Stop auto-rotate when user interacts - using useCallback for optimization
   const handleServiceClick = useCallback((index) => {
@@ -139,7 +139,7 @@ const ServicesOrbital = () => {
       variants={sectionVariants}
       initial="hidden"
       animate={inView ? "visible" : "hidden"}
-      viewport={{ once: true }}
+      viewport={{ once: true, margin: '0px 0px -20% 0px' }} // Trigger animation earlier
     >
       {/* Enhanced background gradients with more atmospheric effect */}
       <div className="absolute inset-0 bg-gray-900/90"></div>
@@ -153,14 +153,14 @@ const ServicesOrbital = () => {
       
       {/* Ambient floating particles - standardized */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {[...Array(12)].map((_, i) => (
+        {[...Array(isMobile ? 8 : 12)].map((_, i) => (
           <div 
             key={i}
             className="absolute w-[2px] h-[2px] rounded-full bg-white opacity-40"
             style={{
               top: `${Math.random() * 100}%`,
               left: `${Math.random() * 100}%`,
-              animation: `float-y ${2 + Math.random() * 3}s ease-in-out infinite alternate`
+              animation: `float-y ${isMobile ? 2 + Math.random() * 2 : 2 + Math.random() * 3}s ease-in-out infinite alternate`
             }}
           ></div>
         ))}

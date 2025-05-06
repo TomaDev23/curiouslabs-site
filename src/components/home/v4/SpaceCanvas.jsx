@@ -55,16 +55,20 @@ const SpaceCanvas = () => {
   
   // Generate different star layers - memoized
   const stars = useMemo(() => {
-    const staticStars = createStars(250, 1);
-    const animatedStars = createStars(80, 1.2);
-    const distantStars = createStars(150, 0.7);
+    // Check if we're on mobile
+    const isMobile = isClient && window.innerWidth < 768;
+    
+    // Reduce star count on mobile devices
+    const staticStars = createStars(isMobile ? 150 : 250, 1);
+    const animatedStars = createStars(isMobile ? 40 : 80, 1.2);
+    const distantStars = createStars(isMobile ? 90 : 150, 0.7);
     
     return {
       staticStars,
       animatedStars,
       distantStars
     };
-  }, []);
+  }, [isClient]);
   
   // Handle resize - keeps canvas sized to the window
   const handleResize = () => {

@@ -22,7 +22,7 @@ const NotFound = lazy(() => import('./pages/404.jsx'));
 const UniverseExperience = lazy(() => import('./pages/UniverseExperience.jsx'));
 const DevPage = lazy(() => import('./pages/dev.jsx'));
 const DevV4CosmicPage = lazy(() => import('./pages/dev_v4_cosmic.jsx'));
-const DevV4CosmicOptimizedPage = lazy(() => import('./pages/dev_v4_cosmic_optimized.jsx'));
+const TestCanvasPage = lazy(() => import('./pages/test_canvas.jsx'));
 
 // Loading fallback component
 const LoadingFallback = () => (
@@ -36,16 +36,19 @@ export default function App() {
     <>
       <ScrollToTop />
       <Routes>
-        {/* Promote DevV4CosmicPage as the main homepage */}
+        {/* Promote V4 Cosmic experience as the main homepage */}
         <Route path="/" element={
           <Suspense fallback={<LoadingFallback />}>
             <DevV4CosmicPage />
           </Suspense>
         } />
         
-        {/* Legacy home route - moved to /legacy-home to preserve access */}
-        {/* <Route path="/" element={<Home />} /> */}
-        <Route path="/legacy-home" element={<Home />} />
+        {/* Legacy Solar System route - accessible via /legacy as an Easter egg */}
+        <Route path="/legacy" element={
+          <Suspense fallback={<LoadingFallback />}>
+            <Home />
+          </Suspense>
+        } />
         
         <Route path="/products" element={
           <Suspense fallback={<LoadingFallback />}>
@@ -122,24 +125,11 @@ export default function App() {
             <DevPage />
           </Suspense>
         } />
-        <Route path="/dev/v4-cosmic" element={
+        
+        {/* Preserve test_canvas diagnostic route */}
+        <Route path="/test_canvas" element={
           <Suspense fallback={<LoadingFallback />}>
-            <DevV4CosmicPage />
-          </Suspense>
-        } />
-        <Route path="/dev/v4-cosmic-optimized" element={
-          <Suspense fallback={<LoadingFallback />}>
-            <DevV4CosmicOptimizedPage />
-          </Suspense>
-        } />
-        <Route path="/v4" element={
-          <Suspense fallback={<LoadingFallback />}>
-            <DevV4CosmicPage />
-          </Suspense>
-        } />
-        <Route path="/v4-optimized" element={
-          <Suspense fallback={<LoadingFallback />}>
-            <DevV4CosmicOptimizedPage />
+            <TestCanvasPage />
           </Suspense>
         } />
         <Route path="*" element={

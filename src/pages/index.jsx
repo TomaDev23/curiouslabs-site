@@ -1,18 +1,20 @@
 // DO NOT MODIFY THIS FILE WITHOUT COMMANDER APPROVAL — TILE 4.1
 import React, { lazy, Suspense, useEffect, useState } from 'react';
-import HomeFloatflowLayout from '@/layouts/HomeFloatflowLayout';
-import EnhancedSolarSystem from '@/components/home/EnhancedSolarSystem';
-import StarfieldBackground from '@/components/home/StarfieldBackground';
-import HeroFloatLayer from '@/components/home/HeroFloatLayer';
-import AboutSection from '@/components/home/AboutSection';
-import useDeviceProfile from '@/hooks/useDeviceProfile';
+import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import HomeFloatflowLayout from '../layouts/HomeFloatflowLayout';
+import EnhancedSolarSystem from '../components/home/EnhancedSolarSystem';
+import StarfieldBackground from '../components/home/StarfieldBackground';
+import HeroFloatLayer from '../components/home/HeroFloatLayer';
+import AboutSection from '../components/home/AboutSection';
+import useDeviceProfile from '../hooks/useDeviceProfile';
 
 // Lazy load below-the-fold components for better performance
-const ServicesFloatLayer = lazy(() => import('@/components/home/ServicesFloatLayer'));
-const ProjectsSection = lazy(() => import('@/components/home/ProjectsSection'));
-const CTASection = lazy(() => import('@/components/home/CTASection'));
-const CuriousBot = lazy(() => import('@/components/home/CuriousBot'));
-const MissionStatus = lazy(() => import('@/components/home/MissionStatus'));
+const ServicesFloatLayer = lazy(() => import('../components/home/ServicesFloatLayer'));
+const ProjectsSection = lazy(() => import('../components/home/ProjectsSection'));
+const CTASection = lazy(() => import('../components/home/CTASection'));
+const CuriousBot = lazy(() => import('../components/home/CuriousBot'));
+const MissionStatus = lazy(() => import('../components/home/MissionStatus'));
 
 // Loading placeholder
 const LazyLoadPlaceholder = () => (
@@ -64,6 +66,24 @@ export default function Home() {
   
   return (
     <HomeFloatflowLayout>
+      {/* Return to Main Site Button */}
+      <motion.div 
+        className="fixed top-8 right-8 z-50"
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 1, duration: 0.5 }}
+        whileHover={{ scale: 1.1 }}
+      >
+        <Link 
+          to="/" 
+          className="flex items-center space-x-2 bg-black/80 backdrop-blur-sm text-xs text-gray-400 hover:text-purple-400 px-3 py-2 rounded-full border border-gray-800 hover:border-purple-500 transition-all duration-300"
+          aria-label="Return to main site"
+        >
+          <span className="text-xl">🚀</span>
+          <span className="font-mono">Return to Cosmic Home</span>
+        </Link>
+      </motion.div>
+
       {/* Background */}
       <div className="absolute inset-0 z-0">
         <StarfieldBackground isLowPerf={isLowPerf} />

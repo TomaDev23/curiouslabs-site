@@ -76,37 +76,49 @@ export default function NavBar() {
             <span className="ml-2 text-xl font-semibold text-white">CuriousLabs</span>
           </div>
           {/* Base gradient line (always visible) */}
-          <div className="absolute -bottom-1 left-0 w-full h-0.5 bg-gradient-to-r from-purple-500/50 to-blue-500/50"></div>
+          <div className="absolute -bottom-1 left-0 w-full h-0.5 bg-gradient-to-r from-purple-500/20 to-blue-500/20"></div>
           {/* Hover effect gradient line (animates on hover) */}
-          <div className="absolute -bottom-1 left-0 w-full h-0.5 bg-gradient-to-r from-purple-500 to-blue-500 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></div>
+          <div className="absolute -bottom-1 left-0 w-full h-0.5 bg-gradient-to-r from-purple-500 to-blue-500 opacity-0 group-hover:opacity-100 scale-x-0 group-hover:scale-x-100 transition-all duration-700 ease-in-out origin-left"></div>
         </Link>
         
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center space-x-8">
           <Link 
             to="/" 
-            className={`text-white hover:text-purple-300 transition ${location.pathname === '/' ? 'text-purple-300' : ''}`}
+            className={`text-white hover:text-purple-300 transition relative group ${location.pathname === '/' ? 'text-purple-300' : ''}`}
           >
             Home
+            {/* Base gradient line (always visible) */}
+            <div className="absolute -bottom-1 left-0 w-full h-0.5 bg-gradient-to-r from-purple-500/10 to-blue-500/10"></div>
+            {/* Hover effect gradient line (animates on hover) */}
+            <div className="absolute -bottom-1 left-0 w-full h-0.5 bg-gradient-to-r from-purple-500 to-blue-500 opacity-0 group-hover:opacity-100 scale-x-0 group-hover:scale-x-100 transition-all duration-700 ease-in-out origin-left"></div>
           </Link>
           
           <Link 
             to="/codelab" 
-            className={`text-white hover:text-purple-300 transition ${location.pathname === '/codelab' ? 'text-purple-300' : ''}`}
+            className={`text-white hover:text-purple-300 transition relative group ${location.pathname === '/codelab' ? 'text-purple-300' : ''}`}
           >
             CodeLab
+            {/* Base gradient line (always visible) */}
+            <div className="absolute -bottom-1 left-0 w-full h-0.5 bg-gradient-to-r from-purple-500/10 to-blue-500/10"></div>
+            {/* Hover effect gradient line (animates on hover) */}
+            <div className="absolute -bottom-1 left-0 w-full h-0.5 bg-gradient-to-r from-purple-500 to-blue-500 opacity-0 group-hover:opacity-100 scale-x-0 group-hover:scale-x-100 transition-all duration-700 ease-in-out origin-left"></div>
           </Link>
           
           {/* Products dropdown */}
           <div className="relative group">
             <Link 
               to="/products" 
-              className={`text-white hover:text-purple-300 transition flex items-center ${location.pathname.includes('/products') ? 'text-purple-300' : ''}`}
+              className={`text-white hover:text-purple-300 transition flex items-center relative ${location.pathname.includes('/products') ? 'text-purple-300' : ''}`}
             >
               Products
               <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
               </svg>
+              {/* Base gradient line (always visible) */}
+              <div className="absolute -bottom-1 left-0 w-full h-0.5 bg-gradient-to-r from-purple-500/10 to-blue-500/10"></div>
+              {/* Hover effect gradient line (animates on hover) */}
+              <div className="absolute -bottom-1 left-0 w-full h-0.5 bg-gradient-to-r from-purple-500 to-blue-500 opacity-0 group-hover:opacity-100 scale-x-0 group-hover:scale-x-100 transition-all duration-700 ease-in-out origin-left"></div>
             </Link>
             
             {/* Dropdown menu */}
@@ -123,48 +135,58 @@ export default function NavBar() {
           
           <Link 
             to="/tools" 
-            className={`text-white hover:text-purple-300 transition ${location.pathname === '/tools' ? 'text-purple-300' : ''}`}
+            className={`text-white hover:text-purple-300 transition relative group ${location.pathname === '/tools' ? 'text-purple-300' : ''}`}
           >
             Tools
+            {/* Base gradient line (always visible) */}
+            <div className="absolute -bottom-1 left-0 w-full h-0.5 bg-gradient-to-r from-purple-500/10 to-blue-500/10"></div>
+            {/* Hover effect gradient line (animates on hover) */}
+            <div className="absolute -bottom-1 left-0 w-full h-0.5 bg-gradient-to-r from-purple-500 to-blue-500 opacity-0 group-hover:opacity-100 scale-x-0 group-hover:scale-x-100 transition-all duration-700 ease-in-out origin-left"></div>
           </Link>
           
           <Link 
             to="/blog" 
-            className={`text-white hover:text-purple-300 transition ${location.pathname === '/blog' ? 'text-purple-300' : ''}`}
+            className={`text-white hover:text-purple-300 transition relative group ${location.pathname === '/blog' ? 'text-purple-300' : ''}`}
           >
             Blog
+            {/* Base gradient line (always visible) */}
+            <div className="absolute -bottom-1 left-0 w-full h-0.5 bg-gradient-to-r from-purple-500/10 to-blue-500/10"></div>
+            {/* Hover effect gradient line (animates on hover) */}
+            <div className="absolute -bottom-1 left-0 w-full h-0.5 bg-gradient-to-r from-purple-500 to-blue-500 opacity-0 group-hover:opacity-100 scale-x-0 group-hover:scale-x-100 transition-all duration-700 ease-in-out origin-left"></div>
           </Link>
           
           <Link 
             to="/docs" 
-            className={`text-white hover:text-purple-300 transition ${location.pathname.includes('/docs') ? 'text-purple-300' : ''}`}
+            className={`text-white hover:text-purple-300 transition relative group ${location.pathname.includes('/docs') ? 'text-purple-300' : ''}`}
           >
             Docs
+            {/* Base gradient line (always visible) */}
+            <div className="absolute -bottom-1 left-0 w-full h-0.5 bg-gradient-to-r from-purple-500/10 to-blue-500/10"></div>
+            {/* Hover effect gradient line (animates on hover) */}
+            <div className="absolute -bottom-1 left-0 w-full h-0.5 bg-gradient-to-r from-purple-500 to-blue-500 opacity-0 group-hover:opacity-100 scale-x-0 group-hover:scale-x-100 transition-all duration-700 ease-in-out origin-left"></div>
           </Link>
           
           <Link 
             to="/about" 
-            className={`text-white hover:text-purple-300 transition ${location.pathname === '/about' ? 'text-purple-300' : ''}`}
+            className={`text-white hover:text-purple-300 transition relative group ${location.pathname === '/about' ? 'text-purple-300' : ''}`}
           >
             About
+            {/* Base gradient line (always visible) */}
+            <div className="absolute -bottom-1 left-0 w-full h-0.5 bg-gradient-to-r from-purple-500/10 to-blue-500/10"></div>
+            {/* Hover effect gradient line (animates on hover) */}
+            <div className="absolute -bottom-1 left-0 w-full h-0.5 bg-gradient-to-r from-purple-500 to-blue-500 opacity-0 group-hover:opacity-100 scale-x-0 group-hover:scale-x-100 transition-all duration-700 ease-in-out origin-left"></div>
           </Link>
           
           <Link 
             to="/contact" 
-            className={`text-white hover:text-purple-300 transition ${location.pathname === '/contact' ? 'text-purple-300' : ''}`}
+            className={`text-white hover:text-purple-300 transition relative group ${location.pathname === '/contact' ? 'text-purple-300' : ''}`}
           >
             Contact
+            {/* Base gradient line (always visible) */}
+            <div className="absolute -bottom-1 left-0 w-full h-0.5 bg-gradient-to-r from-purple-500/10 to-blue-500/10"></div>
+            {/* Hover effect gradient line (animates on hover) */}
+            <div className="absolute -bottom-1 left-0 w-full h-0.5 bg-gradient-to-r from-purple-500 to-blue-500 opacity-0 group-hover:opacity-100 scale-x-0 group-hover:scale-x-100 transition-all duration-700 ease-in-out origin-left"></div>
           </Link>
-          
-          {/* V4 Cosmic Preview link - only visible in development */}
-          {isDevelopment && (
-            <Link 
-              to="/legacy-home" 
-              className={`text-xs text-purple-400 opacity-60 hover:opacity-100 hover:text-purple-300 transition ${location.pathname === '/legacy-home' ? 'text-purple-300 opacity-100' : ''}`}
-            >
-              Legacy Home
-            </Link>
-          )}
         </div>
         
         {/* Mobile menu button */}
@@ -285,16 +307,6 @@ export default function NavBar() {
             >
               Contact
             </Link>
-            
-            {/* V4 Cosmic Preview link for mobile - only visible in development */}
-            {isDevelopment && (
-              <Link 
-                to="/legacy-home" 
-                className={`block py-2 text-purple-400 text-sm opacity-60 hover:opacity-100 hover:text-purple-300 ${location.pathname === '/legacy-home' ? 'text-purple-300 opacity-100' : ''}`}
-              >
-                Legacy Home
-              </Link>
-            )}
           </div>
         </div>
       )}
