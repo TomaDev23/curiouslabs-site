@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState, useMemo, useCallback, memo } from 'react';
-import { motion } from 'framer-motion';
+import { motion, useScroll, useTransform } from 'framer-motion';
 import SpaceCanvas from './SpaceCanvas';
 import { sectionVariants, itemVariants } from '../../../utils/animation';
 import MagneticButton from '../../ui/MagneticButton';
@@ -12,6 +12,7 @@ import { startComponentRender, endComponentRender } from '../../../utils/perform
 import useAccessibilityCheck from '../../../hooks/useAccessibilityCheck';
 import { useLazyLoad } from '../../../hooks/useLazyLoad';
 import LazyImage from '../../ui/LazyImage';
+import LogoStrip from '../../../components/LogoStrip';
 
 /**
  * HeroPortal - Space-themed hero section
@@ -117,6 +118,10 @@ const HeroPortal = () => {
       delay: isMobile ? Math.random() * 0.5 : Math.random() * 1 // Less delay on mobile
     }));
   }, [isMobile]);
+  
+  // Add scroll position for logo strip fade effect
+  const { scrollY } = useScroll();
+  const logoStripOpacity = useTransform(scrollY, [0, 200], [1, 0]);
   
   // Log render duration when component renders
   useEffect(() => {
@@ -427,6 +432,14 @@ const HeroPortal = () => {
             </motion.div>
           </motion.div>
         )}
+        
+        {/* Logo Strip integrated at the bottom of the hero with fade effect */}
+        <motion.div 
+          className="absolute bottom-[50px] left-0 right-0 w-full"
+          style={{ opacity: logoStripOpacity }}
+        >
+          <LogoStrip />
+        </motion.div>
       </motion.section>
     </ErrorBoundary>
   );

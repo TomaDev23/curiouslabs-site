@@ -30,11 +30,11 @@ const HearFromAI = () => {
       
       <div className="container mx-auto px-4 relative z-10">
         <motion.div variants={itemVariants} className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-extrabold bg-gradient-to-r from-curious-purple-400 to-curious-blue-400 bg-clip-text text-transparent mb-6">
-            Hear From Our AI Partners
+          <h2 className="text-4xl md:text-5xl font-extrabold text-white text-center mb-3 drop-shadow-[0_0_10px_rgba(255,255,255,0.3)]">
+            Hear From Our AI
           </h2>
-          <p className="text-lg md:text-xl text-gray-300 max-w-3xl mx-auto">
-            We work alongside AI models to make them better. Here's what our silicon friends have to say about our collaborative approach.
+          <p className="text-lg md:text-xl text-purple-300 font-medium text-center max-w-3xl mx-auto">
+            What our artificial teammates have to say about working with us.
           </p>
         </motion.div>
         

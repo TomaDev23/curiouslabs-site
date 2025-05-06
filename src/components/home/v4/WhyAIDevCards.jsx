@@ -42,7 +42,7 @@ const WhyAIDevCards = () => {
   return (
     <motion.section
       ref={ref}
-      className="relative py-32 overflow-hidden"
+      className="relative py-20 overflow-hidden"
       variants={sectionVariants}
       initial="hidden"
       animate={inView ? "visible" : "hidden"}
@@ -59,11 +59,11 @@ const WhyAIDevCards = () => {
       
       {/* Section Content */}
       <div className="container mx-auto px-4 relative z-10">
-        <motion.div variants={itemVariants} className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-extrabold bg-gradient-to-r from-curious-purple-400 to-curious-blue-400 bg-clip-text text-transparent mb-6">
+        <motion.div variants={itemVariants} className="text-center mb-10">
+          <h2 className="text-4xl md:text-5xl font-extrabold text-white text-center mb-3 drop-shadow-[0_0_10px_rgba(255,255,255,0.3)]">
             Why AI-Assisted Development?
           </h2>
-          <p className="text-lg md:text-xl text-gray-300 max-w-3xl mx-auto">
+          <p className="text-lg md:text-xl text-purple-300 max-w-3xl mx-auto">
             Discover how AI tools and techniques can supercharge your development workflow, 
             reduce tedious tasks, and help you focus on what truly matters.
           </p>
@@ -94,7 +94,7 @@ const WhyAIDevCards = () => {
         <motion.div 
           variants={itemVariants} 
           custom={4}
-          className="mt-16 text-center"
+          className="mt-12 text-center"
         >
           <motion.a
             href="#contact"

@@ -16,9 +16,13 @@ export default function FeaturedProjects() {
       <div className="absolute bottom-0 left-0 w-96 h-96 bg-gradient-to-tr from-curious-blue-600/20 via-curious-purple-400/10 to-transparent rounded-full filter blur-sm md:blur-[80px] opacity-20 md:opacity-30"></div>
       
       <div className="relative z-10 max-w-7xl mx-auto px-4">
-        <h2 className="text-4xl md:text-5xl font-extrabold bg-gradient-to-r from-curious-purple-400 to-curious-blue-400 bg-clip-text text-transparent text-center mb-12">
+        <h2 className="text-4xl md:text-5xl font-extrabold text-white text-center mb-3 drop-shadow-[0_0_10px_rgba(255,255,255,0.3)]">
           Featured Projects
         </h2>
+        
+        <p className="text-lg md:text-xl text-purple-300 font-medium text-center max-w-3xl mx-auto mb-10">
+          Discover our latest innovations and client success stories.
+        </p>
         
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 text-center">
           {metrics.map((metric, index) => (

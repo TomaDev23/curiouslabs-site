@@ -21,7 +21,7 @@ const MissionStatement = () => {
   return (
     <motion.section 
       ref={ref}
-      className="relative pt-32 pb-32 overflow-hidden"
+      className="relative pt-20 pb-20 overflow-hidden"
       variants={sectionVariants}
       initial="hidden"
       animate={inView ? "visible" : "hidden"}
@@ -71,16 +71,20 @@ const MissionStatement = () => {
       </motion.div>
       
       <div className="container mx-auto px-4 relative z-10">
-        <h2 className="text-4xl md:text-5xl font-extrabold bg-gradient-to-r from-curious-purple-400 to-curious-blue-400 bg-clip-text text-transparent text-center mb-12">
+        <h2 className="text-4xl md:text-5xl font-extrabold text-white text-center mb-3 drop-shadow-[0_0_10px_rgba(255,255,255,0.3)]">
           Our Mission
         </h2>
         
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+        <motion.p className="text-lg md:text-xl text-purple-300 font-medium text-center max-w-2xl mx-auto mb-8">
+          Transforming development through AI innovation and community collaboration.
+        </motion.p>
+        
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           {/* Left Column - Text Content */}
           <motion.div variants={itemVariants}>
             <motion.p 
               variants={itemVariants} 
-              className="text-base md:text-lg text-gray-300 leading-relaxed mb-6"
+              className="text-base md:text-lg text-gray-300 leading-relaxed mb-5"
             >
               At CuriousLabs, we're pioneering a new approach to software development. 
               We combine cutting-edge AI technologies with human expertise to solve the most 
@@ -89,7 +93,7 @@ const MissionStatement = () => {
             
             <motion.p 
               variants={itemVariants} 
-              className="text-base md:text-lg text-gray-300 leading-relaxed mb-10"
+              className="text-base md:text-lg text-gray-300 leading-relaxed mb-8"
             >
               Our mission is to transform the software development lifecycle, making it 
               more accessible, efficient, and enjoyable for developers of all skill levels. 

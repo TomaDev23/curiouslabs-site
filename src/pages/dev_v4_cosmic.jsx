@@ -113,13 +113,6 @@ const DevV4CosmicPage = () => {
             </SectionAnchor>
           </div>
           
-          {/* Logo Strip Section - Just below Hero */}
-          <div className="bg-transparent relative">
-            <Suspense fallback={<div className="h-[60px] w-full bg-transparent"></div>}>
-              <LogoStrip />
-            </Suspense>
-          </div>
-          
           {/* About Section - Transparent to show stars */}
           <div className="bg-transparent relative">
             <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/10 z-0"></div>
@@ -129,10 +122,6 @@ const DevV4CosmicPage = () => {
               scrollMargin={8}
             >
               <div className="container mx-auto px-4">
-                <SectionHeader 
-                  title="OUR MISSION" 
-                  subtitle="Transforming development through AI innovation and community collaboration."
-                />
                 <Suspense fallback={<div className="h-[300px] w-full bg-transparent"></div>}>
                   <motion.div
                     ref={aboutRef}
@@ -156,10 +145,6 @@ const DevV4CosmicPage = () => {
               scrollMargin={8}
             >
               <div className="container mx-auto px-4">
-                <SectionHeader 
-                  title="WHY AI-POWERED DEV?" 
-                  subtitle="Harnessing intelligent agents to solve complex coding challenges with speed and precision."
-                />
                 <Suspense fallback={<div className="h-[400px] w-full bg-transparent"></div>}>
                   <motion.div
                     ref={agentRef}
@@ -183,10 +168,6 @@ const DevV4CosmicPage = () => {
               scrollMargin={8}
             >
               <div className="container mx-auto px-4">
-                <SectionHeader 
-                  title="OUR SERVICES" 
-                  subtitle="A constellation of solutions to power your development workflow."
-                />
                 <Suspense fallback={<div className="h-[500px] w-full bg-transparent"></div>}>
                   <motion.div
                     ref={servicesRef}
@@ -203,17 +184,13 @@ const DevV4CosmicPage = () => {
           
           {/* Projects Section - Further transition to dark background */}
           <div className="bg-transparent relative">
-            <div className="absolute inset-0 bg-gradient-to-b from-black/30 to-[#0d0d12]/70 z-0"></div>
+            <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-[#0d0d12]/40 to-[#0d0d12]/90 z-0"></div>
             <SectionAnchor 
               id="projects"
               className="py-16 md:py-20 relative z-10 min-h-[700px]"
               scrollMargin={8}
             >
               <div className="container mx-auto px-4">
-                <SectionHeader 
-                  title="FEATURED PROJECTS" 
-                  subtitle="Discover our latest innovations and client success stories."
-                />
                 <Suspense fallback={<div className="h-[600px] w-full bg-transparent"></div>}>
                   <motion.div
                     ref={projectsRef}
@@ -228,14 +205,15 @@ const DevV4CosmicPage = () => {
             </SectionAnchor>
           </div>
           
-          {/* Projects Logbook - Complete transition to solid dark background */}
-          <div className="bg-[#0d0d12]">
-            {/* Add downward-moving particles for the lower sections */}
-            <ParticleField density="low" yDirection="down" zIndex={1} />
+          {/* Projects Logbook - Subtle solid dark background */}
+          <div className="bg-transparent relative">
+            <div className="absolute inset-0 bg-[#0d0d12] z-0"></div>
+            {/* Add downward-moving particles for the lower sections with reduced opacity */}
+            <ParticleField density="low" yDirection="down" zIndex={1} opacity={0.3} />
             
             <SectionAnchor 
               id="projects-logbook"
-              className="py-16 md:py-20 min-h-[500px]"
+              className="py-16 md:py-20 relative z-10 min-h-[500px]"
               scrollMargin={8}
             >
               <div className="container mx-auto px-4">
@@ -291,10 +269,6 @@ const DevV4CosmicPage = () => {
               scrollMargin={8}
             >
               <div className="container mx-auto px-4">
-                <SectionHeader 
-                  title="HEAR FROM OUR AI" 
-                  subtitle="What our artificial teammates have to say about working with us."
-                />
                 <Suspense fallback={<div className="h-[350px] w-full bg-transparent"></div>}>
                   <motion.div
                     ref={testimonialsRef}

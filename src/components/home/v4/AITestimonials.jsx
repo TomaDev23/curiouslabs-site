@@ -47,7 +47,7 @@ const AITestimonials = () => {
 
   return (
     <motion.section 
-      className="relative py-24 overflow-hidden"
+      className="relative overflow-hidden"
       initial={{ opacity: 0, y: 50 }}
       whileInView={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
@@ -57,16 +57,6 @@ const AITestimonials = () => {
       <div className="absolute inset-0 bg-gradient-to-b from-gray-900/0 via-purple-900/10 to-gray-900/0"></div>
       
       <div className="container mx-auto px-4">
-        <motion.h2 
-          className="text-4xl font-bold text-center mb-16"
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
-        >
-          What the AIs Say About Us
-        </motion.h2>
-        
         <div className="relative h-[600px]">
           {/* Radar animation */}
           <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 -z-10">
