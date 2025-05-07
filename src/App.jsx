@@ -1,11 +1,18 @@
 import React, { Suspense, lazy, useEffect, useState } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import ScrollToTop from './components/ScrollToTop';
 import ErrorBoundary from './components/ErrorBoundary';
+
+// Import BackgroundManager from sandbox (new implementation)
+import BackgroundManager from './components/sandbox/BackgroundManager';
 
 // Main Page (critical, keep eager loaded)
 import Home from './pages/index.jsx';
 import SafeV4CosmicPage from './pages/safe_v4_cosmic.jsx';
+import JourneyV2 from './pages/journey-v2.jsx';
+
+// Restore lazy loading for BackgroundSandbox
+// import BackgroundSandbox from './pages/background_sandbox.jsx';
 
 // Lazy-loaded pages for better performance
 const ProductsPortal = lazy(() => import('./pages/products/index.jsx'));
@@ -25,6 +32,14 @@ const UniverseExperience = lazy(() => import('./pages/UniverseExperience.jsx'));
 const DevPage = lazy(() => import('./pages/dev.jsx'));
 const DevV4CosmicPage = lazy(() => import('./pages/dev_v4_cosmic.jsx'));
 const TestCanvasPage = lazy(() => import('./pages/test_canvas.jsx'));
+const BackgroundSandbox = lazy(() => import('./pages/background_sandbox.jsx'));
+const BackgroundFinal = lazy(() => import('./pages/background_final.jsx'));
+
+// Performance monitoring context
+const PerformanceContext = React.createContext({
+  metrics: {},
+  addMetric: () => {}
+});
 
 // Loading fallback component with timeout redirect
 const LoadingFallback = () => {
@@ -55,10 +70,112 @@ const LoadingFallback = () => {
   );
 };
 
+// BackgroundManagerWrapper component that only renders on specific routes
+const BackgroundManagerWrapper = () => {
+  const location = useLocation();
+  const allowedPaths = ['/', '/safe'];
+  const shouldRenderBackground = allowedPaths.includes(location.pathname);
+  
+  // Check for reduced motion preference
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+  const [renderStart, setRenderStart] = useState(null);
+  const { addMetric } = React.useContext(PerformanceContext);
+  
+  // Check for user's motion preference
+  useEffect(() => {
+    // Only run on client
+    if (typeof window === 'undefined') return;
+    
+    // Check initial preference
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    setPrefersReducedMotion(mediaQuery.matches);
+    
+    // Set render start time for performance monitoring
+    setRenderStart(performance.now());
+    
+    // Listen for changes
+    const handleChange = (e) => {
+      setPrefersReducedMotion(e.matches);
+      console.log(`User prefers reduced motion: ${e.matches}`);
+    };
+    
+    // Modern browsers use addEventListener
+    if (mediaQuery.addEventListener) {
+      mediaQuery.addEventListener('change', handleChange);
+      return () => mediaQuery.removeEventListener('change', handleChange);
+    } 
+    // Older browsers use deprecated addListener
+    else if (mediaQuery.addListener) {
+      mediaQuery.addListener(handleChange);
+      return () => mediaQuery.removeListener(handleChange);
+    }
+  }, []);
+  
+  // Track render completion time
+  useEffect(() => {
+    return () => {
+      if (renderStart && shouldRenderBackground) {
+        const renderEnd = performance.now();
+        const renderTime = renderEnd - renderStart;
+        addMetric('backgroundManager', { 
+          renderTime,
+          route: location.pathname,
+          timestamp: new Date().toISOString()
+        });
+        console.log(`BackgroundManager render time: ${renderTime.toFixed(2)}ms`);
+      }
+    };
+  }, [renderStart, shouldRenderBackground, location.pathname, addMetric]);
+  
+  return shouldRenderBackground ? (
+    <Suspense fallback={null}>
+      <BackgroundManager />
+    </Suspense>
+  ) : null;
+};
+
 export default function App() {
+  // Performance metrics state
+  const [metrics, setMetrics] = useState({});
+  
+  // Add performance metric
+  const addMetric = (key, value) => {
+    setMetrics(prev => {
+      const newMetrics = { ...prev };
+      if (!newMetrics[key]) {
+        newMetrics[key] = [];
+      }
+      newMetrics[key].push(value);
+      
+      // Limit array size to prevent memory issues
+      if (newMetrics[key].length > 50) {
+        newMetrics[key] = newMetrics[key].slice(-50);
+      }
+      
+      return newMetrics;
+    });
+  };
+  
+  // Log performance metrics periodically in development
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'development') {
+      const intervalId = setInterval(() => {
+        if (Object.keys(metrics).length > 0) {
+          console.log('Performance metrics:', metrics);
+        }
+      }, 60000); // Log every minute
+      
+      return () => clearInterval(intervalId);
+    }
+  }, [metrics]);
+
   return (
-    <>
+    <PerformanceContext.Provider value={{ metrics, addMetric }}>
       <ScrollToTop />
+      
+      {/* BackgroundManager only renders on permitted routes */}
+      <BackgroundManagerWrapper />
+      
       <Routes>
         {/* Promote V4 Cosmic experience as the main homepage */}
         <Route path="/" element={
@@ -163,12 +280,33 @@ export default function App() {
             <TestCanvasPage />
           </Suspense>
         } />
+        
+        {/* Background System Sandbox - Restored lazy loading */}
+        <Route path="/background-sandbox" element={
+          <Suspense fallback={<LoadingFallback />}>
+            <BackgroundSandbox />
+          </Suspense>
+        } />
+        
+        {/* New Final Background Route */}
+        <Route path="/background-final" element={
+          <Suspense fallback={<LoadingFallback />}>
+            <BackgroundFinal />
+          </Suspense>
+        } />
+        
+        <Route path="/journey-v2" element={
+          <Suspense fallback={<LoadingFallback />}>
+            <JourneyV2 />
+          </Suspense>
+        } />
+        
         <Route path="*" element={
           <Suspense fallback={<LoadingFallback />}>
             <NotFound />
           </Suspense>
         } />
       </Routes>
-    </>
+    </PerformanceContext.Provider>
   );
 }
