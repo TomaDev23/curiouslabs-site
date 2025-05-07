@@ -22,6 +22,15 @@ export default defineConfig({
   },
   server: {
     open: true,
+    historyApiFallback: true,
+    proxy: {
+      // Forward all routes to index.html for SPA routing
+      '/background-sandbox': {
+        target: 'http://localhost:5173',
+        changeOrigin: false,
+        rewrite: (path) => '/'
+      }
+    }
   },
   build: {
     rollupOptions: {

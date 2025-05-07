@@ -149,3 +149,15 @@ When a user requests a specific, targeted change:
    - Don't substitute your judgment for the user's explicit instructions
 
 **EXAMPLE OF FAILURE**: User repeatedly asks for a simple line to be added at the bottom of an image with specific styling. Instead of implementing this simple fix, the agent makes increasingly complex changes, removes working code, alters positioning, and introduces multiple issues while ignoring the straightforward solution provided by the user.
+
+
+lets try again
+
+
+you have mission and code resources. you dont need nothing but what i give, and you dont need to NOTHING beyond what i say. you caused me to reveret three sessions. this is waste of resources and my precious time. you understand that? you must stick to my plan, and when you have an issue you must freeze and ask what to do. i can solve any conflict with clear planning. you are not mission leader. you are a soldier in a squad. i am planning and in control of what to do when. you must follow the plan very very closely to avoid causing more damage and waste of resources!
+
+read my rules file too
+
+audit the plan, mark the code, simulate yourself using it to build a new atomic page. nothing but that. build it first, later we can do animations and details. you need to build it first and dont get lost on your way and do silly things like simplifying - does this project looks simple to you? its layerd carfully and you must work within it
+
+planning in depth only go

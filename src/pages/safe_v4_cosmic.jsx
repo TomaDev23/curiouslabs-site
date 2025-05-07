@@ -1,13 +1,19 @@
 import React, { Suspense, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import useBackgroundZone from '../hooks/useBackgroundZone';
 
 /**
  * Safe version of the DevV4CosmicPage with minimal dependencies
  * Used as a fallback when the full page fails to load
  */
 const SafeV4CosmicPage = () => {
+  // Background zone hooks for simplified sections
+  const { ref: heroZoneRef } = useBackgroundZone('hero');
+  const { ref: footerZoneRef } = useBackgroundZone('footer');
+  
   useEffect(() => {
     console.log('SafeV4CosmicPage mounted - minimal version');
+    console.log('Background zones initialized (simplified version)');
     
     return () => {
       console.log('SafeV4CosmicPage unmounted');
@@ -36,8 +42,11 @@ const SafeV4CosmicPage = () => {
       
       {/* Main content */}
       <main className="pt-20">
-        {/* Hero Section */}
-        <section className="py-20 text-center flex flex-col items-center justify-center min-h-[80vh] bg-gradient-to-b from-purple-900/20 to-gray-900">
+        {/* Hero Section with background zone */}
+        <section 
+          ref={heroZoneRef}
+          className="py-20 text-center flex flex-col items-center justify-center min-h-[80vh] bg-gradient-to-b from-purple-900/20 to-gray-900"
+        >
           <div className="container mx-auto px-4">
             <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
               Curious Labs
@@ -71,8 +80,11 @@ const SafeV4CosmicPage = () => {
         </section>
       </main>
       
-      {/* Footer */}
-      <footer className="bg-gray-900 border-t border-gray-800 py-8 mt-20">
+      {/* Footer with background zone */}
+      <footer 
+        ref={footerZoneRef}
+        className="bg-gray-900 border-t border-gray-800 py-8 mt-20"
+      >
         <div className="container mx-auto px-4 text-center text-gray-400">
           <p>© {new Date().getFullYear()} CuriousLabs. All rights reserved.</p>
         </div>

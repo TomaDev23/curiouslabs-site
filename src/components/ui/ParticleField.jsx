@@ -9,11 +9,17 @@ import { useBreakpoint } from '../../hooks/useBreakpoint.js';
  * @param {string} props.density - Particle density: 'low', 'medium', 'high'
  * @param {number} props.zIndex - z-index value for positioning
  * @param {string} props.yDirection - Direction of movement: 'up', 'down', 'mixed'
+ * @param {number} props.opacity - Overall opacity of particles (0-1)
+ * @param {number} props.speed - Animation speed multiplier
+ * @param {string} props.color - Base color for particles
  */
 const ParticleField = ({ 
   density = 'medium', 
   zIndex = 0,
-  yDirection = 'up'
+  yDirection = 'up',
+  opacity = 0.4,
+  speed = 1,
+  color = 'rgba(167, 139, 250, 0.3)'
 }) => {
   const breakpoint = useBreakpoint();
   const isMobile = breakpoint === 'mobile';
@@ -49,6 +55,20 @@ const ParticleField = ({
     return Math.random() > 0.5 ? -30 * randomFactor : 30 * randomFactor;
   };
   
+  // Parse color for use in gradients
+  const parseColor = (colorString) => {
+    if (colorString.startsWith('#')) {
+      // Convert hex to rgba
+      const r = parseInt(colorString.slice(1, 3), 16);
+      const g = parseInt(colorString.slice(3, 5), 16);
+      const b = parseInt(colorString.slice(5, 7), 16);
+      return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+    }
+    return colorString;
+  };
+  
+  const parsedColor = parseColor(color);
+  
   // Memoize particles to prevent unnecessary re-renders
   const particles = useMemo(() => {
     return Array.from({ length: getParticleCount() }).map((_, i) => {
@@ -65,20 +85,30 @@ const ParticleField = ({
         originalY: Math.random() * 100, // Store original position for animation
         size,
         duration: 10 + Math.random() * 15, // 10-25 seconds
-        speed: 10 + Math.random() * 15, // Speed for canvas animation
+        speed: (10 + Math.random() * 15) / speed, // Speed for canvas animation, adjusted by speed prop
         delay: Math.random() * 5,
         progress: Math.random(), // Current progress in the animation (0-1)
         opacity: Math.random() * 0.4 + 0.1, // 0.1-0.5
         direction: particleYDirection,
         randomFactor,
         xOffset: (Math.random() - 0.5) * 20, // Slight horizontal drift
-        color: 'rgba(167, 139, 250, 0.3)' // Purple tint
+        color: parsedColor
       };
     });
-  }, [density, isMobile, yDirection]);
+  }, [density, isMobile, yDirection, speed, parsedColor]);
   
   // Generate a few brighter particles for visual interest
   const brightParticles = useMemo(() => {
+    // Extract base color components for glow
+    let glowColor = 'rgba(147, 197, 253, 0.3)'; // Default blue glow
+    
+    if (parsedColor.startsWith('rgba(')) {
+      const parts = parsedColor.match(/rgba\((\d+),\s*(\d+),\s*(\d+),/);
+      if (parts && parts.length >= 4) {
+        glowColor = `rgba(${parts[1]}, ${parts[2]}, ${parts[3]}, 0.3)`;
+      }
+    }
+    
     return Array.from({ length: Math.floor(getParticleCount() / 6) }).map(() => {
       const randomFactor = Math.random() * 0.5 + 0.8;
       const particleYDirection = yDirection === 'mixed' 
@@ -90,16 +120,17 @@ const ParticleField = ({
         y: Math.random() * 100,
         originalY: Math.random() * 100,
         size: Math.random() * 2 + 1.5,
-        speed: 8 + Math.random() * 10,
+        speed: (8 + Math.random() * 10) / speed,
         progress: Math.random(),
         direction: particleYDirection,
         randomFactor,
         xOffset: (Math.random() - 0.5) * 15,
-        opacity: 0.6,
-        color: 'rgba(96, 165, 250, 0.4)', // Blue tone
+        opacity: 0.6 * opacity,
+        color: parsedColor,
+        glowColor
       };
     });
-  }, [density, yDirection]);
+  }, [density, yDirection, speed, parsedColor, opacity]);
   
   // Handle canvas resize
   const handleResize = () => {
@@ -185,7 +216,7 @@ const ParticleField = ({
           xPos, yPos, 0,
           xPos, yPos, particle.size * 3
         );
-        glow.addColorStop(0, 'rgba(147, 197, 253, 0.3)');
+        glow.addColorStop(0, particle.glowColor || 'rgba(147, 197, 253, 0.3)');
         glow.addColorStop(1, 'rgba(147, 197, 253, 0)');
         
         ctx.globalAlpha = currentOpacity * 0.7;

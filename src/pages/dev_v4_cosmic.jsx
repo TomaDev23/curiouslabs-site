@@ -1,9 +1,8 @@
 import React, { Suspense, lazy, useEffect } from 'react';
 import { motion } from 'framer-motion';
 
-// Always import SpaceCanvas eagerly for critical visual first paint
-import SpaceCanvas from '../components/home/v4/SpaceCanvas';
-// Eagerly load NavBar for navigation
+// Remove SpaceCanvas import since it's handled by BackgroundManager
+// Always import NavBar eagerly for navigation
 import NavBar from '../components/NavBar';
 // Eagerly load HeroPortal for immediate visible content
 import HeroPortal from '../components/home/v4/HeroPortal';
@@ -13,6 +12,9 @@ import SectionAnchor from '../components/ui/SectionAnchor';
 import ParticleField from '../components/ui/ParticleField';
 import CosmicHUD from '../components/ui/CosmicHUD';
 import ScrollToTop from '../components/ScrollToTop';
+
+// Import background zone hook
+import useBackgroundZone from '../hooks/useBackgroundZone';
 
 // Lazy load all other components which aren't needed for initial paint
 const LogoStrip = lazy(() => import('../components/LogoStrip'));
@@ -59,30 +61,44 @@ const DevV4CosmicPage = () => {
   const { ref: testimonialsRef, isVisible: testimonialsVisible } = useSectionReveal();
   const { ref: contactRef, isVisible: contactVisible } = useSectionReveal();
   
+  // Background zone hooks for each major section
+  const { ref: heroZoneRef } = useBackgroundZone('hero');
+  const { ref: missionZoneRef } = useBackgroundZone('mission');
+  const { ref: servicesZoneRef } = useBackgroundZone('services');
+  const { ref: projectsZoneRef } = useBackgroundZone('projects');
+  const { ref: testimonialsZoneRef } = useBackgroundZone('testimonials');
+  const { ref: footerZoneRef } = useBackgroundZone('footer');
+  
   // Register smooth scrolling for all hash links
   useEffect(() => {
     registerSmoothScrolling();
     
     // Add diagnostic logging
     console.log('DevV4CosmicPage mounted');
-    console.log('Imported components check:');
-    
-    // Check each component is imported correctly
-    try {
-      console.log('SpaceCanvas is available');
-    } catch(e) {
-      console.error('SpaceCanvas import failed:', e);
-    }
+    console.log('Background zones initialized');
     
     return () => {
       console.log('DevV4CosmicPage unmounted');
     };
   }, []);
   
+  // Helper to combine refs
+  const combineRefs = (...refs) => {
+    return (node) => {
+      refs.forEach(ref => {
+        if (!ref) return;
+        if (typeof ref === 'function') {
+          ref(node);
+        } else {
+          ref.current = node;
+        }
+      });
+    };
+  };
+  
   return (
     <div className="min-h-screen relative bg-black text-white overflow-hidden">
-      {/* Enhanced SpaceCanvas with fade to darker color */}
-      <SpaceCanvas />
+      {/* We no longer need SpaceCanvas here as it's handled by BackgroundManager */}
       
       {/* Add ParticleField component for floating particles - Medium density for main areas */}
       <ParticleField density="medium" zIndex={2} />
@@ -103,7 +119,10 @@ const DevV4CosmicPage = () => {
         {/* Main content with all components */}
         <main>
           {/* Hero Section - Transparent background to show stars */}
-          <div className="bg-transparent">
+          <div 
+            className="bg-transparent"
+            ref={heroZoneRef}
+          >
             <SectionAnchor 
               id="hero"
               className="relative pt-16 md:pt-18"
@@ -114,7 +133,10 @@ const DevV4CosmicPage = () => {
           </div>
           
           {/* About Section - Transparent to show stars */}
-          <div className="bg-transparent relative">
+          <div 
+            className="bg-transparent relative"
+            ref={missionZoneRef}
+          >
             <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/10 z-0"></div>
             <SectionAnchor 
               id="about"
@@ -136,8 +158,11 @@ const DevV4CosmicPage = () => {
             </SectionAnchor>
           </div>
           
-          {/* Agent-Powered Development - Very subtle gradient overlay on stars */}
-          <div className="bg-transparent relative">
+          {/* Agent-Powered Development - Now part of services zone */}
+          <div 
+            className="bg-transparent relative"
+            ref={servicesZoneRef}
+          >
             <div className="absolute inset-0 bg-gradient-to-b from-black/10 to-black/20 z-0"></div>
             <SectionAnchor 
               id="agent-powered"
@@ -159,7 +184,7 @@ const DevV4CosmicPage = () => {
             </SectionAnchor>
           </div>
           
-          {/* Services Orbital - Subtle gradient overlay on stars with increasing opacity */}
+          {/* Services Orbital - Part of services zone */}
           <div className="bg-transparent relative">
             <div className="absolute inset-0 bg-gradient-to-b from-black/20 to-black/30 z-0"></div>
             <SectionAnchor 
@@ -182,8 +207,11 @@ const DevV4CosmicPage = () => {
             </SectionAnchor>
           </div>
           
-          {/* Projects Section - Further transition to dark background */}
-          <div className="bg-transparent relative">
+          {/* Projects Section - Projects zone */}
+          <div 
+            className="bg-transparent relative"
+            ref={projectsZoneRef}
+          >
             <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-[#0d0d12]/40 to-[#0d0d12]/90 z-0"></div>
             <SectionAnchor 
               id="projects"
@@ -205,7 +233,7 @@ const DevV4CosmicPage = () => {
             </SectionAnchor>
           </div>
           
-          {/* Projects Logbook - Subtle solid dark background */}
+          {/* Projects Logbook - Part of projects zone */}
           <div className="bg-transparent relative">
             <div className="absolute inset-0 bg-[#0d0d12] z-0"></div>
             {/* Add downward-moving particles for the lower sections with reduced opacity */}
@@ -235,8 +263,11 @@ const DevV4CosmicPage = () => {
             </SectionAnchor>
           </div>
           
-          {/* Community Hub - Gradient back to gray-900 */}
-          <div className="bg-gradient-to-b from-[#0d0d12] to-gray-900">
+          {/* Community Hub - Part of testimonials zone */}
+          <div 
+            className="bg-gradient-to-b from-[#0d0d12] to-gray-900"
+            ref={testimonialsZoneRef}
+          >
             <SectionAnchor 
               id="community"
               className="py-16 md:py-20 min-h-[450px]"
@@ -261,7 +292,7 @@ const DevV4CosmicPage = () => {
             </SectionAnchor>
           </div>
           
-          {/* AI Testimonials - Gray-900 background */}
+          {/* AI Testimonials - Part of testimonials zone */}
           <div className="bg-gray-900">
             <SectionAnchor 
               id="testimonials"
@@ -283,8 +314,11 @@ const DevV4CosmicPage = () => {
             </SectionAnchor>
           </div>
           
-          {/* Contact Terminal - Gradient to black for footer */}
-          <div className="bg-gradient-to-b from-gray-900 to-black">
+          {/* Contact Terminal - Part of footer zone */}
+          <div 
+            className="bg-gradient-to-b from-gray-900 to-black"
+            ref={footerZoneRef}
+          >
             <SectionAnchor 
               id="contact"
               className="py-16 md:py-20 pb-32 min-h-[400px]"
@@ -309,7 +343,7 @@ const DevV4CosmicPage = () => {
             </SectionAnchor>
           </div>
           
-          {/* Footer Section - Using the new enhanced FooterExperience */}
+          {/* Footer Section - Part of footer zone */}
           <div className="bg-black">
             <section className="pt-0">
               <Suspense fallback={<div className="h-[100px] w-full bg-transparent"></div>}>

@@ -133,6 +133,20 @@ export default function NavBar() {
             </div>
           </div>
           
+          {/* Development mode only links */}
+          {isDevelopment && (
+            <Link 
+              to="/background-sandbox" 
+              className={`text-purple-300 hover:text-purple-200 transition relative group ${location.pathname === '/background-sandbox' ? 'text-purple-200' : ''}`}
+            >
+              BG Sandbox
+              {/* Base gradient line (always visible) */}
+              <div className="absolute -bottom-1 left-0 w-full h-0.5 bg-gradient-to-r from-purple-500/10 to-blue-500/10"></div>
+              {/* Hover effect gradient line (animates on hover) */}
+              <div className="absolute -bottom-1 left-0 w-full h-0.5 bg-gradient-to-r from-purple-500 to-blue-500 opacity-0 group-hover:opacity-100 scale-x-0 group-hover:scale-x-100 transition-all duration-700 ease-in-out origin-left"></div>
+            </Link>
+          )}
+          
           <Link 
             to="/tools" 
             className={`text-white hover:text-purple-300 transition relative group ${location.pathname === '/tools' ? 'text-purple-300' : ''}`}
@@ -219,15 +233,15 @@ export default function NavBar() {
               CodeLab
             </Link>
             
-            {/* Products dropdown for mobile */}
+            {/* Products dropdown (mobile) */}
             <div>
               <button 
-                className={`flex items-center justify-between w-full py-2 text-white hover:text-purple-300 ${location.pathname.includes('/products') ? 'text-purple-300' : ''}`}
                 onClick={toggleProductsDropdown}
+                className={`flex justify-between items-center w-full rounded-md px-3 py-2 text-left ${location.pathname.includes('/products') ? 'bg-[#383853] text-white' : 'text-gray-300 hover:bg-[#383853] hover:text-white'}`}
               >
-                Products
+                <span>Products</span>
                 <svg 
-                  className={`w-4 h-4 ml-1 transform transition-transform ${isProductsDropdownOpen ? 'rotate-180' : ''}`} 
+                  className={`w-4 h-4 ml-1 transform transition-transform ${isProductsDropdownOpen ? 'rotate-180' : 'rotate-0'}`} 
                   fill="none" 
                   stroke="currentColor" 
                   viewBox="0 0 24 24" 
@@ -236,46 +250,29 @@ export default function NavBar() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
               </button>
-              
-              {isProductsDropdownOpen && (
-                <div className="pl-4 border-l border-[#383853]">
-                  <Link 
-                    to="/products/aegis" 
-                    className={`block py-2 text-white hover:text-purple-300 ${location.pathname === '/products/aegis' ? 'text-purple-300' : ''}`}
-                  >
-                    Aegis
-                  </Link>
-                  <Link 
-                    to="/products/opspipe" 
-                    className={`block py-2 text-white hover:text-purple-300 ${location.pathname === '/products/opspipe' ? 'text-purple-300' : ''}`}
-                  >
-                    OpsPipe
-                  </Link>
-                  <Link 
-                    to="/products/moonsignal" 
-                    className={`block py-2 text-white hover:text-purple-300 ${location.pathname === '/products/moonsignal' ? 'text-purple-300' : ''}`}
-                  >
-                    MoonSignal
-                  </Link>
-                  <Link 
-                    to="/products/curious" 
-                    className={`block py-2 text-white hover:text-purple-300 ${location.pathname === '/products/curious' ? 'text-purple-300' : ''}`}
-                  >
-                    Curious
-                  </Link>
-                  <Link 
-                    to="/products/guardian" 
-                    className={`block py-2 text-white hover:text-purple-300 ${location.pathname === '/products/guardian' ? 'text-purple-300' : ''}`}
-                  >
-                    Guardian
-                  </Link>
-                </div>
-              )}
+              <div className={`transition-all duration-300 ease-in-out ${isProductsDropdownOpen ? 'max-h-60 opacity-100' : 'max-h-0 opacity-0 overflow-hidden'}`}>
+                <Link to="/products" className="block rounded-md pl-6 pr-3 py-2 text-gray-300 hover:bg-[#383853] hover:text-white">All Products</Link>
+                <Link to="/products/aegis" className="block rounded-md pl-6 pr-3 py-2 text-gray-300 hover:bg-[#383853] hover:text-white">Aegis</Link>
+                <Link to="/products/opspipe" className="block rounded-md pl-6 pr-3 py-2 text-gray-300 hover:bg-[#383853] hover:text-white">OpsPipe</Link>
+                <Link to="/products/moonsignal" className="block rounded-md pl-6 pr-3 py-2 text-gray-300 hover:bg-[#383853] hover:text-white">MoonSignal</Link>
+                <Link to="/products/curious" className="block rounded-md pl-6 pr-3 py-2 text-gray-300 hover:bg-[#383853] hover:text-white">Curious</Link>
+                <Link to="/products/guardian" className="block rounded-md pl-6 pr-3 py-2 text-gray-300 hover:bg-[#383853] hover:text-white">Guardian</Link>
+              </div>
             </div>
+            
+            {/* Development mode only links (mobile) */}
+            {isDevelopment && (
+              <Link 
+                to="/background-sandbox" 
+                className={`block rounded-md px-3 py-2 ${location.pathname === '/background-sandbox' ? 'bg-purple-800 text-white' : 'text-purple-300 hover:bg-purple-800 hover:text-white'}`}
+              >
+                Background Sandbox
+              </Link>
+            )}
             
             <Link 
               to="/tools" 
-              className={`block py-2 text-white hover:text-purple-300 ${location.pathname === '/tools' ? 'text-purple-300' : ''}`}
+              className={`block rounded-md px-3 py-2 ${location.pathname === '/tools' ? 'bg-[#383853] text-white' : 'text-gray-300 hover:bg-[#383853] hover:text-white'}`}
             >
               Tools
             </Link>
