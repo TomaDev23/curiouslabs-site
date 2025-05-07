@@ -31,7 +31,6 @@ const NotFound = lazy(() => import('./pages/404.jsx'));
 const UniverseExperience = lazy(() => import('./pages/UniverseExperience.jsx'));
 const DevPage = lazy(() => import('./pages/dev.jsx'));
 const DevV4CosmicPage = lazy(() => import('./pages/dev_v4_cosmic.jsx'));
-const TestCanvasPage = lazy(() => import('./pages/test_canvas.jsx'));
 const BackgroundSandbox = lazy(() => import('./pages/background_sandbox.jsx'));
 const BackgroundFinal = lazy(() => import('./pages/background_final.jsx'));
 
@@ -271,13 +270,6 @@ export default function App() {
         <Route path="/dev" element={
           <Suspense fallback={<LoadingFallback />}>
             <DevPage />
-          </Suspense>
-        } />
-        
-        {/* Preserve test_canvas diagnostic route */}
-        <Route path="/test_canvas" element={
-          <Suspense fallback={<LoadingFallback />}>
-            <TestCanvasPage />
           </Suspense>
         } />
         
