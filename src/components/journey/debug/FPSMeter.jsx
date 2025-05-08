@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 
 // Internal metadata for LEGIT compliance
-const metadata = {
+export const metadata = {
   id: 'fps_meter',
   scs: 'SCS-DEBUG',
   type: 'debug',
@@ -34,7 +34,7 @@ export default function FPSMeter() {
         
         // Update average FPS
         fpsHistoryRef.current.push(currentFps);
-        if (fpsHistoryRef.current.length > 10) {
+        if (fpsHistoryRef.current.length > 60) { // Track 60 frames for a more stable average
           fpsHistoryRef.current.shift();
         }
         
