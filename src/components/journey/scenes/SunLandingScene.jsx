@@ -1,5 +1,6 @@
 import React from 'react';
 import { clamp } from '../useScrollProgress';
+import SunFlarePulse from '../visual/SunFlarePulse';
 
 // Internal metadata for LEGIT compliance
 const metadata = {
@@ -7,7 +8,7 @@ const metadata = {
   scs: 'SCS6',
   type: 'scene',
   doc: 'contract_cosmic_scene.md',
-  status: 'placeholder' // Marked as placeholder for future development
+  status: 'implemented'
 };
 
 export default function SunLandingScene({ progress = 0 }) {
@@ -15,9 +16,30 @@ export default function SunLandingScene({ progress = 0 }) {
   
   return (
     <section className="h-screen relative overflow-hidden bg-gradient-to-b from-[#ffa500] via-[#ff8c00] to-[#ff4500]">
-      {/* Scene content will be added incrementally */}
+      {/* Enhanced sun core glow - more intense but original size */}
+      <div className="absolute inset-0 bg-gradient-radial from-yellow-200 via-orange-500 to-transparent opacity-90"></div>
+      
+      {/* Sun flare pulse effect - centered with adjusted intensity */}
       <div className="absolute inset-0 flex items-center justify-center">
-        <h1 className="text-4xl font-bold text-white">Scene: Sun Landing</h1>
+        <SunFlarePulse 
+          opacity={0.7} 
+          fps={24}
+        />
+      </div>
+      
+      {/* Intense center glow - original size */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[50vw] h-[50vw] rounded-full bg-white opacity-70 blur-3xl"></div>
+      
+      {/* Test header for parsing verification */}
+      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 z-50 text-center bg-white/50 px-8 py-4 rounded-xl">
+        <h1 className="text-7xl font-black text-black">
+          CGPT SAY CODE 23
+        </h1>
+      </div>
+      
+      {/* Development indicator - remove in production */}
+      <div className="absolute bottom-4 right-4 text-white text-sm opacity-50">
+        Scene: Sun Landing
       </div>
     </section>
   );

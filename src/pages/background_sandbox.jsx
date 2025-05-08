@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import CosmicJourneyController from '../components/journey/CosmicJourneyController';
 
 console.log("✅ BACKGROUND_SANDBOX.JSX PAGE LOADED");
@@ -17,8 +17,23 @@ const metadata = {
 };
 
 export default function BackgroundSandbox() {
+  useEffect(() => {
+    console.log("🚀 BackgroundSandbox component mounted");
+    console.log("📊 Window dimensions:", window.innerWidth, "x", window.innerHeight);
+    
+    // Log the current URL to verify routing
+    console.log("🔗 Current URL:", window.location.href);
+    
+    return () => {
+      console.log("💤 BackgroundSandbox component unmounted");
+    };
+  }, []);
+
   return (
     <div className="min-h-screen bg-black text-white">
+      <div className="fixed top-4 left-4 z-50 bg-black/70 p-3 rounded text-xs text-white font-mono">
+        Background Sandbox
+      </div>
       <CosmicJourneyController />
     </div>
   );

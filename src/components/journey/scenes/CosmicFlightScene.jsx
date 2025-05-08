@@ -2,6 +2,8 @@ import React from 'react';
 import { clamp } from '../useScrollProgress';
 import CosmicFlightBackdrop from '../visual/backdrops/CosmicFlightBackdrop';
 import StarfieldCanvas from '../visual/StarfieldCanvas';
+import ParallaxSpeedDust from '../visual/ParallaxSpeedDust';
+import GreenAuroraEffects from '../visual/GreenAuroraEffects';
 
 // Internal metadata for LEGIT compliance
 const metadata = {
@@ -19,7 +21,8 @@ export default function CosmicFlightScene({ progress = 0, particleConfig = {} })
     density = 40, 
     fps = 30, 
     hue = 0,
-    glow = 0.8
+    glow = 0.8,
+    speed = 3
   } = particleConfig;
   
   // White stars with enhanced glow
@@ -41,6 +44,19 @@ export default function CosmicFlightScene({ progress = 0, particleConfig = {} })
           baseColor={starColorHue}
           breathing={false} // No breathing in flight mode - stars streak by
           glow={glow}
+        />
+      </div>
+      
+      {/* Green aurora effects - confirmed working component */}
+      <GreenAuroraEffects />
+      
+      {/* Parallax Speed Dust - adds streaking particles with parallax effect */}
+      <div className="absolute inset-0 z-20 w-full h-full">
+        <ParallaxSpeedDust
+          opacity={intensity * 0.8}
+          speed={speed || 3}
+          density={density}
+          fps={fps}
         />
       </div>
       
