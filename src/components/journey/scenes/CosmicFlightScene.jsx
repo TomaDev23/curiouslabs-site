@@ -2,6 +2,15 @@ import React from 'react';
 import { clamp } from '../useScrollProgress';
 import CosmicFlightBackdrop from '../visual/backdrops/CosmicFlightBackdrop';
 
+// Internal metadata for LEGIT compliance
+const metadata = {
+  id: 'cosmic_flight_scene',
+  scs: 'SCS4',
+  type: 'scene',
+  doc: 'contract_cosmic_scene.md',
+  status: 'placeholder' // Marked as placeholder for future development
+};
+
 export default function CosmicFlightScene({ progress = 0 }) {
   const intensity = clamp(progress, 0, 1);
   

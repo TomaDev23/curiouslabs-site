@@ -287,11 +287,13 @@ export default function App() {
           </Suspense>
         } />
         
+        {/* Temporarily disabled journey-v2 route to avoid conflicts with background-sandbox
         <Route path="/journey-v2" element={
           <Suspense fallback={<LoadingFallback />}>
             <JourneyV2 />
           </Suspense>
         } />
+        */}
         
         <Route path="*" element={
           <Suspense fallback={<LoadingFallback />}>

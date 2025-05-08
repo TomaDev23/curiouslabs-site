@@ -1,6 +1,18 @@
 import React from 'react';
+import { clamp } from '../useScrollProgress';
+
+// Internal metadata for LEGIT compliance
+const metadata = {
+  id: 'sun_approach_scene',
+  scs: 'SCS5',
+  type: 'scene',
+  doc: 'contract_cosmic_scene.md',
+  status: 'placeholder' // Marked as placeholder for future development
+};
 
 export default function SunApproachScene({ progress = 0 }) {
+  const intensity = clamp(progress, 0, 1);
+  
   return (
     <section className="h-screen relative overflow-hidden bg-gradient-to-b from-[#f1f5f9] via-[#ffe4c4] to-[#ffa500]">
       {/* Scene content will be added incrementally */}

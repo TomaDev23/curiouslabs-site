@@ -1,5 +1,5 @@
 import React from 'react';
-import JourneyV2 from './journey-v2';
+import CosmicJourneyController from '../components/journey/CosmicJourneyController';
 
 console.log("✅ BACKGROUND_SANDBOX.JSX PAGE LOADED");
 
@@ -9,7 +9,7 @@ console.log("✅ BACKGROUND_SANDBOX.JSX PAGE LOADED");
  */
 
 // LEGIT metadata for protocol compliance
-export const metadata = {
+const metadata = {
   id: 'background_sandbox',
   scs: 'SCS2',
   type: 'page',
@@ -17,5 +17,9 @@ export const metadata = {
 };
 
 export default function BackgroundSandbox() {
-  return <JourneyV2 />;
+  return (
+    <div className="min-h-screen bg-black text-white">
+      <CosmicJourneyController />
+    </div>
+  );
 } 

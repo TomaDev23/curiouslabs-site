@@ -25,12 +25,7 @@
   animation: spin-slow-reverse 60s linear infinite;
 }
 
-/* Star field effect for background */
-.star-field {
-  background-image: radial-gradient(circle at center, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
-  background-size: 60px 60px;
-  background-position: 0 0;
-}
+/* Replaced with Tailwind bg-star-field utility */
 
 /* Subtle twinkle effect for core */
 @keyframes twinkle {

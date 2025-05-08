@@ -1,7 +1,14 @@
 import { useRef, useEffect, useState } from 'react';
 
+// Change from export to const - preserve the information without breaking Fast Refresh
+const metadata = {
+  id: 'cosmic_reveal_backdrop',
+  scs: 'SCS3',
+  type: 'visual',
+  doc: 'contract_cosmic_backdrop.md'
+};
+
 export default function CosmicRevealBackdrop({ progress = 0 }) {
-  const canvasRef = useRef(null);
   const nebulaCanvasRef = useRef(null);
   const particleRef = useRef(null);
   const [initialized, setInitialized] = useState(false);
@@ -23,9 +30,10 @@ export default function CosmicRevealBackdrop({ progress = 0 }) {
     // Particle properties
     let particles = [];
     
-    // Generate particles - balanced count for smooth movement
+    // Generate particles - reduced count for performance
     const generateParticles = () => {
-      const particleCount = 120; // Increased from 100
+      // Reduced particle count by 50% for performance (was 120)
+      const particleCount = 60 + Math.floor(progress * 20); 
       particles = [];
       
       for (let i = 0; i < particleCount; i++) {
@@ -50,9 +58,22 @@ export default function CosmicRevealBackdrop({ progress = 0 }) {
       }
     };
     
-    // Animation loop
+    // Animation loop with performance throttling
     let animationId;
-    const animate = () => {
+    let lastFrameTime = 0;
+    const targetFPS = 30; // Reduced from 60 for better performance
+    const frameInterval = 1000 / targetFPS;
+    
+    const animate = (timestamp) => {
+      // Only render if enough time has passed (throttle to target FPS)
+      const elapsed = timestamp - lastFrameTime;
+      if (elapsed < frameInterval) {
+        animationId = requestAnimationFrame(animate);
+        return;
+      }
+      
+      lastFrameTime = timestamp - (elapsed % frameInterval);
+      
       // Clear with less fade for smoother trails
       ctx.fillStyle = 'rgba(0, 0, 0, 0.2)'; // Back to original alpha
       ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -282,170 +303,6 @@ export default function CosmicRevealBackdrop({ progress = 0 }) {
     };
   }, [progress]);
   
-  // Star field animation - more elegant, less flashy
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-    
-    let stars = [];
-    let initialized = false;
-    
-    // Set canvas dimensions
-    const resize = () => {
-      canvas.width = canvas.offsetWidth;
-      canvas.height = canvas.offsetHeight;
-      
-      // Regenerate stars when resizing
-      generateStars();
-      initialized = true;
-    };
-    
-    // Star properties - more refined
-    const generateStars = () => {
-      // Slightly lower density
-      const density = 0.8 + progress * 1.5; // Reduced from 1 + progress * 2
-      const starCount = Math.floor((canvas.width * canvas.height) / (2800 / density)); // Reduced density
-      stars = [];
-      
-      // Create different star types with more refined properties
-      for (let i = 0; i < starCount; i++) {
-        // Fewer bright stars for subtlety
-        const starType = Math.random();
-        const brightStarThreshold = 0.92 - (progress * 0.1); // 8%-18% chance (reduced from 12%-27%)
-        let starProps;
-        
-        if (starType > brightStarThreshold) { // Bright stars
-          starProps = {
-            radius: Math.random() * 1.2 + 0.7, // 0.7-1.9 (reduced from 0.8-2.3)
-            opacity: Math.random() * 0.25 + 0.65, // 0.65-0.9 (reduced from 0.7-1.0)
-            twinkleSpeed: Math.random() * 0.015 + 0.008, // Half speed
-            flickerSpeed: Math.random() * 0.01 + 0.004, // Half speed
-            // More refined colors - deeper blues
-            color: Math.random() < 0.4 + (progress * 0.2) ? 
-              `hsl(${170 + Math.random() * 40}, 75%, 70%)` : // More muted teals
-              `hsl(${220 + Math.random() * 30}, 70%, 75%)`, // Deeper blues
-            expansion: 1 + Math.random() * progress * 1.5, // Gentler growth (1.5 vs 2)
-          };
-        } else { // Background stars
-          starProps = {
-            radius: Math.random() * 0.5 + 0.2, // 0.2-0.7 (reduced from 0.2-0.9)
-            opacity: Math.random() * 0.3 + 0.25, // 0.25-0.55 (reduced from 0.3-0.7)
-            twinkleSpeed: Math.random() * 0.01 + 0.004, // Half speed
-            flickerSpeed: Math.random() * 0.005 + 0.001, // Half speed
-            color: `hsl(${210 + Math.random() * 60}, ${45 + progress * 20}%, ${80 + Math.random() * 15}%)`,
-            expansion: 1 + Math.random() * progress * 0.7, // Much less growth (0.7 vs 1)
-          };
-        }
-        
-        // Distance from center affects movement (gentler movement)
-        const centerX = canvas.width / 2;
-        const centerY = canvas.height / 2;
-        const x = Math.random() * canvas.width;
-        const y = Math.random() * canvas.height;
-        
-        // Calculate angle from center for expansion direction
-        const angleFromCenter = Math.atan2(y - centerY, x - centerX);
-        
-        stars.push({
-          x,
-          y,
-          ...starProps,
-          twinklePhase: Math.random() * Math.PI * 2,
-          flickerPhase: Math.random() * Math.PI * 2,
-          centerDist: Math.sqrt(Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2)),
-          moveAngle: angleFromCenter,
-        });
-      }
-      
-      // Mark as initialized
-      setInitialized(true);
-    };
-    
-    // Fix animation loop to avoid constant reassignment
-    let animationId;
-    const animate = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      
-      // Center for expansion effect
-      const centerX = canvas.width / 2;
-      const centerY = canvas.height / 2;
-      
-      // Draw each star
-      stars.forEach(star => {
-        // Update twinkle and flicker - gentler animation
-        star.twinklePhase += star.twinkleSpeed;
-        star.flickerPhase += star.flickerSpeed;
-        
-        // More subtle variations (0.8-1.0 instead of 0.7-1.0)
-        const twinkleFactor = 0.8 + 0.2 * Math.sin(star.twinklePhase);
-        const flickerFactor = 0.8 + 0.2 * Math.sin(star.flickerPhase * 0.5);
-        
-        // Calculate expansion-based movement (gentler)
-        const expansionSpeed = 0.09 + (progress * 0.3); // Slightly increased from 0.07 + 0.28
-        const speedFactor = star.centerDist * 0.0002 * expansionSpeed * star.expansion; // Consistent speed factor
-        
-        // Move stars outward with progress - more gradually
-        if (progress > 0.25) { // Delayed start (0.25 vs 0.2)
-          const moveAmount = speedFactor * (progress - 0.25) * 2.3; // Increased from 2.0 for smoother movement
-          star.x += Math.cos(star.moveAngle) * moveAmount;
-          star.y += Math.sin(star.moveAngle) * moveAmount;
-        }
-        
-        // Wrap around edges
-        if (star.x < -50) star.x = canvas.width + 50;
-        if (star.x > canvas.width + 50) star.x = -50;
-        if (star.y < -50) star.y = canvas.height + 50;
-        if (star.y > canvas.height + 50) star.y = -50;
-        
-        // Draw star with more subtle glow
-        const radius = star.radius * twinkleFactor * star.expansion;
-        const opacity = star.opacity * twinkleFactor * flickerFactor;
-        
-        // Subtler glow for stars
-        if (radius > 0.7) {
-          ctx.shadowColor = star.color;
-          ctx.shadowBlur = radius * (2 + progress * 2); // Gentler glow (2+2 vs 3+3)
-        }
-        
-        ctx.beginPath();
-        ctx.arc(star.x, star.y, radius, 0, Math.PI * 2);
-        
-        // Extract hue from color for vibrance adjustment with progress
-        const colorParts = star.color.match(/hsl\((\d+),\s*(\d+)%,\s*(\d+)%\)/);
-        if (colorParts) {
-          // More subtle saturation/lightness boost
-          const satBoost = Math.min(100, parseInt(colorParts[2]) + (progress * 7)); // Reduced (7 vs 10)
-          const lightBoost = Math.min(100, parseInt(colorParts[3]) + (progress * 3)); // Reduced (3 vs 5)
-          ctx.fillStyle = `hsla(${colorParts[1]}, ${satBoost}%, ${lightBoost}%, ${opacity})`;
-        } else {
-          ctx.fillStyle = star.color.replace('hsl', 'hsla').replace(')', `, ${opacity})`);
-        }
-        
-        ctx.fill();
-        ctx.shadowBlur = 0; // Reset blur
-      });
-      
-      animationId = requestAnimationFrame(animate);
-    };
-    
-    // Initialize once
-    if (!initialized) {
-      resize();
-      window.addEventListener('resize', resize);
-    }
-    
-    animationId = requestAnimationFrame(animate);
-    
-    // Cleanup
-    return () => {
-      window.removeEventListener('resize', resize);
-      cancelAnimationFrame(animationId);
-    };
-  }, [progress, initialized]);
-  
   // Calculate aurora animation - more subtle intensity
   const auroraIntensity = Math.min(1, progress * 1.5); // Gentler increase (1.5 vs 2)
   
@@ -471,117 +328,35 @@ export default function CosmicRevealBackdrop({ progress = 0 }) {
         style={{ mixBlendMode: 'screen' }}
       />
       
-      {/* Star field canvas */}
+      {/* Particle acceleration effect - flowing outward as progress increases */}
       <canvas 
-        ref={canvasRef}
+        ref={particleRef}
         className="absolute inset-0 w-full h-full"
         style={{ mixBlendMode: 'screen' }}
       />
       
-      {/* Particle acceleration canvas */}
-      <canvas 
-        ref={particleRef}
+      {/* Aurora effects - glow from the edges */}
+      <div 
         className="absolute inset-0 w-full h-full"
-        style={{ 
-          mixBlendMode: 'screen',
-          opacity: Math.min(1, 0.15 + progress * 0.6) // Reduced opacity (0.15+0.6 vs 0.2+0.8)
-        }}
-      />
-      
-      {/* Aurora wave 1 - left side with more subtle glow */}
-      <div 
-        className="absolute left-0 bottom-0 w-1/3 h-screen"
         style={{
-          background: `linear-gradient(to top, 
-            rgba(${70 + progress * 50}, ${120 + progress * 70}, ${160 + progress * 40}, ${0.12 + auroraIntensity * 0.12}), 
-            rgba(${50 + progress * 30}, ${90 + progress * 50}, ${160 + progress * 40}, ${0.08 + auroraIntensity * 0.08}) 40%, 
-            rgba(${30 + progress * 20}, ${70 + progress * 40}, ${140 + progress * 40}, ${0.04 + auroraIntensity * 0.04}) 70%, 
-            transparent 100%)`,
-          filter: `blur(${35 + auroraIntensity * 10}px)`, // Increased blur for softness
-          opacity: 0.15 + (auroraIntensity * 0.3), // Reduced opacity
-          transform: `translateX(${-8 + auroraIntensity * 8}%) scaleX(${0.9 + auroraIntensity * 0.15})`, // Less movement
-          animation: 'auroraWave1 15s infinite alternate ease-in-out', // Slower animation (15s vs 10s)
+          boxShadow: `inset 0 0 ${150 + progress * 100}px ${60 + progress * 40}px rgba(100, 120, 255, ${Math.min(0.35, auroraIntensity * 0.35)})`,
+          opacity: auroraIntensity * 0.9, // Reduced from 1.0
+          animation: 'auroraGlow 45s infinite alternate ease-in-out', // Slower animation (45s vs 30s)
         }}
       />
       
-      {/* Aurora wave 2 - center with more subtle glow */}
-      <div 
-        className="absolute left-1/3 bottom-0 w-1/3 h-screen"
-        style={{
-          background: `linear-gradient(to top, 
-            rgba(${110 + progress * 30}, ${70 + progress * 50}, ${180 + progress * 45}, ${0.12 + auroraIntensity * 0.12}), 
-            rgba(${130 + progress * 30}, ${90 + progress * 50}, ${200 + progress * 25}, ${0.08 + auroraIntensity * 0.08}) 40%, 
-            rgba(${150 + progress * 30}, ${110 + progress * 50}, ${220 + progress * 10}, ${0.04 + auroraIntensity * 0.04}) 70%, 
-            transparent 100%)`,
-          filter: `blur(${40 + auroraIntensity * 8}px)`, // Increased blur
-          opacity: 0.15 + (auroraIntensity * 0.35), // Reduced opacity
-          transform: `scaleY(${0.96 + auroraIntensity * 0.1})`, // Less scaling
-          animation: 'auroraWave2 18s infinite alternate-reverse ease-in-out', // Slower (18s vs 15s)
-        }}
-      />
-      
-      {/* Aurora wave 3 - right side with more subtle glow */}
-      <div 
-        className="absolute right-0 bottom-0 w-1/3 h-screen"
-        style={{
-          background: `linear-gradient(to top, 
-            rgba(${50 + progress * 50}, ${140 + progress * 50}, ${180 + progress * 45}, ${0.12 + auroraIntensity * 0.12}), 
-            rgba(${70 + progress * 40}, ${120 + progress * 50}, ${160 + progress * 50}, ${0.08 + auroraIntensity * 0.08}) 40%, 
-            rgba(${90 + progress * 30}, ${100 + progress * 50}, ${140 + progress * 70}, ${0.04 + auroraIntensity * 0.04}) 70%, 
-            transparent 100%)`,
-          filter: `blur(${40 + auroraIntensity * 10}px)`, // Increased blur
-          opacity: 0.15 + (auroraIntensity * 0.3), // Reduced opacity
-          transform: `translateX(${8 - auroraIntensity * 8}%) scaleX(${0.9 + auroraIntensity * 0.15})`, // Less movement
-          animation: 'auroraWave3 16s infinite alternate ease-in-out', // Slower (16s vs 12s)
-        }}
-      />
-      
-      {/* Atmospheric glow - more subtle */}
-      <div 
-        className="absolute inset-x-0 top-0 h-1/3"
-        style={{
-          background: `linear-gradient(to bottom, 
-            rgba(${110 + progress * 30}, ${130 + progress * 60}, ${210 + progress * 20}, ${0.1 * progress}), 
-            rgba(${90 + progress * 30}, ${110 + progress * 60}, ${190 + progress * 20}, ${0.07 * progress}) 40%, 
-            rgba(${70 + progress * 30}, ${90 + progress * 60}, ${170 + progress * 20}, ${0.03 * progress}) 70%, 
-            transparent 100%)`,
-          filter: `blur(${30 * progress}px)`, // Increased blur
-          opacity: Math.min(1, progress * 1.5), // Gentler appearance (1.5 vs 2)
-          animation: 'atmosphereBreak 15s infinite alternate ease-in-out', // Slower (15s vs 10s)
-          display: progress > 0.15 ? 'block' : 'none', // Show a bit later (15% vs 10%)
-        }}
-      />
-      
-      {/* Add keyframes for animations - gentler, slower animations */}
+      {/* Add keyframes */}
       <style jsx>{`
         @keyframes breatheBackground {
-          0% { filter: hue-rotate(0deg) brightness(1); }
-          50% { filter: hue-rotate(${10 + progress * 10}deg) brightness(${1 + progress * 0.15}); } /* Reduced rotation and brightness */
-          100% { filter: hue-rotate(0deg) brightness(1); }
+          0% { background-position: 50% 50%; }
+          50% { background-position: 51% 51%; }
+          100% { background-position: 49% 49%; }
         }
         
-        @keyframes auroraWave1 {
-          0% { transform: translateX(-6%) scaleY(0.92) scaleX(${0.9 + auroraIntensity * 0.15}); opacity: ${0.15 + (auroraIntensity * 0.25)}; } /* Less movement */
-          50% { transform: translateX(-3%) scaleY(1.08) scaleX(${0.95 + auroraIntensity * 0.15}); opacity: ${0.2 + (auroraIntensity * 0.3)}; }
-          100% { transform: translateX(-7%) scaleY(0.98) scaleX(${0.92 + auroraIntensity * 0.15}); opacity: ${0.18 + (auroraIntensity * 0.28)}; }
-        }
-        
-        @keyframes auroraWave2 {
-          0% { transform: translateY(1.5%) scaleY(0.96); opacity: ${0.15 + (auroraIntensity * 0.25)}; } /* Less movement */
-          50% { transform: translateY(-1.5%) scaleY(1.03); opacity: ${0.2 + (auroraIntensity * 0.35)}; }
-          100% { transform: translateY(0.5%) scaleY(0.99); opacity: ${0.18 + (auroraIntensity * 0.3)}; }
-        }
-        
-        @keyframes auroraWave3 {
-          0% { transform: translateX(6%) scaleY(1.08) scaleX(${0.9 + auroraIntensity * 0.15}); opacity: ${0.15 + (auroraIntensity * 0.25)}; } /* Less movement */
-          50% { transform: translateX(3%) scaleY(0.92) scaleX(${0.95 + auroraIntensity * 0.15}); opacity: ${0.2 + (auroraIntensity * 0.3)}; }
-          100% { transform: translateX(7%) scaleY(0.98) scaleX(${0.92 + auroraIntensity * 0.15}); opacity: ${0.18 + (auroraIntensity * 0.28)}; }
-        }
-        
-        @keyframes atmosphereBreak {
-          0% { opacity: ${Math.min(1, progress * 1.4)}; transform: translateY(0px); } /* Reduced opacity change */
-          50% { opacity: ${Math.min(1, progress * 1.5)}; transform: translateY(-3px); } /* Less movement (-3px vs -5px) */
-          100% { opacity: ${Math.min(1, progress * 1.45)}; transform: translateY(0px); }
+        @keyframes auroraGlow {
+          0% { box-shadow: inset 0 0 ${150 + progress * 100}px ${60 + progress * 40}px rgba(100, 120, 255, ${Math.min(0.3, auroraIntensity * 0.3)}); }
+          50% { box-shadow: inset 0 0 ${150 + progress * 100}px ${60 + progress * 40}px rgba(120, 100, 255, ${Math.min(0.32, auroraIntensity * 0.32)}); }
+          100% { box-shadow: inset 0 0 ${150 + progress * 100}px ${60 + progress * 40}px rgba(90, 110, 255, ${Math.min(0.27, auroraIntensity * 0.27)}); }
         }
       `}</style>
     </div>
