@@ -30,13 +30,6 @@ export default function SunLandingScene({ progress = 0 }) {
       {/* Intense center glow - original size */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[50vw] h-[50vw] rounded-full bg-white opacity-70 blur-3xl"></div>
       
-      {/* Test header for parsing verification */}
-      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 z-50 text-center bg-white/50 px-8 py-4 rounded-xl">
-        <h1 className="text-7xl font-black text-black">
-          CGPT SAY CODE 23
-        </h1>
-      </div>
-      
       {/* Development indicator - remove in production */}
       <div className="absolute bottom-4 right-4 text-white text-sm opacity-50">
         Scene: Sun Landing
