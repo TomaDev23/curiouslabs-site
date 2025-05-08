@@ -1,3 +1,250 @@
+
+<thinking>
+After carefully reviewing the provided files, including the critical rules and guidelines, here is my analysis and plan for executing the jitter reduction phases:
+
+Key Rules to Follow:
+- Only implement what is explicitly requested in each phase
+- Preserve existing code structure and architecture 
+- Make minimal changes necessary to achieve each phase's goal
+- Respect the existing asset management system and path references
+- Adhere strictly to the documented tech stack and styling approach
+- Do not add any enhancements or changes beyond the phase scope
+- Analyze code thoroughly before making edits
+- Request clarification if any part of a phase is unclear
+- Stop and reassess immediately if user provides negative feedback
+
+Phase Execution Plan:
+
+Phase 1: Lock Animation Timings
+- Standardize duration, delay, ease across all animated components 
+- Use exact transition config provided, no variations
+- Apply to HeroPortal, ServicesOrbital, Metrics, ProjectsLogbook
+- Do not touch any other props, styles or logic
+
+Phase 2: Breakpoint Refactor  
+- Create useIsMobile hook in specified location
+- Replace direct window.innerWidth usage with useIsMobile 
+- Refactor ParticleField, SpaceCanvas, ServicesOrbital, HeroPortal
+- Do not change any component's layout, order or non-breakpoint logic
+
+Phase 3: Animation Sync & Stagger Unification
+- Create animationTiming.js with provided config
+- Replace hardcoded animation values with config references
+- Eliminate randomized durations/delays 
+- Ensure mobile and desktop have smooth, synced animations
+- Do not change any animation types, styles or variants
+
+Phase 4: Environmental Blur & GPU Load Harmonization  
+- Create blurConfig.js utility with provided constants
+- Refactor SpaceCanvas, HeroPortal, Metrics, ServicesOrbital
+- Replace responsive blur Tailwind classes with blurConfig references
+- Ensure glow/ambient effects use GPU-safe blur on mobile
+- Do not modify any colors, opacities, layer order or non-blur styles
+
+Validation & Tracking:
+- After each phase, run Lighthouse audits on /test_canvas and / 
+- Verify no layout shifts, repaint jitter or animation desyncs
+- Ensure no unintended visual changes occurred
+- Update documentation with each phase's changes
+- Commit with descriptive message after each phase
+
+If any step fails validation or receives negative user feedback, I will stop immediately, report the issue, and await further instructions. I will not attempt to self-correct or deviate from the explicit scope.
+
+Please let me know if you would like me to proceed with this phased execution plan while adhering strictly to the provided rules and constraints.
+</thinking>
+
+Search files...
+<search_quality_reflection>
+The search results provide a good overview of the jitter reduction plan and its phases, including key details like:
+
+- The specific components and files that need to be modified in each phase
+- The types of changes needed (e.g. standardizing animation timings, refactoring breakpoint logic)
+- Validation steps to confirm the fixes worked as intended
+- Important rules and constraints to follow during implementation
+
+It also covers some important meta aspects like:
+
+- Simulating the changes first before making any actual code edits
+- Stopping immediately if any step fails validation or gets negative user feedback
+- Updating documentation after each phase
+- Committing changes with descriptive messages
+
+However, to fully map out an actionable plan, I think some additional information could still be helpful:
+
+- The exact code changes needed in each target file (e.g. what CSS properties to modify)
+- How to batch the edits to minimize iterations while still allowing frequent validation
+- More specifics on the types of documentation updates required
+- Clearer guidance on how to handle potential conflicts between the phases
+
+So while this provides a solid foundation, I would probably do a bit more targeted searching and code analysis before finalizing a step-by-step execution plan. The overall phased approach seems sound, but ironing out those implementation details will be important.
+</search_quality_reflection>
+
+<search_quality_score>4</search_quality_score>
+
+Search files...
+<search_quality_reflection>
+The additional search results provide more of the specific details needed to finalize a comprehensive execution plan for the jitter reduction phases. Key additions include:
+
+- Exact code changes to make in each target file, like the CSS properties to modify for animation timings and the JSX structure to use for adding Suspense boundaries
+- Suggestions for how to batch the edits, like doing typography changes first, then background optimizations
+- More specifics on documentation, like updating the Site Map and including descriptive commit messages
+- Guidance on handling potential conflicts, such as ensuring typography changes don't break animations and testing background optimizations with text overlays to verify readability
+
+With these extra implementation details, I feel I now have enough context to put together a solid step-by-step plan that covers all the key aspects - the technical changes to make, the order to make them in, how to validate and document each phase, and how to mitigate risks.
+
+The only piece I might still be missing is an estimate of how long each phase/batch of changes might take. But I could probably come up with rough timelines based on the scope of edits needed in each phase.
+
+Overall, between the original search and these additional targeted results, I believe I have a sufficiently comprehensive view of the work required to smoothly execute this jitter reduction initiative while adhering to all the project constraints and best practices. The phased approach, validation steps, and risk mitigation strategies give me confidence it can be done in a controlled, incremental way.
+</search_quality_reflection>
+
+<search_quality_score>5</search_quality_score>
+
+<result>
+After thoroughly analyzing the jitter reduction plan, relevant files, and project rules, here is my comprehensive simulation and execution plan:
+
+# 🎯 Jitter Reduction Execution Plan
+
+## 🔒 Strict Adherence to Rules
+- No deviations from documented specs
+- Preserve existing code structure 
+- Make minimal changes to achieve each phase's goal
+- Use only approved tech stack and styling
+- No enhancements beyond explicit scope
+- Thoroughly analyze code before editing
+- Stop and report immediately if any issues arise
+
+## 📋 Phase Details & Simulation
+
+### 🎨 Phase 1: Lock Animation Timings
+- Standardize `duration`, `delay`, `ease` across all animated components 
+- Use exact transition config provided
+- Apply to `HeroPortal`, `ServicesOrbital`, `Metrics`, `ProjectsLogbook`
+- No changes to other props, styles or logic
+
+#### Key Code Changes
+```js
+// Standardize everywhere 
+transition={{
+  duration: 0.3,
+  delay: 0.1,  
+  ease: 'easeOut'
+}}
+```
+
+### 🌐 Phase 2: Breakpoint Refactor
+- Create `useIsMobile` hook in `src/hooks/useIsMobile.js`
+- Replace direct `window.innerWidth` usage with `useIsMobile` 
+- Refactor `ParticleField`, `SpaceCanvas`, `ServicesOrbital`, `HeroPortal`
+- No changes to layout, order or non-breakpoint logic
+
+#### Key Code Changes  
+```js
+// useIsMobile.js
+export const useIsMobile = () => {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const update = () => setIsMobile(window.innerWidth < 768);
+    update(); // Initial
+    window.addEventListener('resize', update); 
+    return () => window.removeEventListener('resize', update);
+  }, []);
+
+  return isMobile;
+};
+```
+
+### 🎬 Phase 3: Animation Sync
+- Create `animationTiming.js` with provided config
+- Replace hardcoded animation values with config references
+- Eliminate randomized durations/delays 
+- Ensure smooth, synced animations on all devices
+- No changes to animation types, styles or variants
+
+#### Key Code Changes
+```js
+// animationTiming.js
+export const ANIMATION_CONFIG = {
+  duration: 0.35,
+  delay: 0.05,
+  staggerChildren: 0.1,
+  mobileStagger: 0.05  
+};
+```
+
+### 🖌️ Phase 4: Blur & GPU Optimization
+- Create `blurConfig.js` utility with provided constants
+- Refactor `SpaceCanvas`, `HeroPortal`, `Metrics`, `ServicesOrbital` 
+- Replace responsive blur classes with `blurConfig` references
+- Ensure GPU-safe effects on mobile
+- No changes to colors, opacities, layer order or non-blur styles
+
+#### Key Code Changes
+```js
+// blurConfig.js
+export const BLUR_CONFIG = {
+  default: 'blur-md',
+  soft: 'blur-sm',
+  strong: 'blur-xl',
+  gpuSafeMobile: 'blur-sm md:blur-md'
+};
+```
+
+## 📋 Execution & Validation Plan
+
+1. Implement Phase 1 (Animation Timings)
+   - Commit with descriptive message
+   - Run Lighthouse audits on `/test_canvas` and `/`
+   - Verify no animation desyncs or visual changes
+   - Update Site Map and other relevant docs
+
+2. Implement Phase 2 (Breakpoint Refactor) 
+   - Commit with descriptive message
+   - Run Lighthouse audits on `/test_canvas` and `/`
+   - Verify no layout shifts or responsiveness issues
+   - Update Site Map and other relevant docs
+
+3. Implement Phase 3 (Animation Sync)
+   - Commit with descriptive message 
+   - Run Lighthouse audits on `/test_canvas` and `/`
+   - Verify smooth, synced animations on all devices
+   - Update Site Map and other relevant docs
+
+4. Implement Phase 4 (Blur & GPU Optimization)
+   - Commit with descriptive message
+   - Run Lighthouse audits on `/test_canvas` and `/` 
+   - Verify no visual changes or performance regressions
+   - Update Site Map and other relevant docs
+
+5. Final Validation
+   - Thorough manual testing of all modified components
+   - Verify no unintended visual changes
+   - Confirm Lighthouse scores remain stable
+   - Get final approval from project lead
+
+## ⚠️ Risk Mitigation
+- Test typography changes don't break animations
+- Verify background optimizations maintain readability 
+- Ensure Suspense boundaries don't conflict with motion wrappers
+- Avoid re-render loops from visibility triggers
+
+## ⏰ Estimated Timeline
+- Phase 1 (Animation Timings): 1-2 days
+- Phase 2 (Breakpoint Refactor): 2-3 days 
+- Phase 3 (Animation Sync): 1-2 days
+- Phase 4 (Blur & GPU Optimization): 2-3 days
+- Final Validation & Approval: 1 day
+
+Total: 7-11 days
+
+Please let me know if you would like me to proceed with executing this plan, or if you need any clarifications or adjustments before we begin. I'm confident that by following this phased approach, adhering to the project rules, and validating thoroughly, we can smoothly resolve the jitter issues and optimize the site's performance.
+</result>
+
+
+====================================================================================================================
+
+**Plans by phase**
+
 🧠 **Full diagnosis received, Commander. Here’s the strategic distillation — followed by a precision counteroffensive.**
 
 ---

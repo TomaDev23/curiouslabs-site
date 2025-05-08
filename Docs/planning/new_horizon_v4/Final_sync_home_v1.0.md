@@ -379,4 +379,3 @@ const applyPerformanceProfile = () => {
 
 The key issue in your current implementation appears to be **variable timing values creating visual chaos**. By standardizing timing, establishing hierarchy, and optimizing performance, your cosmic site will achieve balance between engagement and smoothness.
 
-Would you like me to focus on any specific component in more detail, or shall we implement this orchestration plan?
