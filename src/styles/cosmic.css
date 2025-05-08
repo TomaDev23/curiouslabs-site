@@ -119,4 +119,74 @@
   background-size: 200px 200px;
   opacity: 0.02;
   mix-blend-mode: overlay;
+}
+
+/**
+ * Cosmic Journey Visual Effects - CSS Animations
+ * For background_sandbox.jsx
+ */
+
+/* Nebula fade animation for aurora effects */
+@keyframes nebulaFade {
+  0% { background-position: 0% 50%; opacity: 0.4; }
+  50% { background-position: 100% 50%; opacity: 0.7; }
+  100% { background-position: 0% 50%; opacity: 0.4; }
+}
+
+.nebula-fade {
+  background: linear-gradient(135deg, #35204a, #4B2E83 30%, #A3E1B5 50%, #E1BEE7 70%, #6f71d9);
+  background-size: 200% 200%;
+  animation: nebulaFade 15s ease infinite;
+  will-change: background-position, opacity;
+}
+
+/* Pulsing animation for flare and glow effects */
+@keyframes cosmicPulse {
+  0% { transform: scale(1); opacity: 0.5; }
+  50% { transform: scale(1.2); opacity: 0.8; }
+  100% { transform: scale(1); opacity: 0.5; }
+}
+
+.cosmic-pulse {
+  animation: cosmicPulse 3s infinite ease-in-out;
+  will-change: transform, opacity;
+}
+
+/* Scene-specific visual effect layers */
+.dormant-layer {
+  --scene-color-primary: #040c36;
+  --scene-color-secondary: #030928;
+}
+
+.awakening-layer {
+  --scene-color-primary: #2a1344;
+  --scene-color-secondary: #1c1040;
+}
+
+.cosmic-reveal-layer {
+  --scene-color-primary: #1a2c56;
+  --scene-color-secondary: #7bb2f9;
+}
+
+.cosmic-flight-layer {
+  --scene-color-primary: #192b3a;
+  --scene-color-secondary: #7fe5d6;
+}
+
+.sun-approach-layer {
+  --scene-color-primary: #fffbe6;
+  --scene-color-secondary: #facc15;
+}
+
+.sun-landing-layer {
+  --scene-color-primary: #fca311;
+  --scene-color-secondary: #fde68a;
+}
+
+/* Canvas shared styles */
+canvas.effect-canvas {
+  position: absolute;
+  inset: 0;
+  transition: opacity 0.5s ease-out;
+  pointer-events: none;
 } 

@@ -23,3 +23,20 @@ body {
 }
 
 /* Custom utilities and overrides can be added below */
+
+/* Scene-specific animations */
+
+/* Nebula Fade Animation for AwakeningScene */
+@keyframes nebulaFade {
+  0% { background-position: 0% 50%; opacity: 0.4; }
+  50% { background-position: 100% 50%; opacity: 0.7; }
+  100% { background-position: 0% 50%; opacity: 0.4; }
+}
+
+.nebula-fade {
+  background: linear-gradient(135deg, #35204a, #4B2E83 30%, #A3E1B5 50%, #E1BEE7 70%, #6f71d9);
+  background-size: 200% 200%;
+  animation: nebulaFade 15s ease infinite;
+  will-change: background-position, opacity;
+  mix-blend-mode: screen;
+}
