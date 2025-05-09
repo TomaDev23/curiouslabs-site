@@ -3,12 +3,18 @@ import { motion } from 'framer-motion';
 import NavBar from '../components/NavBar';
 import FooterMain from '../components/FooterMain';
 import useDeviceProfile from '../hooks/useDeviceProfile';
+import HomepageSectionDebug from '../components/debug/HomepageSectionDebug';
 
 const HomeFloatflowLayout = ({ children }) => {
   const [scrollY, setScrollY] = useState(0);
   const [isLoaded, setIsLoaded] = useState(false);
   const mainContainerRef = useRef(null);
   const { isLowPerf, prefersReducedMotion } = useDeviceProfile();
+  
+  // Development environment detection
+  const isDev = process.env.NODE_ENV === 'development' || 
+                window.location.hostname === 'localhost' || 
+                window.location.hostname === '127.0.0.1';
   
   useEffect(() => {
     const handleScroll = () => {
@@ -47,6 +53,9 @@ const HomeFloatflowLayout = ({ children }) => {
       </main>
       
       <FooterMain />
+      
+      {/* Add Homepage Section Debug in development */}
+      {isDev && <HomepageSectionDebug />}
     </div>
   );
 };

@@ -33,6 +33,7 @@ const DevPage = lazy(() => import('./pages/dev.jsx'));
 const DevV4CosmicPage = lazy(() => import('./pages/dev_v4_cosmic.jsx'));
 const BackgroundSandbox = lazy(() => import('./pages/background_sandbox.jsx'));
 const BackgroundFinal = lazy(() => import('./pages/background_final.jsx'));
+const HomeV5AtomicPage = lazy(() => import('./pages/HomeV5AtomicPage.jsx'));
 
 // Performance monitoring context
 const PerformanceContext = React.createContext({
@@ -294,6 +295,12 @@ export default function App() {
           </Suspense>
         } />
         */}
+        
+        <Route path="/home-v5" element={
+          <Suspense fallback={<LoadingFallback />}>
+            <HomeV5AtomicPage />
+          </Suspense>
+        } />
         
         <Route path="*" element={
           <Suspense fallback={<LoadingFallback />}>
