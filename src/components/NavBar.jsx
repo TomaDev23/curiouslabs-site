@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { IMAGES } from '../utils/assets';
 import { useBreakpoint } from '../hooks/useBreakpoint.js';
@@ -10,9 +10,14 @@ export default function NavBar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProductsDropdownOpen, setIsProductsDropdownOpen] = useState(false);
+  const [autoScrolling, setAutoScrolling] = useState(false);
   const location = useLocation();
   const breakpoint = useBreakpoint();
   const isMobile = breakpoint === 'mobile';
+  
+  // Auto-scroll animation ref
+  const autoScrollAnimationRef = useRef(null);
+  const autoScrollStartTimeRef = useRef(0);
   
   // Track scroll for navbar styling
   useEffect(() => {
@@ -60,6 +65,113 @@ export default function NavBar() {
     setIsMobileMenuOpen(false);
     setIsProductsDropdownOpen(false);
   }, [location.pathname]);
+  
+  // Determine if we're on the cosmic journey page - improved detection
+  const isCosmicJourneyPage = location.pathname === '/home-v5' || location.pathname.includes('cosmic');
+  
+  // Auto-scroll functionality - fixed implementation
+  const toggleAutoScroll = () => {
+    console.log("[AUTO-SCROLL] Button clicked!", autoScrolling ? "Will stop" : "Will start");
+    if (autoScrolling) {
+      stopAutoScroll();
+    } else {
+      startAutoScroll();
+    }
+  };
+  
+  const startAutoScroll = () => {
+    // Cancel any existing animation
+    if (autoScrollAnimationRef.current) {
+      cancelAnimationFrame(autoScrollAnimationRef.current);
+    }
+    
+    console.log("[AUTO-SCROLL] Starting animation");
+    setAutoScrolling(true);
+    
+    // Get scroll dimensions
+    const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
+    if (scrollHeight <= 0) {
+      console.log("[AUTO-SCROLL] Invalid scroll height");
+      return;
+    }
+    
+    console.log("[AUTO-SCROLL] Document height:", document.documentElement.scrollHeight, "Window height:", window.innerHeight);
+    
+    // Get current scroll position and save start time
+    const startScrollY = window.scrollY;
+    const startProgress = startScrollY / scrollHeight;
+    
+    console.log("[AUTO-SCROLL] Starting from:", startScrollY, "px, progress:", startProgress);
+    
+    autoScrollStartTimeRef.current = Date.now();
+    
+    // Animation duration - 45 seconds total
+    const totalDuration = 45000;
+    const duration = totalDuration * (1 - startProgress);
+    
+    let lastTimestamp = null;
+    
+    // Animation function - improved with timestamp
+    const animateScroll = (timestamp) => {
+      if (!autoScrolling) {
+        console.log("[AUTO-SCROLL] Animation stopped by flag");
+        return;
+      }
+      
+      if (!lastTimestamp) lastTimestamp = timestamp;
+      
+      const elapsedTime = Date.now() - autoScrollStartTimeRef.current;
+      
+      // Calculate progress (0 to 1)
+      const progress = Math.min(elapsedTime / duration, 1);
+      
+      // Calculate new scroll position - direct calculation
+      const targetY = startScrollY + ((scrollHeight - startScrollY) * progress);
+      
+      // Log every second
+      if (timestamp - lastTimestamp > 1000) {
+        console.log(`[AUTO-SCROLL] Progress: ${(progress * 100).toFixed(1)}%, position: ${targetY.toFixed(0)}px`);
+        lastTimestamp = timestamp;
+      }
+      
+      // Perform the scroll - more direct method
+      try {
+        window.scrollTo(0, targetY);
+      } catch (error) {
+        console.error("[AUTO-SCROLL] Error scrolling:", error);
+      }
+      
+      // If not complete, continue animation
+      if (progress < 1) {
+        autoScrollAnimationRef.current = requestAnimationFrame(animateScroll);
+      } else {
+        console.log("[AUTO-SCROLL] Animation complete");
+        setAutoScrolling(false);
+        autoScrollAnimationRef.current = null;
+      }
+    };
+    
+    // Start animation
+    autoScrollAnimationRef.current = requestAnimationFrame(animateScroll);
+  };
+  
+  const stopAutoScroll = () => {
+    console.log("Stopping auto-scroll");
+    if (autoScrollAnimationRef.current) {
+      cancelAnimationFrame(autoScrollAnimationRef.current);
+      autoScrollAnimationRef.current = null;
+    }
+    setAutoScrolling(false);
+  };
+  
+  // Clean up auto-scroll animation when component unmounts
+  useEffect(() => {
+    return () => {
+      if (autoScrollAnimationRef.current) {
+        cancelAnimationFrame(autoScrollAnimationRef.current);
+      }
+    };
+  }, []);
   
   return (
     <header className={`fixed top-0 left-0 right-0 bg-gradient-to-r from-[#28293D]/95 to-[#1F2040]/95 backdrop-blur-md z-50 ${isScrolled ? 'shadow-lg' : ''}`}>
@@ -201,6 +313,34 @@ export default function NavBar() {
             {/* Hover effect gradient line (animates on hover) */}
             <div className="absolute -bottom-1 left-0 w-full h-0.5 bg-gradient-to-r from-purple-500 to-blue-500 opacity-0 group-hover:opacity-100 scale-x-0 group-hover:scale-x-100 transition-all duration-700 ease-in-out origin-left"></div>
           </Link>
+          
+          {/* Auto-scroll button - only visible on cosmic journey page */}
+          {isCosmicJourneyPage && (
+            <button
+              className="flex items-center space-x-1 px-4 py-2 bg-blue-900/60 hover:bg-blue-700/70 text-white rounded-full transition-all"
+              onClick={toggleAutoScroll}
+              style={{ 
+                boxShadow: autoScrolling ? '0 0 15px rgba(100, 200, 255, 0.6)' : 'none'
+              }}
+            >
+              {autoScrolling ? (
+                <>
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
+                    <rect x="6" y="4" width="4" height="16" rx="1" />
+                    <rect x="14" y="4" width="4" height="16" rx="1" />
+                  </svg>
+                  <span>Pause Journey</span>
+                </>
+              ) : (
+                <>
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M8 5v14l11-7z" />
+                  </svg>
+                  <span>Play Journey</span>
+                </>
+              )}
+            </button>
+          )}
         </div>
         
         {/* Mobile menu button */}
@@ -304,6 +444,35 @@ export default function NavBar() {
             >
               Contact
             </Link>
+            
+            {/* Auto-scroll button in mobile menu - only visible on cosmic journey page */}
+            {isCosmicJourneyPage && (
+              <button
+                onClick={toggleAutoScroll}
+                className={`flex items-center justify-between w-full rounded-md px-3 py-4 mt-3 text-left ${
+                  autoScrolling ? 'bg-blue-900/80 text-white' : 'bg-[#383853] text-white hover:bg-[#383880]'
+                }`}
+              >
+                <span className="flex items-center">
+                  {autoScrolling ? (
+                    <>
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 24 24" fill="currentColor">
+                        <rect x="6" y="4" width="4" height="16" rx="1" />
+                        <rect x="14" y="4" width="4" height="16" rx="1" />
+                      </svg>
+                      Pause Cosmic Journey
+                    </>
+                  ) : (
+                    <>
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M8 5v14l11-7z" />
+                      </svg>
+                      Play Cosmic Journey
+                    </>
+                  )}
+                </span>
+              </button>
+            )}
           </div>
         </div>
       )}
