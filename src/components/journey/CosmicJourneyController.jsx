@@ -9,6 +9,9 @@ import ColorOverlay from './ColorOverlay';
 import SceneBackdrop from './visual/SceneBackdrop';
 import FPSMeter from './debug/FPSMeter';
 import ConstellationGlow from './visual/ConstellationGlow';
+import SceneBoundaryDebug from './debug/SceneBoundaryDebug';
+import { useParticlePerformanceConfig } from './hooks/useParticlePerformanceConfig';
+import { useSceneVisibility } from './hooks/useSceneVisibility';
 
 // LEGIT-compliant metadata
 const metadata = {
@@ -20,12 +23,12 @@ const metadata = {
 
 // Define scenes with their scroll ranges
 const SCENES = [
-  { key: 'dormant', range: [0.0, 0.1], Component: DormantScene },
-  { key: 'awakening', range: [0.1, 0.3], Component: AwakeningScene },
-  { key: 'cosmicReveal', range: [0.3, 0.5], Component: CosmicRevealScene },
-  { key: 'cosmicFlight', range: [0.5, 0.7], Component: CosmicFlightScene },
-  { key: 'sunApproach', range: [0.7, 0.85], Component: SunApproachScene },
-  { key: 'sunLanding', range: [0.85, 1.0], Component: SunLandingScene },
+  { key: 'dormant', range: [0.0, 0.05], Component: DormantScene, transitionDuration: 1.0 },
+  { key: 'awakening', range: [0.05, 0.15], Component: AwakeningScene, transitionDuration: 1.0 },
+  { key: 'cosmicReveal', range: [0.15, 0.3], Component: CosmicRevealScene, transitionDuration: 0.8 },
+  { key: 'cosmicFlight', range: [0.3, 0.8], Component: CosmicFlightScene, transitionDuration: 0.6 },
+  { key: 'sunApproach', range: [0.8, 0.9], Component: SunApproachScene, transitionDuration: 1.0 },
+  { key: 'sunLanding', range: [0.9, 1.0], Component: SunLandingScene, transitionDuration: 1.0 },
 ];
 
 // Development environment detection
@@ -39,14 +42,17 @@ export default function CosmicJourneyController() {
   const [validSceneIndex, setValidSceneIndex] = useState(0);
   const [showFpsMeter, setShowFpsMeter] = useState(true); // Start visible in dev mode
   
-  // Global particle configuration for visual effects
-  const [globalParticleConfig, setGlobalParticleConfig] = useState({
-    density: 115,   // Number of particles
-    speed: 1,       // Animation speed multiplier
-    fps: 15,        // Target FPS for throttling
-    hue: 0,         // Base color hue (using white stars now)
-    glow: 0.8       // Glow intensity (0-1)
-  });
+  // Check if device is mobile
+  const isMobile = useRef(window.innerWidth <= 768);
+  
+  // Current scene key
+  const currentSceneKey = SCENES[validSceneIndex]?.key || '';
+  
+  // Use our custom hook for performance-optimized particle config
+  const globalParticleConfig = useParticlePerformanceConfig(currentSceneKey);
+  
+  // Use our custom hook for scene visibility management
+  const visibleScenes = useSceneVisibility(SCENES, scrollProgress, validSceneIndex);
   
   // Store last scroll position to prevent unnecessary updates
   const lastScrollPosRef = useRef(0);
@@ -54,14 +60,16 @@ export default function CosmicJourneyController() {
   // Handle scroll events with efficiency optimizations
   useEffect(() => {
     const handleScroll = () => {
-      // Throttle scroll calculations
-      if (Math.abs(window.scrollY - lastScrollPosRef.current) < 5) return;
+      // Throttle scroll calculations with improved mobile handling
+      const minScrollDelta = isMobile.current ? 10 : 5;
+      if (Math.abs(window.scrollY - lastScrollPosRef.current) < minScrollDelta) return;
       lastScrollPosRef.current = window.scrollY;
       
       // Calculate overall scroll progress (0-1)
       const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
       if (scrollHeight <= 0) return;
       
+      // Clamp progress between 0-1 to prevent jitter
       const progress = Math.max(0, Math.min(1, window.scrollY / scrollHeight));
       setScrollProgress(progress);
 
@@ -78,74 +86,6 @@ export default function CosmicJourneyController() {
       const { range } = SCENES[idx];
       const sceneProgressValue = (progress - range[0]) / (range[1] - range[0]);
       setSceneProgress(Math.max(0, Math.min(1, sceneProgressValue)));
-      
-      // Update particle configuration based on current scene
-      const sceneKey = SCENES[idx].key;
-      switch(sceneKey) {
-        case 'dormant':
-          setGlobalParticleConfig({
-            density: 115,  // Increased for better visibility
-            speed: 1,
-            fps: 15,      // Higher FPS for smoother animation
-            hue: 0,       // White stars (hue doesn't matter)
-            glow: 0.8     // Enhanced glow
-          });
-          break;
-        case 'awakening':
-          setGlobalParticleConfig({
-            density: 95,   // Increased for better visibility
-            speed: 1,
-            fps: 10,
-            hue: 0,        // White stars
-            glow: 0.8      // Enhanced glow
-          });
-          break;
-        case 'cosmicReveal':
-          setGlobalParticleConfig({
-            density: 20,
-            speed: 1,
-            fps: 10,
-            hue: 0,        // White stars
-            glow: 0.8      // Enhanced glow
-          });
-          break;
-        case 'cosmicFlight':
-          setGlobalParticleConfig({
-            density: 40,
-            speed: 3,
-            fps: 30,       // High FPS for fast movement
-            hue: 0,        // White stars
-            glow: 0.8      // Enhanced glow
-          });
-          break;
-        case 'sunApproach':
-          setGlobalParticleConfig({
-            density: 30,
-            speed: 1,
-            fps: 5,
-            hue: 0,        // White stars
-            glow: 0.9      // Enhanced glow
-          });
-          break;
-        case 'sunLanding':
-          setGlobalParticleConfig({
-            density: 30,
-            speed: 2,
-            fps: 30,
-            hue: 0,        // White stars
-            glow: 1.0      // Maximum glow
-          });
-          break;
-        default:
-          // Default configuration
-          setGlobalParticleConfig({
-            density: 115,
-            speed: 1,
-            fps: 15,
-            hue: 0,
-            glow: 0.8
-          });
-      }
     };
     
     window.addEventListener('scroll', handleScroll, { passive: true });
@@ -170,12 +110,14 @@ export default function CosmicJourneyController() {
   // Debug overlay for development
   const DebugOverlay = () => (
     <div className="fixed top-4 left-4 z-50 bg-black/70 p-3 rounded text-xs text-white font-mono">
-      <div className="mb-1">Scroll: {Math.round(scrollProgress * 100)}%</div>
+      <div className="mb-1">Scroll: {Math.round(scrollProgress * 100)}% ({Math.round(scrollProgress * 700)}vh)</div>
       <div className="mb-1">Scene: <span className="text-green-400">{SCENES[validSceneIndex].key}</span></div>
       <div className="mb-1">Progress: {Math.round(sceneProgress * 100)}%</div>
       <div className="mb-1">Particles: {globalParticleConfig.density} @ {globalParticleConfig.fps}fps</div>
       <div className="text-xs text-gray-400 mt-2">Scroll to explore scenes</div>
       <div className="text-xs text-gray-400">Press F to toggle FPS meter</div>
+      <div className="text-xs text-gray-400">Press V to toggle VH values</div>
+      <div className="text-xs text-gray-400">Press M to toggle VH markers</div>
     </div>
   );
 
@@ -186,19 +128,18 @@ export default function CosmicJourneyController() {
   // These functions create the "fixed in space" effect by calculating
   // transforms based on scroll position
   const getConstellation1Position = () => {
-    // Start at center of viewport at 25% scroll (end of awakening scene)
-    // Move up and off screen by 45% scroll (middle of cosmic reveal)
-    // This creates a parallax effect that makes it seem "fixed" in space
-    const yPos = 50 - ((scrollProgress - 0.25) / 0.2) * 100;
+    // Start at center of viewport at 15% scroll (105vh - Ursa Minor appearance)
+    // Move up and off screen by 30% scroll (210vh - Ursa Minor disappearance)
+    const yPos = 50 - ((scrollProgress - 0.15) / 0.15) * 100;
     return {
       top: `${yPos}%`,
     };
   };
 
   const getConstellation2Position = () => {
-    // Start at bottom of viewport at 55% scroll (start of cosmic flight) 
-    // End at top of viewport at 70% scroll (before sun approach)
-    const yPos = 100 - ((scrollProgress - 0.55) / 0.15) * 110;
+    // Start at bottom of viewport at 40% scroll (280vh - Orion appearance) 
+    // End at top of viewport at 60% scroll (420vh - Orion disappearance)
+    const yPos = 100 - ((scrollProgress - 0.4) / 0.2) * 110;
     return {
       top: `${yPos}%`,
     };
@@ -212,22 +153,31 @@ export default function CosmicJourneyController() {
       {/* Container for all scenes */}
       <div className="relative">
         {/* Fixed container for scene visibility control */}
-        <div className="fixed inset-0 z-0 overflow-hidden">
-          {SCENES.map(({ key, Component }, index) => (
+        <div 
+          className="fixed inset-0 z-0 overflow-hidden"
+          style={{ 
+            willChange: 'transform',
+            contain: 'strict'  // Containment for rendering optimization
+          }}
+        >
+          {SCENES.map(({ key, Component, transitionDuration }, index) => (
             <div
               key={key}
               style={{
                 opacity: validSceneIndex === index ? 1 : 0,
-                transition: 'opacity 0.8s ease-in-out', // Smoother transitions
+                transition: `opacity ${transitionDuration}s ease-in-out`, // Variable transitions
                 position: 'absolute',
                 inset: 0,
                 zIndex: validSceneIndex === index ? 1 : 0,
+                display: visibleScenes.includes(key) ? 'block' : 'none', // Only render visible scenes
               }}
             >
-              <Component 
-                progress={sceneProgress}
-                particleConfig={globalParticleConfig}
-              />
+              {visibleScenes.includes(key) && (
+                <Component 
+                  progress={sceneProgress}
+                  particleConfig={globalParticleConfig}
+                />
+              )}
             </div>
           ))}
         </div>
@@ -237,49 +187,59 @@ export default function CosmicJourneyController() {
         
         {/* Fixed constellation layer that spans across scenes */}
         <div className="fixed inset-0 z-30 pointer-events-none">
-          {/* First constellation (appears during Awakening/Cosmic Reveal) - LEFT SIDE */}
+          {/* First constellation (appears during CosmicRevealScene) - LEFT SIDE */}
           <div 
             className="fixed left-0 w-1/2 h-full"
+            data-constellation-id="ursa"
             style={{
-              visibility: (scrollProgress >= 0.25 && scrollProgress <= 0.45) ? 'visible' : 'hidden',
+              visibility: (scrollProgress >= 0.15 && scrollProgress <= 0.3) ? 'visible' : 'hidden',
               ...getConstellation1Position(),
             }}
           >
             <ConstellationGlow 
               fps={30}
               layer="A"
-              position="center"
+              type="ursaMinor"
+              opacity={(scrollProgress >= 0.15 && scrollProgress <= 0.3) 
+                ? Math.min(1, (scrollProgress - 0.15) * 5)
+                : 0
+              }
             />
           </div>
           
-          {/* Second constellation (appears during Cosmic Flight) - RIGHT SIDE */}
+          {/* Second constellation (appears during CosmicFlightScene) - RIGHT SIDE */}
           <div 
             className="fixed right-0 w-1/2 h-full"
+            data-constellation-id="orion"
             style={{
-              visibility: (scrollProgress >= 0.55 && scrollProgress <= 0.70) ? 'visible' : 'hidden',
+              visibility: (scrollProgress >= 0.4 && scrollProgress <= 0.6) ? 'visible' : 'hidden',
               ...getConstellation2Position(),
             }}
           >
             <ConstellationGlow 
               fps={30}
               layer="B"
-              position="center"
-              rotation={15} // Apply a slight rotation
+              type="orion"
+              opacity={(scrollProgress >= 0.4 && scrollProgress <= 0.6) 
+                ? Math.min(1, (scrollProgress - 0.4) * 5)
+                : 0
+              }
             />
           </div>
         </div>
         
-        {/* Debug overlay */}
-        {isDev && <DebugOverlay />}
-        
-        {/* FPS Meter (dev mode only, can toggle with F key) */}
+        {/* Debug components for development only */}
         {isDev && showFpsMeter && <FPSMeter />}
+        {isDev && <DebugOverlay />}
+        {isDev && <SceneBoundaryDebug scenes={SCENES} scrollProgress={scrollProgress} />}
         
-        {/* Spacer elements to create scroll height */}
+        {/* Spacer elements to create scroll height - now 7 sections for 700vh */}
         <div className="pointer-events-none">
-          {SCENES.map((scene, i) => (
+          {/* Create 7 sections instead of 6 to match 700vh height */}
+          {Array.from({ length: 7 }).map((_, i) => (
             <section
               key={i}
+              data-scroll-zone={i}
               className="h-screen w-full"
               style={{
                 borderBottom: '1px solid rgba(255,255,255,0.1)'
@@ -287,6 +247,27 @@ export default function CosmicJourneyController() {
             />
           ))}
         </div>
+        
+        {/* VH Markers for debugging (toggleable) */}
+        {isDev && (
+          <div className="fixed inset-0 pointer-events-none z-40">
+            {[100, 200, 300, 400, 500, 600].map((vh) => (
+              <div 
+                key={vh}
+                data-vh-marker
+                className="absolute left-0 w-full border-t border-dashed border-blue-500/30"
+                style={{ 
+                  top: `${vh}vh`,
+                  display: 'block'
+                }}
+              >
+                <span className="bg-black/70 text-blue-400 px-2 py-1 text-xs rounded">
+                  {vh}vh
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

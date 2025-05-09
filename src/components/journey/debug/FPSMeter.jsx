@@ -1,81 +1,146 @@
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { motion } from 'framer-motion';
 
-// Internal metadata for LEGIT compliance
-export const metadata = {
+// LEGIT-compliant metadata
+const metadata = {
   id: 'fps_meter',
-  scs: 'SCS-DEBUG',
+  scs: 'SCS0',
   type: 'debug',
-  doc: 'contract_cosmic_debug.md'
+  doc: 'contract_debug_tools.md'
 };
 
+/**
+ * FPSMeter - Performance monitoring component
+ * Updated for TILE v5.0.C to include VH marker toggle
+ * Only visible in development mode
+ * 
+ * @returns {React.ReactElement} FPS meter overlay
+ */
 export default function FPSMeter() {
   const [fps, setFps] = useState(0);
-  const [avgFps, setAvgFps] = useState(0);
-  const frameCountRef = useRef(0);
+  const [showMarkers, setShowMarkers] = useState(true);
+  const [isExpanded, setIsExpanded] = useState(true);
+  const frameRef = useRef(0);
   const lastTimeRef = useRef(performance.now());
-  const fpsHistoryRef = useRef([]);
+  const framesRef = useRef(0);
   
-  // Color coding based on performance thresholds
-  const getFpsColor = (fps) => {
-    if (fps >= 50) return '#4ade80'; // green-400
-    if (fps >= 30) return '#facc15'; // yellow-400
-    return '#f87171'; // red-400
-  };
-
+  // Calculate FPS
   useEffect(() => {
-    const updateFps = () => {
-      frameCountRef.current += 1;
+    const updateFPS = () => {
       const now = performance.now();
-      const delta = now - lastTimeRef.current;
-
-      if (delta >= 1000) {
-        const currentFps = Math.round((frameCountRef.current * 1000) / delta);
-        setFps(currentFps);
-        
-        // Update average FPS
-        fpsHistoryRef.current.push(currentFps);
-        if (fpsHistoryRef.current.length > 60) { // Track 60 frames for a more stable average
-          fpsHistoryRef.current.shift();
-        }
-        
-        const sum = fpsHistoryRef.current.reduce((a, b) => a + b, 0);
-        setAvgFps(Math.round(sum / fpsHistoryRef.current.length));
-        
-        frameCountRef.current = 0;
+      framesRef.current++;
+      
+      // Update FPS every 500ms
+      if (now - lastTimeRef.current >= 500) {
+        setFps(Math.round((framesRef.current * 1000) / (now - lastTimeRef.current)));
+        framesRef.current = 0;
         lastTimeRef.current = now;
       }
-
-      requestAnimationFrame(updateFps);
+      
+      frameRef.current = requestAnimationFrame(updateFPS);
     };
-
-    const rafId = requestAnimationFrame(updateFps);
-    return () => cancelAnimationFrame(rafId);
+    
+    frameRef.current = requestAnimationFrame(updateFPS);
+    
+    return () => {
+      cancelAnimationFrame(frameRef.current);
+    };
   }, []);
-
+  
+  // Toggle VH markers with M key
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'm' || e.key === 'M') {
+        setShowMarkers(prev => !prev);
+        
+        // Update all VH markers visibility
+        const markers = document.querySelectorAll('[data-vh-marker]');
+        markers.forEach(marker => {
+          marker.style.display = !showMarkers ? 'block' : 'none';
+        });
+      }
+    };
+    
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [showMarkers]);
+  
+  // Only render in development mode
+  if (process.env.NODE_ENV !== 'development') return null;
+  
+  // Get color based on FPS
+  const getFpsColor = () => {
+    if (fps >= 55) return 'text-green-400';
+    if (fps >= 30) return 'text-yellow-400';
+    return 'text-red-400';
+  };
+  
   return (
-    <div style={{
-      position: 'fixed',
-      top: '16px',
-      right: '16px',
-      zIndex: 9999,
-      backgroundColor: 'rgba(0, 0, 0, 0.75)',
-      color: 'white',
-      padding: '8px 12px',
-      borderRadius: '4px',
-      fontSize: '14px',
-      fontFamily: 'monospace',
-      userSelect: 'none',
-      pointerEvents: 'none'
-    }}>
-      <div style={{ color: getFpsColor(fps) }}>
-        FPS: {fps}
+    <motion.div 
+      className="fixed left-4 bottom-4 z-50 bg-black/80 p-2 rounded-lg text-white text-xs font-mono backdrop-blur-sm border border-gray-700 shadow-xl"
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+    >
+      <div className="flex justify-between items-center">
+        <h3 className="font-bold text-xs">FPS Monitor</h3>
+        <div className="flex gap-2">
+          <button 
+            onClick={() => {
+              setShowMarkers(prev => !prev);
+              // Update all VH markers visibility
+              const markers = document.querySelectorAll('[data-vh-marker]');
+              markers.forEach(marker => {
+                marker.style.display = !showMarkers ? 'block' : 'none';
+              });
+            }} 
+            className={`text-[10px] px-1.5 py-0.5 rounded ${showMarkers ? 'bg-blue-600' : 'bg-gray-700'}`}
+            title="Toggle VH markers (M key)"
+          >
+            VH
+          </button>
+          <button 
+            onClick={() => setIsExpanded(prev => !prev)} 
+            className="text-gray-400 hover:text-white"
+          >
+            {isExpanded ? '−' : '+'}
+          </button>
+        </div>
       </div>
-      <div style={{ color: '#60a5fa' }}>
-        AVG: {avgFps}
-      </div>
-      <div style={{ fontSize: '10px', color: '#9ca3af', marginTop: '4px' }}>
-        DEV MODE
-      </div>
-    </div>
+      
+      {isExpanded && (
+        <>
+          <div className="mt-1 flex items-center gap-2">
+            <span>FPS:</span>
+            <span className={`${getFpsColor()} font-bold`}>{fps}</span>
+            <div className="relative w-24 h-1.5 bg-gray-700 rounded-full overflow-hidden">
+              <div 
+                className={`absolute inset-y-0 left-0 ${fps >= 55 ? 'bg-green-500' : fps >= 30 ? 'bg-yellow-500' : 'bg-red-500'}`}
+                style={{ width: `${Math.min(100, fps * 100 / 60)}%` }}
+              />
+            </div>
+          </div>
+          
+          <div className="mt-2 text-[10px] text-gray-400 flex items-center">
+            <div className="flex items-center gap-1">
+              <div className="w-2 h-2 rounded-full bg-green-400"></div>
+              <span>60fps+</span>
+            </div>
+            <div className="flex items-center gap-1 ml-2">
+              <div className="w-2 h-2 rounded-full bg-yellow-400"></div>
+              <span>30-59fps</span>
+            </div>
+            <div className="flex items-center gap-1 ml-2">
+              <div className="w-2 h-2 rounded-full bg-red-400"></div>
+              <span>&lt;30fps</span>
+            </div>
+          </div>
+          
+          <div className="mt-2 text-[10px] text-gray-500">
+            Press M to toggle VH markers
+          </div>
+        </>
+      )}
+    </motion.div>
   );
 } 
