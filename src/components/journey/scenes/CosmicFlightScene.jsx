@@ -31,7 +31,7 @@ export default function CosmicFlightScene({ progress = 0, particleConfig = {} })
   return (
     <section className="h-screen w-screen relative overflow-hidden cosmic-flight-layer">
       {/* Scene backdrop with cosmic warp and mint trails */}
-      <div className="absolute inset-0 z-0">
+      <div className="absolute inset-0 z-35">
         <CosmicFlightBackdrop progress={intensity} />
       </div>
 

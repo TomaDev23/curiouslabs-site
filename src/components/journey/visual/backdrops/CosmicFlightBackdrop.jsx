@@ -288,13 +288,14 @@ export default function CosmicFlightBackdrop({ progress = 0 }) {
           className="absolute h-[2px] left-0"
           style={{
             top: `${trail.verticalPosition}%`,
-            width: `${35 + (warpIntensity * 55)}%`, // Slightly reduced
+            width: `${35 + (warpIntensity * 55)}%`,
             height: `${trail.width}px`,
-            background: `linear-gradient(to right, hsla(${trail.hue}, 75%, 60%, 0), hsla(${trail.hue}, 90%, 70%, 0.8) 50%, hsla(${trail.hue}, 75%, 60%, 0))`, // Slightly reduced intensity
-            filter: 'blur(5px)', // Increased blur for softness
+            background: `linear-gradient(to right, hsla(${trail.hue}, 75%, 60%, 0), hsla(${trail.hue}, 90%, 70%, 0.8) 50%, hsla(${trail.hue}, 75%, 60%, 0))`,
+            filter: 'blur(5px)',
             opacity: trail.opacity * warpIntensity,
             transform: 'translateX(-100%)',
             animation: `warpTrail ${trail.speed}s ${trail.delay}s infinite linear`,
+            zIndex: 250
           }}
         />
       ))}

@@ -49,7 +49,7 @@ export default function NebulaBase({
         ref={canvasRef}
         className={`absolute inset-0 w-full h-full ${className}`}
         style={{ 
-          border: '1px solid rgba(255,255,255,0.05)' // Very subtle debug border
+          border: 'none'
         }}
       />
     </div>

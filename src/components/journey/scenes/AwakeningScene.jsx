@@ -1,7 +1,6 @@
 import React from 'react';
 import { clamp } from '../useScrollProgress';
 import AwakeningBackdrop from '../visual/backdrops/AwakeningBackdrop';
-import StarfieldCanvas from '../visual/StarfieldCanvas';
 
 // Internal metadata for LEGIT compliance
 const metadata = {
@@ -28,9 +27,6 @@ export default function AwakeningScene({ progress = 0, particleConfig = {} }) {
     glow = 0.8
   } = particleConfig;
   
-  // White stars with enhanced glow
-  const starColorHue = "hsl(0, 0%, 100%)";
-  
   // Nebula fade opacity increases with scene progress
   const nebulaOpacity = Math.min(1, intensity * 1.5); // Full opacity at ~67% progress
   
@@ -49,18 +45,6 @@ export default function AwakeningScene({ progress = 0, particleConfig = {} }) {
           transform: `scale(${1 + intensity * 0.1})` // Subtle growth as scene progresses
         }}
       ></div>
-      
-      {/* Star Layer - now using absolute position within the scene */}
-      <div className="absolute inset-0 z-40">
-        <StarfieldCanvas
-          opacity={1}
-          density={density}
-          fps={fps}
-          baseColor={starColorHue}
-          breathing={true}
-          glow={glow}
-        />
-      </div>
       
       {/* Robot character - fades out as scene progresses */}
       <div 

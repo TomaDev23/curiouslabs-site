@@ -1,7 +1,6 @@
 import React from 'react';
 import { clamp } from '../useScrollProgress';
 import DormantBackdrop from '../visual/backdrops/DormantBackdrop';
-import StarfieldCanvas from '../visual/StarfieldCanvas';
 
 // Internal metadata for LEGIT compliance
 const metadata = {
@@ -22,26 +21,11 @@ export default function DormantScene({ progress = 0, particleConfig = {} }) {
     glow = 0.8
   } = particleConfig;
   
-  // White stars with enhanced glow
-  const starColorHue = "hsl(0, 0%, 100%)";
-  
   return (
     <section className="h-screen w-screen relative overflow-hidden dormant-layer">
       {/* Deep space backdrop with parallax */}
       <div className="absolute inset-0 z-0">
         <DormantBackdrop progress={intensity} />
-      </div>
-      
-      {/* Star Layer - now using absolute position within the scene */}
-      <div className="absolute inset-0 z-40">
-        <StarfieldCanvas
-          opacity={1}
-          density={density}
-          fps={fps}
-          baseColor={starColorHue}
-          breathing={true}
-          glow={glow}
-        />
       </div>
       
       {/* Robot character - static in dormant state */}
