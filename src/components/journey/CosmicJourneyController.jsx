@@ -81,7 +81,7 @@ export default function CosmicJourneyController() {
     // Animation loop for smooth interpolation
     const animateScroll = () => {
       // Interpolate the scroll value for ultra-smooth transitions
-      const interpolationFactor = 0.15; // Adjust this for smoother/faster transitions
+      const interpolationFactor = 0.09; // Matches contract_scroll_settings.md - creates "boat in water" effect
       
       // Calculate the smooth progress with interpolation
       const diff = targetScrollProgressRef.current - smoothScrollProgressRef.current;
@@ -228,10 +228,10 @@ export default function CosmicJourneyController() {
   // Calculate positions for parallax effect with ultra-smooth transitions
   const getConstellation1Position = () => {
     // Start at center of viewport at 15% scroll (105vh - Ursa Minor appearance)
-    // Move up and off screen by 30% scroll (210vh - Ursa Minor disappearance)
-    const progress = (smoothScrollProgress - 0.15) / 0.15;
+    // Move up and off screen by 64% scroll (448vh - Extended disappearance)
+    const progress = (smoothScrollProgress - 0.15) / 0.49; // Extended range to match 0.64 visibility 
     const clampedProgress = Math.max(0, Math.min(1, progress));
-    const yPos = 50 - clampedProgress * 100;
+    const yPos = 50 - clampedProgress * 150; // Use same movement approach as constellation 2
     
     return {
       top: `${yPos}%`,
@@ -313,7 +313,7 @@ export default function CosmicJourneyController() {
             className="fixed left-0 w-1/2 h-full"
             data-constellation-id="ursa"
             style={{
-              visibility: (smoothScrollProgress >= 0.15 && smoothScrollProgress <= 0.3) ? 'visible' : 'hidden',
+              visibility: (smoothScrollProgress >= 0.15 && smoothScrollProgress <= 0.64) ? 'visible' : 'hidden',
               ...getConstellation1Position(),
             }}
           >
@@ -321,7 +321,7 @@ export default function CosmicJourneyController() {
               fps={60}
               layer="A"
               type="ursaMinor"
-              opacity={(smoothScrollProgress >= 0.15 && smoothScrollProgress <= 0.3) 
+              opacity={(smoothScrollProgress >= 0.15 && smoothScrollProgress <= 0.64) 
                 ? Math.min(1, (smoothScrollProgress - 0.15) * 5)
                 : 0
               }

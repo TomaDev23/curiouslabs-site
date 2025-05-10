@@ -1,5 +1,6 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import CosmicJourneyController from '../components/journey/CosmicJourneyController';
+import AnimationCurveTest from '../components/journey/test/AnimationCurveTest';
 
 console.log("✅ BACKGROUND_SANDBOX.JSX PAGE LOADED");
 
@@ -17,15 +18,26 @@ const metadata = {
 };
 
 export default function BackgroundSandbox() {
+  const [scrollProgress, setScrollProgress] = useState(0);
+
   useEffect(() => {
     console.log("🚀 BackgroundSandbox component mounted");
     console.log("📊 Window dimensions:", window.innerWidth, "x", window.innerHeight);
     
     // Log the current URL to verify routing
     console.log("🔗 Current URL:", window.location.href);
+
+    const handleScroll = () => {
+      const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = window.scrollY / scrollHeight;
+      setScrollProgress(progress);
+    };
+
+    window.addEventListener('scroll', handleScroll);
     
     return () => {
       console.log("💤 BackgroundSandbox component unmounted");
+      window.removeEventListener('scroll', handleScroll);
     };
   }, []);
 
@@ -35,6 +47,7 @@ export default function BackgroundSandbox() {
         Background Sandbox
       </div>
       <CosmicJourneyController />
+      <AnimationCurveTest progress={scrollProgress} />
     </div>
   );
 } 
