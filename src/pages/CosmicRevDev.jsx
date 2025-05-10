@@ -4,6 +4,8 @@ import { lazy } from 'react';
 // Lazy-load LEGIT components
 const GalaxyJourney = lazy(() => import('../components/journey/visual/GalaxyJourney/StaticGalaxy'));
 const HUDManager = lazy(() => import('../components/cosmic-explorer/core/HUDManager'));
+const ModeSwitcher = lazy(() => import('../components/cosmic-explorer/core/ModeSwitcher'));
+const HUDSelector = lazy(() => import('../components/cosmic-explorer/core/HUDSelector'));
 
 // LEGIT metadata declaration
 export const metadata = {
@@ -58,7 +60,7 @@ const EXPLORER_MODES = {
  * Creates a non-scrolling, fixed viewport experience with galaxy visualization
  */
 const CosmicRevDev = () => {
-  // Explorer mode state (new)
+  // Explorer mode state
   const [explorerMode, setExplorerMode] = useState('SHOW');
 
   // Camera and scene state for HUDs
@@ -71,6 +73,9 @@ const CosmicRevDev = () => {
   const [showControls, setShowControls] = useState(true);
   const [activeTab, setActiveTab] = useState('scene');
   
+  // Active HUDs state
+  const [activeHUDs, setActiveHUDs] = useState(['selector']);
+  
   // Visual parameter states
   const [visualParams, setVisualParams] = useState({
     starCount: 3000,
@@ -81,6 +86,21 @@ const CosmicRevDev = () => {
     colorShift: 0
   });
 
+  // Load active HUDs from localStorage when mode changes
+  useEffect(() => {
+    try {
+      const savedActiveHUDs = localStorage.getItem(`cosmic_explorer_${explorerMode.toLowerCase()}_huds`);
+      if (savedActiveHUDs) {
+        setActiveHUDs(JSON.parse(savedActiveHUDs));
+      } else {
+        // Default to showing selector HUD
+        setActiveHUDs(['selector']);
+      }
+    } catch (error) {
+      console.error('Error loading HUD state from localStorage:', error);
+    }
+  }, [explorerMode]);
+  
   // Handle explorer mode change
   const handleModeChange = (newMode) => {
     setExplorerMode(newMode);
@@ -94,6 +114,16 @@ const CosmicRevDev = () => {
         setActiveTab('visual');
         break;
       case 'DEBUG':
+        // Show only the selector HUD when switching to DEBUG mode
+        setActiveHUDs(['selector']);
+        
+        // Save to localStorage for persistence
+        try {
+          localStorage.setItem(`cosmic_explorer_${newMode.toLowerCase()}_huds`, JSON.stringify(['selector']));
+        } catch (error) {
+          console.error('Error saving HUD state to localStorage:', error);
+        }
+        break;
       case 'DEV':
         // These will have custom UI later
         break;
@@ -107,6 +137,18 @@ const CosmicRevDev = () => {
     if (stateData) {
       if (stateData.cameraPosition) setCameraPosition(stateData.cameraPosition);
       if (stateData.cameraRotation) setCameraRotation(stateData.cameraRotation);
+    }
+  };
+
+  // Handle HUD toggling
+  const handleToggleHUD = (newActiveHUDs) => {
+    setActiveHUDs(newActiveHUDs);
+    
+    // Save to localStorage for persistence
+    try {
+      localStorage.setItem(`cosmic_explorer_${explorerMode.toLowerCase()}_huds`, JSON.stringify(newActiveHUDs));
+    } catch (error) {
+      console.error('Error saving HUD state to localStorage:', error);
     }
   };
 
@@ -190,10 +232,32 @@ const CosmicRevDev = () => {
     }
   };
 
+  // Generate HUD selector content for ModeSwitcher to use
+  const renderHUDSelectorContent = () => {
+    return (
+      <Suspense fallback={<div className="p-2 text-white text-xs">Loading HUD Selector...</div>}>
+        <HUDSelector
+          mode={explorerMode}
+          activeHUDs={activeHUDs}
+          onToggleHUD={handleToggleHUD}
+          visualParams={visualParams}
+        />
+      </Suspense>
+    );
+  };
+
   return (
     <div id="cosmic-rev-container" className="h-screen w-screen overflow-hidden relative bg-black">
       {/* Fixed background */}
       <div className="fixed inset-0 bg-black z-0" />
+      
+      {/* Title bar */}
+      <div className="fixed top-0 left-0 w-full bg-black/60 p-2 flex justify-between items-center z-50">
+        <h1 className="text-white text-2xl font-bold ml-4">Cosmic Galaxy Explorer</h1>
+        <div className="text-white opacity-50 mr-4 text-sm">
+          Press 'c' to toggle controls | 's' to save | 'l' to load
+        </div>
+      </div>
       
       {/* Galaxy Journey Component */}
       <Suspense fallback={<div className="fixed inset-0 flex items-center justify-center text-white">Loading Galaxy...</div>}>
@@ -213,13 +277,15 @@ const CosmicRevDev = () => {
         />
       </Suspense>
       
-      {/* HUD Manager (new) */}
+      {/* HUD Manager */}
       <Suspense fallback={<div className="fixed top-5 right-5 bg-black/60 p-2 rounded text-xs text-white">Loading HUDs...</div>}>
         <HUDManager
           activeMode={explorerMode}
           visualParams={visualParams}
           cameraPosition={cameraPosition}
           cameraRotation={cameraRotation}
+          activeHUDs={activeHUDs}
+          onToggleHUD={handleToggleHUD}
         />
       </Suspense>
       
@@ -230,237 +296,189 @@ const CosmicRevDev = () => {
         </div>
       )}
       
-      {/* Scene Controls */}
+      {/* Scene Controls with ModeSwitcher at the top */}
       {showControls && (
-        <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50 bg-black/80 p-4 rounded-lg max-w-2xl w-full">
-          <div className="text-white flex justify-between items-center mb-4">
-            <h2 className="text-xl">
-              <span className="text-green-400">{SCENE_PRESETS[selectedScene]?.name || selectedScene}</span>
-              <span className="ml-2 text-sm text-blue-400">
-                {explorerMode !== 'SHOW' && `${explorerMode} Mode`}
-              </span>
-            </h2>
-            <div className="text-xs text-gray-400">
-              Press 'c' to toggle controls | 's' to save | 'l' to load | Shift+1-4 for modes
-            </div>
-          </div>
+        <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50 bg-black/80 rounded-lg max-w-2xl w-full">
+          {/* ModeSwitcher component */}
+          <Suspense fallback={<div className="p-3 text-center text-white text-sm">Loading mode switcher...</div>}>
+            <ModeSwitcher
+              currentMode={explorerMode}
+              onModeChange={handleModeChange}
+              activeTab={activeTab}
+              onTabChange={setActiveTab}
+              hudSelectorContent={renderHUDSelectorContent()}
+            />
+          </Suspense>
           
-          {/* Tab navigation */}
-          <div className="flex border-b border-gray-700 mb-4">
-            <button 
-              className={`px-4 py-1 mr-2 ${activeTab === 'scene' ? 'bg-blue-600 text-white' : 'text-gray-400'}`}
-              onClick={() => setActiveTab('scene')}
-            >
-              Scene (1)
-            </button>
-            <button 
-              className={`px-4 py-1 mr-2 ${activeTab === 'camera' ? 'bg-blue-600 text-white' : 'text-gray-400'}`}
-              onClick={() => setActiveTab('camera')}
-            >
-              Camera (2)
-            </button>
-            <button 
-              className={`px-4 py-1 mr-2 ${activeTab === 'visual' ? 'bg-blue-600 text-white' : 'text-gray-400'}`}
-              onClick={() => setActiveTab('visual')}
-            >
-              Visual (3)
-            </button>
-            <button 
-              className={`px-4 py-1 ${activeTab === 'mode' ? 'bg-blue-600 text-white' : 'text-gray-400'}`}
-              onClick={() => setActiveTab('mode')}
-            >
-              Mode (4)
-            </button>
-          </div>
-          
-          {/* Scene tab */}
-          {activeTab === 'scene' && (
-            <>
-              <p className="text-gray-300 text-sm mb-4">{SCENE_PRESETS[selectedScene]?.description}</p>
+          {/* Only show these controls for SHOW and SANDBOX modes */}
+          {(explorerMode === 'SHOW' || explorerMode === 'SANDBOX') && (
+            <div className="p-4 pt-0">
+              {/* Scene tab */}
+              {activeTab === 'scene' && (
+                <>
+                  <p className="text-gray-300 text-sm mb-4">{SCENE_PRESETS[selectedScene]?.description}</p>
+                  
+                  <div className="flex flex-wrap gap-2 justify-center mb-4">
+                    {Object.keys(SCENE_PRESETS).map(scene => (
+                      <button
+                        key={scene}
+                        className={`px-3 py-1 rounded ${selectedScene === scene ? 'bg-green-500' : 'bg-gray-600'}`}
+                        onClick={() => setSelectedScene(scene)}
+                      >
+                        {SCENE_PRESETS[scene].name}
+                      </button>
+                    ))}
+                  </div>
+                  
+                  <div className="w-full px-2">
+                    <label className="text-white text-sm block mb-1">
+                      Scene Progress: {(sceneProgress * 100).toFixed(0)}%
+                    </label>
+                    <input
+                      type="range"
+                      min="0"
+                      max="1"
+                      step="0.01"
+                      value={sceneProgress}
+                      onChange={(e) => setSceneProgress(parseFloat(e.target.value))}
+                      className="w-full"
+                    />
+                  </div>
+                </>
+              )}
               
-              <div className="flex flex-wrap gap-2 justify-center mb-4">
-                {Object.keys(SCENE_PRESETS).map(scene => (
-                  <button
-                    key={scene}
-                    className={`px-3 py-1 rounded ${selectedScene === scene ? 'bg-green-500' : 'bg-gray-600'}`}
-                    onClick={() => setSelectedScene(scene)}
-                  >
-                    {SCENE_PRESETS[scene].name}
-                  </button>
-                ))}
-              </div>
+              {/* Camera tab */}
+              {activeTab === 'camera' && (
+                <>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-white text-sm block mb-1">
+                        Camera Distance: {visualParams.cameraDistance}
+                      </label>
+                      <input
+                        type="range"
+                        min="10"
+                        max="100"
+                        step="1"
+                        value={visualParams.cameraDistance}
+                        onChange={(e) => handleVisualParamChange('cameraDistance', parseFloat(e.target.value))}
+                        className="w-full"
+                      />
+                    </div>
+                    
+                    <div>
+                      <label className="text-white text-sm block mb-1">
+                        Rotation: {visualParams.rotation}°
+                      </label>
+                      <input
+                        type="range"
+                        min="0"
+                        max="360"
+                        step="1"
+                        value={visualParams.rotation}
+                        onChange={(e) => handleVisualParamChange('rotation', parseFloat(e.target.value))}
+                        className="w-full"
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="mt-4 flex justify-center gap-4">
+                    <button
+                      className="px-4 py-2 bg-blue-800 rounded"
+                      onClick={() => handleVisualParamChange('rotation', (visualParams.rotation + 45) % 360)}
+                    >
+                      Rotate +45°
+                    </button>
+                    <button
+                      className="px-4 py-2 bg-blue-800 rounded"
+                      onClick={() => handleVisualParamChange('cameraDistance', 30)}
+                    >
+                      Reset Camera
+                    </button>
+                  </div>
+                </>
+              )}
               
-              <div className="w-full px-2">
-                <label className="text-white text-sm block mb-1">
-                  Scene Progress: {(sceneProgress * 100).toFixed(0)}%
-                </label>
-                <input
-                  type="range"
-                  min="0"
-                  max="1"
-                  step="0.01"
-                  value={sceneProgress}
-                  onChange={(e) => setSceneProgress(parseFloat(e.target.value))}
-                  className="w-full"
-                />
-              </div>
-            </>
-          )}
-          
-          {/* Camera tab */}
-          {activeTab === 'camera' && (
-            <>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="text-white text-sm block mb-1">
-                    Camera Distance: {visualParams.cameraDistance}
-                  </label>
-                  <input
-                    type="range"
-                    min="10"
-                    max="100"
-                    step="1"
-                    value={visualParams.cameraDistance}
-                    onChange={(e) => handleVisualParamChange('cameraDistance', parseFloat(e.target.value))}
-                    className="w-full"
-                  />
+              {/* Visual tab */}
+              {activeTab === 'visual' && (
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-white text-sm block mb-1">
+                      Star Count: {visualParams.starCount}
+                    </label>
+                    <input
+                      type="range"
+                      min="500"
+                      max="10000"
+                      step="500"
+                      value={visualParams.starCount}
+                      onChange={(e) => handleVisualParamChange('starCount', parseInt(e.target.value))}
+                      className="w-full"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="text-white text-sm block mb-1">
+                      Galaxy Particles: {visualParams.galaxyCount}
+                    </label>
+                    <input
+                      type="range"
+                      min="5000"
+                      max="50000"
+                      step="1000"
+                      value={visualParams.galaxyCount}
+                      onChange={(e) => handleVisualParamChange('galaxyCount', parseInt(e.target.value))}
+                      className="w-full"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="text-white text-sm block mb-1">
+                      Brightness: {visualParams.brightness.toFixed(1)}
+                    </label>
+                    <input
+                      type="range"
+                      min="0.1"
+                      max="2.0"
+                      step="0.1"
+                      value={visualParams.brightness}
+                      onChange={(e) => handleVisualParamChange('brightness', parseFloat(e.target.value))}
+                      className="w-full"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="text-white text-sm block mb-1">
+                      Color Shift: {visualParams.colorShift}
+                    </label>
+                    <input
+                      type="range"
+                      min="-180"
+                      max="180"
+                      step="10"
+                      value={visualParams.colorShift}
+                      onChange={(e) => handleVisualParamChange('colorShift', parseInt(e.target.value))}
+                      className="w-full"
+                    />
+                  </div>
                 </div>
-                
-                <div>
-                  <label className="text-white text-sm block mb-1">
-                    Rotation: {visualParams.rotation}°
-                  </label>
-                  <input
-                    type="range"
-                    min="0"
-                    max="360"
-                    step="1"
-                    value={visualParams.rotation}
-                    onChange={(e) => handleVisualParamChange('rotation', parseFloat(e.target.value))}
-                    className="w-full"
-                  />
-                </div>
-              </div>
+              )}
               
-              <div className="mt-4 flex justify-center gap-4">
-                <button
-                  className="px-4 py-2 bg-blue-800 rounded"
-                  onClick={() => handleVisualParamChange('rotation', (visualParams.rotation + 45) % 360)}
-                >
-                  Rotate +45°
-                </button>
-                <button
-                  className="px-4 py-2 bg-blue-800 rounded"
-                  onClick={() => handleVisualParamChange('cameraDistance', 30)}
-                >
-                  Reset Camera
-                </button>
-              </div>
-            </>
-          )}
-          
-          {/* Visual tab */}
-          {activeTab === 'visual' && (
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="text-white text-sm block mb-1">
-                  Star Count: {visualParams.starCount}
-                </label>
-                <input
-                  type="range"
-                  min="500"
-                  max="10000"
-                  step="500"
-                  value={visualParams.starCount}
-                  onChange={(e) => handleVisualParamChange('starCount', parseInt(e.target.value))}
-                  className="w-full"
-                />
-              </div>
-              
-              <div>
-                <label className="text-white text-sm block mb-1">
-                  Galaxy Particles: {visualParams.galaxyCount}
-                </label>
-                <input
-                  type="range"
-                  min="5000"
-                  max="50000"
-                  step="1000"
-                  value={visualParams.galaxyCount}
-                  onChange={(e) => handleVisualParamChange('galaxyCount', parseInt(e.target.value))}
-                  className="w-full"
-                />
-              </div>
-              
-              <div>
-                <label className="text-white text-sm block mb-1">
-                  Brightness: {visualParams.brightness.toFixed(1)}
-                </label>
-                <input
-                  type="range"
-                  min="0.1"
-                  max="2.0"
-                  step="0.1"
-                  value={visualParams.brightness}
-                  onChange={(e) => handleVisualParamChange('brightness', parseFloat(e.target.value))}
-                  className="w-full"
-                />
-              </div>
-              
-              <div>
-                <label className="text-white text-sm block mb-1">
-                  Color Shift: {visualParams.colorShift}
-                </label>
-                <input
-                  type="range"
-                  min="-180"
-                  max="180"
-                  step="10"
-                  value={visualParams.colorShift}
-                  onChange={(e) => handleVisualParamChange('colorShift', parseInt(e.target.value))}
-                  className="w-full"
-                />
-              </div>
+              {/* Mode tab - removed as redundant, now handled by ModeSwitcher */}
             </div>
           )}
           
-          {/* Mode tab (new) */}
-          {activeTab === 'mode' && (
-            <>
-              <p className="text-gray-300 text-sm mb-4">
-                {EXPLORER_MODES[explorerMode]?.description || "Switch between different explorer modes"}
-              </p>
-              
-              <div className="flex flex-wrap gap-2 justify-center mb-4">
-                {Object.entries(EXPLORER_MODES).map(([mode, info]) => (
-                  <button
-                    key={mode}
-                    className={`px-3 py-1 rounded ${explorerMode === mode ? 'bg-blue-500' : 'bg-gray-600'}`}
-                    onClick={() => handleModeChange(mode)}
-                  >
-                    {info.label}
-                  </button>
-                ))}
-              </div>
-              
-              <div className="bg-gray-800/50 p-3 rounded mt-4">
-                <h3 className="text-white text-sm font-medium mb-2">Mode Features:</h3>
-                <ul className="text-gray-300 text-sm list-disc pl-5 space-y-1">
-                  <li><strong>SHOW</strong>: Professional choreographed sequences</li>
-                  <li><strong>SANDBOX</strong>: Interactive parameter adjustments</li>
-                  <li><strong>DEBUG</strong>: Technical visualization tools</li>
-                  <li><strong>DEV</strong>: Advanced developer features</li>
-                </ul>
-              </div>
-            </>
-          )}
+          {/* Keyboard shortcut hint at the bottom */}
+          <div className="text-xs text-center text-gray-500 pb-2">
+            Shift+1-4: Switch modes | Alt+1-2: Toggle HUDs | `: Toggle HUD selector
+          </div>
         </div>
       )}
       
-      {/* Info Overlay - Fixed position */}
-      <div className="fixed top-8 left-8 text-white z-10 pointer-events-none">
-        <h1 className="text-3xl font-bold">Cosmic Galaxy Explorer</h1>
-        <p className="text-gray-300 mt-2">Static 3D visualization space</p>
+      {/* Current scene name */}
+      <div className="fixed top-1/2 transform -translate-y-1/2 right-8 text-lg text-white opacity-60 z-10 font-mono">
+        <div className="text-green-400">{explorerMode === 'SHOW' && selectedScene && SCENE_PRESETS[selectedScene]?.name}</div>
+        <div>{explorerMode === 'SHOW' && <div className="text-xs">Scene Progress: {(sceneProgress * 100).toFixed(0)}%</div>}</div>
       </div>
     </div>
   );

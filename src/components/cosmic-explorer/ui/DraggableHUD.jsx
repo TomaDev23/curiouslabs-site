@@ -14,6 +14,9 @@ export const metadata = {
   doc: 'contract_draggable_hud.md'
 };
 
+// Keep track of highest z-index to bring active HUD to front
+let globalZIndex = 1000;
+
 /**
  * DraggableHUD component
  * Base component for all draggable HUD panels
@@ -31,6 +34,7 @@ const DraggableHUD = ({
   const [position, setPosition] = useState(initialPosition);
   const [isDragging, setIsDragging] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
+  const [zIndex, setZIndex] = useState(globalZIndex++);
   const dragRef = useRef(null);
   const dragStartRef = useRef({ x: 0, y: 0 });
   
@@ -43,6 +47,10 @@ const DraggableHUD = ({
   
   // Start dragging
   const handleMouseDown = (e) => {
+    // Bring to front
+    const newZIndex = globalZIndex++;
+    setZIndex(newZIndex);
+    
     setIsDragging(true);
     dragStartRef.current = {
       x: e.clientX - position.x,
@@ -96,7 +104,8 @@ const DraggableHUD = ({
       className={`draggable-hud ${isMinimized ? 'minimized' : ''} ${className}`}
       style={{
         transform: `translate(${position.x}px, ${position.y}px)`,
-        width: isMinimized ? 'auto' : `${width}px`
+        width: isMinimized ? 'auto' : `${width}px`,
+        zIndex
       }}
     >
       {/* HUD Header */}
@@ -140,12 +149,12 @@ const DraggableHUD = ({
           box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
           overflow: hidden;
           backdrop-filter: blur(8px);
-          z-index: 900;
           user-select: none;
           max-height: 80vh;
           display: flex;
           flex-direction: column;
           border: 1px solid rgba(70, 80, 180, 0.4);
+          pointer-events: auto;
         }
         
         .draggable-hud.minimized {
