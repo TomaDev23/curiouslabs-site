@@ -118,18 +118,19 @@ These policies are absolute. No component, style, or feature may violate these d
 The following pages are documented and sanctioned:
 
 1. **Home (`/`)**: Main landing page with Hero, LogoStrip, DynamicExpansion, Metrics, CaseStudies, and Testimonials.
-2. **Products Portal (`/products`)**: Overview of all products with cards for each product.
-3. **Product Pages**:
+2. **Cosmic Revolution (`/cosmic-rev`)**: Static 3D galaxy space experience with scene presets and fixed viewport.
+3. **Products Portal (`/products`)**: Overview of all products with cards for each product.
+4. **Product Pages**:
    - Aegis (`/products/aegis`): Security product page
    - OpsPipe (`/products/opspipe`): DevOps automation product page
    - MoonSignal (`/products/moonsignal`): Analytics product page
    - Curious (`/products/curious`): Code exploration product page
    - Guardian (`/products/guardian`): Monitoring product page
-4. **CodeLab (`/codelab`)**: Interactive playground for tools
-5. **Blog (`/blog`)**: Coming soon page for blog content
-6. **Documentation (`/docs`)**: Resource for guides and API documentation
-7. **About (`/about`)**: Company information, mission, and values
-8. **Contact (`/contact`)**: Contact information and form placeholder
+5. **CodeLab (`/codelab`)**: Interactive playground for tools
+6. **Blog (`/blog`)**: Coming soon page for blog content
+7. **Documentation (`/docs`)**: Resource for guides and API documentation
+8. **About (`/about`)**: Company information, mission, and values
+9. **Contact (`/contact`)**: Contact information and form placeholder
 
 ## 🔃 Routing Implementation
 - All navigation must use React Router's `<Link>` component

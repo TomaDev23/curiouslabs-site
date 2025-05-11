@@ -7,14 +7,14 @@ import SunApproachScene from './scenes/SunApproachScene';
 import SunLandingScene from './scenes/SunLandingScene';
 import ColorOverlay from './ColorOverlay';
 import SceneBackdrop from './visual/SceneBackdrop';
-import FPSMeter from './debug/FPSMeter';
 import ConstellationGlow from './visual/ConstellationGlow';
-import SceneBoundaryDebug from './debug/SceneBoundaryDebug';
 import { useParticlePerformanceConfig } from './hooks/useParticlePerformanceConfig';
 import { useSceneVisibility } from './hooks/useSceneVisibility';
 import { getDissolveOpacity } from '../../utils/dissolveEngine';
 import PersistentElements from './PersistentElements';
 import GlobalParticleSystem from './visual/GlobalParticleSystem';
+import withDraggable from '../../components/ui/DraggableHOC';
+import { useHUDContext } from '../../components/ui/HUDHub';
 
 // LEGIT-compliant metadata
 const metadata = {
@@ -39,11 +39,61 @@ const isDev = process.env.NODE_ENV === 'development' ||
               window.location.hostname === 'localhost' || 
               window.location.hostname === '127.0.0.1';
 
+// Debug overlay content component - will be wrapped with draggable HOC
+const SceneDebugOverlayContent = ({ scrollProgress, currentSceneKey, sceneProgress }) => {
+  // Check if hud is visible based on HUDContext
+  const { hudVisibility } = useHUDContext?.() || { hudVisibility: {} };
+  const isVisible = hudVisibility['hud_6'] !== false; // Using HUD 6 for Scene Progress
+  
+  // Log visibility state for debugging
+  useEffect(() => {
+    console.log('[HUD6] Visibility state:', isVisible, 'from context:', hudVisibility);
+  }, [isVisible, hudVisibility]);
+  
+  // Early return if not visible based on HUD hub toggle
+  if (!isVisible) return null;
+  
+  return (
+    <div className="bg-gray-900/90 p-4 rounded-lg text-xs text-white font-mono border-2 border-purple-500 shadow-xl">
+      <div className="flex justify-between items-center mb-2">
+        <strong className="text-purple-300">HUD 6: Scene Progress</strong>
+      </div>
+      <div className="mb-1 text-lg">Scroll Progress: {(scrollProgress * 100).toFixed(2)}%</div>
+      <div className="mb-1">Position: {window.scrollY}px / {document.documentElement.scrollHeight}px</div>
+      <div className="mb-1">Current Scene: <span className="text-purple-400">{currentSceneKey}</span></div>
+      <div className="mb-2">Scene Progress: {(isNaN(sceneProgress) ? 0 : sceneProgress * 100).toFixed(2)}%</div>
+      
+      <div className="text-xs mt-2 pt-2 border-t border-gray-700">
+        {SCENES.map(scene => (
+          <div key={scene.key} className="flex items-center mb-1">
+            <div className={`w-2 h-2 rounded-full mr-2 ${currentSceneKey === scene.key ? 'bg-purple-500' : 'bg-gray-500'}`}></div>
+            <div className={`${currentSceneKey === scene.key ? 'text-purple-400' : 'text-gray-400'}`}>
+              {scene.key}: {scene.range[0] * 100}% - {scene.range[1] * 100}%
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+// Create draggable version with specific storage key for position
+const DraggableSceneDebugOverlay = withDraggable(SceneDebugOverlayContent, {
+  defaultPosition: { x: 380, y: 400 },  // Positioned far to the right and lower to avoid navbar and other components
+  zIndex: 10000,  // Ensure it's in the global layer
+  storageId: 'draggable_SceneDebugOverlayContent_position'
+});
+
+// New combined component that replaces the original DebugOverlay
+export const SceneDebugOverlay = (props) => {
+  console.log('[HUD6] SceneDebugOverlay rendering with draggable wrapper');
+  return <DraggableSceneDebugOverlay {...props} />;
+};
+
 export default function CosmicJourneyController() {
   const [scrollProgress, setScrollProgress] = useState(0);
   const [sceneProgress, setSceneProgress] = useState(0);
   const [validSceneIndex, setValidSceneIndex] = useState(0);
-  const [showFpsMeter, setShowFpsMeter] = useState(true); // Start visible in dev mode
   
   // Check if device is mobile
   const isMobile = useRef(window.innerWidth <= 768);
@@ -186,41 +236,6 @@ export default function CosmicJourneyController() {
       }
     };
   }, []);
-  
-  // Toggle FPS meter with F key (dev only)
-  useEffect(() => {
-    if (!isDev) return;
-    
-    const handleKeyDown = (e) => {
-      if (e.key === 'f' || e.key === 'F') {
-        setShowFpsMeter(prev => !prev);
-      }
-    };
-    
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
-
-  // Alternative debug overlay with more detail
-  const DebugOverlay = () => (
-    <div className="fixed top-4 left-4 z-[9999] bg-black/80 p-4 rounded-lg text-xs text-white font-mono">
-      <div className="mb-1 text-lg">Scroll Progress: {(scrollProgress * 100).toFixed(2)}%</div>
-      <div className="mb-1">Position: {window.scrollY}px / {document.documentElement.scrollHeight}px</div>
-      <div className="mb-1">Current Scene: <span className="text-green-400">{currentSceneKey}</span></div>
-      <div className="mb-2">Scene Progress: {(isNaN(sceneProgress) ? 0 : sceneProgress * 100).toFixed(2)}%</div>
-      
-      <div className="text-xs mt-2 pt-2 border-t border-gray-700">
-        {SCENES.map(scene => (
-          <div key={scene.key} className="flex items-center mb-1">
-            <div className={`w-2 h-2 rounded-full mr-2 ${currentSceneKey === scene.key ? 'bg-green-500' : 'bg-gray-500'}`}></div>
-            <div className={`${currentSceneKey === scene.key ? 'text-green-400' : 'text-gray-400'}`}>
-              {scene.key}: {scene.range[0] * 100}% - {scene.range[1] * 100}%
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
 
   // Get current scene information
   const currentScene = SCENES[validSceneIndex].key;
@@ -350,9 +365,8 @@ export default function CosmicJourneyController() {
         </div>
         
         {/* Debug components for development only */}
-        {isDev && showFpsMeter && <FPSMeter />}
-        {isDev && <DebugOverlay />}
-        {isDev && <SceneBoundaryDebug scenes={SCENES} scrollProgress={scrollProgress} />}
+        {/* FPSMeter is now managed by HUDSystem */}
+        {/* SceneDebugOverlay is now managed by HUDSystem */}
         
         {/* Mint-colored warp trails - only during CosmicFlight scene */}
         {currentSceneKey === 'cosmicFlight' && (
@@ -404,27 +418,6 @@ export default function CosmicJourneyController() {
             />
           ))}
         </div>
-        
-        {/* VH Markers for debugging (toggleable) */}
-        {isDev && (
-          <div className="fixed inset-0 pointer-events-none z-40">
-            {[100, 200, 300, 400, 500, 600].map((vh) => (
-              <div 
-                key={vh}
-                data-vh-marker
-                className="absolute left-0 w-full border-t border-dashed border-blue-500/30"
-                style={{ 
-                  top: `${vh}vh`,
-                  display: 'block'
-                }}
-              >
-                <span className="bg-black/70 text-blue-400 px-2 py-1 text-xs rounded">
-                  {vh}vh
-                </span>
-              </div>
-            ))}
-          </div>
-        )}
       </div>
     </div>
   );

@@ -1,98 +1,128 @@
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import withDraggable from '../../../components/ui/DraggableHOC';
 
 // LEGIT-compliant metadata
-const metadata = {
+export const metadata = {
   id: 'scene_boundary_debug',
   scs: 'SCS0',
   type: 'debug',
   doc: 'contract_debug_tools.md'
 };
 
+// Default scenes for fallback
+const DEFAULT_SCENES = [
+  { key: 'dormant', range: [0.0, 0.05], transitionDuration: 1.0, fadeZone: 0.01 }, 
+  { key: 'awakening', range: [0.05, 0.15], transitionDuration: 1.0, fadeZone: 0.015 },
+  { key: 'cosmicReveal', range: [0.15, 0.3], transitionDuration: 0.8, fadeZone: 0.015 },
+  { key: 'cosmicFlight', range: [0.3, 0.8], transitionDuration: 0.6, fadeZone: 0.015 },
+  { key: 'sunApproach', range: [0.8, 0.9], transitionDuration: 1.0, fadeZone: 0.015 },
+  { key: 'sunLanding', range: [0.9, 1.0], transitionDuration: 1.0, fadeZone: 0.01 },
+];
+
 /**
- * SceneBoundaryDebug - Visualizes scene boundaries and scroll position
- * Updated for TILE v5.0.D to show dissolve zones and transition timing
- * Only visible in development mode
- * 
- * @param {Array} scenes - Array of scene objects with key, range properties
- * @param {number} scrollProgress - Current scroll progress (0-1)
- * @returns {React.ReactElement} Scene boundary debug overlay
+ * SceneBoundaryDebug Content Component - Visualizes scene boundaries and scroll position
+ * Will be wrapped with draggable HOC - Renamed to HUD ATOMIC 2
  */
-export default function SceneBoundaryDebug({ scenes, scrollProgress }) {
+function SceneBoundaryDebugContent({ scenes = [], scrollProgress = 0 }) {
   const [showVhValues, setShowVhValues] = useState(true);
   const [showDissolveZones, setShowDissolveZones] = useState(false);
   const [showTransitionTiming, setShowTransitionTiming] = useState(false);
   const [isExpanded, setIsExpanded] = useState(true);
   const [lastTransitionTime, setLastTransitionTime] = useState(null);
   const [currentSceneKey, setCurrentSceneKey] = useState('');
+  const [isVisible, setIsVisible] = useState(true); // Start visible by default
   
-  // Enhanced scene data with fade zones
-  const scenesWithFadeZones = scenes.map(scene => ({
-    ...scene,
-    fadeZone: scene.key === 'dormant' || scene.key === 'sunLanding' ? 0.03 : 0.05
-  }));
-  
-  // Toggle VH values display with V key
+  // Use keyboard shortcut to toggle visibility (Shift+H+2)
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (e.key === 'v' || e.key === 'V') {
-        setShowVhValues(prev => !prev);
-      } else if (e.key === 'd' || e.key === 'D') {
-        setShowDissolveZones(prev => !prev);
-      } else if (e.key === 't' || e.key === 'T') {
-        setShowTransitionTiming(prev => !prev);
+      // Check for Shift+H+2 combination
+      if (e.shiftKey && e.key === 'H' && e.code === 'Digit2') {
+        setIsVisible(prev => !prev);
+        console.log('[HUD ATOMIC 2] Visibility toggled with keyboard shortcut');
+      }
+      
+      // Only handle other shortcuts if visible
+      if (isVisible) {
+        if (e.key === 'v' || e.key === 'V') {
+          setShowVhValues(prev => !prev);
+        } else if (e.key === 'd' || e.key === 'D') {
+          setShowDissolveZones(prev => !prev);
+        } else if (e.key === 't' || e.key === 'T') {
+          setShowTransitionTiming(prev => !prev);
+        }
       }
     };
     
+    // Listen for custom event from NavBar button
+    const handleToggleHudAtomic2 = () => {
+      setIsVisible(prev => !prev);
+      console.log('[HUD ATOMIC 2] Visibility toggled from NavBar button');
+    };
+    
     window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
+    window.addEventListener('toggleHudAtomic2', handleToggleHudAtomic2);
+    
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('toggleHudAtomic2', handleToggleHudAtomic2);
+    };
+  }, [isVisible]);
+  
+  // Use default scenes if none provided
+  const usableScenes = (scenes && scenes.length > 0) ? scenes : DEFAULT_SCENES;
+  
+  // Enhanced scene data with fade zones
+  const scenesWithFadeZones = usableScenes.map(scene => ({
+    ...scene,
+    fadeZone: scene.fadeZone || (scene.key === 'dormant' || scene.key === 'sunLanding' ? 0.03 : 0.05)
+  }));
   
   // Track scene transitions for timing display
   useEffect(() => {
-    const currentScene = scenes.find(
-      ({ range }) => scrollProgress >= range[0] && scrollProgress < range[1]
-    );
+    if (!isVisible) return;
     
-    if (currentScene && currentScene.key !== currentSceneKey) {
-      setLastTransitionTime(new Date());
-      setCurrentSceneKey(currentScene.key);
+    try {
+      const currentScene = usableScenes.find(
+        ({ range }) => scrollProgress >= range[0] && scrollProgress < range[1]
+      );
+      
+      if (currentScene && currentScene.key !== currentSceneKey) {
+        setLastTransitionTime(new Date());
+        setCurrentSceneKey(currentScene.key);
+      }
+    } catch (error) {
+      console.error('[HUD ATOMIC 2] Error tracking scene transitions:', error);
     }
-  }, [scrollProgress, scenes, currentSceneKey]);
+  }, [scrollProgress, usableScenes, currentSceneKey, isVisible]);
   
   // Calculate the total height for vh calculations (700vh for AtomicPageFrame)
   const totalVhHeight = 700;
   
-  if (!scenes || scenes.length === 0) return null;
+  // Early return if not visible - MOVED AFTER ALL HOOKS
+  if (!isVisible) {
+    return null;
+  }
   
   return (
-    <motion.div 
-      className="fixed right-4 top-4 z-50 bg-black/80 rounded-lg p-2 text-xs font-mono text-white backdrop-blur-sm border border-gray-700 shadow-xl"
-      initial={{ opacity: 0, y: -10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
-    >
-      <div className="flex justify-between items-center mb-1">
-        <h3 className="text-green-400 font-bold text-xs">Scene Boundaries</h3>
+    <div className="bg-gray-900/90 rounded-lg p-2 text-xs font-mono text-white backdrop-blur-sm border-2 border-purple-500 shadow-xl">
+      <div className="flex justify-between items-center mb-1 draggable-handle">
+        <h3 className="text-purple-300 font-bold text-xs">HUD ATOMIC 2</h3>
         <div className="flex gap-2">
           <button 
             onClick={() => setShowVhValues(prev => !prev)} 
-            className={`text-[10px] px-1.5 py-0.5 rounded ${showVhValues ? 'bg-blue-600' : 'bg-gray-700'}`}
-            title="Toggle VH values display (V key)"
+            className={`text-[10px] px-1.5 py-0.5 rounded ${showVhValues ? 'bg-purple-600' : 'bg-gray-700'}`}
           >
             VH
           </button>
           <button 
             onClick={() => setShowDissolveZones(prev => !prev)} 
-            className={`text-[10px] px-1.5 py-0.5 rounded ${showDissolveZones ? 'bg-green-600' : 'bg-gray-700'}`}
-            title="Toggle dissolve zone highlights (D key)"
+            className={`text-[10px] px-1.5 py-0.5 rounded ${showDissolveZones ? 'bg-purple-600' : 'bg-gray-700'}`}
           >
             DZ
           </button>
           <button 
             onClick={() => setShowTransitionTiming(prev => !prev)} 
             className={`text-[10px] px-1.5 py-0.5 rounded ${showTransitionTiming ? 'bg-purple-600' : 'bg-gray-700'}`}
-            title="Toggle transition timing (T key)"
           >
             MS
           </button>
@@ -226,9 +256,46 @@ export default function SceneBoundaryDebug({ scenes, scrollProgress }) {
             Press D to toggle dissolve zones
             <br />
             Press T to toggle transition timing
+            <br />
+            Press Shift+H+2 to toggle visibility
           </div>
         </>
       )}
-    </motion.div>
+    </div>
   );
+}
+
+// Create draggable version with unique storage ID
+const DraggableSceneBoundaryDebug = withDraggable(SceneBoundaryDebugContent, {
+  defaultPosition: { x: 20, y: 350 },
+  zIndex: 103, // Correct z-index for HUD layer
+  storageId: 'scene_boundary_debug_atomic_2'
+});
+
+/**
+ * SceneBoundaryDebug - Exports the draggable scene boundary debug component
+ * Renamed to HUD ATOMIC 2 for the page layer
+ */
+export default function SceneBoundaryDebug(props) {
+  try {
+    return <DraggableSceneBoundaryDebug {...props} />;
+  } catch (error) {
+    console.error('[HUD ATOMIC 2] Error rendering:', error);
+    // Return a visible error message instead of null
+    return (
+      <div style={{ 
+        position: 'fixed', 
+        top: '20px', 
+        right: '20px', 
+        backgroundColor: 'rgba(255, 0, 0, 0.8)', 
+        color: 'white', 
+        padding: '10px', 
+        borderRadius: '5px', 
+        fontSize: '12px',
+        zIndex: 120 // Debug overlay layer
+      }}>
+        Error rendering HUD ATOMIC 2: {error?.message || 'Unknown error'}
+      </div>
+    );
+  }
 } 

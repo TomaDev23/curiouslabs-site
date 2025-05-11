@@ -1,5 +1,7 @@
 # 👝 CuriousLabs Landing Page – Cursor Mission Context
 
+> **⚠️ LEGACY DOCUMENT**: This is a historical document from early development. For current project information, please refer to the authoritative contracts in `Docs/contracts/`, particularly `route-lock.md` and `article_Welcome_agent.md`.
+
 ## 🌟 Mission Objective
 
 Build a **modern, elegant, AI-native landing page** for **CuriousLabs**, an elite CodeOps service lab.  
@@ -36,7 +38,7 @@ Primary stack: **React + TailwindCSS**, built inside **Cursor** using image-to-c
 - ✅ Uploaded UI screenshots (6 PNGs)
 - ✅ MidJourney prompt packs for visual hero sections
 - ✅ Service descriptions and mission logs (to be inserted later)
-- 🧠 Tagline: _“You send a mess. I return a TILE.”_
+- 🧠 Tagline: _"You send a mess. I return a TILE."_
 
 ---
 

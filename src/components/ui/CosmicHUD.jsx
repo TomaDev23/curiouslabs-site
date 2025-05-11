@@ -40,7 +40,7 @@ const CosmicHUD = ({ showSectionLabel = true, showProgress = true, position = 'b
   
   return (
     <motion.div
-      className={`fixed ${positionClasses} z-40 pointer-events-none`}
+      className={`fixed ${positionClasses} z-[95] pointer-events-none`}
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.3 }}

@@ -147,9 +147,6 @@ const HeroPortal = () => {
       >
         {/* Removing SpaceCanvas integration since it's now handled at the page level */}
         
-        {/* Enhanced cosmic radial background for stronger purple glow */}
-        <div className="absolute inset-0 bg-gradient-radial from-purple-900/30 via-gray-900/20 to-black opacity-60"></div>
-        
         {/* Enhanced Interactive Parallax Star Field - lazy loaded */}
         <div 
           ref={(node) => {
@@ -406,7 +403,7 @@ const HeroPortal = () => {
         {/* Enhanced scroll indicator - hidden once user has scrolled */}
         {!hasScrolled && (
           <motion.div
-            className="absolute bottom-10 left-1/2 transform -translate-x-1/2"
+            className="absolute bottom-10 left-1/2 transform -translate-x-1/2 z-[60]"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 0.7, y: 0 }}
             transition={{ 

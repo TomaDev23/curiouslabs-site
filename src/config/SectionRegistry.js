@@ -1,0 +1,95 @@
+import HeroPortal from '../components/home/v4/HeroPortal';
+import MissionStatement from '../components/home/v4/MissionStatement';
+import WhyAIDevCards from '../components/home/v4/WhyAIDevCards';
+import ServicesOrbital from '../components/home/v4/ServicesOrbital';
+import FeaturedProjects from '../components/home/v4/FeaturedProjects';
+import ProjectsLogbook from '../components/home/v4/ProjectsLogbook';
+import CommunityHub from '../components/home/v4/CommunityHub';
+import HearFromAI from '../components/home/v4/HearFromAI';
+import ContactTerminal from '../components/home/v4/ContactTerminal';
+
+// LEGIT metadata for this registry
+export const metadata = {
+  id: 'section_registry',
+  scs: 'SCS-ATOMIC-REGISTRY',
+  type: 'config',
+  doc: 'contract_section_registry.md'
+};
+
+/**
+ * Home-v5 Section Configuration
+ * Defines each section component, position, and props
+ * Following the tile layout defined in Plan_v1.0.md
+ */
+export const HOME_V5_SECTIONS = [
+  {
+    id: 'hero_portal',
+    position: 100,
+    component: HeroPortal,
+    props: {}
+  },
+  {
+    id: 'mission_statement',
+    position: 200,
+    component: MissionStatement,
+    props: {}
+  },
+  {
+    id: 'why_ai_cards', 
+    position: 300,
+    component: WhyAIDevCards,
+    props: {}
+  },
+  {
+    id: 'service_ring',
+    position: 400,
+    component: ServicesOrbital,
+    props: {}
+  },
+  {
+    id: 'featured_metrics',
+    position: 500,
+    component: FeaturedProjects,
+    props: {}
+  },
+  {
+    id: 'project_gallery',
+    position: 550,
+    component: ProjectsLogbook,
+    props: {}
+  },
+  {
+    id: 'community_hub',
+    position: 600,
+    component: CommunityHub,
+    props: {}
+  },
+  {
+    id: 'ai_testimonials',
+    position: 650,
+    component: HearFromAI,
+    props: {}
+  },
+  {
+    id: 'contact_terminal',
+    position: 700,
+    component: ContactTerminal,
+    props: {}
+  }
+];
+
+/**
+ * Section Registry for ContentLayer
+ * Maps section IDs to their component implementations
+ */
+export const SectionRegistry = {
+  hero_portal: HeroPortal,
+  mission_statement: MissionStatement,
+  why_ai_cards: WhyAIDevCards,
+  service_ring: ServicesOrbital,
+  featured_metrics: FeaturedProjects,
+  project_gallery: ProjectsLogbook,
+  community_hub: CommunityHub,
+  ai_testimonials: HearFromAI,
+  contact_terminal: ContactTerminal
+}; 

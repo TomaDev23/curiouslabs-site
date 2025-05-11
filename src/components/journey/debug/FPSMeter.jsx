@@ -1,8 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
+import withDraggable from '../../../components/ui/DraggableHOC';
+
+// Import HUDContext directly from HUDHub
+import { useHUDContext } from '../../../components/ui/HUDHub';
 
 // LEGIT-compliant metadata
-const metadata = {
+export const metadata = {
   id: 'fps_meter',
   scs: 'SCS0',
   type: 'debug',
@@ -10,19 +14,25 @@ const metadata = {
 };
 
 /**
- * FPSMeter - Performance monitoring component
- * Updated for TILE v5.0.C to include VH marker toggle
- * Only visible in development mode
- * 
- * @returns {React.ReactElement} FPS meter overlay
+ * FPSMeter Internal Component - Performance monitoring component
+ * Will be wrapped with withDraggable
  */
-export default function FPSMeter() {
+function FPSMeterContent() {
   const [fps, setFps] = useState(0);
   const [showMarkers, setShowMarkers] = useState(true);
   const [isExpanded, setIsExpanded] = useState(true);
   const frameRef = useRef(0);
   const lastTimeRef = useRef(performance.now());
   const framesRef = useRef(0);
+  
+  // Get visibility state directly from HUDContext
+  const { hudVisibility } = useHUDContext?.() || { hudVisibility: {} };
+  const isVisible = hudVisibility['hud_3'] !== false;
+  
+  // Log visibility state for debugging
+  useEffect(() => {
+    console.log('[HUD3] Visibility state:', isVisible, 'from context:', hudVisibility);
+  }, [isVisible, hudVisibility]);
   
   // Calculate FPS
   useEffect(() => {
@@ -65,8 +75,8 @@ export default function FPSMeter() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [showMarkers]);
   
-  // Only render in development mode
-  if (process.env.NODE_ENV !== 'development') return null;
+  // Early return if not visible based on HUD context
+  if (!isVisible) return null;
   
   // Get color based on FPS
   const getFpsColor = () => {
@@ -76,14 +86,9 @@ export default function FPSMeter() {
   };
   
   return (
-    <motion.div 
-      className="fixed left-4 bottom-4 z-50 bg-black/80 p-2 rounded-lg text-white text-xs font-mono backdrop-blur-sm border border-gray-700 shadow-xl"
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
-    >
+    <div className="bg-gray-900/90 p-2 rounded-lg text-white text-xs font-mono backdrop-blur-sm border-2 border-purple-500 shadow-xl">
       <div className="flex justify-between items-center">
-        <h3 className="font-bold text-xs">FPS Monitor</h3>
+        <h3 className="font-bold text-xs text-purple-300">HUD 3: FPS Monitor</h3>
         <div className="flex gap-2">
           <button 
             onClick={() => {
@@ -94,7 +99,7 @@ export default function FPSMeter() {
                 marker.style.display = !showMarkers ? 'block' : 'none';
               });
             }} 
-            className={`text-[10px] px-1.5 py-0.5 rounded ${showMarkers ? 'bg-blue-600' : 'bg-gray-700'}`}
+            className={`text-[10px] px-1.5 py-0.5 rounded ${showMarkers ? 'bg-purple-600' : 'bg-gray-700'}`}
             title="Toggle VH markers (M key)"
           >
             VH
@@ -141,6 +146,21 @@ export default function FPSMeter() {
           </div>
         </>
       )}
-    </motion.div>
+    </div>
   );
+}
+
+// Create draggable version with specific storage key for position
+const DraggableFPSMeter = withDraggable(FPSMeterContent, {
+  defaultPosition: { x: 20, y: 220 },
+  zIndex: 10000,
+  storageId: 'draggable_FPSMeterContent_position'
+});
+
+/**
+ * FPSMeter - Exports the draggable FPS meter component
+ */
+export default function FPSMeter() {
+  console.log('[HUD3] FPSMeter rendering');
+  return <DraggableFPSMeter />;
 } 

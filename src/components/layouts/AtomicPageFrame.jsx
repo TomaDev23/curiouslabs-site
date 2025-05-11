@@ -1,30 +1,238 @@
-import React from 'react';
+import React, { useState, useEffect, useRef, forwardRef } from 'react';
 import NavBar from '../NavBar';
 import FooterExperience from '../home/v4/FooterExperience';
-import { ScrollDebugOverlay } from '../ui/ScrollDebugOverlay';
 import CosmicJourneyController from '../journey/CosmicJourneyController';
+import { ContentLayer } from './ContentLayer';
+import { AdvancedControlPanel } from './AdvancedControlPanel';
+import { HOME_V5_SECTIONS, SectionRegistry } from '../../config/SectionRegistry';
+import HUDHub, { HUDProvider } from '../ui/HUDHub';
+import withDraggable from '../ui/DraggableHOC';
 
-const metadata = {
+// LEGIT compliance metadata
+export const metadata = {
   id: 'atomic_page_frame',
-  scs: 'SCS-ATOMIC-FRAME',
+  scs: 'SCS-PAGE-FRAME',
   type: 'layout',
   doc: 'contract_atomic_page_frame.md'
 };
 
-export function AtomicPageFrame() {
+// Local storage key for saving section positions
+const STORAGE_KEY = 'home-v5-section-positions';
+const VISIBILITY_KEY = 'home-v5-section-visibility';
+
+// Create a draggable version of AdvancedControlPanel for the page
+const PageDraggableAdvancedControlPanel = withDraggable(AdvancedControlPanel, {
+  defaultPosition: { x: 100, y: 100 },
+  zIndex: 20000,
+  storageId: 'page_draggable_admin_panel_position'
+});
+
+export const AtomicPageFrame = forwardRef(({ scenes = [], scrollProgress = 0 }, ref) => {
+  // Track whether we're in edit mode
+  const [isEditMode, setIsEditMode] = useState(false);
+  
+  // Track whether to show the admin panel
+  const [showAdminPanel, setShowAdminPanel] = useState(true); // Start visible by default
+  
+  // Track hidden sections by ID
+  const [hiddenSections, setHiddenSections] = useState(() => {
+    // Try to load from localStorage
+    if (typeof window !== 'undefined') {
+      try {
+        const savedVisibility = localStorage.getItem(VISIBILITY_KEY);
+        if (savedVisibility) {
+          return JSON.parse(savedVisibility);
+        }
+      } catch (e) {
+        console.error('Error loading saved visibility:', e);
+      }
+    }
+    
+    // Default to no hidden sections
+    return [];
+  });
+  
+  // State for section configurations, initialized from localStorage or defaults
+  const [sections, setSections] = useState(() => {
+    // Try to load from localStorage
+    if (typeof window !== 'undefined') {
+      try {
+        const savedPositions = localStorage.getItem(STORAGE_KEY);
+        if (savedPositions) {
+          // Parse saved positions and merge with default sections
+          const positionMap = JSON.parse(savedPositions);
+          
+          // Return sections with saved positions
+          return HOME_V5_SECTIONS.map(section => {
+            const savedSection = positionMap.find(s => s.id === section.id);
+            return savedSection 
+              ? { ...section, position: savedSection.position } 
+              : section;
+          });
+        }
+      } catch (e) {
+        console.error('Error loading saved positions:', e);
+      }
+    }
+    
+    // Fall back to default positions
+    return HOME_V5_SECTIONS;
+  });
+  
+  // Handle keyboard shortcut to toggle admin panel and HUDs
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      // Ctrl+Alt+P to toggle admin panel
+      if (e.ctrlKey && e.altKey && e.key === 'p') {
+        setShowAdminPanel(prev => !prev);
+      }
+      
+      // Shift+H+1 to toggle HUD ATOMIC 1
+      if (e.shiftKey && e.key === 'H' && e.code === 'Digit1') {
+        setShowAdminPanel(prev => !prev);
+        console.log('[HUD ATOMIC 1] Visibility toggled with keyboard shortcut');
+      }
+    };
+    
+    // Listen for custom events from NavBar buttons
+    const handleToggleHudAtomic1 = () => {
+      setShowAdminPanel(prev => !prev);
+      console.log('[HUD ATOMIC 1] Visibility toggled from NavBar button');
+    };
+    
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('toggleHudAtomic1', handleToggleHudAtomic1);
+    
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('toggleHudAtomic1', handleToggleHudAtomic1);
+    };
+  }, []);
+  
+  // Handle section drag for positioning
+  const handleSectionDrag = (id, newPosition) => {
+    // Ensure position is within reasonable bounds (0 to 1000vh)
+    const position = Math.max(0, Math.min(1000, newPosition));
+    
+    // Update the section position
+    setSections(prevSections => 
+      prevSections.map(section => 
+        section.id === id 
+          ? { ...section, position } 
+          : section
+      )
+    );
+  };
+  
+  // For backward compatibility - use handleSectionDrag
+  const handleSectionPositionChange = handleSectionDrag;
+  
+  // Save current positions to localStorage
+  const handleSavePositions = () => {
+    try {
+      // Extract just the id and position for storage
+      const positionsToSave = sections.map(({ id, position }) => ({ id, position }));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(positionsToSave));
+      
+      // Also save visibility state
+      localStorage.setItem(VISIBILITY_KEY, JSON.stringify(hiddenSections));
+      
+      alert('Section positions and visibility saved successfully!');
+    } catch (e) {
+      console.error('Error saving positions:', e);
+      alert('Error saving positions. See console for details.');
+    }
+  };
+  
+  // Reset positions to defaults
+  const handleResetPositions = () => {
+    if (window.confirm('Reset all positions to default and show all sections?')) {
+      setSections(HOME_V5_SECTIONS);
+      setHiddenSections([]);
+      localStorage.removeItem(STORAGE_KEY);
+      localStorage.removeItem(VISIBILITY_KEY);
+    }
+  };
+  
+  // Toggle section visibility
+  const handleToggleSectionVisibility = (id) => {
+    setHiddenSections(prev => {
+      if (prev.includes(id)) {
+        // Section is currently hidden, so show it
+        return prev.filter(sectionId => sectionId !== id);
+      } else {
+        // Section is currently visible, so hide it
+        return [...prev, id];
+      }
+    });
+  };
+  
+  // Show all sections
+  const handleShowAllSections = () => {
+    setHiddenSections([]);
+  };
+  
+  // Hide all sections
+  const handleHideAllSections = () => {
+    setHiddenSections(sections.map(section => section.id));
+  };
+  
+  // Toggle edit mode
+  const handleToggleEditMode = () => {
+    setIsEditMode(prev => !prev);
+  };
+  
+  // Calculate spacer height based on the last section position
+  const maxPosition = sections.reduce(
+    (max, section) => Math.max(max, section.position), 
+    0
+  );
+  const spacerHeight = Math.max(800, maxPosition + 100); // Add 100vh for last section height
+  
   return (
-    <div className="relative w-full text-white">
-      {/* Cosmic Journey Controller as fixed background (z-0) */}
-      <div className="fixed inset-0 z-0">
-        <CosmicJourneyController />
-      </div>
-      
-      <NavBar />
-      
-      <main className="relative">
-        {/* 700vh spacer for layout */}
-        <div className="h-[700vh] relative">
-          {/* Optional debug markers - visible in development only */}
+    <HUDProvider>
+      <div className="relative w-full text-white" ref={ref}>
+        {/* Cosmic Journey Controller as fixed background (z-0) */}
+        <div className="fixed inset-0 z-0">
+          <CosmicJourneyController />
+        </div>
+        
+        <NavBar />
+        
+        {/* Content layer with all sections */}
+        <ContentLayer 
+          sections={sections} 
+          SectionRegistry={SectionRegistry}
+          isEditMode={isEditMode} 
+          hiddenSections={hiddenSections}
+        />
+        
+        {/* Admin panel for development (HUD ATOMIC 1) */}
+        {showAdminPanel && (
+          <PageDraggableAdvancedControlPanel 
+            sections={sections}
+            onSectionMove={handleSectionPositionChange}
+            onToggleEditMode={handleToggleEditMode}
+            isEditMode={isEditMode}
+            onSave={handleSavePositions}
+            onReset={handleResetPositions}
+            hiddenSections={hiddenSections}
+            onToggleSectionVisibility={handleToggleSectionVisibility}
+            onShowAllSections={handleShowAllSections}
+            onHideAllSections={handleHideAllSections}
+            customClassName=""
+            customTitle="HUD ATOMIC 1"
+            scenes={scenes}
+            scrollProgress={scrollProgress}
+          />
+        )}
+        
+        {/* Hidden spacer to set page height */}
+        <div 
+          className="w-full pointer-events-none" 
+          style={{ height: `${spacerHeight}vh` }}
+        >
+          {/* VH Markers for design reference (hidden in production) */}
           {process.env.NODE_ENV === 'development' && (
             <>
               <div className="absolute top-[100vh] left-0 w-full border-t border-dashed border-purple-500/30">
@@ -45,15 +253,18 @@ export function AtomicPageFrame() {
               <div className="absolute top-[600vh] left-0 w-full border-t border-dashed border-purple-500/30">
                 <span className="bg-black/70 text-purple-400 px-2 py-1 text-xs rounded">600vh</span>
               </div>
+              <div className="absolute top-[700vh] left-0 w-full border-t border-dashed border-purple-500/30">
+                <span className="bg-black/70 text-purple-400 px-2 py-1 text-xs rounded">700vh</span>
+              </div>
             </>
           )}
         </div>
-      </main>
-      
-      <FooterExperience />
-      
-      {/* Debug overlay */}
-      <ScrollDebugOverlay />
-    </div>
+        
+        <FooterExperience />
+        
+        {/* HUD Hub Button - Only in development */}
+        {process.env.NODE_ENV === 'development' && <HUDHub />}
+      </div>
+    </HUDProvider>
   );
-} 
+}); 

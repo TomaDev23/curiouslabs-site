@@ -10,6 +10,8 @@ export default function NavBar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProductsDropdownOpen, setIsProductsDropdownOpen] = useState(false);
+  const [showHudAtomic1, setShowHudAtomic1] = useState(true);
+  const [showHudAtomic2, setShowHudAtomic2] = useState(true);
   const location = useLocation();
   const breakpoint = useBreakpoint();
   const isMobile = breakpoint === 'mobile';
@@ -61,25 +63,62 @@ export default function NavBar() {
     setIsProductsDropdownOpen(false);
   }, [location.pathname]);
   
+  // Toggle HUD visibility and dispatch custom events
+  const toggleHudAtomic1 = () => {
+    setShowHudAtomic1(prev => !prev);
+    // Dispatch a custom event that the HUD component can listen for
+    window.dispatchEvent(new CustomEvent('toggleHudAtomic1'));
+    console.log('[HUD ATOMIC 1] Visibility toggled from navbar');
+  };
+  
+  const toggleHudAtomic2 = () => {
+    setShowHudAtomic2(prev => !prev);
+    // Dispatch a custom event that the HUD component can listen for
+    window.dispatchEvent(new CustomEvent('toggleHudAtomic2'));
+    console.log('[HUD ATOMIC 2] Visibility toggled from navbar');
+  };
+  
   return (
-    <header className={`fixed top-0 left-0 right-0 bg-gradient-to-r from-[#28293D]/95 to-[#1F2040]/95 backdrop-blur-md z-50 ${isScrolled ? 'shadow-lg' : ''}`}>
+    <header className={`fixed top-0 left-0 right-0 bg-gradient-to-r from-[#28293D]/95 to-[#1F2040]/95 backdrop-blur-md z-[110] ${isScrolled ? 'shadow-lg' : ''}`}>
       <nav className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
         {/* Logo */}
-        <Link to="/" className="flex flex-col items-start relative group">
-          <div className="flex items-center">
-            <img 
-              src={IMAGES.LOGO} 
-              alt="CuriousLabs" 
-              className="h-8 w-auto object-contain"
-              style={{ filter: 'drop-shadow(0 0 1px rgba(139, 92, 246, 0.3))' }}
-            />
-            <span className="ml-2 text-xl font-semibold text-white">CuriousLabs</span>
-          </div>
-          {/* Base gradient line (always visible) */}
-          <div className="absolute -bottom-1 left-0 w-full h-0.5 bg-gradient-to-r from-purple-500/20 to-blue-500/20"></div>
-          {/* Hover effect gradient line (animates on hover) */}
-          <div className="absolute -bottom-1 left-0 w-full h-0.5 bg-gradient-to-r from-purple-500 to-blue-500 opacity-0 group-hover:opacity-100 scale-x-0 group-hover:scale-x-100 transition-all duration-700 ease-in-out origin-left"></div>
-        </Link>
+        <div className="flex items-center">
+          <Link to="/" className="flex flex-col items-start relative group">
+            <div className="flex items-center">
+              <img 
+                src={IMAGES.LOGO} 
+                alt="CuriousLabs" 
+                className="h-8 w-auto object-contain"
+                style={{ filter: 'drop-shadow(0 0 1px rgba(139, 92, 246, 0.3))' }}
+              />
+              <span className="ml-2 text-xl font-semibold text-white">CuriousLabs</span>
+            </div>
+            {/* Base gradient line (always visible) */}
+            <div className="absolute -bottom-1 left-0 w-full h-0.5 bg-gradient-to-r from-purple-500/20 to-blue-500/20"></div>
+            {/* Hover effect gradient line (animates on hover) */}
+            <div className="absolute -bottom-1 left-0 w-full h-0.5 bg-gradient-to-r from-purple-500 to-blue-500 opacity-0 group-hover:opacity-100 scale-x-0 group-hover:scale-x-100 transition-all duration-700 ease-in-out origin-left"></div>
+          </Link>
+          
+          {/* HUD ATOMIC buttons - only in development mode */}
+          {isDevelopment && (
+            <div className="flex ml-4 space-x-2">
+              <button
+                onClick={toggleHudAtomic1}
+                className={`px-2 py-1 text-xs rounded-md ${showHudAtomic1 ? 'bg-purple-600 text-white' : 'bg-gray-700 text-gray-300'} hover:bg-purple-500 transition-colors`}
+                title="Toggle HUD ATOMIC 1 (Shift+H+1)"
+              >
+                HUD 1
+              </button>
+              <button
+                onClick={toggleHudAtomic2}
+                className={`px-2 py-1 text-xs rounded-md ${showHudAtomic2 ? 'bg-purple-600 text-white' : 'bg-gray-700 text-gray-300'} hover:bg-purple-500 transition-colors`}
+                title="Toggle HUD ATOMIC 2 (Shift+H+2)"
+              >
+                HUD 2
+              </button>
+            </div>
+          )}
+        </div>
         
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center space-x-8">
