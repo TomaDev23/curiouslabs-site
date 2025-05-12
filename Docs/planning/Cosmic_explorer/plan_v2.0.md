@@ -69,6 +69,4 @@ Based on the architecture plan, I'll implement these 5 Dev tools:
    - Week 2: Component Inspector and Rendering Profiler
    - Week 3: Particle Designer and refinements
 
-## Next Steps
 
-I'll begin with the Shader Lab HUD, which provides a powerful GLSL editing environment that complements the existing Material Inspector and will serve as a foundation for further shader-based development.

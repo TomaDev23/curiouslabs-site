@@ -48,42 +48,7 @@ For now, we’re only tasked with importing `NavBar` and `FooterExperience` into
 
 ---
 
-## 🚀 **Cursor Mission: TILE v5.0.A – Rebuild Home V5 with v4 NavBar and Footer**
-
-### 🔰 **Objective**
-Set up the `/home-v5` route with `HomeV5AtomicPage`, create a layout wrapper (`AtomicPageFrame`), and import `NavBar` (from `../components/NavBar`) and `FooterExperience` (from `../components/home/v4/FooterExperience`) from the current homepage. Use a simple black static background, and defer all other components (including cosmic backgrounds) until later phases.
-
----
-
-## 🧩 **Tiled Tasks**
-
-### **Tile 0.0: Create HomeV5AtomicPage**
-Set up the new page at `/home-v5`.
-
-**File**: `src/pages/HomeV5AtomicPage.jsx`
-```jsx
-import { Suspense } from 'react';
-import { AtomicPageFrame } from '../components/layouts/AtomicPageFrame';
-import Loading from '../components/Loading';
-
-const metadata = {
-  id: 'home_v5_atomic_page',
-  scs: 'SCS-HOME-V5',
-  type: 'page',
-  doc: 'contract_home_v5_atomic.md'
-};
-
-export default function HomeV5AtomicPage() {
-  return (
-    <Suspense fallback={<Loading />}>
-      <AtomicPageFrame />
-    </Suspense>
-  );
-}
-
-
-===========================================================================================================================
-
+##
 
 # Component Modules in the Current Homepage (dev_v4_cosmic.jsx)
 

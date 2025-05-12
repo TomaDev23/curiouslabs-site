@@ -2,13 +2,13 @@ import { metrics } from "../../../data/metrics";
 import { motion, useReducedMotion } from "framer-motion";
 import { useBreakpoint } from "../../../hooks/useBreakpoint.js";
 
-export default function FeaturedProjects() {
+export default function LegacyFeaturedProjects() {
   const prefersReducedMotion = useReducedMotion();
   const breakpoint = useBreakpoint();
   const isMobile = breakpoint === 'mobile';
   
   return (
-    <section id="featured-projects" className="relative py-24 bg-gradient-to-b from-curious-dark-900 via-curious-dark-800 to-curious-dark-900 overflow-hidden">
+    <section id="featured-projects" className="relative py-24 bg-gradient-to-b from-curious-dark-900 via-curious-dark-800 to-curious-dark-900 overflow-hidden border-8 border-purple-600">
       {/* Standardized nebula positioning - one top-right */}
       <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-curious-purple-600/20 via-curious-blue-400/10 to-transparent rounded-full filter blur-sm md:blur-[80px] opacity-20 md:opacity-30"></div>
       

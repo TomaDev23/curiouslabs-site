@@ -253,6 +253,7 @@ export default function CosmicRevealScene({ scrollProgress, particleConfig }) {
     </div>
   );
 }
+
 Tile 4: Add Parallax Speed Dust to CosmicFlightScene
 Goal: Add fast-moving particles with parallax.
 File: src/components/journey/visual/ParallaxSpeedDust.jsx

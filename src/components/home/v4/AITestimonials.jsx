@@ -57,7 +57,7 @@ const AITestimonials = () => {
       <div className="absolute inset-0 bg-gradient-to-b from-gray-900/0 via-purple-900/10 to-gray-900/0"></div>
       
       <div className="container mx-auto px-4">
-        <div className="relative h-[600px]">
+        <div className="relative h-[700px] mx-[-15%] w-[130%]">
           {/* Radar animation */}
           <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 -z-10">
             <motion.div 

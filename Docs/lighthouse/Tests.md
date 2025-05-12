@@ -37,3 +37,8 @@ npx lighthouse https://curiouslabs-site.vercel.app/ `
 
 start curiouslabs_mobile_report.html
 
+
+=======================================================================================================================
+
+grok
+

@@ -42,6 +42,16 @@ const ServicesFloatLayer = () => {
     <section className="relative py-20 bg-black">
       <div className="absolute inset-0 bg-gradient-to-b from-gray-900/70 to-black/90 z-0"></div>
       
+      {/* Cosmic neon border effect */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute inset-x-0 top-0 h-[1px] bg-gradient-to-r from-transparent via-blue-500/40 to-transparent"></div>
+        <div className="absolute inset-x-0 bottom-0 h-[1px] bg-gradient-to-r from-transparent via-purple-500/40 to-transparent"></div>
+        <div className="absolute inset-y-0 left-0 w-[1px] bg-gradient-to-b from-transparent via-cyan-500/30 to-transparent"></div>
+        <div className="absolute inset-y-0 right-0 w-[1px] bg-gradient-to-b from-transparent via-fuchsia-500/30 to-transparent"></div>
+        <div className="absolute top-0 left-0 w-[100px] h-[100px] bg-blue-500/10 blur-[50px] rounded-full"></div>
+        <div className="absolute bottom-0 right-0 w-[100px] h-[100px] bg-purple-500/10 blur-[50px] rounded-full"></div>
+      </div>
+      
       <div className="container mx-auto px-4 relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {services.map((service, index) => (

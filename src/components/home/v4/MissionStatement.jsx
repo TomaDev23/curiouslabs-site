@@ -21,41 +21,77 @@ const MissionStatement = () => {
   return (
     <motion.section 
       ref={ref}
-      className="relative pt-20 pb-20 overflow-hidden"
+      className="relative pt-[30vh] pb-[30vh] overflow-hidden"
       variants={sectionVariants}
       initial="hidden"
       animate={inView ? "visible" : "hidden"}
       viewport={{ once: true }}
     >
-      {/* Background elements */}
-      <div className="absolute inset-0 bg-gradient-to-b from-gray-900 to-gray-900/70"></div>
+      {/* Background elements with soft fading edges */}
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-gray-900/20 to-transparent"></div>
       
-      {/* Standardized nebula positioning - one top-right */}
-      <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-curious-purple-600/20 via-curious-blue-400/10 to-transparent rounded-full filter blur-[80px] opacity-30"></div>
+      {/* 2. Nebula positioning - GREEN */}
+      <motion.div 
+        className="absolute top-[10%] right-0 w-[30rem] h-[20rem] rounded-full filter blur-[80px]"
+        initial={{ 
+          opacity: 0.4,
+          background: 'radial-gradient(ellipse at 60% 40%, rgba(74, 222, 128, 0.35), rgba(22, 163, 74, 0.2) 40%, transparent 80%)'
+        }}
+        animate={{ 
+          opacity: 0.4,
+          background: [
+            'radial-gradient(ellipse at 60% 40%, rgba(74, 222, 128, 0.35), rgba(22, 163, 74, 0.2) 40%, transparent 80%)',
+            'radial-gradient(ellipse at 62% 38%, rgba(74, 222, 128, 0.32), rgba(249, 115, 22, 0.18) 45%, transparent 82%)',
+            'radial-gradient(ellipse at 61% 39%, rgba(74, 222, 128, 0.35), rgba(22, 163, 74, 0.2) 40%, transparent 80%)'
+          ]
+        }}
+        style={{
+          transform: 'rotate(-15deg)'
+        }}
+        transition={{ 
+          background: {
+            duration: 15,
+            repeat: Infinity,
+            repeatType: "mirror",
+            ease: [0.45, 0.05, 0.55, 0.95] // Custom easing for ultra-smooth transitions
+          }
+        }}
+      />
       
-      {/* Standardized nebula positioning - one bottom-left */}
-      <div className="absolute bottom-0 left-0 w-96 h-96 bg-gradient-to-tr from-curious-blue-600/20 via-curious-purple-400/10 to-transparent rounded-full filter blur-[80px] opacity-30"></div>
+      {/* 2. Nebula positioning - GREEN */}
+      <motion.div 
+        className="absolute bottom-[10%] left-0 w-[30rem] h-[20rem] rounded-full filter blur-[80px]"
+        initial={{ 
+          opacity: 0.4,
+          background: 'radial-gradient(ellipse at 30% 70%, rgba(22, 163, 74, 0.35), rgba(74, 222, 128, 0.2) 45%, transparent 85%)'
+        }}
+        animate={{ 
+          opacity: 0.4,
+          background: [
+            'radial-gradient(ellipse at 30% 70%, rgba(22, 163, 74, 0.35), rgba(74, 222, 128, 0.2) 45%, transparent 85%)',
+            'radial-gradient(ellipse at 32% 68%, rgba(249, 115, 22, 0.18), rgba(74, 222, 128, 0.32) 50%, transparent 82%)',
+            'radial-gradient(ellipse at 30% 70%, rgba(22, 163, 74, 0.35), rgba(74, 222, 128, 0.2) 45%, transparent 85%)'
+          ]
+        }}
+        style={{
+          transform: 'rotate(15deg)'
+        }}
+        transition={{ 
+          background: {
+            duration: 18,
+            repeat: Infinity,
+            repeatType: "mirror",
+            ease: [0.45, 0.05, 0.55, 0.95], // Custom easing for ultra-smooth transitions
+            delay: 3
+          }
+        }}
+      />
       
-      {/* Standardized particle effect */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {[...Array(12)].map((_, i) => (
-          <div 
-            key={i}
-            className="absolute w-[2px] h-[2px] rounded-full bg-white opacity-40"
-            style={{
-              top: `${Math.random() * 100}%`,
-              left: `${Math.random() * 100}%`,
-              animation: `float-y ${2 + Math.random() * 3}s ease-in-out infinite alternate`
-            }}
-          ></div>
-        ))}
-      </div>
-      
-      {/* Star burst */}
+      {/* 1. Star burst - RED */}
       <motion.div 
         className="absolute left-0 top-1/2 transform -translate-y-1/2 w-full h-0"
         initial={{ opacity: 0, scale: 0.5 }}
-        whileInView={{ opacity: 0.15, scale: 1 }}
+        whileInView={{ opacity: 0.3, scale: 1 }}
         viewport={{ once: true }}
         transition={{ duration: 1.5 }}
       >
@@ -63,7 +99,7 @@ const MissionStatement = () => {
           {[...Array(8)].map((_, i) => (
             <div 
               key={i} 
-              className="absolute w-[600px] h-[1px] bg-gradient-to-r from-transparent via-purple-500 to-transparent"
+              className="absolute w-[600px] h-[2px] bg-gradient-to-r from-transparent via-red-500 to-transparent"
               style={{ transform: `rotate(${i * 22.5}deg)` }}
             />
           ))}
@@ -82,33 +118,35 @@ const MissionStatement = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           {/* Left Column - Text Content */}
           <motion.div variants={itemVariants}>
-            <motion.p 
-              variants={itemVariants} 
-              className="text-base md:text-lg text-gray-300 leading-relaxed mb-5"
-            >
-              At CuriousLabs, we're pioneering a new approach to software development. 
-              We combine cutting-edge AI technologies with human expertise to solve the most 
-              challenging coding problems with unprecedented efficiency.
-            </motion.p>
-            
-            <motion.p 
-              variants={itemVariants} 
-              className="text-base md:text-lg text-gray-300 leading-relaxed mb-8"
-            >
-              Our mission is to transform the software development lifecycle, making it 
-              more accessible, efficient, and enjoyable for developers of all skill levels. 
-              We're building the future of collaborative AI-assisted coding.
-            </motion.p>
+            <div className="bg-gray-900/30 backdrop-blur-[2px] p-6 rounded-xl border border-gray-800/30">
+              <motion.p 
+                variants={itemVariants} 
+                className="text-base md:text-lg text-gray-100 leading-relaxed mb-5"
+              >
+                At CuriousLabs, we're pioneering a new approach to software development. 
+                We combine cutting-edge AI technologies with human expertise to solve the most 
+                challenging coding problems with unprecedented efficiency.
+              </motion.p>
+              
+              <motion.p 
+                variants={itemVariants} 
+                className="text-base md:text-lg text-gray-100 leading-relaxed mb-0"
+              >
+                Our mission is to transform the software development lifecycle, making it 
+                more accessible, efficient, and enjoyable for developers of all skill levels. 
+                We're building the future of collaborative AI-assisted coding.
+              </motion.p>
+            </div>
             
             {/* Mission stats */}
             <motion.div 
               variants={itemVariants}
-              className="grid grid-cols-2 gap-6"
+              className="grid grid-cols-2 gap-6 mt-8"
             >
               {stats.map((stat, index) => (
                 <motion.div 
                   key={stat.label}
-                  className="bg-gray-900/70 backdrop-blur-md p-4 rounded-2xl border border-gray-700 hover:border-curious-purple-700/40 shadow-curious-purple-600/30"
+                  className="bg-gray-900/80 backdrop-blur-sm p-4 rounded-2xl border border-gray-700 hover:border-curious-purple-700/40 shadow-curious-purple-600/30"
                   whileHover={{ y: -5, boxShadow: "0 10px 25px -5px rgba(147, 51, 234, 0.3)" }}
                   variants={itemVariants}
                   custom={index}

@@ -2,7 +2,6 @@ import HeroPortal from '../components/home/v4/HeroPortal';
 import MissionStatement from '../components/home/v4/MissionStatement';
 import WhyAIDevCards from '../components/home/v4/WhyAIDevCards';
 import ServicesOrbital from '../components/home/v4/ServicesOrbital';
-import FeaturedProjects from '../components/home/v4/FeaturedProjects';
 import ProjectsLogbook from '../components/home/v4/ProjectsLogbook';
 import CommunityHub from '../components/home/v4/CommunityHub';
 import HearFromAI from '../components/home/v4/HearFromAI';
@@ -47,12 +46,6 @@ export const HOME_V5_SECTIONS = [
     props: {}
   },
   {
-    id: 'featured_metrics',
-    position: 500,
-    component: FeaturedProjects,
-    props: {}
-  },
-  {
     id: 'project_gallery',
     position: 550,
     component: ProjectsLogbook,
@@ -87,7 +80,6 @@ export const SectionRegistry = {
   mission_statement: MissionStatement,
   why_ai_cards: WhyAIDevCards,
   service_ring: ServicesOrbital,
-  featured_metrics: FeaturedProjects,
   project_gallery: ProjectsLogbook,
   community_hub: CommunityHub,
   ai_testimonials: HearFromAI,

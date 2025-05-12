@@ -142,8 +142,25 @@ const ServicesOrbital = () => {
       viewport={{ once: true, margin: '0px 0px -20% 0px' }} // Trigger animation earlier
     >
       {/* Enhanced background gradients with more atmospheric effect */}
-      <div className="absolute inset-0 bg-gray-900/90"></div>
+      <div className="absolute inset-0 bg-gray-900/90 border-4 border-gradient-cosmic"></div>
       <div className="absolute inset-0 bg-gradient-to-b from-gray-900/0 via-curious-purple-900/20 to-gray-900/0"></div>
+      
+      {/* Cosmic neon border effect - keep this for additional glow */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute inset-x-0 top-0 h-[1px] bg-gradient-to-r from-transparent via-blue-500/60 to-transparent"></div>
+        <div className="absolute inset-x-0 bottom-0 h-[1px] bg-gradient-to-r from-transparent via-purple-500/60 to-transparent"></div>
+        <div className="absolute inset-y-0 left-0 w-[1px] bg-gradient-to-b from-transparent via-cyan-500/50 to-transparent"></div>
+        <div className="absolute inset-y-0 right-0 w-[1px] bg-gradient-to-b from-transparent via-fuchsia-500/50 to-transparent"></div>
+        <div className="absolute top-0 left-0 w-[150px] h-[150px] bg-cyan-500/15 blur-[80px] rounded-full"></div>
+        <div className="absolute bottom-0 right-0 w-[150px] h-[150px] bg-fuchsia-500/15 blur-[80px] rounded-full"></div>
+      </div>
+      
+      {/* Add style for cosmic gradient border */}
+      <style jsx>{`
+        .border-gradient-cosmic {
+          border-image: linear-gradient(to right, #3b82f6, #8b5cf6, #d946ef, #8b5cf6, #3b82f6) 1;
+        }
+      `}</style>
       
       {/* Standardized nebula positioning - one top-right */}
       <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-curious-purple-600/20 via-curious-blue-400/10 to-transparent rounded-full filter blur-[80px] opacity-30"></div>

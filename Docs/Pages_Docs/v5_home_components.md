@@ -1,19 +1,258 @@
+# HomeV5AtomicPage Architecture & Components
+
+## 🌌 Overview
+
+The HomeV5AtomicPage is a modern, scroll-driven experience built with a layered architecture. The page combines a cosmic journey background with content sections that can be positioned and customized through an advanced control system.
+
+## 📦 Components and Imports
+
+### Eagerly Loaded Components
+1. `AtomicPageFrame` (from `src/components/layouts/AtomicPageFrame.jsx`)
+2. `ContentLayer` (from `src/components/layouts/ContentLayer.jsx`)
+3. `NavBar` (from `src/components/NavBar`)
+4. `HUDSystem` (from `src/components/ui/HUDSystem.jsx`)
+5. `SceneBoundaryDebug` (from `src/components/journey/debug/SceneBoundaryDebug.jsx`)
+6. `CosmicJourneyController` (from `src/components/journey/CosmicJourneyController.jsx`)
+
+### Lazy Loaded Section Components
+7. `HeroPortal` (from `src/components/home/v5/HeroPortal`)
+8. `MissionStatement` (from `src/components/home/v5/MissionStatement`)
+9. `WhyAIDevCards` (from `src/components/home/v5/WhyAIDevCards`)
+10. `ServicesFloatLayer` (from `src/components/home/v5/ServicesFloatLayer`)
+11. `FeaturedProjects` (from `src/components/home/v5/FeaturedProjects`)
+12. `ServicesOrbital` (from `src/components/home/v5/ServicesOrbital`)
+13. `ProjectsLogbook` (from `src/components/home/v5/ProjectsLogbook`)
+14. `CommunityHub` (from `src/components/home/v5/CommunityHub`)
+15. `HearFromAI` (from `src/components/home/v5/HearFromAI`)
+16. `ContactTerminal` (from `src/components/home/v5/ContactTerminal`)
+17. `FooterExperience` (from `src/components/home/v5/FooterExperience`)
+
+### Visual Components
+18. `StarfieldCanvas` (from `src/components/visual/StarfieldCanvas.jsx`)
+19. `ParallaxSpeedDust` (from `src/components/visual/ParallaxSpeedDust.jsx`)
+20. `ConstellationGlow` (from `src/components/visual/ConstellationGlow.jsx`)
+21. `GreenAuroraEffects` (from `src/components/visual/GreenAuroraEffects.jsx`)
+22. `CosmicFlightBackdrop` (from `src/components/visual/backdrops/CosmicFlightBackdrop.jsx`)
+23. `CosmicRevealBackdrop` (from `src/components/visual/backdrops/CosmicRevealBackdrop.jsx`)
+24. `SceneBackdrop` (from `src/components/visual/SceneBackdrop.jsx`)
+25. `SunFlarePulse` (from `src/components/visual/SunFlarePulse.jsx`)
+26. `ColorOverlay` (from `src/components/ColorOverlay.jsx`)
+
+### Page Order
+- 700vh total height (for cosmic journey)
+- Core frame (`AtomicPageFrame`)
+- Content sections managed by `ContentLayer` based on positions in `SectionRegistry.js`
+- Cosmic background managed by `CosmicJourneyController`
+
+## 🔄 Layer System (Z-index hierarchy)
+
+| Layer Name | Z-index Range | Purpose | Key Components |
+|------------|---------------|---------|----------------|
+| Base Layer | 0-9 | Background elements | CosmicJourneyController, 3D scenes |
+| Content Layer | 10-50 | Main website content | Sections, ContentLayer components |
+| UI Control Layer | 60-90 | Interactive UI elements | AdvancedControlPanel |
+| HUD Layer | 100-109 | Development/debug HUDs | SceneBoundaryDebug, HUDSystem |
+| Navigation Layer | 110-119 | Primary navigation | NavBar |
+| Debug Overlay Layer | 120+ | Critical debugging tools | ScrollDebugOverlay |
+
+## 🧩 Core Components
+
+### AtomicPageFrame
+- **Purpose**: Main container for the entire page
+- **Responsibilities**:
+  - Manages section positions and visibility
+  - Handles localStorage persistence
+  - Provides keyboard shortcuts for admin controls
+  - Coordinates the overall page structure
+- **File Path**: `src/components/layouts/AtomicPageFrame.jsx`
+
+### ContentLayer
+- **Purpose**: Renders and manages page sections
+- **Responsibilities**:
+  - Positions sections based on vh units
+  - Enables drag-and-drop section positioning in edit mode
+  - Applies visibility filters based on hiddenSections array
+- **File Path**: `src/components/layouts/ContentLayer.jsx`
+
+### SectionRegistry
+- **Purpose**: Defines available sections and their components
+- **Responsibilities**:
+  - Maps section IDs to component implementations
+  - Configures default positions for sections
+- **File Path**: `src/config/SectionRegistry.js`
+
+### HUDSystem
+- **Purpose**: Manages development HUDs
+- **Responsibilities**:
+  - Provides scroll and scene data to HUDs
+  - Controls HUD visibility
+- **File Path**: `src/components/ui/HUDSystem.jsx`
+
+### SceneBoundaryDebug
+- **Purpose**: Visualizes scene boundaries and scroll progress
+- **Responsibilities**:
+  - Shows scene transitions and boundaries
+  - Displays current scroll position
+- **File Path**: `src/components/journey/debug/SceneBoundaryDebug.jsx`
+
+## 🛠️ Page Editing Mechanisms
+
+### Section Position Editing
+- **Toggle Edit Mode**: Via AdvancedControlPanel
+- **Drag Sections**: When in edit mode, drag sections to new positions
+- **Position Storage**: Saved in vh units to localStorage
+- **Reset Option**: Reset to defaults via panel button
+
+### Section Visibility Control
+- **Toggle Visibility**: Show/hide individual sections
+- **Bulk Actions**: Show/hide all sections with single buttons
+- **Persistence**: Visibility state saved to localStorage
+
+### Keyboard Shortcuts
+- **Ctrl+Alt+P**: Toggle admin panel
+- **Shift+H+1**: Toggle HUD ATOMIC 1 (admin panel)
+
+## 📊 Data Flow
+
+### Scroll Data
+- Tracked in `HomeV5AtomicPage` via scroll event listener
+- Passed to `AtomicPageFrame`, `SceneBoundaryDebug`, and `HUDSystem`
+- Used to visualize current scroll position relative to scenes
+
+### Scene Data
+- Defined in `HomeV5AtomicPage` as `DEFAULT_SCENES`
+- Each scene has a key, range (start/end points), transition duration, and fade zone
+- Used for coordinating animations and transitions based on scroll position
+
+### Section Configuration
+- Defined in `SectionRegistry.js` as `HOME_V5_SECTIONS`
+- Includes ID, position (in vh units), component reference, and props
+- Can be modified at runtime and saved to localStorage
+
+### State Persistence
+- Section positions saved to localStorage under `home-v5-section-positions`
+- Section visibility saved under `home-v5-section-visibility`
+- Persisted across page reloads for consistent editing experience
+
 # Cosmic Journey Page Structure & Architecture
 
 ## 🌌 Overview
 
 The Cosmic Journey page is a scroll-driven experience built with multiple layered scenes that transition based on scroll position. The total page height spans 700vh (7 viewport heights), with scenes and visual elements orchestrated by the `CosmicJourneyController`.
 
-## 🎮 Controller Architecture
+I'll provide a comprehensive overview of the HomeV5AtomicPage structure, its layers, and the editing mechanisms:
 
-**Central Controller:** `CosmicJourneyController.jsx`
-- **Purpose:** Manages the entire cosmic journey experience
-- **Responsibilities:**
+## HomeV5AtomicPage Structure and Layers
+
+### Core Layers (Z-index hierarchy)
+1. **Base Layer (z-0)**
+   - `CosmicJourneyController` - Provides the cosmic background animations
+   - Positioned as fixed with `inset-0` to cover the entire viewport
+
+2. **Content Layer (z-10 to z-50)**
+   - Managed by `ContentLayer` component
+   - Contains all section components positioned absolutely based on vh units
+   - Sections are defined in `SectionRegistry.js` and positioned via `HOME_V5_SECTIONS` array
+
+3. **UI Control Layer (z-60 to z-90)**
+   - `AdvancedControlPanel` (wrapped by `PageDraggableAdvancedControlPanel`)
+   - Allows for section management, visibility control, and position editing
+
+4. **HUD Layer (z-100 to z-109)**
+   - `SceneBoundaryDebug` - Visualizes scene boundaries and scroll position
+   - Managed through `HUDSystem` and `HUDProvider`
+
+5. **Navigation Layer (z-110 to z-119)**
+   - `NavBar` - Main navigation component
+
+6. **Debug Overlay Layer (z-120+)**
+   - Development tools and critical debugging components
+
+### Key Components
+
+1. **AtomicPageFrame**
+   - Main container for the entire page
+   - Manages section positions, visibility, and edit mode
+   - Handles localStorage persistence for section positions and visibility
+   - Provides keyboard shortcuts for toggling admin panels and HUDs
+
+2. **ContentLayer**
+   - Renders sections based on their registered components and positions
+   - Handles section dragging in edit mode
+   - Applies visibility filters based on hiddenSections array
+
+3. **SectionRegistry**
+   - Defines available sections and their components
+   - Maps section IDs to component implementations
+   - Configures default positions for sections
+
+4. **HUDSystem**
+   - Manages development HUDs
+   - Provides scroll and scene data to HUDs
+
+5. **SceneBoundaryDebug**
+   - Visualizes scene boundaries and scroll progress
+   - Helps with development and debugging of scroll-based animations
+
+### Page Editing Mechanisms
+
+1. **Section Position Editing**
+   - Toggle edit mode via `AdvancedControlPanel`
+   - Drag sections to new positions when in edit mode
+   - Positions are stored in vh units and saved to localStorage
+   - Reset positions to defaults via panel button
+
+2. **Section Visibility Control**
+   - Toggle visibility of individual sections via panel
+   - Show/hide all sections with single buttons
+   - Visibility state saved to localStorage
+
+3. **Keyboard Shortcuts**
+   - `Ctrl+Alt+P` - Toggle admin panel
+   - `Shift+H+1` - Toggle HUD ATOMIC 1 (admin panel)
+
+4. **Scene Management**
+   - Default scenes defined in `HomeV5AtomicPage.jsx`
+   - Scene data passed to `SceneBoundaryDebug` and `HUDSystem`
+   - Scroll progress tracked and used for scene transitions
+
+### Data Flow
+
+1. **Scroll Data**
+   - Tracked in `HomeV5AtomicPage` via scroll event listener
+   - Passed to `AtomicPageFrame`, `SceneBoundaryDebug`, and `HUDSystem`
+   - Used to visualize current scroll position relative to scenes
+
+2. **Scene Data**
+   - Defined in `HomeV5AtomicPage` as `DEFAULT_SCENES`
+   - Each scene has a key, range (start/end points), transition duration, and fade zone
+   - Used for coordinating animations and transitions based on scroll position
+
+3. **Section Configuration**
+   - Defined in `SectionRegistry.js` as `HOME_V5_SECTIONS`
+   - Includes ID, position (in vh units), component reference, and props
+   - Can be modified at runtime and saved to localStorage
+
+4. **State Persistence**
+   - Section positions saved to localStorage under `home-v5-section-positions`
+   - Section visibility saved under `home-v5-section-visibility`
+   - Persisted across page reloads for consistent editing experience
+
+This architecture provides a flexible, component-based approach to building and managing the page, with strong separation of concerns between layers and robust development tools for visual debugging and layout adjustment.
+
+
+## 🎮 CosmicJourneyController
+
+The `CosmicJourneyController` manages the cosmic background experience:
+
+- **Purpose**: Orchestrates the cosmic journey background
+- **Responsibilities**:
   - Tracks scroll position and calculates progress (0-1)
   - Manages scene transitions and visibility
   - Controls particle configurations for each scene
   - Handles performance optimizations
   - Orchestrates global visual elements
+- **File Path**: `src/components/journey/CosmicJourneyController.jsx`
 
 ```ascii
 ┌──────────────────────────────────────────────────────────┐
@@ -33,7 +272,7 @@ The Cosmic Journey page is a scroll-driven experience built with multiple layere
 └──────────────────────────────────────────────────────────┘
 ```
 
-## 📋 Scene Layer Structure
+## 📋 Scene Structure
 
 | Scene Name       | Scroll Range    | VH Range     | Key Components                           |
 |------------------|-----------------|--------------|------------------------------------------|
@@ -44,185 +283,16 @@ The Cosmic Journey page is a scroll-driven experience built with multiple layere
 | Sun Approach     | 0.8 - 0.9       | 560vh - 630vh| StarfieldCanvas, SunGlow                |
 | Sun Landing      | 0.9 - 1.0       | 630vh - 700vh| StarfieldCanvas, SunFlare, LandingEffect|
 
-## 🔄 Scroll Flow & Progress Calculation
-
-```ascii
-               ┌───────────────────────┐
- User Scrolls  │                       │
-───────────────►  Raw Scroll Progress  │
-               │                       │
-               └──────────┬────────────┘
-                          │
-                          ▼
-               ┌───────────────────────┐
-               │                       │
-               │  Interpolated Smooth  │◄──┐
-               │  Scroll Progress      │   │
-               │                       │   │ Interpolation Factor: 0.09
-               └──────────┬────────────┘   │ ("boat in water" effect)
-                          │                │
-                          │                │
-                          ▼                │
-               ┌───────────────────────┐   │
-               │                       │   │
-               │  Animation Loop       │───┘
-               │                       │
-               └──────────┬────────────┘
-                          │
-                          ▼
-        ┌────────────────────────────────┐
-        │                                │
-        │  Scene & Component Updates     │
-        │                                │
-        └────────────────────────────────┘
-```
-
-## 🧩 Visual Layer Stack
-
-```ascii
-Z-Index Layering (front to back):
-┌────────────────────────────────────────────┐
-│ z-50+ Debug Overlays (Development only)    │
-├────────────────────────────────────────────┤
-│ z-40  Warp Trails (Cosmic Flight only)     │
-├────────────────────────────────────────────┤
-│ z-30  Constellation Layer                  │
-├────────────────────────────────────────────┤
-│ z-20  Scene-specific Particle Effects      │
-├────────────────────────────────────────────┤
-│ z-10  Starfield Canvas                     │
-├────────────────────────────────────────────┤
-│ z-0   Scene Backdrop                       │
-└────────────────────────────────────────────┘
-```
-
-## 🌠 Constellation Management
-
-Two constellations appear at specific scroll positions and move across the viewport:
-
-1. **Ursa Minor**
-   - **Visibility:** 0.15 - 0.64 (105vh - 448vh)
-   - **Position:** Left side of screen
-   - **Movement:** Starts centered, moves upward out of viewport
-   - **Component:** `ConstellationGlow` with `type="ursaMinor"`
-
-2. **Orion**
-   - **Visibility:** 0.4 - 0.85 (280vh - 595vh)
-   - **Position:** Right side of screen
-   - **Movement:** Starts at bottom, moves to top of viewport
-   - **Component:** `ConstellationGlow` with `type="orion"`
-
-## 🎨 Component Breakdown
-
-### Scene Components
-Each scene component is conditionally rendered based on scroll position and receives:
-- `progress`: Progress within the scene (0-1)
-- `particleConfig`: Scene-specific configuration for particles
-
-### Global Components
-- **GlobalParticleSystem**
-  - Manages all Three.js particle effects
-  - Creates optimized WebGL context
-  - Renders stars, dust, galaxy effects
-  
-- **SceneBackdrop**
-  - Provides backdrop visuals for all scenes
-  - Handles color transitions between scenes
-  
-- **ColorOverlay**
-  - Manages global color effects and transitions
-
-## 🎬 Visual Components Library
-
-| Component Name | File Path | Purpose | Key Properties |
-|----------------|-----------|---------|----------------|
-| **StarfieldCanvas** | `visual/StarfieldCanvas.jsx` | Creates dynamic star field with twinkling effect | `density`, `opacity`, `fps`, `baseColor`, `breathing`, `glow` |
-| **ParallaxSpeedDust** | `visual/ParallaxSpeedDust.jsx` | Creates streaking particles with parallax effect | `opacity`, `speed`, `density`, `fps` |
-| **ConstellationGlow** | `visual/ConstellationGlow.jsx` | Renders constellation star patterns with glow effect | `type`, `opacity`, `fps`, `layer` |
-| **GreenAuroraEffects** | `visual/GreenAuroraEffects.jsx` | Creates aurora-like effects | `opacity`, `intensity` |
-| **CosmicFlightBackdrop** | `visual/backdrops/CosmicFlightBackdrop.jsx` | Creates warp/flight tunnel effect | `progress` |
-| **CosmicRevealBackdrop** | `visual/backdrops/CosmicRevealBackdrop.jsx` | Creates cosmic reveal backdrop | `progress` |
-| **SceneBackdrop** | `visual/SceneBackdrop.jsx` | Global backdrop that spans all scenes | `progress` |
-| **SunFlarePulse** | `visual/SunFlarePulse.jsx` | Creates pulsing sun effect | `scale`, `opacity`, `intensity` |
-| **ColorOverlay** | `ColorOverlay.jsx` | Provides color transitions between scenes | N/A |
-
-## 📝 LEGIT Compliance
-
-All components in the Cosmic Journey adhere to the LEGIT (Layout Engine Governance & Integration Template) standards:
-
-### Metadata Structure
-```javascript
-// LEGIT-compliant metadata
-const metadata = {
-  id: 'component_id',
-  scs: 'SCS0',         // Scene Control Standard version
-  type: 'component_type',
-  doc: 'contract_doc.md'
-};
-```
-
-### LEGIT Contract Requirements
-1. **Documentation Reference**
-   - Each component links to its contract document
-   - References proper versioning in SCS field
-
-2. **Rendering Compliance**
-   - Scene rendering follows specified opacity transitions
-   - Components respect z-index layering requirements
-   - Proper containment for optimization (`contain: strict`)
-
-3. **Animation Standards**
-   - Scroll interpolation factor set to 0.09 for "boat in water" effect
-   - Scene transitions use proper duration and easing
-   - Animation frames properly canceled on component unmount
-
-4. **Mobile Compliance**
-   - Responsive design with mobile-specific configurations
-   - Performance optimizations for touch devices
-
-5. **Memory Management**
-   - Resources properly disposed when scenes unmount
-   - WebGL contexts managed efficiently
-   - Event listeners cleaned up properly
-
-## 🔩 Performance Optimization Hooks
-
-### useParticlePerformanceConfig
-```javascript
-// src/components/journey/hooks/useParticlePerformanceConfig.js
-```
-
-This hook optimizes particle rendering settings per scene:
-
-| Scene          | Desktop Settings | Mobile Settings |
-|----------------|------------------|-----------------|
-| dormant        | density: 115, fps: 15 | density: 100, fps: 12 |
-| awakening      | density: 95, fps: 10  | density: 80, fps: 8   |
-| cosmicReveal   | density: 20, fps: 10  | density: 15, fps: 8   |
-| cosmicFlight   | density: 40, fps: 30  | density: 30, fps: 24  |
-| sunApproach    | density: 150, fps: 15 | density: 120, fps: 12 |
-| sunLanding     | density: 30, fps: 24  | density: 25, fps: 20  |
-
-### useSceneVisibility
-```javascript
-// src/components/journey/hooks/useSceneVisibility.js
-```
-
-This hook optimizes memory usage by only rendering scenes that are near the current viewport:
-- Keeps the current scene mounted
-- Mounts scenes within 350vh of current position
-- Unmounts distant scenes to reduce memory usage and improve performance
-
 ## 📱 Mobile Responsiveness
 
-The Cosmic Journey adapts for mobile devices with:
+The HomeV5AtomicPage adapts for mobile devices with:
 
 1. **Device Detection**
    ```javascript
    const isMobile = useRef(window.innerWidth <= 768);
    ```
 
-2. **Mobile-Optimized Particle Settings**
+2. **Mobile-Optimized Settings**
    - Reduced particle density (20-30% fewer particles)
    - Lower FPS settings to preserve battery
    - Reduced visual effects intensity
@@ -263,17 +333,18 @@ Development environment includes:
 - **SceneBoundaryDebug**: Visualizes scene boundaries
 - **VH Markers**: Shows viewport height markers at 100vh intervals
 
-## 📐 Scene Configuration Reference
+## 📝 LEGIT Compliance
+
+All components adhere to the LEGIT standards:
 
 ```javascript
-const SCENES = [
-  { key: 'dormant', range: [0.0, 0.05], Component: DormantScene, transitionDuration: 1.0, fadeZone: 0.01 },
-  { key: 'awakening', range: [0.05, 0.15], Component: AwakeningScene, transitionDuration: 1.0, fadeZone: 0.015 },
-  { key: 'cosmicReveal', range: [0.15, 0.3], Component: CosmicRevealScene, transitionDuration: 0.8, fadeZone: 0.015 },
-  { key: 'cosmicFlight', range: [0.3, 0.8], Component: CosmicFlightScene, transitionDuration: 0.6, fadeZone: 0.015 },
-  { key: 'sunApproach', range: [0.8, 0.9], Component: SunApproachScene, transitionDuration: 1.0, fadeZone: 0.015 },
-  { key: 'sunLanding', range: [0.9, 1.0], Component: SunLandingScene, transitionDuration: 1.0, fadeZone: 0.01 },
-];
+// LEGIT-compliant metadata
+export const metadata = {
+  id: 'component_id',          // Following naming convention
+  scs: 'SCS-COMPONENT-TYPE',   // Security compliance tag
+  type: 'development|ui|core',  // Component type
+  doc: 'contract_component_name.md' // Reference to contract
+};
 ```
 
 ## 🔄 Lifecycle Flow
@@ -291,19 +362,106 @@ const SCENES = [
 
 ## 📁 Key File Paths
 
-- **Controller:** `src/components/journey/CosmicJourneyController.jsx`
-- **Scene Components:** `src/components/journey/scenes/[SceneName].jsx`
-- **Visual Components:** `src/components/journey/visual/`
-- **Hooks:** `src/components/journey/hooks/`
-- **Utilities:** `src/utils/dissolveEngine.js`
+- **HomeV5AtomicPage**: `src/pages/HomeV5AtomicPage.jsx`
+- **AtomicPageFrame**: `src/components/layouts/AtomicPageFrame.jsx`
+- **ContentLayer**: `src/components/layouts/ContentLayer.jsx`
+- **SectionRegistry**: `src/config/SectionRegistry.js`
+- **CosmicJourneyController**: `src/components/journey/CosmicJourneyController.jsx`
+- **SceneBoundaryDebug**: `src/components/journey/debug/SceneBoundaryDebug.jsx`
+- **HUDSystem**: `src/components/ui/HUDSystem.jsx`
 
 ## 🐛 Common Issues & Solutions
 
-- **Jittery Scrolling**: Check if interpolation factor (0.09) is correctly set
-- **Visibility Issues**: Confirm scene range boundaries and fadeZone settings
-- **Constellation Disappears**: Check visibility conditions and position calculations
-- **High CPU Usage**: Verify particle density and FPS settings per scene
-- **Memory Leaks**: Check for proper cleanup in scene components and particle systems
+| Issue | Symptoms | Solution |
+|-------|----------|----------|
+| **Jittery Scrolling** | Cosmic background elements jump during scroll | Increase `smoothFactor` in `useScrollSmoothing` hook (current: 0.09) |
+| **Visibility Issues** | Components appear/disappear at wrong scroll positions | Check scene range configuration in `sceneConfig.js` |
+| **Disappearing Constellations** | Constellations vanish unexpectedly | Verify z-index layering and check `ConstellationGlow` opacity settings |
+| **High CPU Usage** | Page becomes sluggish, especially on mobile | Reduce FPS settings in `GlobalParticleSystem` or disable effects for mobile |
+| **Memory Leaks** | Performance degrades over time | Ensure all animation loops are properly cleaned up in useEffect cleanup functions |
+| **Mobile Responsiveness** | Elements positioned incorrectly on small screens | Check viewport calculations in `useViewportUnits` hook |
+
+## 🧩 Visual Layer Stack
+
+```ascii
+Z-Index Layering (front to back):
+┌────────────────────────────────────────────┐
+│ z-50+ Debug Overlays (Development only)    │
+├────────────────────────────────────────────┤
+│ z-40  Warp Trails (Cosmic Flight only)     │
+├────────────────────────────────────────────┤
+│ z-30  Constellation Layer                  │
+├────────────────────────────────────────────┤
+│ z-20  Scene-specific Particle Effects      │
+├────────────────────────────────────────────┤
+│ z-10  Starfield Canvas                     │
+├────────────────────────────────────────────┤
+│ z-0   Scene Backdrop                       │
+└────────────────────────────────────────────┘
+```
+
+## 🔄 Scroll Flow & Progress Calculation
+
+```ascii
+               ┌───────────────────────┐
+ User Scrolls  │                       │
+───────────────►  Raw Scroll Progress  │
+               │                       │
+               └──────────┬────────────┘
+                          │
+                          ▼
+               ┌───────────────────────┐
+               │                       │
+               │  Interpolated Smooth  │◄──┐
+               │  Scroll Progress      │   │
+               │                       │   │ Interpolation Factor: 0.09
+               └──────────┬────────────┘   │ ("boat in water" effect)
+                          │                │
+                          │                │
+                          ▼                │
+               ┌───────────────────────┐   │
+               │                       │   │
+               │  Animation Loop       │───┘
+               │                       │
+               └──────────┬────────────┘
+                          │
+                          ▼
+        ┌────────────────────────────────┐
+        │                                │
+        │  Scene & Component Updates     │
+        │                                │
+        └────────────────────────────────┘
+```
+
+## 🌠 Constellation Management
+
+Two constellations appear at specific scroll positions and move across the viewport:
+
+1. **Ursa Minor**
+   - **Visibility:** 0.15 - 0.64 (105vh - 448vh)
+   - **Position:** Left side of screen
+   - **Movement:** Starts centered, moves upward out of viewport
+   - **Component:** `ConstellationGlow` with `type="ursaMinor"`
+
+2. **Orion**
+   - **Visibility:** 0.4 - 0.85 (280vh - 595vh)
+   - **Position:** Right side of screen
+   - **Movement:** Starts at bottom, moves to top of viewport
+   - **Component:** `ConstellationGlow` with `type="orion"`
+
+## 🎬 Visual Components Library
+
+| Component Name | File Path | Purpose | Key Properties |
+|----------------|-----------|---------|----------------|
+| **StarfieldCanvas** | `visual/StarfieldCanvas.jsx` | Creates dynamic star field with twinkling effect | `density`, `opacity`, `fps`, `baseColor`, `breathing`, `glow` |
+| **ParallaxSpeedDust** | `visual/ParallaxSpeedDust.jsx` | Creates streaking particles with parallax effect | `opacity`, `speed`, `density`, `fps` |
+| **ConstellationGlow** | `visual/ConstellationGlow.jsx` | Renders constellation star patterns with glow effect | `type`, `opacity`, `fps`, `layer` |
+| **GreenAuroraEffects** | `visual/GreenAuroraEffects.jsx` | Creates aurora-like effects | `opacity`, `intensity` |
+| **CosmicFlightBackdrop** | `visual/backdrops/CosmicFlightBackdrop.jsx` | Creates warp/flight tunnel effect | `progress` |
+| **CosmicRevealBackdrop** | `visual/backdrops/CosmicRevealBackdrop.jsx` | Creates cosmic reveal backdrop | `progress` |
+| **SceneBackdrop** | `visual/SceneBackdrop.jsx` | Global backdrop that spans all scenes | `progress` |
+| **SunFlarePulse** | `visual/SunFlarePulse.jsx` | Creates pulsing sun effect | `scale`, `opacity`, `intensity` |
+| **ColorOverlay** | `ColorOverlay.jsx` | Provides color transitions between scenes | N/A |
 
 ## 📚 In-Depth Scene Breakdowns
 
