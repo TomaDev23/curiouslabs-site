@@ -82,14 +82,14 @@ function SceneBoundaryDebugContent({ scenes = [], scrollProgress = 0 }) {
     if (!isVisible) return;
     
     try {
-      const currentScene = usableScenes.find(
-        ({ range }) => scrollProgress >= range[0] && scrollProgress < range[1]
-      );
-      
-      if (currentScene && currentScene.key !== currentSceneKey) {
-        setLastTransitionTime(new Date());
-        setCurrentSceneKey(currentScene.key);
-      }
+    const currentScene = usableScenes.find(
+      ({ range }) => scrollProgress >= range[0] && scrollProgress < range[1]
+    );
+    
+    if (currentScene && currentScene.key !== currentSceneKey) {
+      setLastTransitionTime(new Date());
+      setCurrentSceneKey(currentScene.key);
+    }
     } catch (error) {
       console.error('[HUD ATOMIC 2] Error tracking scene transitions:', error);
     }

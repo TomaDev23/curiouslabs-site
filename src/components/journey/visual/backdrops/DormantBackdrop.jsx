@@ -55,7 +55,7 @@ export default function DormantBackdrop({ progress = 0 }) {
       variation: 60 // Hue variation range
     },
     moon: {
-      glow: 'rgba(200,205,230,0.35)' // Slightly reduced from 0.40
+      glow: 'rgba(200,205,230,0.45)' // Enhanced glow opacity from original 0.35
     }
   };
   
@@ -82,8 +82,8 @@ export default function DormantBackdrop({ progress = 0 }) {
         <div 
           className="absolute rounded-full overflow-hidden"
           style={{
-            width: '10.4vw',
-            height: '10.4vw',
+            width: '8.84vw',
+            height: '8.84vw',
             top: '12%',
             left: '15%',
             background: 'radial-gradient(circle, rgba(255,255,252,1) 0%, rgba(250,250,245,1) 40%, rgba(245,245,240,1) 70%, rgba(240,240,235,1) 90%)',
@@ -131,7 +131,7 @@ export default function DormantBackdrop({ progress = 0 }) {
         </div>
       </div>
       
-      {/* Moon light cast on floor/robot */}
+      {/* Moon light cast on floor/robot - enhanced with subtle animation */}
       <div 
         className="absolute inset-0 w-full h-full z-5 pointer-events-none"
         style={{
@@ -139,9 +139,9 @@ export default function DormantBackdrop({ progress = 0 }) {
           mixBlendMode: 'screen',
           animation: 'moonLightPulse 20s infinite alternate ease-in-out',
         }}
-      ></div>
+      />
       
-      {/* Keyframe animations */}
+      {/* Enhanced keyframe animations */}
       <style jsx>{`
         @keyframes moonGlow {
           0% { opacity: 0.95; filter: blur(0.5px) brightness(0.98); transform: scale(1.0); }
@@ -152,7 +152,8 @@ export default function DormantBackdrop({ progress = 0 }) {
         
         @keyframes moonLightPulse {
           0% { opacity: 0.85; }
-          50% { opacity: 1; }
+          33% { opacity: 0.92; }
+          66% { opacity: 1; }
           100% { opacity: 0.9; }
         }
       `}</style>

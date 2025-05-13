@@ -18,6 +18,7 @@
 8. [Navigation Flow](#navigation-flow)
 9. [File System Organization](#file-system-organization)
 10. [Simplified Reference](#simplified-reference)
+11. [Celestial Bodies System](#celestial-bodies-system)
 
 ---
 
@@ -49,7 +50,7 @@ The application follows the LEGIT certification system which enforces compliance
 | `/products/aegis` | `Aegis.jsx` | Aegis product page |
 | `/products/opspipe` | `OpsPipe.jsx` | OpsPipe product page |
 | `/products/moonsignal` | `MoonSignal.jsx` | MoonSignal product page |
-| `/products/curious` | `Curious.jsx` | Curious app page |
+| `/products/curious` | `Curious.jsx` | Curious app product page |
 | `/products/guardian` | `Guardian.jsx` | Guardian product page |
 | `/codelab` | `CodeLab.jsx` | CodeOps service landing page |
 | `/tools` | `Tools.jsx` | Utilities & microtools page |
@@ -74,6 +75,8 @@ The application follows the LEGIT certification system which enforces compliance
 | `/dev_v4_cosmic` | `DevV4CosmicPage.jsx` | Cosmic experience development (same as `/`) |
 | `/test_canvas` | `TestCanvasPage.jsx` | Visual isolation route for debug |
 | `/home-v5` | `HomeV5AtomicPage.jsx` | Atomic design homepage rebuild |
+| `/dev/mars-test` | `MarsTestPage.jsx` | Mars component testing with scene transitions |
+| `/dev/combined-parallax-test` | `CombinedParallaxTest.jsx` | Parallax effects testing with Moon component |
 
 ---
 
@@ -148,6 +151,7 @@ The CuriousLabs platform implements a strict z-index based layering system that 
 - **SectionRegistry**: Configuration system for section management
 - **AtomicPageFrame**: Layout framework for atomic design pages
 - **CosmicJourneyController**: 3D visualization environment
+- **CelestialController**: Manager for celestial body components
 
 ### UI Components
 
@@ -157,6 +161,9 @@ The CuriousLabs platform implements a strict z-index based layering system that 
 - **FooterExperience**: Enhanced footer with interactive elements
 - **NavMenu**: Navigation menu component
 - **ScrollToTop**: Utility for page navigation
+- **CelestialBody**: Base component for celestial bodies
+- **Mars**: Mars planet component with scene transitions
+- **Moon**: Moon celestial body with parallax effects
 
 ### Developer Tools
 
@@ -300,13 +307,18 @@ src/
 │   ├── home/             # Homepage components
 │   │   └── v4/           # v4 design system
 │   ├── journey/          # Cosmic journey components
+│   │   └── celestial/    # Celestial body components
+│   │       ├── bodies/   # Planet components
+│   │       ├── hooks/    # Celestial-specific hooks
+│   │       └── utils/    # Utility functions
 │   ├── layouts/          # Layout components
 │   ├── nav/              # Navigation components
 │   └── ui/               # General UI components
 ├── context/          # React context providers
 ├── hooks/            # Custom React hooks
 ├── pages/            # Page components
-│   └── products/         # Product page components
+│   ├── products/         # Product page components
+│   └── dev/              # Development pages
 ├── utils/            # Utility functions
 ├── config/           # Configuration files
 │   └── SectionRegistry.js  # Section registry
@@ -316,6 +328,7 @@ src/
 Docs/
 ├── contracts/        # LEGIT contracts
 ├── Pages_Docs/       # Page documentation
+├── celestial_page/   # Celestial bodies documentation
 └── Dev_tools/        # Developer tools docs
 ```
 
@@ -350,6 +363,8 @@ Docs/
 - `/codelab`, `/tools`, `/docs` - Developer resources
 - `/about`, `/contact`, `/blog` - Company information
 - `/home-v5` - New homepage development
+- `/dev/mars-test` - Mars component testing environment
+- `/dev/combined-parallax-test` - Parallax effects and Moon testing
 
 ### Main Pages (Components)
 
@@ -380,6 +395,55 @@ Docs/
 - **AdminPanel** - Edit section positions
 - **ScrollDebugOverlay** - Debug scroll position
 - **Various HUDs** - Development and debugging tools
+
+---
+
+## 🪐 Celestial Bodies System
+
+The Celestial Bodies system provides interactive planetary components for the cosmic journey experience.
+
+### Key Components
+
+- **CelestialController**: Manages all celestial bodies and scene transitions
+- **CelestialBody**: Base component for all celestial bodies
+- **Mars**: Mars planet implementation with scene-specific styling
+- **Moon**: Moon implementation with crater details and glow effects
+- **CelestialContext**: Context provider for celestial system state
+
+### Custom Hooks
+
+- **useCelestialParallax**: Calculates position offsets for parallax effects
+- **useCelestialPerformance**: Provides performance optimizations for celestial rendering
+- **useCombinedParallax**: Combines mouse and scroll-based parallax effects
+
+### Scene Types
+
+1. **dormant**: Initial state with subtle effects
+2. **awakening**: Transitional state with increased visibility
+3. **cosmicReveal**: Enhanced state with strong glow effects
+4. **cosmicFlight**: Maximum intensity state with full effects
+
+### Parallax Types
+
+1. **Standard Parallax**: Scroll-based movement
+2. **Mouse Parallax**: Position based on mouse coordinates
+3. **Combined Parallax**: Hybrid approach using both scroll and mouse input
+
+### Integration Patterns
+
+- Fixed background with scrollable content
+- Section-specific celestial bodies
+- Interactive celestial bodies with click handlers
+- Layered parallax effects for depth perception
+
+### Documentation
+
+Comprehensive documentation is available in the `Docs/celestial_page/` directory:
+- Component contracts
+- Integration guides
+- Schema references
+- Asset requirements
+- Development routes
 
 ---
 

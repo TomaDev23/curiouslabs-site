@@ -15,6 +15,9 @@ This document provides documentation for the custom React hooks used in the Curi
 - [useHUDPosition](#usehudposition)
 - [useViewportConstraint](#useviewportconstraint)
 - [useLocalStorage](#uselocalstorage)
+- [useCelestialParallax](#usecelestialparallax)
+- [useCelestialPerformance](#usecelestialperformance)
+- [useCombinedParallax](#usecombinedparallax)
 
 ## useBreakpoint
 
@@ -288,6 +291,213 @@ An array containing:
 
 - State value from localStorage (or initialValue if not found)
 - Setter function that updates both state and localStorage
+
+## useCelestialParallax
+
+A hook for creating scene-specific parallax effects for celestial bodies based on scroll position.
+
+### Usage
+
+```jsx
+import { useCelestialParallax } from '../components/journey/celestial/hooks/useCelestialParallax';
+
+function MarsComponent() {
+  const { position } = useCelestialParallax(
+    0.8,          // parallax factor
+    '3d',         // parallax style
+    'cosmicReveal' // scene type
+  );
+  
+  return (
+    <div
+      style={{
+        transform: `translate3d(${position.x}px, ${position.y}px, 0) translate(-50%, -50%)`
+      }}
+    >
+      Mars Planet
+    </div>
+  );
+}
+```
+
+### Parameters
+
+- `factor`: (number) Intensity of parallax effect. Default: 1
+- `style`: (string) Style of parallax effect ('3d' or 'dripping'). Default: '3d'
+- `scene`: (string) Current scene context ('dormant', 'awakening', 'cosmicReveal', 'cosmicFlight'). Default: 'dormant'
+
+### Returns
+
+An object containing:
+
+- `position`: Object with x and y coordinates for positioning
+- `ref`: React ref object to attach to the element
+- `scrollProgress`: Normalized scroll progress (0-1)
+
+### Scene-Specific Behavior
+
+#### Dormant Scene
+- X-axis: `scrollY * factor * 0.05`
+- Y-axis: `scrollY * factor * 0.03`
+
+#### Awakening Scene
+- X-axis: `scrollY * factor * 0.08`
+- Y-axis: `scrollY * factor * 0.2`
+
+#### Cosmic Reveal Scene (3D style)
+- X-axis: `scrollY * factor * 0.15`
+- Y-axis: `scrollY * factor * 0.8`
+
+#### Cosmic Flight Scene (3D style)
+- X-axis: `scrollY * factor * 0.12`
+- Y-axis: `scrollY * factor * 0.5`
+
+## useCelestialPerformance
+
+A hook for optimizing celestial body rendering based on device capabilities.
+
+### Usage
+
+```jsx
+import { useCelestialPerformance } from '../components/journey/celestial/hooks/useCelestialPerformance';
+
+function CelestialBody() {
+  const { shouldRender, isLowPerfDevice } = useCelestialPerformance();
+  
+  useEffect(() => {
+    if (isLowPerfDevice) {
+      // Apply performance optimizations
+      // - Reduce effects
+      // - Simplify animations
+      // - Disable certain features
+    }
+  }, [isLowPerfDevice]);
+  
+  if (!shouldRender) {
+    return null; // Don't render on very low-end devices
+  }
+  
+  return (
+    <div className={isLowPerfDevice ? 'low-perf-mode' : ''}>
+      Celestial Body Content
+    </div>
+  );
+}
+```
+
+### Returns
+
+An object containing:
+
+- `shouldRender`: Boolean indicating if the component should render based on performance capabilities
+- `isLowPerfDevice`: Boolean indicating if the device has limited performance capabilities
+
+### Performance Detection
+
+The hook uses several factors to determine device capabilities:
+
+- Device memory (if available via navigator.deviceMemory)
+- Hardware concurrency (number of logical processors)
+- User agent string (for identifying mobile devices)
+- Previous rendering performance metrics
+
+## useCombinedParallax
+
+A hook that combines both mouse movement and scroll position for enhanced parallax effects.
+
+### Usage
+
+```jsx
+import { useCombinedParallax } from '../hooks/useCombinedParallax';
+
+function MoonComponent() {
+  const { position, mousePosition } = useCombinedParallax({
+    mouseInfluence: 0.05,
+    scrollInfluence: 0.1,
+    depth: 2
+  });
+  
+  return (
+    <div
+      style={{
+        transform: `translate3d(${position.x}px, ${position.y}px, 0) translate(-50%, -50%)`
+      }}
+    >
+      Moon Component
+      <div className="debug-info">
+        Mouse: {mousePosition.x.toFixed(0)}, {mousePosition.y.toFixed(0)}
+      </div>
+    </div>
+  );
+}
+```
+
+### Parameters
+
+An options object with:
+
+- `mouseInfluence`: (number) How much mouse movement affects position. Default: 0.05
+- `scrollInfluence`: (number) How much scroll affects position. Default: 0.1
+- `depth`: (number) Simulated depth factor for 3D-like movement. Default: 1
+- `smoothing`: (number) Movement smoothing factor (0-1). Default: 0.2
+- `bounds`: (object) Movement constraints. Default: { x: 100, y: 100 }
+
+### Returns
+
+An object containing:
+
+- `position`: Current calculated position with x and y coordinates
+- `mousePosition`: Current mouse position relative to viewport center
+- `scrollPosition`: Current normalized scroll position (0-1)
+- `resetPosition`: Function to reset to initial position
+
+### Implementation Details
+
+The hook combines two types of input:
+
+1. **Mouse tracking**: Calculates position offset based on mouse coordinates relative to the center of the viewport
+2. **Scroll tracking**: Adds vertical offset based on scroll position
+
+The formula for position calculation is:
+
+```javascript
+x = (mouseX - centerX) * mouseInfluence * depth
+y = (mouseY - centerY) * mouseInfluence * depth + scrollY * scrollInfluence
+```
+
+Where:
+- `mouseX/Y` is the current mouse position
+- `centerX/Y` is the center of the viewport
+- `scrollY` is the current scroll position
+- `mouseInfluence`, `scrollInfluence`, and `depth` are the parameters
+
+### Example with Multiple Elements
+
+```jsx
+function ParallaxScene() {
+  // Different parameters create layered depth effect
+  const foreground = useCombinedParallax({ mouseInfluence: 0.08, depth: 3 });
+  const midground = useCombinedParallax({ mouseInfluence: 0.05, depth: 2 });
+  const background = useCombinedParallax({ mouseInfluence: 0.02, depth: 1 });
+  
+  return (
+    <div className="scene">
+      <div 
+        className="layer background" 
+        style={{ transform: `translate3d(${background.position.x}px, ${background.position.y}px, 0)` }}
+      ></div>
+      <div 
+        className="layer midground" 
+        style={{ transform: `translate3d(${midground.position.x}px, ${midground.position.y}px, 0)` }}
+      ></div>
+      <div 
+        className="layer foreground" 
+        style={{ transform: `translate3d(${foreground.position.x}px, ${foreground.position.y}px, 0)` }}
+      ></div>
+    </div>
+  );
+}
+```
 
 ---
 

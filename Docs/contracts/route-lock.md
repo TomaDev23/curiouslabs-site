@@ -46,6 +46,8 @@
 | `/dev_v4_cosmic`| `DevV4CosmicPage.jsx`     | 🧪 Dev     | Primary staging page (now `/`)     |
 | `/test_canvas` | `TestCanvasPage.jsx`       | 🧪 Dev     | Visual isolation route (for debug) |
 | `/home-v5`     | `HomeV5AtomicPage.jsx`     | 🧪 Dev     | Staging for homepage rebuild (v5)  |
+| `/dev/mars-test`| `MarsTestPage.jsx`        | 🧪 Dev     | Mars component testing environment |
+| `/dev/combined-parallax-test` | `CombinedParallaxTest.jsx` | 🧪 Dev | Parallax effects with Moon testing |
 
 > 🧼 All dev-only routes **must be removed before production tag v1.0.0**
 
@@ -107,6 +109,8 @@ const CosmicRevDev         = lazy(() => import('./pages/CosmicRevDev.jsx'));
 const SafeV4CosmicPage     = lazy(() => import('./pages/safe_v4_cosmic.jsx'));
 const TestCanvasPage       = lazy(() => import('./pages/test_canvas.jsx'));
 const HomeV5AtomicPage     = lazy(() => import('./pages/HomeV5AtomicPage.jsx'));
+const MarsTestPage         = lazy(() => import('./pages/dev/mars-test.jsx'));
+const CombinedParallaxTest = lazy(() => import('./pages/dev/combined-parallax-test.jsx'));
 ```
 
 ## 📋 Integration Requirements

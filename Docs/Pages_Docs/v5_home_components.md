@@ -55,6 +55,47 @@ The HomeV5AtomicPage is a modern, scroll-driven experience built with a layered 
 | Navigation Layer | 110-119 | Primary navigation | NavBar |
 | Debug Overlay Layer | 120+ | Critical debugging tools | ScrollDebugOverlay |
 
+
+## 🛣️ Route Structure
+
+### Production Routes
+
+| Route | Component File | Purpose |
+|-------|---------------|---------|
+| `/` | `DevV4CosmicPage.jsx` | Main homepage with cosmic visualization |
+| `/cosmic-rev` | `CosmicRevDev.jsx` | Cosmic Revolution experience with static galaxy visualization |
+| `/products` | `ProductsPortal.jsx` | Product index page |
+| `/products/aegis` | `Aegis.jsx` | Aegis product page |
+| `/products/opspipe` | `OpsPipe.jsx` | OpsPipe product page |
+| `/products/moonsignal` | `MoonSignal.jsx` | MoonSignal product page |
+| `/products/curious` | `Curious.jsx` | Curious app page |
+| `/products/guardian` | `Guardian.jsx` | Guardian product page |
+| `/codelab` | `CodeLab.jsx` | CodeOps service landing page |
+| `/tools` | `Tools.jsx` | Utilities & microtools page |
+| `/docs` | `Documentation.jsx` | Developer documentation |
+| `/blog` | `Blog.jsx` | Blog hub |
+| `/about` | `About.jsx` | About CuriousLabs |
+| `/contact` | `Contact.jsx` | Contact + inquiry form |
+| `/404` | `NotFound.jsx` | Custom 404 page |
+
+### Special Routes
+
+| Route | Component File | Purpose |
+|-------|---------------|---------|
+| `/legacy` | `Home.jsx` | Original homepage (easter egg) |
+| `/safe` | `SafeV4CosmicPage.jsx` | Minimal fallback page |
+
+### Development Routes
+
+| Route | Component File | Purpose |
+|-------|---------------|---------|
+| `/dev` | `DevPage.jsx` | General development testing page |
+| `/dev_v4_cosmic` | `DevV4CosmicPage.jsx` | Cosmic experience development (same as `/`) |
+| `/test_canvas` | `TestCanvasPage.jsx` | Visual isolation route for debug |
+| `/home-v5` | `HomeV5AtomicPage.jsx` | Atomic design homepage rebuild |
+
+---
+
 ## 🧩 Core Components
 
 ### AtomicPageFrame

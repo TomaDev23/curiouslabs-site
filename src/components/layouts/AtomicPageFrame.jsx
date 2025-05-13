@@ -191,46 +191,37 @@ export const AtomicPageFrame = forwardRef(({ scenes = [], scrollProgress = 0 }, 
   
   return (
     <HUDProvider>
-      <div className="relative w-full text-white" ref={ref}>
-        {/* Cosmic Journey Controller as fixed background (z-0) */}
-        <div className="fixed inset-0 z-0">
+      {/* Root container - optimize for proper scroll event propagation */}
+      <div 
+        className="w-full text-white"
+        ref={ref}
+        data-legit-root="atomic-page-frame"
+      >
+        {/* Base Layer (z-0 to z-9): CosmicJourneyController */}
+        <div className="fixed inset-0 z-0" data-legit-layer="base">
           <CosmicJourneyController />
         </div>
         
-        <NavBar />
+        {/* Navigation Layer (z-110 to z-119): NavBar */}
+        <div className="z-[110]" data-legit-layer="navigation">
+          <NavBar />
+        </div>
         
-        {/* Content layer with all sections */}
-        <ContentLayer 
-          sections={sections} 
-          SectionRegistry={SectionRegistry}
-          isEditMode={isEditMode} 
-          hiddenSections={hiddenSections}
-        />
-        
-        {/* Admin panel for development (HUD ATOMIC 1) */}
-        {showAdminPanel && (
-          <PageDraggableAdvancedControlPanel 
-            sections={sections}
-            onSectionMove={handleSectionPositionChange}
-            onToggleEditMode={handleToggleEditMode}
-            isEditMode={isEditMode}
-            onSave={handleSavePositions}
-            onReset={handleResetPositions}
+        {/* Content Layer (z-10 to z-50): ContentLayer */}
+        <div className="z-[10]" data-legit-layer="content">
+          <ContentLayer 
+            sections={sections} 
+            SectionRegistry={SectionRegistry}
+            isEditMode={isEditMode} 
             hiddenSections={hiddenSections}
-            onToggleSectionVisibility={handleToggleSectionVisibility}
-            onShowAllSections={handleShowAllSections}
-            onHideAllSections={handleHideAllSections}
-            customClassName=""
-            customTitle="HUD ATOMIC 1"
-            scenes={scenes}
-            scrollProgress={scrollProgress}
           />
-        )}
+        </div>
         
-        {/* Hidden spacer to set page height */}
+        {/* Spacer to create page height */}
         <div 
           className="w-full pointer-events-none" 
           style={{ height: `${spacerHeight}vh` }}
+          data-legit-element="spacer"
         >
           {/* VH Markers for design reference (hidden in production) */}
           {process.env.NODE_ENV === 'development' && (
@@ -260,10 +251,37 @@ export const AtomicPageFrame = forwardRef(({ scenes = [], scrollProgress = 0 }, 
           )}
         </div>
         
+        {/* Footer */}
         <FooterExperience />
         
-        {/* HUD Hub Button - Only in development */}
-        {process.env.NODE_ENV === 'development' && <HUDHub />}
+        {/* UI Control Layer (z-60 to z-90): Admin Panel */}
+        {showAdminPanel && (
+          <div className="z-[80]" data-legit-layer="ui-control">
+            <PageDraggableAdvancedControlPanel 
+              sections={sections}
+              onSectionMove={handleSectionPositionChange}
+              onToggleEditMode={handleToggleEditMode}
+              isEditMode={isEditMode}
+              onSave={handleSavePositions}
+              onReset={handleResetPositions}
+              hiddenSections={hiddenSections}
+              onToggleSectionVisibility={handleToggleSectionVisibility}
+              onShowAllSections={handleShowAllSections}
+              onHideAllSections={handleHideAllSections}
+              customClassName=""
+              customTitle="HUD ATOMIC 1"
+              scenes={scenes}
+              scrollProgress={scrollProgress}
+            />
+          </div>
+        )}
+        
+        {/* HUD Layer (z-100 to z-109): HUD Hub */}
+        {process.env.NODE_ENV === 'development' && (
+          <div className="z-[100]" data-legit-layer="hud">
+            <HUDHub />
+          </div>
+        )}
       </div>
     </HUDProvider>
   );

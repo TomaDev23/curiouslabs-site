@@ -1,30 +1,38 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
-// Note: rollup-plugin-visualizer would require approval for installation
-// import { visualizer } from 'rollup-plugin-visualizer';
+import fs from 'fs';
 
+// https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
     react(),
-    // Uncomment after approval and installation
-    // visualizer({
-    //   filename: 'dist/report.html',
-    //   open: true,
-    //   gzipSize: true,
-    //   brotliSize: true,
-    // })
+    {
+      name: 'handle-client-side-routing',
+      configureServer(server) {
+        server.middlewares.use((req, res, next) => {
+          // Check if the request is for a client-side route
+          if (req.url.startsWith('/dev/') && !req.url.includes('.')) {
+            // Serve the index.html for client-side routes
+            req.url = '/';
+          }
+          next();
+        });
+      }
+    }
   ],
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './src'),
-    },
+      '@': path.resolve(__dirname, './src')
+    }
   },
   server: {
     open: true,
-    historyApiFallback: true,
+    port: 5173,
+    strictPort: true,
+    host: true,
+    // Handle client-side routing
     proxy: {
-      // Forward all routes to index.html for SPA routing
       '/background-sandbox': {
         target: 'http://localhost:5173',
         changeOrigin: false,
@@ -33,22 +41,15 @@ export default defineConfig({
     }
   },
   build: {
-    rollupOptions: {
-      output: {
-        manualChunks: {
-          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
-          'ui-vendor': ['framer-motion'],
-        }
-      }
-    },
-    chunkSizeWarningLimit: 1000,
-    cssCodeSplit: true,
+    outDir: 'dist',
+    emptyOutDir: true,
+    sourcemap: true,
     minify: 'terser',
     terserOptions: {
       compress: {
-        drop_console: true,
-        drop_debugger: true,
-      },
-    },
-  },
+        drop_console: false,
+        drop_debugger: true
+      }
+    }
+  }
 });

@@ -36,6 +36,13 @@ const BackgroundFinal = lazy(() => import('./pages/background_final.jsx'));
 const HomeV5AtomicPage = lazy(() => import('./pages/HomeV5AtomicPage.jsx'));
 import CosmicRevDev from './pages/CosmicRevDev';
 
+// Parallax test pages
+const ParallaxTest = lazy(() => import('./pages/dev/parallax-test.jsx'));
+const MouseParallaxTest = lazy(() => import('./pages/dev/mouse-parallax-test.jsx'));
+const CombinedParallaxTest = lazy(() => import('./pages/dev/combined-parallax-test.jsx'));
+const MarsTestPage = lazy(() => import('./pages/dev/mars-test.jsx'));
+const DevIndex = lazy(() => import('./pages/dev/index.jsx'));
+
 // Performance monitoring context
 const PerformanceContext = React.createContext({
   metrics: {},
@@ -272,6 +279,33 @@ export default function App() {
         <Route path="/dev" element={
           <Suspense fallback={<LoadingFallback />}>
             <DevPage />
+          </Suspense>
+        } />
+        
+        {/* Parallax test routes */}
+        <Route path="/dev/index" element={
+          <Suspense fallback={<LoadingFallback />}>
+            <DevIndex />
+          </Suspense>
+        } />
+        <Route path="/dev/parallax-test" element={
+          <Suspense fallback={<LoadingFallback />}>
+            <ParallaxTest />
+          </Suspense>
+        } />
+        <Route path="/dev/mouse-parallax-test" element={
+          <Suspense fallback={<LoadingFallback />}>
+            <MouseParallaxTest />
+          </Suspense>
+        } />
+        <Route path="/dev/combined-parallax-test" element={
+          <Suspense fallback={<LoadingFallback />}>
+            <CombinedParallaxTest />
+          </Suspense>
+        } />
+        <Route path="/dev/mars-test" element={
+          <Suspense fallback={<LoadingFallback />}>
+            <MarsTestPage />
           </Suspense>
         } />
         
