@@ -442,7 +442,7 @@ function Stars() {
     showStarsHUD
   } = useControls('Stars Settings', {
     showStarsHUD: { value: false, label: 'Show Stars HUD' },
-    starCount: { value: 2500, min: 500, max: 5000, step: 100 },
+    starCount: { value: 20000, min: 5000, max: 30000, step: 1000 },
     distribution: folder({
       starDensity: { value: 0.8, min: 0.1, max: 1.0, step: 0.05 },
       globalOpacity: { value: 0.4, min: 0.1, max: 1.0, step: 0.05 },
@@ -461,12 +461,24 @@ function Stars() {
   
   // Generate star positions and attributes - recreate when starCount changes
   const [positions, colors, sizes, randomOffsets, starDistances, starTypes] = React.useMemo(() => {
+    console.log(`Generating ${starCount} stars`);
+    
     const positions = new Float32Array(starCount * 3);
     const colors = new Float32Array(starCount * 3);
     const sizes = new Float32Array(starCount);
     const randomOffsets = new Float32Array(starCount);
     const starDistances = new Float32Array(starCount);
     const starTypes = new Float32Array(starCount);
+    
+    // Calculate thresholds for star type distribution
+    // 70% smallest stars, 30% distributed among other types
+    const smallStarThreshold = 0.7;
+    const redGiantThreshold = smallStarThreshold + 0.02; // 2%
+    const yellowBrightThreshold = redGiantThreshold + 0.03; // 3%
+    const blueWhiteBrightThreshold = yellowBrightThreshold + 0.015; // 1.5%
+    const blueWhiteMediumThreshold = blueWhiteBrightThreshold + 0.08; // 8%
+    const yellowMediumThreshold = blueWhiteMediumThreshold + 0.075; // 7.5%
+    const orangeThreshold = yellowMediumThreshold + 0.08; // 8%
     
     for (let i = 0; i < starCount; i++) {
       // Create a more even 3D distribution using improved spherical mapping
@@ -493,55 +505,56 @@ function Stars() {
       starDistances[i] = distance;
       
       // Star colors - Create different star types with more vibrant colors
+      // Use a uniform distribution for star types
       const starType = Math.random();
       starTypes[i] = starType; // Store star type for animation variation
       
-      if (starType > 0.985) {
+      if (starType > blueWhiteBrightThreshold) {
         // Bright blue-white stars (very rare, very bright)
         colors[i * 3] = 0.7 + Math.random() * 0.3;
         colors[i * 3 + 1] = 0.85 + Math.random() * 0.15;
         colors[i * 3 + 2] = 1.0;
         // Make these stars larger
         sizes[i] = 8.0 + Math.random() * 4.0;
-      } else if (starType > 0.97) {
+      } else if (starType > yellowBrightThreshold) {
         // Bright yellow stars (rare, bright)
         colors[i * 3] = 1.0;
         colors[i * 3 + 1] = 0.9 + Math.random() * 0.1;
         colors[i * 3 + 2] = 0.6 + Math.random() * 0.3;
         // Make these stars larger
         sizes[i] = 6.0 + Math.random() * 3.0;
-      } else if (starType > 0.95) {
+      } else if (starType > redGiantThreshold) {
         // Red giants (rare)
         colors[i * 3] = 1.0;
         colors[i * 3 + 1] = 0.3 + Math.random() * 0.3;
         colors[i * 3 + 2] = 0.3 + Math.random() * 0.2;
         // Make these stars larger
         sizes[i] = 5.0 + Math.random() * 3.0;
-      } else if (starType > 0.9) {
+      } else if (starType > blueWhiteMediumThreshold) {
         // Blue-white stars (hot, medium-sized)
         colors[i * 3] = 0.8 + Math.random() * 0.2;
         colors[i * 3 + 1] = 0.9 + Math.random() * 0.1;
         colors[i * 3 + 2] = 1.0;
         sizes[i] = 2.5 + Math.random() * 1.5;
-      } else if (starType > 0.8) {
+      } else if (starType > yellowMediumThreshold) {
         // Yellow-white stars (like our sun)
         colors[i * 3] = 1.0;
         colors[i * 3 + 1] = 0.9 + Math.random() * 0.1;
         colors[i * 3 + 2] = 0.7 + Math.random() * 0.3;
         sizes[i] = 2.0 + Math.random() * 1.0;
-      } else if (starType > 0.7) {
+      } else if (starType > orangeThreshold) {
         // Orange-reddish stars
         colors[i * 3] = 1.0;
         colors[i * 3 + 1] = 0.5 + Math.random() * 0.3;
         colors[i * 3 + 2] = 0.3 + Math.random() * 0.3;
         sizes[i] = 1.8 + Math.random() * 0.8;
       } else {
-        // White/silver stars (most common)
+        // White/silver stars (most common - 70%)
         const brightness = 0.8 + Math.random() * 0.2;
         colors[i * 3] = brightness;
         colors[i * 3 + 1] = brightness;
         colors[i * 3 + 2] = brightness;
-        sizes[i] = 1.0 + Math.random() * 1.0;
+        sizes[i] = 0.8 + Math.random() * 0.4; // Smaller size for common stars
       }
       
       // Random offset for twinkling effect
