@@ -1,4 +1,4 @@
-# ✅ CuriousLabs Control Layers Contract — v1.0
+yu# ✅ CuriousLabs Control Layers Contract — v1.0
 
 📍 Location: src/Docs/contracts/contract_control_layers.md  
 🧱 Purpose: Define standardized layering system for separation of concerns across the CuriousLabs platform

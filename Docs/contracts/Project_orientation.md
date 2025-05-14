@@ -19,6 +19,8 @@
 9. [File System Organization](#file-system-organization)
 10. [Simplified Reference](#simplified-reference)
 11. [Celestial Bodies System](#celestial-bodies-system)
+12. [Planet Sandbox Contracts](#planet-sandbox-contracts)
+13. [Diagnostic Reports](#diagnostic-reports)
 
 ---
 
@@ -444,6 +446,143 @@ Comprehensive documentation is available in the `Docs/celestial_page/` directory
 - Schema references
 - Asset requirements
 - Development routes
+
+---
+
+## 📜 Planet Sandbox Contracts
+
+The Planet Sandbox system is defined by a set of LEGIT contracts that provide comprehensive specifications for implementation.
+
+### Contract Structure
+
+| Contract File | Purpose | Key Components |
+|---------------|---------|----------------|
+| `contract_planet_sandbox.md` | Main contract defining overall structure | PlanetSandboxPage, SolarSystem, rendering requirements |
+| `contract_planet_components.md` | Planet-specific requirements | Base planet requirements, individual planet specifications |
+| `contract_ui_components.md` | UI element specifications | Control Panel, Planet Selector HUD, Information Panel |
+| `contract_implementation_guide.md` | Implementation instructions | Project structure, step-by-step guide, code examples |
+
+### Key Features
+
+- **Dual View Modes**: Single Planet View and Solar System View
+- **Planet Components**: Earth, Moon, Mars, Venus, Jupiter, Saturn, Uranus, Neptune, and Pluto
+- **Interactive Controls**: Zoom, rotate, pan, and planet selection
+- **Information Display**: Planet data and educational content
+- **Visual Effects**: Realistic materials, textures, atmospheres, and lighting
+
+### Implementation Path
+
+The contracts follow a hierarchical structure with the main contract (`contract_planet_sandbox.md`) referencing all subcontracts. Developers should:
+
+1. Start with the main contract for overall understanding
+2. Reference specific component contracts for detailed requirements
+3. Follow the implementation guide for practical instructions
+4. Validate against all contracts before deployment
+
+### Integration Points
+
+- Route: `/dev/planet-sandbox`
+- Component: `PlanetSandboxPage`
+- Related Systems: Celestial Bodies System, HUD System
+- Documentation: `Docs/contracts/Solar_System/README.md`
+
+---
+
+# 🛡️ CuriousLabs Diagnostic Report
+
+## Title: GPU Black Framebuffer Interference
+
+---
+
+## 📌 Summary
+
+This report documents a confirmed system-level issue where PrintScreen and clipboard-based screenshots failed to capture WebGL-rendered scenes — even after navigating away from the source page or closing Chrome.
+
+The issue was confirmed to be a GPU memory retention and framebuffer compositing failure triggered by an active WebGL render context.
+
+---
+
+## 🧠 Root Cause
+
+| Layer                | Cause                                                                          |
+| -------------------- | ------------------------------------------------------------------------------ |
+| **GPU**              | VRAM framebuffer not releasing after heavy WebGL session                       |
+| **Chrome**           | Persistent hardware-accelerated rendering of canvas layer                      |
+| **OS (Windows)**     | System compositor failing to flush GPU layer into final framebuffer            |
+| **Screenshot Layer** | `PrtScn` and clipboard tools accessing a black buffer instead of screen pixels |
+
+---
+
+## 🧪 Symptoms
+
+* Screenshots taken using `PrtScn` or clipboard shortcuts appear completely black
+* Issue persists even after navigating away or closing the browser tab
+* Only a **system reboot** clears the issue and restores normal screenshot behavior
+* WebGL render remains functional and visible during the session
+
+---
+
+## ✅ Confirmed Fix
+
+* A **full reboot** clears the compositor and GPU VRAM stack, restoring screenshot functionality
+
+---
+
+## 🛠️ Preventive Measures
+
+### 1. Use Snipping Tool or `Win + Shift + S`
+
+These tools capture from a higher screen layer and bypass GPU framebuffer quirks
+
+### 2. Add `preserveDrawingBuffer: true`
+
+In Three.js Canvas config:
+
+```jsx
+<Canvas gl={{ preserveDrawingBuffer: true }} />
+```
+
+✅ Helps in many screenshot + `.toDataURL()` scenarios
+❗ Not a guaranteed fix for all OS/GPU conditions
+
+### 3. Minimize WebGL surfaces when not active
+
+Unload or hide WebGL scenes to reduce GPU compositor lock risk
+
+### 4. Use `.toDataURL()` capture utility
+
+For export-safe rendering during dev, implement a capture button:
+
+```js
+canvas.toDataURL('image/png')
+```
+
+### 5. Disable Hardware Acceleration (dev only)
+
+Temporarily disable via Chrome settings:
+`chrome://settings/system` → Turn OFF "Use hardware acceleration"
+
+---
+
+## 🧬 CuriousLabs Protocol Log
+
+* 🧠 Issue detected: Screenshot buffer showing black
+* 🛠️ `preserveDrawingBuffer: true` applied
+* ❌ Issue persisted
+* 🧪 Reboot triggered → ✅ Issue resolved
+* ✅ Screenshots now function across tools and clipboard
+
+---
+
+## 📂 File Location
+
+Add this to:
+
+```md
+/Docs/system/gpu_black_framebuffer.md
+```
+
+Log as a Class-A Interference Incident under `Project_orientation.md`
 
 ---
 

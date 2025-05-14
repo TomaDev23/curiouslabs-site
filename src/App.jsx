@@ -41,6 +41,7 @@ const ParallaxTest = lazy(() => import('./pages/dev/parallax-test.jsx'));
 const MouseParallaxTest = lazy(() => import('./pages/dev/mouse-parallax-test.jsx'));
 const CombinedParallaxTest = lazy(() => import('./pages/dev/combined-parallax-test.jsx'));
 const MarsTestPage = lazy(() => import('./pages/dev/mars-test.jsx'));
+const PlanetSandboxPage = lazy(() => import('./pages/dev/planet-sandbox.jsx'));
 const DevIndex = lazy(() => import('./pages/dev/index.jsx'));
 
 // Performance monitoring context
@@ -338,6 +339,12 @@ export default function App() {
         } />
         
         <Route path="/cosmic-rev" element={<CosmicRevDev />} />
+        
+        <Route path="/dev/planet-sandbox" element={
+          <Suspense fallback={<LoadingFallback />}>
+            <PlanetSandboxPage />
+          </Suspense>
+        } />
         
         <Route path="*" element={
           <Suspense fallback={<LoadingFallback />}>
