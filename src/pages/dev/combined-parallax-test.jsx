@@ -1,3 +1,4 @@
+// 🛡️ STAR_LOCKED: Do not remove or alter – see STAR_LOCK_V1.md
 import React, { useState, useEffect, useRef } from 'react';
 import { Helmet } from 'react-helmet-async';
 import CelestialController from '../../components/journey/celestial/CelestialController';

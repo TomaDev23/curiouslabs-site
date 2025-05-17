@@ -2,6 +2,7 @@ import React, { Suspense, useRef, useState, useEffect } from 'react';
 import { AtomicPageFrame } from '../components/layouts/AtomicPageFrame';
 import HUDSystem from '../components/ui/HUDSystem';
 import SceneBoundaryDebug from '../components/journey/debug/SceneBoundaryDebug';
+import SceneFaderHUD from '../components/home/v5/SceneFaderHUD';
 
 const metadata = {
   id: 'home_v5_atomic_page',
@@ -51,6 +52,9 @@ export default function HomeV5AtomicPage() {
   
   return (
     <>
+      {/* Scene Fader HUD - Mounted at root level */}
+      <SceneFaderHUD />
+      
       <Suspense fallback={
         <div className="fixed inset-0 flex items-center justify-center bg-black text-white">
           <p className="text-xl">Loading...</p>

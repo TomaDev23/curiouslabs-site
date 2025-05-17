@@ -7,48 +7,85 @@
  */
 
 /**
- * Calculates the opacity value for a scene based on scroll position
- * 
- * @param {number} scrollProgress - Current scroll progress (0-1)
- * @param {number} sceneStart - Scene start position (0-1)
- * @param {number} sceneEnd - Scene end position (0-1)
- * @param {number} fadeZone - Size of the fade zone (0-1)
- * @returns {number} - Opacity value (0-1)
+ * Enhanced dissolve engine with cubic easing and z-index management
+ * LEGIT Contract: SCS0 - Scene Transition Management
  */
-export const getDissolveOpacity = (scrollProgress, sceneStart, sceneEnd, fadeZone) => {
-  // Early return cases for scenes completely outside view
-  if (scrollProgress >= sceneEnd + fadeZone || scrollProgress <= sceneStart - fadeZone) {
-    return 0;
-  }
-  
-  // Scene is fully visible (non-fade zone)
-  if (scrollProgress >= sceneStart && scrollProgress <= sceneEnd) {
-    return 1;
-  }
-  
-  // Fade-in zone calculation
-  if (scrollProgress >= sceneStart - fadeZone && scrollProgress < sceneStart) {
-    return (scrollProgress - (sceneStart - fadeZone)) / fadeZone;
-  }
-  
-  // Fade-out zone calculation
-  if (scrollProgress > sceneEnd && scrollProgress <= sceneEnd + fadeZone) {
-    return 1 - (scrollProgress - sceneEnd) / fadeZone;
-  }
-  
-  return 0; // Fallback
+
+/**
+ * Cubic easing function for smooth transitions
+ * @param {number} t - Input value (0-1)
+ * @returns {number} Eased value
+ */
+const cubicEaseInOut = (t) => {
+  return t < 0.5
+    ? 4 * t * t * t
+    : 1 - Math.pow(-2 * t + 2, 3) / 2;
 };
 
 /**
- * Creates a CSS class for cross-fade effects
- * Compatible with browsers that don't support mix-blend-mode
- * 
- * @returns {string} - CSS class string for fade effects
+ * Calculates smooth opacity value for scene transitions
+ * @param {number} scrollProgress - Current scroll progress (0-1)
+ * @param {number} sceneStart - Scene start point (0-1)
+ * @param {number} sceneEnd - Scene end point (0-1)
+ * @param {number} fadeZone - Size of the fade zone (0-1)
+ * @returns {number} Opacity value between 0 and 1
  */
-export const getFadeBlendClass = () => `
-  .fade-blend {
-    background: linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(0,0,0,0));
-    mask-image: linear-gradient(to top, black 70%, transparent 100%);
-    -webkit-mask-image: linear-gradient(to top, black 70%, transparent 100%);
+export function getDissolveOpacity(scrollProgress, sceneStart, sceneEnd, fadeZone) {
+  // Calculate effective boundaries with fade zones
+  const fadeInStart = Math.max(0, sceneStart - fadeZone);
+  const fadeInEnd = sceneStart + (fadeZone * 0.1); // Small buffer for initial fade
+  const fadeOutStart = sceneEnd - (fadeZone * 0.1); // Small buffer for final fade
+  const fadeOutEnd = Math.min(1, sceneEnd + fadeZone);
+
+  // Guarantee 0 opacity outside effective range
+  if (scrollProgress <= fadeInStart || scrollProgress >= fadeOutEnd) {
+    return 0;
   }
-`; 
+
+  // Full opacity in main scene range
+  if (scrollProgress >= fadeInEnd && scrollProgress <= fadeOutStart) {
+    return 1;
+  }
+
+  // Calculate fade-in opacity
+  if (scrollProgress > fadeInStart && scrollProgress < fadeInEnd) {
+    const progress = (scrollProgress - fadeInStart) / (fadeInEnd - fadeInStart);
+    return cubicEaseInOut(progress);
+  }
+
+  // Calculate fade-out opacity
+  if (scrollProgress > fadeOutStart && scrollProgress < fadeOutEnd) {
+    const progress = 1 - ((scrollProgress - fadeOutStart) / (fadeOutEnd - fadeOutStart));
+    return cubicEaseInOut(progress);
+  }
+
+  return 0;
+}
+
+/**
+ * Calculates z-index for proper scene layering
+ * @param {number} opacity - Current scene opacity (0-1)
+ * @param {number} baseZIndex - Base z-index for the scene
+ * @returns {number} Calculated z-index
+ */
+export function getDissolveZIndex(opacity, baseZIndex) {
+  return Math.round(baseZIndex + (opacity * 10));
+}
+
+/**
+ * Generates optimized CSS for fade transitions
+ * @returns {string} CSS class definition
+ */
+export function getFadeBlendClass() {
+  return `
+    .scene-layer {
+      position: absolute;
+      inset: 0;
+      will-change: opacity, transform;
+      backface-visibility: hidden;
+      transform-style: preserve-3d;
+      contain: paint;
+      transition: opacity 0.1s cubic-bezier(0.4, 0.0, 0.2, 1);
+    }
+  `;
+} 

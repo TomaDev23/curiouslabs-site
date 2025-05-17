@@ -73,6 +73,9 @@ const CosmicRevDev = () => {
   const [showControls, setShowControls] = useState(true);
   const [activeTab, setActiveTab] = useState('scene');
   
+  // 🛠️ ADDED: Camera movement toggle state
+  const [cameraMovementEnabled, setCameraMovementEnabled] = useState(true);
+  
   // Active HUDs state
   const [activeHUDs, setActiveHUDs] = useState(['selector']);
   
@@ -271,11 +274,27 @@ const CosmicRevDev = () => {
             cameraDistance: visualParams.cameraDistance,
             rotation: visualParams.rotation,
             brightness: visualParams.brightness,
-            colorShift: visualParams.colorShift
+            colorShift: visualParams.colorShift,
+            cameraMovementEnabled
           }}
           onStateChange={handleGalaxyStateChange}
         />
       </Suspense>
+      
+      {/* 🛠️ ADDED: Camera movement toggle button */}
+      <button
+        onClick={() => setCameraMovementEnabled(prev => !prev)}
+        className="fixed top-4 right-4 z-[9999] px-5 py-3 bg-black bg-opacity-80 text-white rounded-md shadow-lg hover:bg-opacity-90 transition-all"
+        style={{
+          border: '3px solid rgba(100, 200, 255, 0.8)',
+          fontSize: '16px',
+          fontWeight: 'bold',
+          boxShadow: '0 0 20px rgba(100, 200, 255, 0.6)',
+          cursor: 'pointer'
+        }}
+      >
+        {cameraMovementEnabled ? '🛑 Stop Camera' : '▶️ Start Camera'}
+      </button>
       
       {/* HUD Manager */}
       <Suspense fallback={<div className="fixed top-5 right-5 bg-black/60 p-2 rounded text-xs text-white">Loading HUDs...</div>}>
