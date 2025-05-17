@@ -50,6 +50,7 @@ A component is properly layered only if it:
 | HUDSelector                 | HUD Layer           | 106        | HUD control panel                 |
 | NavBar                      | Navigation Layer    | 110        | Main navigation                   |
 | ScrollDebugOverlay          | Debug Overlay Layer | 120        | Scroll position debugging         |
+| ParallaxSpeedDust           | Content Layer       | z-20       | Persistent speed/motion effects (0.25-0.85) |
 
 ### 2.2 /home-v5 Page Layer Structure
 

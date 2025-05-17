@@ -5,7 +5,11 @@ Scene-Specific Effects (In Scene Components)
 DormantScene: LightGlowDust (subtle breathing stars, 5FPS).
 AwakeningScene: NebulaFade (aurora shimmer, 10FPS).
 CosmicRevealScene: ConstellationGlow (pulsing constellations, 10FPS).
-CosmicFlightScene: ParallaxSpeedDust (fast particles, 30FPS).
+CosmicFlightScene: ParallaxSpeedDust
+- Fast particles with three depth bands
+- FPS: Dynamic based on scroll velocity
+- Persistent across 0.25-0.85 scroll range
+- Enhanced visibility and movement consistency
 SunApproachScene: SolarFlickerDust (warm particles, 5FPS).
 SunLandingScene: SunFlarePulse (flare burst, 30FPS).
 Global Effects (In CosmicJourneyController)

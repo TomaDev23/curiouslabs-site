@@ -1,5 +1,3 @@
-
-
 🚀 Cosmic Flight Page Mapping Analysis
 Controller
 Name: CosmicJourneyController
@@ -338,11 +336,32 @@ All components are properly documented with LEGIT compliance metadata, ensuring 
 4. **Parallax Speed Dust:**
    - Component: `ParallaxSpeedDust`
    - Z-index: 20
-   - Opacity: Increases with progress (up to 0.8)
-   - Speed: 3 (configurable)
-   - Density: Based on StarfieldCanvas density
-   - FPS: Based on StarfieldCanvas FPS
-   - Features: Particles with varying speeds for parallax effect
+   - Scene Range: 0.25 - 0.85 (wider range for persistence)
+   - Depth Bands:
+     - NEAR: 1.0 (Full speed, highest opacity)
+     - MID: 0.85
+     - FAR: 0.65
+   - Particle Properties:
+     - Minimum Count: 75 particles
+     - Base Speed: Minimum 0.8
+     - Length: 8-23px
+     - Distribution: 150% canvas height
+     - Phase: Random (0-2π)
+     - Pulse Speed: 0.5-1.5
+     - Pulse Strength: 0.15-0.35
+   - Animation Features:
+     - Constant base movement
+     - Scroll-coupled parallax
+     - Breathing effect with pulse
+     - Depth-aware rendering
+   - Performance:
+     - Cleanup on unmount
+     - Proper animation state tracking
+     - Visibility always maintained
+   - Initialization:
+     - Guaranteed minimum particle count
+     - Automatic recovery from missing particles
+     - Persistent animation state
 
 ## 5. SunApproachScene (Tile 5)
 **File Path:** `src/components/journey/scenes/SunApproachScene.jsx`
@@ -603,3 +622,21 @@ This comprehensive inventory shows all visual elements, their properties, animat
 5. Scene Title (implicit z-index: auto)
 
 This comprehensive inventory shows all visual elements, their properties, animations, and how they're layered in each scene.
+
+### ParallaxSpeedDust Animation Specifics:
+- **Base Movement:**
+  - Constant vertical movement regardless of scroll
+  - Speed scaled by depth band (1.0, 0.85, 0.65)
+  - Minimum speed enforced at 0.8
+- **Scroll Coupling:**
+  - Depth-based parallax offset
+  - Smooth transitions between scenes
+  - Wider visibility range (0.25-0.85)
+- **Particle Breathing:**
+  - Individual phase offsets
+  - Customizable pulse speed and strength
+  - Affects both length and opacity
+- **Reset Logic:**
+  - Random height distribution on reset
+  - Maintains consistent particle density
+  - Prevents clumping and gaps

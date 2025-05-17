@@ -1,10 +1,10 @@
-# 🎬 Dissolve Engine Contract - CuriousLabs (v1.0)
+# 🎬 Dissolve Engine Contract - CuriousLabs (v1.1)
 
 📍 Path: `src/utils/dissolveEngine.js`  
 🔒 Status: **ACTIVE**
 
 ## 📚 Purpose
-Dissolve Engine provides utilities for calculating smooth, cinematic transitions between scenes in the CosmicJourneyController. It enables multiple scenes to be visible simultaneously during transitions, creating film-like dissolve effects.
+Dissolve Engine provides utilities for calculating smooth, cinematic transitions between scenes in the CosmicJourneyController. It enables multiple scenes to be visible simultaneously during transitions, creating film-like dissolve effects with special handling for the initial Dormant scene.
 
 ## 🧩 API Reference
 
@@ -30,16 +30,33 @@ Returns a number between 0 and 1 representing the opacity that should be applied
 - Returns 0 if scene is completely outside view (including fade zone)
 - Returns 1 if scroll position is within main scene boundaries
 - Returns a value between 0-1 if in fade-in or fade-out zone
-- Calculates linear fade based on position within fade zone
+- Special handling for Dormant scene to ensure smooth entry and extended fade-out
+- Uses cubic-bezier easing for smooth transitions
 
 #### Example Usage
 ```js
-// At 4.5% scroll position, with DormantScene (0-5%) and fadeZone of 0.03
-const dormantOpacity = getDissolveOpacity(0.045, 0.0, 0.05, 0.03); // Returns 1.0
-const awakeningOpacity = getDissolveOpacity(0.045, 0.05, 0.15, 0.05); // Returns partial opacity
+// At start, with DormantScene (0-8%) and fadeZone of 0.08
+const dormantOpacity = getDissolveOpacity(0.0, 0.0, 0.08, 0.08); // Returns 1.0
+const awakeningOpacity = getDissolveOpacity(0.045, 0.05, 0.15, 0.08); // Returns partial opacity
 ```
 
-### 2. `getFadeBlendClass`
+### 2. `getDissolveZIndex`
+
+#### Function Signature
+```js
+function getDissolveZIndex(opacity, baseZIndex)
+```
+
+#### Parameters
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| opacity | Number (0-1) | Current opacity of the scene |
+| baseZIndex | Number | Base z-index for the scene |
+
+#### Return Value
+Returns a calculated z-index value that ensures proper scene layering during transitions.
+
+### 3. `getFadeBlendClass`
 
 #### Function Signature
 ```js
@@ -47,7 +64,7 @@ function getFadeBlendClass()
 ```
 
 #### Return Value
-Returns a CSS class string with styles for creating fade blend effects in browsers that don't support mix-blend-mode.
+Returns CSS classes for optimized scene rendering with proper GPU acceleration and transitions.
 
 #### Example Usage
 ```js
@@ -56,42 +73,52 @@ const styleEl = document.createElement('style');
 styleEl.textContent = getFadeBlendClass();
 document.head.appendChild(styleEl);
 
-// Apply class to element
-<div className="fade-blend">...</div>
+// Apply class to scene layer
+<div className="scene-layer">...</div>
 ```
 
-## 🖥️ Typical Scene Configuration
+## 🖥️ Scene Configuration
 
-### Fade Zone Values
-| Scene | Range | Fade Zone | Effective Range |
-|-------|-------|-----------|----------------|
-| DormantScene | 0.0 - 0.05 | 0.03 | -0.03 to 0.08 |
-| AwakeningScene | 0.05 - 0.15 | 0.05 | 0.0 to 0.20 |
-| CosmicRevealScene | 0.15 - 0.3 | 0.05 | 0.10 to 0.35 |
-| CosmicFlightScene | 0.3 - 0.8 | 0.05 | 0.25 to 0.85 |
-| SunApproachScene | 0.8 - 0.9 | 0.05 | 0.75 to 0.95 |
-| SunLandingScene | 0.9 - 1.0 | 0.03 | 0.87 to 1.03 |
+### Current Scene Values
+| Scene | Range | Fade Zone | Transition Duration | Notes |
+|-------|-------|-----------|---------------------|-------|
+| DormantScene | 0.0 - 0.08 | 0.08 | 3.5s | Extended fade for smooth entry |
+| AwakeningScene | 0.05 - 0.15 | 0.08 | 3.5s | Overlaps with Dormant |
+| CosmicRevealScene | 0.15 - 0.3 | 0.08 | 3.5s | Standard transition |
+| CosmicFlightScene | 0.3 - 0.8 | 0.015 | 2.0s | Includes persistent ParallaxSpeedDust (0.25-0.85) |
+| SunApproachScene | 0.8 - 0.9 | 0.015 | 2.0s | Faster transition |
+| SunLandingScene | 0.9 - 1.0 | 0.01 | 2.0s | Quick final transition |
 
-## 🧮 Visualization
+## 🧮 Transition Visualization
 ```
-Scene Range:   |------|
-Fade Zone:  |--|    |--|
-Opacity:    /‾‾‾‾‾‾‾‾\
+Scene Range:      |---------|
+Fade Zone:    |--|         |--|
+Mount Zone: |--|             |--|
+Opacity:      /‾‾‾‾‾‾‾‾‾\
 ```
 
-## 🔄 Example Transition
-At scroll position 0.13:
-- CosmicRevealScene: 0 (not yet visible)
+## 🔄 Example Transitions
+
+### Initial Load (0% scroll)
+- DormantScene: 1.0 (fully visible)
+- AwakeningScene: 0 (not yet visible)
+
+### Dormant to Awakening (5% scroll)
+- DormantScene: ~0.9 (fading out)
+- AwakeningScene: ~0.1 (fading in)
+
+### Mid-Transition (6.5% scroll)
+- DormantScene: ~0.5 (mid-fade)
+- AwakeningScene: ~0.5 (mid-fade)
+
+### Complete Transition (8% scroll)
+- DormantScene: 0 (fully faded)
 - AwakeningScene: 1.0 (fully visible)
-- DormantScene: 0 (no longer visible)
-
-At scroll position 0.145:
-- CosmicRevealScene: 0.9 (fading in, almost fully visible)
-- AwakeningScene: 0.9 (fading out, still mostly visible)
-- DormantScene: 0 (no longer visible)
 
 ## 🧠 Integration Notes
-- This utility is designed to work with the CosmicJourneyController
-- It enables multiple scenes to be visible simultaneously during transitions
-- Should be used with `mix-blend-mode: screen` for optimal visual effect
-- Provides fallback CSS for browsers with limited support for advanced blend modes 
+- Scenes mount 2% before their fade-in point (`start - 0.02`)
+- Scenes hold at 0 opacity for 0.5% scroll before starting fade (`start + 0.005`)
+- Dormant scene has special handling to ensure smooth entry and extended fade
+- Uses cubic-bezier timing function for natural easing
+- Implements visibility toggling for performance optimization
+- Proper GPU acceleration through will-change and transform properties 

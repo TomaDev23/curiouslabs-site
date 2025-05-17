@@ -30,6 +30,28 @@ The HomeV5AtomicPage is a modern, scroll-driven experience built with a layered 
 ### Visual Components
 18. `StarfieldCanvas` (from `src/components/visual/StarfieldCanvas.jsx`)
 19. `ParallaxSpeedDust` (from `src/components/visual/ParallaxSpeedDust.jsx`)
+    - Purpose: Creates depth-aware particle effects for cosmic flight
+    - Props:
+      - opacity: Controls overall visibility
+      - speed: Base movement speed (minimum 0.8)
+      - density: Minimum particle count (75)
+      - fps: Animation frame rate
+      - scrollProgress: For parallax calculations
+    - Features:
+      - Three depth bands (NEAR: 1.0, MID: 0.85, FAR: 0.65)
+      - Persistent animation across 0.25-0.85 scroll range
+      - Automatic particle recovery and initialization
+      - Scroll-coupled movement with depth awareness
+      - Breathing effect with customizable pulse
+      - Guaranteed minimum particle density
+      - Performance optimized animation state tracking
+    - Animation Properties:
+      - Base movement: Constant with depth-scaled speed
+      - Particle length: 8-23px
+      - Distribution: 150% canvas height
+      - Phase: Random (0-2π)
+      - Pulse speed: 0.5-1.5
+      - Pulse strength: 0.15-0.35
 20. `ConstellationGlow` (from `src/components/visual/ConstellationGlow.jsx`)
 21. `GreenAuroraEffects` (from `src/components/visual/GreenAuroraEffects.jsx`)
 22. `CosmicFlightBackdrop` (from `src/components/visual/backdrops/CosmicFlightBackdrop.jsx`)
@@ -495,7 +517,7 @@ Two constellations appear at specific scroll positions and move across the viewp
 | Component Name | File Path | Purpose | Key Properties |
 |----------------|-----------|---------|----------------|
 | **StarfieldCanvas** | `visual/StarfieldCanvas.jsx` | Creates dynamic star field with twinkling effect | `density`, `opacity`, `fps`, `baseColor`, `breathing`, `glow` |
-| **ParallaxSpeedDust** | `visual/ParallaxSpeedDust.jsx` | Creates streaking particles with parallax effect | `opacity`, `speed`, `density`, `fps` |
+| **ParallaxSpeedDust** | `visual/ParallaxSpeedDust.jsx` | Creates depth-aware particle effects for cosmic flight | `opacity`, `speed`, `density`, `fps`, `scrollProgress` |
 | **ConstellationGlow** | `visual/ConstellationGlow.jsx` | Renders constellation star patterns with glow effect | `type`, `opacity`, `fps`, `layer` |
 | **GreenAuroraEffects** | `visual/GreenAuroraEffects.jsx` | Creates aurora-like effects | `opacity`, `intensity` |
 | **CosmicFlightBackdrop** | `visual/backdrops/CosmicFlightBackdrop.jsx` | Creates warp/flight tunnel effect | `progress` |
@@ -623,29 +645,35 @@ Two constellations appear at specific scroll positions and move across the viewp
 **Theme:** Main journey through space with warp speed effect and cosmic phenomena.
 
 **Visuals & Components:**
-- **StarfieldCanvas:**
-  - Density: 40 stars
-  - FPS: 30 (higher for smooth motion)
-  - Star streaking effect active
-  - White stars with enhanced glow
-- **CosmicFlightBackdrop:**
-  - Warp tunnel effect with increasing intensity
-  - Distortion field that intensifies with progress
 - **ParallaxSpeedDust:**
-  - Multiple layers of particles with varying speeds
-  - Creates depth perception through parallax
-  - Opacity: 0.8 * intensity
-- **GreenAuroraEffects:**
-  - Ethereal green energy wisps
-  - Flowing movement patterns
-- **Orion Constellation:**
-  - Position: Right side of screen
-  - Visibility: 0.4 - 0.85 scroll range
-  - Movement: Bottom to top of viewport
-- **Mint-colored Warp Trails:**
-  - 8 horizontal trails with varying lengths
-  - Subtle mint gradient (`hsl(160-174, 75-85%, 60-65%)`)
-  - Animation: Linear movement at various speeds
+  - Component: `ParallaxSpeedDust`
+  - Z-index: 20
+  - Scene Range: 0.25 - 0.85 (wider range for persistence)
+  - Depth Bands:
+    - NEAR: 1.0 (Full speed, highest opacity)
+    - MID: 0.85
+    - FAR: 0.65
+  - Particle Properties:
+    - Minimum Count: 75 particles
+    - Base Speed: Minimum 0.8
+    - Length: 8-23px
+    - Distribution: 150% canvas height
+    - Phase: Random (0-2π)
+    - Pulse Speed: 0.5-1.5
+    - Pulse Strength: 0.15-0.35
+  - Animation Features:
+    - Constant base movement
+    - Scroll-coupled parallax
+    - Breathing effect with pulse
+    - Depth-aware rendering
+  - Performance:
+    - Cleanup on unmount
+    - Proper animation state tracking
+    - Visibility always maintained
+  - Initialization:
+    - Guaranteed minimum particle count
+    - Automatic recovery from missing particles
+    - Persistent animation state
 
 **Layers (front to back):**
 1. Warp trails (z-40)
