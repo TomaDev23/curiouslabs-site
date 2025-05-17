@@ -24,14 +24,14 @@ const metadata = {
   doc: 'contract_cosmic_controller.md'
 };
 
-// Define scenes with their scroll ranges
+// Define scenes with their scroll ranges - aligned with saved section positions
 const SCENES = [
   { key: 'dormant', range: [0.0, 0.08], Component: DormantScene, transitionDuration: 3.5, fadeZone: 0.08 },
-  { key: 'awakening', range: [0.05, 0.15], Component: AwakeningScene, transitionDuration: 3.5, fadeZone: 0.08 },
-  { key: 'cosmicReveal', range: [0.15, 0.3], Component: CosmicRevealScene, transitionDuration: 3.5, fadeZone: 0.08 },
-  { key: 'cosmicFlight', range: [0.3, 0.8], Component: CosmicFlightScene, transitionDuration: 2.0, fadeZone: 0.015 },
-  { key: 'sunApproach', range: [0.8, 0.9], Component: SunApproachScene, transitionDuration: 2.0, fadeZone: 0.015 },
-  { key: 'sunLanding', range: [0.9, 1.0], Component: SunLandingScene, transitionDuration: 2.0, fadeZone: 0.01 },
+  { key: 'awakening', range: [0.05, 0.18], Component: AwakeningScene, transitionDuration: 3.5, fadeZone: 0.08 },
+  { key: 'cosmicReveal', range: [0.15, 0.37], Component: CosmicRevealScene, transitionDuration: 3.5, fadeZone: 0.08 },
+  { key: 'cosmicFlight', range: [0.37, 0.45], Component: CosmicFlightScene, transitionDuration: 2.0, fadeZone: 0.015 },
+  { key: 'sunApproach', range: [0.45, 0.59], Component: SunApproachScene, transitionDuration: 2.0, fadeZone: 0.015 },
+  { key: 'sunLanding', range: [0.59, 1.0], Component: SunLandingScene, transitionDuration: 2.0, fadeZone: 0.01 },
 ];
 
 // Development environment detection
@@ -128,31 +128,29 @@ export default function CosmicJourneyController() {
       
       // Special handling for Dormant scene
       if (scene.key === 'dormant') {
-        // Full opacity at start
         if (scrollProgress <= scene.range[0]) return 1;
-        
-        // Gradual fade out during overlap with Awakening
         if (scrollProgress <= end) {
           return getDissolveOpacity(
             scrollProgress,
             scene.range[0],
             scene.range[1],
-            scene.fadeZone
+            scene.fadeZone,
+            true // Enable smooth fade for dormant scene
           );
         }
-        
         return 0;
       }
       
-      // Extended pre-fade and post-fade zero opacity zones
-      if (scrollProgress <= start + 0.005) return 0;
-      if (scrollProgress >= end - 0.005) return 0;
+      // Adjusted fade zones for smoother transitions
+      if (scrollProgress <= start + 0.01) return 0;
+      if (scrollProgress >= end - 0.01) return 0;
       
       return getDissolveOpacity(
         scrollProgress,
         scene.range[0],
         scene.range[1],
-        scene.fadeZone
+        scene.fadeZone,
+        false // Standard fade for other scenes
       );
     });
   }, [scrollProgress]);

@@ -29,7 +29,7 @@ export const HOME_V5_SECTIONS = [
   },
   {
     id: 'mission_statement',
-    position: 200,
+    position: 180,
     component: MissionStatement,
     props: {}
   },
@@ -41,25 +41,25 @@ export const HOME_V5_SECTIONS = [
   },
   {
     id: 'service_ring',
-    position: 400,
+    position: 370,
     component: ServicesOrbital,
     props: {}
   },
   {
     id: 'project_gallery',
-    position: 550,
+    position: 450,
     component: ProjectsLogbook,
     props: {}
   },
   {
     id: 'community_hub',
-    position: 600,
+    position: 470,
     component: CommunityHub,
     props: {}
   },
   {
     id: 'ai_testimonials',
-    position: 650,
+    position: 590,
     component: HearFromAI,
     props: {}
   },
