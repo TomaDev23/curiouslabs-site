@@ -85,7 +85,7 @@ export default function Moon({
       position={position}
       glowColor={sceneStyles.glowColor}
       glowSize={glowSize}
-      zIndex={20}
+      zIndex={35}
       parallaxFactor={parallaxFactor}
       parallaxStyle={parallaxStyle}
       style={{ 

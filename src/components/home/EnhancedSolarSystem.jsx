@@ -1,3 +1,4 @@
+// 🛡️ STAR_LOCKED: Do not remove or alter – see STAR_LOCK_V1.md
 import React, { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';

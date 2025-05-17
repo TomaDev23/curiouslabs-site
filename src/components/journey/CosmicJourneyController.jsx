@@ -10,7 +10,7 @@ import SceneBackdrop from './visual/SceneBackdrop';
 import ConstellationGlow from './visual/ConstellationGlow';
 import { useParticlePerformanceConfig } from './hooks/useParticlePerformanceConfig';
 import { useSceneVisibility } from './hooks/useSceneVisibility';
-import { getDissolveOpacity } from '../../utils/dissolveEngine';
+import { getDissolveOpacity, getDissolveZIndex, getFadeBlendClass } from '../../utils/dissolveEngine';
 import PersistentElements from './PersistentElements';
 import GlobalParticleSystem from './visual/GlobalParticleSystem';
 import withDraggable from '../../components/ui/DraggableHOC';
@@ -26,12 +26,12 @@ const metadata = {
 
 // Define scenes with their scroll ranges
 const SCENES = [
-  { key: 'dormant', range: [0.0, 0.05], Component: DormantScene, transitionDuration: 1.0, fadeZone: 0.01 },
-  { key: 'awakening', range: [0.05, 0.15], Component: AwakeningScene, transitionDuration: 1.0, fadeZone: 0.015 },
-  { key: 'cosmicReveal', range: [0.15, 0.3], Component: CosmicRevealScene, transitionDuration: 0.8, fadeZone: 0.015 },
-  { key: 'cosmicFlight', range: [0.3, 0.8], Component: CosmicFlightScene, transitionDuration: 0.6, fadeZone: 0.015 },
-  { key: 'sunApproach', range: [0.8, 0.9], Component: SunApproachScene, transitionDuration: 1.0, fadeZone: 0.015 },
-  { key: 'sunLanding', range: [0.9, 1.0], Component: SunLandingScene, transitionDuration: 1.0, fadeZone: 0.01 },
+  { key: 'dormant', range: [0.0, 0.08], Component: DormantScene, transitionDuration: 3.5, fadeZone: 0.08 },
+  { key: 'awakening', range: [0.05, 0.15], Component: AwakeningScene, transitionDuration: 3.5, fadeZone: 0.08 },
+  { key: 'cosmicReveal', range: [0.15, 0.3], Component: CosmicRevealScene, transitionDuration: 3.5, fadeZone: 0.08 },
+  { key: 'cosmicFlight', range: [0.3, 0.8], Component: CosmicFlightScene, transitionDuration: 2.0, fadeZone: 0.015 },
+  { key: 'sunApproach', range: [0.8, 0.9], Component: SunApproachScene, transitionDuration: 2.0, fadeZone: 0.015 },
+  { key: 'sunLanding', range: [0.9, 1.0], Component: SunLandingScene, transitionDuration: 2.0, fadeZone: 0.01 },
 ];
 
 // Development environment detection
@@ -90,6 +90,22 @@ export const SceneDebugOverlay = (props) => {
   return <DraggableSceneDebugOverlay {...props} />;
 };
 
+// Calculate which scenes should be visible based on scroll position and fade zones
+const getVisibleScenes = (scrollProgress, scenes) => {
+  return scenes.filter(scene => {
+    const start = scene.range[0] - scene.fadeZone;
+    const end = scene.range[1] + scene.fadeZone;
+    
+    // Special case for Dormant scene to ensure proper overlap with Awakening
+    if (scene.key === 'dormant') {
+      return scrollProgress <= (scene.range[1] + scene.fadeZone);
+    }
+    
+    // Mount earlier and unmount later to ensure proper fade handling
+    return scrollProgress >= (start - 0.02) && scrollProgress <= (end + 0.02);
+  });
+};
+
 export default function CosmicJourneyController() {
   const [scrollProgress, setScrollProgress] = useState(0);
   const [sceneProgress, setSceneProgress] = useState(0);
@@ -104,14 +120,41 @@ export default function CosmicJourneyController() {
   // Use our custom hook for performance-optimized particle config
   const globalParticleConfig = useParticlePerformanceConfig(currentSceneKey);
   
-  // Use our custom hook for scene visibility management
-  const visibleScenes = useSceneVisibility(SCENES, scrollProgress, validSceneIndex);
-  
-  // Calculate scene opacities using dissolveEngine
+  // Calculate scene opacities using enhanced dissolveEngine
   const sceneOpacities = useMemo(() => {
-    return SCENES.map(scene => 
-      getDissolveOpacity(scrollProgress, scene.range[0], scene.range[1], scene.fadeZone)
-    );
+    return SCENES.map(scene => {
+      const start = scene.range[0] - scene.fadeZone;
+      const end = scene.range[1] + scene.fadeZone;
+      
+      // Special handling for Dormant scene
+      if (scene.key === 'dormant') {
+        // Full opacity at start
+        if (scrollProgress <= scene.range[0]) return 1;
+        
+        // Gradual fade out during overlap with Awakening
+        if (scrollProgress <= end) {
+          return getDissolveOpacity(
+            scrollProgress,
+            scene.range[0],
+            scene.range[1],
+            scene.fadeZone
+          );
+        }
+        
+        return 0;
+      }
+      
+      // Extended pre-fade and post-fade zero opacity zones
+      if (scrollProgress <= start + 0.005) return 0;
+      if (scrollProgress >= end - 0.005) return 0;
+      
+      return getDissolveOpacity(
+        scrollProgress,
+        scene.range[0],
+        scene.range[1],
+        scene.fadeZone
+      );
+    });
   }, [scrollProgress]);
   
   // Store last scroll position to prevent unnecessary updates
@@ -275,47 +318,61 @@ export default function CosmicJourneyController() {
     };
   };
 
+  // Add fade blend styles
+  useEffect(() => {
+    const styleEl = document.createElement('style');
+    styleEl.textContent = getFadeBlendClass();
+    document.head.appendChild(styleEl);
+    return () => styleEl.remove();
+  }, []);
+
+  // Get visible scenes
+  const visibleScenes = useMemo(() => 
+    getVisibleScenes(scrollProgress, SCENES),
+    [scrollProgress]
+  );
+
   return (
     <div className="w-full text-white">
       <GlobalParticleSystem 
-        scrollProgress={smoothScrollProgress} 
-        activeScene={currentScene} 
+        scrollProgress={scrollProgress} 
+        activeScene={currentSceneKey}
         sceneProgress={sceneProgress}
       />
       
-      {/* Global color overlay */}
       <ColorOverlay />
       
-      {/* Container for all scenes */}
       <div className="relative">
-        {/* Fixed container for scene visibility control */}
-        <div 
-          className="fixed inset-0 z-0 overflow-hidden"
-          style={{ 
-            willChange: 'transform',
-            contain: 'strict'  // Containment for rendering optimization
-          }}
-        >
-          {SCENES.map(({ key, Component, transitionDuration }, index) => (
-            <div
-              key={key}
-              style={{
-                opacity: sceneOpacities[index],
-                transition: `opacity ${transitionDuration}s ease-in-out`, // Variable transitions
-                position: 'absolute',
-                inset: 0,
-                zIndex: validSceneIndex === index ? 1 : 0,
-                display: visibleScenes.includes(key) ? 'block' : 'none', // Only render visible scenes
-              }}
-            >
-              {visibleScenes.includes(key) && (
+        <div className="fixed inset-0 z-0 overflow-hidden">
+          {SCENES.map(({ key, Component, transitionDuration }, index) => {
+            const isVisible = visibleScenes.includes(SCENES[index]);
+            const opacity = sceneOpacities[index];
+            const baseZIndex = index * 10;
+            
+            // Only mount when scene should be visible
+            if (!isVisible) return null;
+            
+            return (
+              <div
+                key={key}
+                style={{
+                  opacity,
+                  transition: `opacity ${transitionDuration}s cubic-bezier(0.4, 0.0, 0.2, 1)`,
+                  position: 'absolute',
+                  inset: 0,
+                  zIndex: getDissolveZIndex(opacity, baseZIndex),
+                  visibility: opacity === 0 ? 'hidden' : 'visible',
+                }}
+                className="scene-layer"
+              >
                 <Component 
                   progress={sceneProgress}
+                  scrollProgress={smoothScrollProgress}
                   particleConfig={globalParticleConfig}
                 />
-              )}
-            </div>
-          ))}
+              </div>
+            );
+          })}
         </div>
         
         {/* Global scene backdrop with all visual effects */}
@@ -404,17 +461,13 @@ export default function CosmicJourneyController() {
           </div>
         )}
         
-        {/* Spacer elements to create scroll height - now 7 sections for 700vh */}
+        {/* Spacer elements for scroll height */}
         <div className="pointer-events-none">
-          {/* Create 7 sections instead of 6 to match 700vh height */}
           {Array.from({ length: 7 }).map((_, i) => (
             <section
               key={i}
               data-scroll-zone={i}
               className="h-screen w-full"
-              style={{
-                borderBottom: 'none'
-              }}
             />
           ))}
         </div>

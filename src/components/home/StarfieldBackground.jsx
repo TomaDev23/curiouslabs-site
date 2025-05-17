@@ -1,3 +1,4 @@
+// 🛡️ STAR_LOCKED: Do not remove or alter – see STAR_LOCK_V1.md
 import React, { useEffect, useRef } from 'react';
 
 /**

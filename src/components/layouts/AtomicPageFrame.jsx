@@ -7,6 +7,7 @@ import { AdvancedControlPanel } from './AdvancedControlPanel';
 import { HOME_V5_SECTIONS, SectionRegistry } from '../../config/SectionRegistry';
 import HUDHub, { HUDProvider } from '../ui/HUDHub';
 import withDraggable from '../ui/DraggableHOC';
+import BaseStarfieldBackdrop from '../home/v5/BaseStarfieldBackdrop';
 
 // LEGIT compliance metadata
 export const metadata = {
@@ -115,13 +116,23 @@ export const AtomicPageFrame = forwardRef(({ scenes = [], scrollProgress = 0 }, 
     const position = Math.max(0, Math.min(1000, newPosition));
     
     // Update the section position
-    setSections(prevSections => 
-      prevSections.map(section => 
+    setSections(prevSections => {
+      const newSections = prevSections.map(section => 
         section.id === id 
           ? { ...section, position } 
           : section
-      )
-    );
+      );
+      
+      // Auto-save to localStorage for immediate persistence
+      try {
+        const positionsToSave = newSections.map(({ id, position }) => ({ id, position }));
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(positionsToSave));
+      } catch (e) {
+        console.warn('Auto-save failed:', e);
+      }
+      
+      return newSections;
+    });
   };
   
   // For backward compatibility - use handleSectionDrag
@@ -130,14 +141,34 @@ export const AtomicPageFrame = forwardRef(({ scenes = [], scrollProgress = 0 }, 
   // Save current positions to localStorage
   const handleSavePositions = () => {
     try {
-      // Extract just the id and position for storage
-      const positionsToSave = sections.map(({ id, position }) => ({ id, position }));
+      // Validate sections before saving
+      if (!sections || !Array.isArray(sections)) {
+        throw new Error('Invalid sections data');
+      }
+      
+      // Extract and validate positions
+      const positionsToSave = sections.map(section => {
+        if (!section.id || typeof section.position !== 'number') {
+          throw new Error(`Invalid section data: ${JSON.stringify(section)}`);
+        }
+        return {
+          id: section.id,
+          position: Math.max(0, Math.min(1000, section.position)) // Ensure valid range
+        };
+      });
+      
+      // Save positions
       localStorage.setItem(STORAGE_KEY, JSON.stringify(positionsToSave));
       
-      // Also save visibility state
-      localStorage.setItem(VISIBILITY_KEY, JSON.stringify(hiddenSections));
+      // Save visibility state
+      if (Array.isArray(hiddenSections)) {
+        localStorage.setItem(VISIBILITY_KEY, JSON.stringify(hiddenSections));
+      }
       
       alert('Section positions and visibility saved successfully!');
+      
+      // Log for verification
+      console.log('Saved positions:', positionsToSave);
     } catch (e) {
       console.error('Error saving positions:', e);
       alert('Error saving positions. See console for details.');
@@ -199,6 +230,7 @@ export const AtomicPageFrame = forwardRef(({ scenes = [], scrollProgress = 0 }, 
       >
         {/* Base Layer (z-0 to z-9): CosmicJourneyController */}
         <div className="fixed inset-0 z-0" data-legit-layer="base">
+          <BaseStarfieldBackdrop />
           <CosmicJourneyController />
         </div>
         
