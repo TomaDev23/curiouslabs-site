@@ -21,6 +21,128 @@ const PERFORMANCE_THRESHOLD_LOAD = 200; // ms
 const FPS_SAMPLE_SIZE = 10;
 
 /**
+ * Performance monitoring utilities for canvas animations
+ * LEGIT-compliant performance tracking
+ */
+
+// Performance thresholds (in ms)
+export const PERF_THRESHOLDS = {
+  FRAME_BUDGET: 16.67,      // 60fps target
+  WARN: 25.0,              // 40fps
+  CRITICAL: 33.33          // 30fps
+};
+
+class PerformanceMonitor {
+  constructor() {
+    this.metrics = new Map();
+    this.frameHistory = new Array(60).fill(0);
+    this.historyIndex = 0;
+    this.enabled = process.env.NODE_ENV === 'development';
+    this.warningThreshold = 3; // Number of consecutive slow frames before warning
+    this.slowFrameCount = 0;
+  }
+
+  /**
+   * Start timing a component's frame
+   * @param {string} componentId - Unique identifier for the component
+   */
+  startFrame(componentId) {
+    if (!this.enabled) return;
+    
+    if (!this.metrics.has(componentId)) {
+      this.metrics.set(componentId, {
+        lastFrameTime: 0,
+        frameCount: 0,
+        totalTime: 0,
+        maxTime: 0,
+        warnings: 0
+      });
+    }
+
+    const metric = this.metrics.get(componentId);
+    metric.frameStart = performance.now();
+  }
+
+  /**
+   * End timing for a component's frame
+   * @param {string} componentId - Unique identifier for the component
+   * @param {Object} details - Additional timing details
+   */
+  endFrame(componentId, details = {}) {
+    if (!this.enabled) return;
+
+    const metric = this.metrics.get(componentId);
+    if (!metric || !metric.frameStart) return;
+
+    const frameDuration = performance.now() - metric.frameStart;
+    
+    // Update metrics
+    metric.frameCount++;
+    metric.totalTime += frameDuration;
+    metric.maxTime = Math.max(metric.maxTime, frameDuration);
+    metric.lastFrameTime = frameDuration;
+
+    // Update frame history
+    this.frameHistory[this.historyIndex] = frameDuration;
+    this.historyIndex = (this.historyIndex + 1) % this.frameHistory.length;
+
+    // Check for performance issues
+    if (frameDuration > PERF_THRESHOLDS.WARN) {
+      this.slowFrameCount++;
+      if (this.slowFrameCount >= this.warningThreshold) {
+        metric.warnings++;
+        console.warn(
+          `Performance warning in ${componentId}:`,
+          `\n- Frame time: ${frameDuration.toFixed(2)}ms`,
+          `\n- Average: ${(metric.totalTime / metric.frameCount).toFixed(2)}ms`,
+          `\n- Max: ${metric.maxTime.toFixed(2)}ms`,
+          `\n- Details:`, details
+        );
+        this.slowFrameCount = 0;
+      }
+    } else {
+      this.slowFrameCount = Math.max(0, this.slowFrameCount - 1);
+    }
+  }
+
+  /**
+   * Get performance report for a component
+   * @param {string} componentId - Unique identifier for the component
+   */
+  getReport(componentId) {
+    if (!this.enabled) return null;
+
+    const metric = this.metrics.get(componentId);
+    if (!metric) return null;
+
+    const avgTime = metric.totalTime / metric.frameCount;
+    const recentAvg = this.frameHistory.reduce((a, b) => a + b, 0) / this.frameHistory.length;
+
+    return {
+      frameCount: metric.frameCount,
+      averageTime: avgTime,
+      maxTime: metric.maxTime,
+      lastFrameTime: metric.lastFrameTime,
+      recentAverageTime: recentAvg,
+      warnings: metric.warnings,
+      isHealthy: avgTime < PERF_THRESHOLDS.WARN
+    };
+  }
+
+  /**
+   * Reset metrics for a component
+   * @param {string} componentId - Unique identifier for the component
+   */
+  reset(componentId) {
+    if (!this.enabled) return;
+    this.metrics.delete(componentId);
+    this.slowFrameCount = 0;
+  }
+}
+
+export const performanceMonitor = new PerformanceMonitor();
+
+/**
  * Start tracking a component render
  * @param {string} componentName - The name of the component being rendered
  * @returns {number} Start time for the render

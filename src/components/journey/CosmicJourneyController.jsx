@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import DormantScene from './scenes/DormantScene';
 import AwakeningScene from './scenes/AwakeningScene';
 import CosmicRevealScene from './scenes/CosmicRevealScene';
@@ -15,6 +15,8 @@ import PersistentElements from './PersistentElements';
 import GlobalParticleSystem from './visual/GlobalParticleSystem';
 import withDraggable from '../../components/ui/DraggableHOC';
 import { useHUDContext } from '../../components/ui/HUDHub';
+import { ScrollPipeline } from '../../utils/scrollPipeline';
+import { performanceMonitor, PERF_THRESHOLDS } from '../../utils/performanceMonitor';
 
 // LEGIT-compliant metadata
 const metadata = {
@@ -26,12 +28,12 @@ const metadata = {
 
 // Define scenes with their scroll ranges - aligned with saved section positions
 const SCENES = [
-  { key: 'dormant', range: [0.0, 0.08], Component: DormantScene, transitionDuration: 3.5, fadeZone: 0.08 },
-  { key: 'awakening', range: [0.05, 0.18], Component: AwakeningScene, transitionDuration: 3.5, fadeZone: 0.08 },
-  { key: 'cosmicReveal', range: [0.15, 0.37], Component: CosmicRevealScene, transitionDuration: 3.5, fadeZone: 0.08 },
-  { key: 'cosmicFlight', range: [0.37, 0.45], Component: CosmicFlightScene, transitionDuration: 2.0, fadeZone: 0.015 },
-  { key: 'sunApproach', range: [0.45, 0.59], Component: SunApproachScene, transitionDuration: 2.0, fadeZone: 0.015 },
-  { key: 'sunLanding', range: [0.59, 1.0], Component: SunLandingScene, transitionDuration: 2.0, fadeZone: 0.01 },
+  { key: 'dormant', range: [0.0, 0.08], Component: DormantScene, transitionDuration: 3.5, fadeZone: 0.05 },
+  { key: 'awakening', range: [0.05, 0.15], Component: AwakeningScene, transitionDuration: 3.5, fadeZone: 0.05 },
+  { key: 'cosmicReveal', range: [0.15, 0.30], Component: CosmicRevealScene, transitionDuration: 3.5, fadeZone: 0.05 },
+  { key: 'cosmicFlight', range: [0.30, 0.75], Component: CosmicFlightScene, transitionDuration: 2.0, fadeZone: 0.04 },
+  { key: 'sunApproach', range: [0.75, 0.89], Component: SunApproachScene, transitionDuration: 2.0, fadeZone: 0.04 },
+  { key: 'sunLanding', range: [0.89, 1.0], Component: SunLandingScene, transitionDuration: 2.0, fadeZone: 0.04 }
 ];
 
 // Development environment detection
@@ -93,23 +95,42 @@ export const SceneDebugOverlay = (props) => {
 // Calculate which scenes should be visible based on scroll position and fade zones
 const getVisibleScenes = (scrollProgress, scenes) => {
   return scenes.filter(scene => {
-    const start = scene.range[0] - scene.fadeZone;
-    const end = scene.range[1] + scene.fadeZone;
+    const extendedFadeZone = scene.fadeZone * 1.5;
+    const start = scene.range[0] - extendedFadeZone;
+    const end = scene.range[1] + extendedFadeZone;
     
-    // Special case for Dormant scene to ensure proper overlap with Awakening
+    // Special case for Dormant scene - always visible until fully faded
     if (scene.key === 'dormant') {
-      return scrollProgress <= (scene.range[1] + scene.fadeZone);
+      return scrollProgress <= 0.15; // Keep mounted until awakening scene is fully established
     }
     
-    // Mount earlier and unmount later to ensure proper fade handling
-    return scrollProgress >= (start - 0.02) && scrollProgress <= (end + 0.02);
+    // Special case for awakening - keep mounted longer
+    if (scene.key === 'awakening') {
+      return scrollProgress >= (start - 0.05) && scrollProgress <= (end + 0.05);
+    }
+    
+    // Special case for scene transitions
+    if (scene.key === 'cosmicReveal' && scrollProgress >= scene.range[1] - 0.02) {
+      return true; // Keep visible slightly longer
+    }
+    if (scene.key === 'cosmicFlight' && scrollProgress <= scene.range[0] + 0.02) {
+      return true; // Start mounting slightly earlier
+    }
+    
+    // More generous mounting/unmounting
+    return scrollProgress >= (start - 0.03) && scrollProgress <= (end + 0.03);
   });
 };
 
-export default function CosmicJourneyController() {
+// Performance monitoring constants
+const FRAME_BUDGET = 16.67; // 60fps target
+const WARN_THRESHOLD = FRAME_BUDGET * 1.5; // 150% of budget
+
+export default function CosmicJourneyController({ children }) {
   const [scrollProgress, setScrollProgress] = useState(0);
   const [sceneProgress, setSceneProgress] = useState(0);
   const [validSceneIndex, setValidSceneIndex] = useState(0);
+  const [performanceStats, setPerformanceStats] = useState(null);
   
   // Check if device is mobile
   const isMobile = useRef(window.innerWidth <= 768);
@@ -123,35 +144,54 @@ export default function CosmicJourneyController() {
   // Calculate scene opacities using enhanced dissolveEngine
   const sceneOpacities = useMemo(() => {
     return SCENES.map(scene => {
-      const start = scene.range[0] - scene.fadeZone;
-      const end = scene.range[1] + scene.fadeZone;
-      
-      // Special handling for Dormant scene
+      // Special handling for dormant scene - extend into awakening scene
       if (scene.key === 'dormant') {
-        if (scrollProgress <= scene.range[0]) return 1;
-        if (scrollProgress <= end) {
-          return getDissolveOpacity(
-            scrollProgress,
-            scene.range[0],
-            scene.range[1],
-            scene.fadeZone,
-            true // Enable smooth fade for dormant scene
-          );
+        if (scrollProgress <= 0.05) return 1; // Full opacity until awakening starts
+        if (scrollProgress <= 0.15) { // Extended fade through awakening
+          // Smooth fade out during overlap with awakening
+          const fadeProgress = (scrollProgress - 0.05) / 0.10; // Extended fade duration
+          return Math.cos(fadeProgress * Math.PI / 2); // Cosine easing for ultra-smooth fade
         }
         return 0;
       }
-      
-      // Adjusted fade zones for smoother transitions
-      if (scrollProgress <= start + 0.01) return 0;
-      if (scrollProgress >= end - 0.01) return 0;
-      
-      return getDissolveOpacity(
+
+      // Calculate base opacity with scene-specific options
+      const baseOpacity = getDissolveOpacity(
         scrollProgress,
         scene.range[0],
         scene.range[1],
         scene.fadeZone,
-        false // Standard fade for other scenes
+        {
+          smoothFade: true,
+          fadeInBuffer: scene.key === 'awakening' ? 0.05 : 0.02, // Longer fade-in for awakening
+          fadeOutBuffer: scene.key === 'sunLanding' ? 0.03 : 0.02,
+          easeIntensity: scene.key === 'cosmicFlight' ? 1.8 : 1.5
+        }
       );
+
+      // Special handling for awakening scene to complement dormant fade
+      if (scene.key === 'awakening') {
+        if (scrollProgress <= 0.05) return 0; // Start completely transparent
+        if (scrollProgress <= 0.15) { // Extended fade-in to match dormant fade-out
+          const fadeInProgress = (scrollProgress - 0.05) / 0.10;
+          return Math.sin(fadeInProgress * Math.PI / 2); // Sine easing for complementary fade
+        }
+        // After 0.15, use the base opacity calculation
+        return baseOpacity;
+      }
+
+      // Rest of the special transition handling
+      if (scene.key === 'cosmicReveal' && scrollProgress >= scene.range[1] - 0.02) {
+        const transitionProgress = (scrollProgress - (scene.range[1] - 0.02)) / 0.02;
+        return baseOpacity * (1 - transitionProgress);
+      }
+      
+      if (scene.key === 'cosmicFlight' && scrollProgress <= scene.range[0] + 0.02) {
+        const transitionProgress = (scrollProgress - scene.range[0]) / 0.02;
+        return baseOpacity * transitionProgress;
+      }
+
+      return baseOpacity;
     });
   }, [scrollProgress]);
   
@@ -164,6 +204,79 @@ export default function CosmicJourneyController() {
   const [smoothScrollProgress, setSmoothScrollProgress] = useState(0);
   const animationRef = useRef(null);
   
+  // Animation system refs
+  const effectRefs = useRef({
+    particles: null,
+    aurora: null,
+    starfield: null
+  });
+  
+  const lastFrameTime = useRef(0);
+  const animationFrameId = useRef(null);
+  const isAnimating = useRef(true);
+
+  // Frame performance monitoring
+  const monitorFramePerformance = useCallback((delta) => {
+    if (delta > WARN_THRESHOLD) {
+      console.warn(`Frame time exceeded budget: ${delta.toFixed(2)}ms`);
+      // Log active effects for debugging
+      Object.entries(effectRefs.current).forEach(([name, effect]) => {
+        if (effect?.isActive) {
+          console.log(`Active effect: ${name}`);
+        }
+      });
+    }
+  }, []);
+
+  // Master animation loop
+  const masterAnimationLoop = useCallback((timestamp) => {
+    if (!isAnimating.current) return;
+
+    // Calculate delta time
+    const delta = lastFrameTime.current ? timestamp - lastFrameTime.current : 0;
+    lastFrameTime.current = timestamp;
+
+    // Monitor performance in development
+    if (process.env.NODE_ENV === 'development') {
+      monitorFramePerformance(delta);
+    }
+
+    // Update all effect systems
+    const { particles, aurora, starfield } = effectRefs.current;
+    
+    if (particles?.update) {
+      particles.update(delta, smoothScrollProgress);
+    }
+    if (aurora?.update) {
+      aurora.update(delta, smoothScrollProgress);
+    }
+    if (starfield?.update) {
+      starfield.update(delta, smoothScrollProgress);
+    }
+
+    // Schedule next frame
+    animationFrameId.current = requestAnimationFrame(masterAnimationLoop);
+  }, [smoothScrollProgress, monitorFramePerformance]);
+
+  // Initialize and cleanup animation loop
+  useEffect(() => {
+    isAnimating.current = true;
+    lastFrameTime.current = performance.now();
+    animationFrameId.current = requestAnimationFrame(masterAnimationLoop);
+
+    return () => {
+      isAnimating.current = false;
+      if (animationFrameId.current) {
+        cancelAnimationFrame(animationFrameId.current);
+      }
+    };
+  }, [masterAnimationLoop]);
+
+  // Effect registration function
+  const registerEffect = useCallback((type, effectInstance) => {
+    effectRefs.current[type] = effectInstance;
+  }, []);
+
   // Handle scroll events with advanced smoothing and interpolation
   useEffect(() => {
     let animationFrameId = null;
@@ -330,6 +443,41 @@ export default function CosmicJourneyController() {
     [scrollProgress]
   );
 
+  // Performance monitoring
+  const checkPerformance = useCallback(() => {
+    if (process.env.NODE_ENV === 'development') {
+      const report = performanceMonitor.getReport(metadata.id);
+      if (report) {
+        setPerformanceStats(report);
+        
+        // Log performance issues to console
+        if (!report.isHealthy) {
+          console.warn('CosmicJourney Performance Report:', {
+            ...report,
+            threshold: PERF_THRESHOLDS.WARN,
+            budget: PERF_THRESHOLDS.FRAME_BUDGET
+          });
+        }
+      }
+    }
+  }, []);
+
+  // Initialize ScrollPipeline and performance monitoring
+  useEffect(() => {
+    ScrollPipeline.init();
+    const cleanup = ScrollPipeline.subscribe(setScrollProgress);
+    
+    // Setup performance check interval
+    const perfInterval = setInterval(checkPerformance, 5000);
+    
+    return () => {
+      cleanup();
+      ScrollPipeline.cleanup();
+      clearInterval(perfInterval);
+      performanceMonitor.reset(metadata.id);
+    };
+  }, [checkPerformance]);
+
   return (
     <div className="w-full text-white">
       <GlobalParticleSystem 
@@ -342,24 +490,26 @@ export default function CosmicJourneyController() {
       
       <div className="relative">
         <div className="fixed inset-0 z-0 overflow-hidden">
-          {SCENES.map(({ key, Component, transitionDuration }, index) => {
+          {SCENES.map(({ key, Component }, index) => {
             const isVisible = visibleScenes.includes(SCENES[index]);
             const opacity = sceneOpacities[index];
             const baseZIndex = index * 10;
             
-            // Only mount when scene should be visible
             if (!isVisible) return null;
             
             return (
               <div
                 key={key}
                 style={{
-                  opacity,
-                  transition: `opacity ${transitionDuration}s cubic-bezier(0.4, 0.0, 0.2, 1)`,
+                  opacity: Math.max(0, Math.min(1, opacity || 0)),
                   position: 'absolute',
                   inset: 0,
+                  willChange: 'opacity, transform',
+                  transform: 'translateZ(0)',
+                  contain: 'paint layout',
                   zIndex: getDissolveZIndex(opacity, baseZIndex),
-                  visibility: opacity === 0 ? 'hidden' : 'visible',
+                  visibility: opacity <= 0.01 ? 'hidden' : 'visible',
+                  pointerEvents: opacity > 0.1 ? 'auto' : 'none'
                 }}
                 className="scene-layer"
               >
@@ -367,6 +517,7 @@ export default function CosmicJourneyController() {
                   progress={sceneProgress}
                   scrollProgress={smoothScrollProgress}
                   particleConfig={globalParticleConfig}
+                  onRegisterEffect={registerEffect}
                 />
               </div>
             );

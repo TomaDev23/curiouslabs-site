@@ -76,18 +76,24 @@ A component is properly layered only if it:
    - Must support proper stacking with semi-transparent elements above
    - Must not capture pointer events intended for higher layers
    - Must provide renderless layout options for performance critical scenes
+   - Must use optimized canvas container for all canvas elements
+   - Must integrate with master animation loop
+   - Must implement frame timing diagnostics
 
 2. **Content Layer Elements**
    - Must be organized within the ContentLayer component
    - Must respect section hierarchy and relative positions
    - Must not have z-index conflicts within their section groups
    - Must remain navigable and accessible even when HUDs are active
+   - Must use centralized scroll pipeline for animations
+   - Must implement proper cleanup for performance monitoring
 
 3. **UI Control Layer Elements**
    - Must use consistent z-index values for similar controls
    - Must properly handle focus states and keyboard navigation
    - Must respect the UI control hierarchy
    - Must not interfere with navigation elements
+   - Must integrate with performance monitoring system
 
 4. **HUD Layer Elements**
    - Must be managed exclusively by HUDManager
@@ -95,17 +101,22 @@ A component is properly layered only if it:
    - Must respect position persistence and layout rules
    - Must automatically adjust for viewport constraints
    - Must not block critical navigation elements
+   - Must include performance monitoring HUDs when in development
+   - Must respect frame timing thresholds
 
 5. **Navigation Layer Elements**
    - Must always remain accessible and visible
    - Must use proper stacking to ensure they appear above other elements
    - Must handle focus management appropriately
    - Must remain functional regardless of scroll position
+   - Must not impact scroll performance
 
 6. **Debug Overlay Layer Elements**
    - Must be clearly visible above all other elements
    - Must provide methods to temporarily hide them if needed
    - Must not interfere with application functionality even when visible
+   - Must include frame timing diagnostics
+   - Must show performance metrics when enabled
 
 ### 3.2 Controller Responsibilities
 
@@ -113,11 +124,16 @@ A component is properly layered only if it:
    - Manages all Base Layer elements
    - Controls 3D scene rendering and optimization
    - Handles camera and view perspectives
+   - Implements master animation loop
+   - Monitors frame timing and performance
+   - Manages canvas optimization
 
 2. **ContentLayer & SectionRegistry**
    - Manages all Content Layer elements
    - Controls section positioning and visibility
    - Handles section loading and unloading
+   - Integrates with ScrollPipeline
+   - Monitors scroll performance impact
 
 3. **UIController**
    - Manages all UI Control Layer elements

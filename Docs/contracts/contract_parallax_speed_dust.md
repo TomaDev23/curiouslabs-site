@@ -94,17 +94,42 @@ const defaultProps = {
 - Guaranteed minimum particle count
 - Automatic recovery from missing particles
 - Proper canvas context setup
+- Integration with optimized CanvasContainer
+- Hardware acceleration enabled by default
 
 ### Runtime
-- Efficient particle updates
+- Efficient particle updates through master animation loop
+- Integration with centralized ScrollPipeline
+- Frame timing diagnostics and monitoring
 - Proper animation state tracking
 - Cleanup on unmount
 - Hardware acceleration when available
+
+### Performance Monitoring
+- Real-time frame timing tracking
+- Performance thresholds:
+  - Target: 16.67ms (60fps)
+  - Warning: 25.0ms (40fps)
+  - Critical: 33.33ms (30fps)
+- Detailed metrics collection:
+  - Particles drawn/skipped
+  - Frame duration
+  - Scene opacity
+  - Animation state
 
 ### Mobile Optimization
 - Reduced particle count on mobile
 - Optimized render cycles
 - Touch event handling
+- Dynamic FPS adjustment
+- Hardware acceleration flags
+
+### Canvas Optimization
+- DPI-aware rendering
+- Efficient resize handling
+- Proper cleanup of resources
+- Optimized clearing strategy
+- GPU acceleration enabled
 
 ---
 
@@ -115,18 +140,24 @@ const defaultProps = {
 - [ ] Depth band visibility check
 - [ ] Scroll transition smoothness
 - [ ] Mobile rendering quality
+- [ ] Canvas optimization verification
+- [ ] Hardware acceleration check
 
 ### Performance Tests
 - [ ] FPS monitoring (target: 60fps)
 - [ ] Memory usage tracking
 - [ ] GPU utilization check
 - [ ] Mobile device battery impact
+- [ ] Frame timing verification
+- [ ] Scroll performance impact
 
 ### Integration Tests
 - [ ] Scene transition verification
 - [ ] Scroll position accuracy
 - [ ] Component cleanup check
 - [ ] Error boundary testing
+- [ ] Canvas container integration
+- [ ] ScrollPipeline integration
 
 ---
 

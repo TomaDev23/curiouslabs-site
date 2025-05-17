@@ -23,35 +23,43 @@ function cubicEaseInOut(t) {
  * @param {number} sceneStart - Scene start point (0-1)
  * @param {number} sceneEnd - Scene end point (0-1)
  * @param {number} fadeZone - Size of fade zone (0-1)
- * @param {boolean} smoothFade - Whether to use extra smooth fading
+ * @param {Object} options - Additional options for fine-tuning
  * @returns {number} Opacity value between 0 and 1
  */
-export function getDissolveOpacity(scrollProgress, sceneStart, sceneEnd, fadeZone, smoothFade = false) {
+export function getDissolveOpacity(scrollProgress, sceneStart, sceneEnd, fadeZone, options = {}) {
+  const {
+    smoothFade = true,
+    fadeInBuffer = 0.02,
+    fadeOutBuffer = 0.02,
+    easeIntensity = 1.5
+  } = options;
+
   // Calculate effective boundaries with fade zones
   const fadeInStart = Math.max(0, sceneStart - fadeZone);
-  const fadeInEnd = sceneStart + (fadeZone * (smoothFade ? 0.2 : 0.1));
-  const fadeOutStart = sceneEnd - (fadeZone * (smoothFade ? 0.2 : 0.1));
+  const fadeInEnd = sceneStart + (fadeZone * fadeInBuffer);
+  const fadeOutStart = sceneEnd - (fadeZone * fadeOutBuffer);
   const fadeOutEnd = Math.min(1, sceneEnd + fadeZone);
 
-  // Before fade in or after fade out
-  if (scrollProgress <= fadeInStart || scrollProgress >= fadeOutEnd) {
-    return 0;
-  }
+  // Early exit for out-of-range values
+  if (scrollProgress <= fadeInStart) return 0;
+  if (scrollProgress >= fadeOutEnd) return 0;
 
   // Full opacity between fade zones
   if (scrollProgress >= fadeInEnd && scrollProgress <= fadeOutStart) {
     return 1;
   }
 
-  // Fade in
+  // Calculate fade-in
   if (scrollProgress < fadeInEnd) {
     const progress = (scrollProgress - fadeInStart) / (fadeInEnd - fadeInStart);
-    return smoothFade ? cubicEaseInOut(progress) : progress;
+    const easedProgress = smoothFade ? cubicEaseInOut(progress) : progress;
+    return Math.max(0, Math.min(1, Math.pow(easedProgress, easeIntensity)));
   }
 
-  // Fade out
-  const progress = 1 - (scrollProgress - fadeOutStart) / (fadeOutEnd - fadeOutStart);
-  return smoothFade ? cubicEaseInOut(progress) : progress;
+  // Calculate fade-out
+  const progress = 1 - ((scrollProgress - fadeOutStart) / (fadeOutEnd - fadeOutStart));
+  const easedProgress = smoothFade ? cubicEaseInOut(progress) : progress;
+  return Math.max(0, Math.min(1, Math.pow(easedProgress, easeIntensity)));
 }
 
 /**
@@ -61,16 +69,22 @@ export function getDissolveOpacity(scrollProgress, sceneStart, sceneEnd, fadeZon
  * @returns {number} Z-index value
  */
 export function getDissolveZIndex(opacity, baseZIndex) {
-  return opacity > 0.1 ? baseZIndex : baseZIndex - 1;
+  return Math.round(opacity > 0.1 ? baseZIndex : baseZIndex - 1);
 }
 
 /**
  * Generates optimized CSS for fade transitions
- * @param {number} opacity - Current scene opacity
  * @returns {string} CSS class name for fade blend mode
  */
-export function getFadeBlendClass(opacity) {
-  if (opacity <= 0) return 'hidden';
-  if (opacity >= 1) return 'visible';
-  return 'fade-blend';
+export function getFadeBlendClass() {
+  return `
+    .scene-layer {
+      position: absolute;
+      inset: 0;
+      will-change: opacity, transform;
+      backface-visibility: hidden;
+      transform-style: preserve-3d;
+      contain: paint;
+    }
+  `;
 } 
