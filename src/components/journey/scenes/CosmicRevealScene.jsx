@@ -28,11 +28,6 @@ export default function CosmicRevealScene({ progress = 0, particleConfig = {} })
       
       {/* Three.js backdrop with red cube */}
       <CosmicRevealBackdrop progress={intensity} />
-      
-      {/* Scene label for development */}
-      <div className="absolute bottom-5 right-5 text-white opacity-50">
-        Scene: Cosmic Reveal
-      </div>
     </section>
   );
 } 

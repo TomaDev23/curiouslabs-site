@@ -13,25 +13,28 @@ const metadata = {
   doc: 'contract_cosmic_scene.md'
 };
 
-export default function CosmicFlightScene({ progress = 0, particleConfig = {} }) {
+export default function CosmicFlightScene({ progress = 0, scrollProgress, particleConfig = {} }) {
   const intensity = clamp(progress, 0, 1);
   
-  // Use particle config from controller or defaults
+  // Default values with safe fallbacks
   const { 
     density = 40, 
     fps = 30, 
+    speed = 3,
     hue = 0,
-    glow = 0.8,
-    speed = 3
+    glow = 0.8
   } = particleConfig;
-  
+
   // White stars with enhanced glow
   const starColorHue = "hsl(0, 0%, 100%)";
+
+  // Only render parallax when we're actually in the cosmic flight scene
+  const shouldRenderParallax = scrollProgress >= 0.3 && scrollProgress <= 0.8;
 
   return (
     <section className="h-screen w-screen relative overflow-hidden cosmic-flight-layer">
       {/* Scene backdrop with cosmic warp and mint trails */}
-      <div className="absolute inset-0 z-35">
+      <div className="absolute inset-0 z-[2]">
         <CosmicFlightBackdrop progress={intensity} />
       </div>
 
@@ -42,23 +45,26 @@ export default function CosmicFlightScene({ progress = 0, particleConfig = {} })
           density={density}
           fps={fps}
           baseColor={starColorHue}
-          breathing={false} // No breathing in flight mode - stars streak by
+          breathing={false}
           glow={glow}
         />
       </div>
       
-      {/* Green aurora effects - confirmed working component */}
+      {/* Green aurora effects */}
       <GreenAuroraEffects />
       
-      {/* Parallax Speed Dust - adds streaking particles with parallax effect */}
-      <div className="absolute inset-0 z-20 w-full h-full">
-        <ParallaxSpeedDust
-          opacity={intensity * 0.8}
-          speed={speed || 3}
-          density={density}
-          fps={fps}
-        />
-      </div>
+      {/* Parallax Speed Dust - only render when in scene range */}
+      {shouldRenderParallax && (
+        <div className="absolute inset-0 z-20 w-full h-full">
+          <ParallaxSpeedDust
+            opacity={intensity * 0.8}
+            speed={speed}
+            density={density}
+            fps={fps}
+            scrollProgress={scrollProgress}
+          />
+        </div>
+      )}
       
       {/* Scene title indicator for development */}
       <div className="absolute bottom-10 right-10 text-white text-2xl font-bold opacity-70 z-50">

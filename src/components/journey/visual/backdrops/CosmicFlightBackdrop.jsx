@@ -295,7 +295,7 @@ export default function CosmicFlightBackdrop({ progress = 0 }) {
             opacity: trail.opacity * warpIntensity,
             transform: 'translateX(-100%)',
             animation: `warpTrail ${trail.speed}s ${trail.delay}s infinite linear`,
-            zIndex: 250
+            zIndex: 40
           }}
         />
       ))}

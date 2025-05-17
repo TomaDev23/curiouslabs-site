@@ -33,6 +33,7 @@ export const metadata = {
  * @param {number} props.sceneData.scrollPosition - Current scroll position in vh
  * @param {number} props.scrollProgress - Overall scroll progress (0-1)
  * @param {Object} props.options - Optional visual parameters
+ * @param {boolean} props.options.cameraMovementEnabled - Whether camera movement is enabled
  */
 const GalaxyRenderer = ({
   width,
@@ -526,56 +527,61 @@ const GalaxyRenderer = ({
     
     // Update camera position for each scene
     if (cameraRef.current) {
-      let cameraX = 0;
-      let cameraY = 0;
-      let cameraZ = 30;
+      // 🛠️ ADDED: Check if camera movement is enabled
+      const cameraMovementEnabled = options.cameraMovementEnabled !== undefined ? options.cameraMovementEnabled : true;
       
-      switch (scene) {
-        case 'dormant':
-          // Gentle floating camera
-          cameraX = Math.sin(timeSeconds * 0.5) * 3;
-          cameraY = Math.cos(timeSeconds * 0.3) * 2;
-          cameraZ = 30;
-          break;
-          
-        case 'awakening':
-          // More dynamic movement
-          cameraX = Math.sin(timeSeconds * 0.7) * 5 * progress;
-          cameraY = Math.cos(timeSeconds * 0.5) * 3 * progress;
-          cameraZ = 30 - progress * 5;
-          break;
-          
-        case 'cosmicReveal':
-          // Wider camera movement
-          cameraX = Math.sin(timeSeconds * 0.3) * 8;
-          cameraY = Math.cos(timeSeconds * 0.2) * 5;
-          cameraZ = 25;
-          
-          // Camera shake during explosion
-          if (isExploding) {
-            const shakeIntensity = Math.sin(explosionProgress * Math.PI) * 2;
-            cameraX += (Math.random() - 0.5) * shakeIntensity;
-            cameraY += (Math.random() - 0.5) * shakeIntensity;
-            cameraZ += (Math.random() - 0.5) * shakeIntensity;
-          }
-          break;
-          
-        case 'cosmicFlight':
-          // Smooth orbital camera
-          const circleRadius = 15 + Math.sin(progress * Math.PI * 2) * 5;
-          const circleSpeed = 0.1 + Math.sin(progress * Math.PI) * 0.05;
-          const circleAngle = timeSeconds * circleSpeed;
-          
-          cameraX = Math.sin(circleAngle) * circleRadius;
-          cameraY = Math.cos(circleAngle) * circleRadius * 0.6;
-          cameraZ = 20 + Math.sin(timeSeconds * 0.2) * 5;
-          break;
+      if (cameraMovementEnabled) {
+        let cameraX = 0;
+        let cameraY = 0;
+        let cameraZ = 30;
+        
+        switch (scene) {
+          case 'dormant':
+            // Gentle floating camera
+            cameraX = Math.sin(timeSeconds * 0.5) * 3;
+            cameraY = Math.cos(timeSeconds * 0.3) * 2;
+            cameraZ = 30;
+            break;
+            
+          case 'awakening':
+            // More dynamic movement
+            cameraX = Math.sin(timeSeconds * 0.7) * 5 * progress;
+            cameraY = Math.cos(timeSeconds * 0.5) * 3 * progress;
+            cameraZ = 30 - progress * 5;
+            break;
+            
+          case 'cosmicReveal':
+            // Wider camera movement
+            cameraX = Math.sin(timeSeconds * 0.3) * 8;
+            cameraY = Math.cos(timeSeconds * 0.2) * 5;
+            cameraZ = 25;
+            
+            // Camera shake during explosion
+            if (isExploding) {
+              const shakeIntensity = Math.sin(explosionProgress * Math.PI) * 2;
+              cameraX += (Math.random() - 0.5) * shakeIntensity;
+              cameraY += (Math.random() - 0.5) * shakeIntensity;
+              cameraZ += (Math.random() - 0.5) * shakeIntensity;
+            }
+            break;
+            
+          case 'cosmicFlight':
+            // Smooth orbital camera
+            const circleRadius = 15 + Math.sin(progress * Math.PI * 2) * 5;
+            const circleSpeed = 0.1 + Math.sin(progress * Math.PI) * 0.05;
+            const circleAngle = timeSeconds * circleSpeed;
+            
+            cameraX = Math.sin(circleAngle) * circleRadius;
+            cameraY = Math.cos(circleAngle) * circleRadius * 0.6;
+            cameraZ = 20 + Math.sin(timeSeconds * 0.2) * 5;
+            break;
+        }
+        
+        // Apply camera position with smooth lerp
+        cameraRef.current.position.x += (cameraX - cameraRef.current.position.x) * 0.05;
+        cameraRef.current.position.y += (cameraY - cameraRef.current.position.y) * 0.05;
+        cameraRef.current.position.z += (cameraZ - cameraRef.current.position.z) * 0.05;
       }
-      
-      // Apply camera position with smooth lerp
-      cameraRef.current.position.x += (cameraX - cameraRef.current.position.x) * 0.05;
-      cameraRef.current.position.y += (cameraY - cameraRef.current.position.y) * 0.05;
-      cameraRef.current.position.z += (cameraZ - cameraRef.current.position.z) * 0.05;
       
       // Always look at center
       cameraRef.current.lookAt(0, 0, 0);

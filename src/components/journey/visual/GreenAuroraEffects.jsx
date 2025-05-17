@@ -3,7 +3,7 @@ import React from 'react';
 // Green aurora effects for the cosmic flight scene
 export default function GreenAuroraEffects() {
   return (
-    <div className="absolute inset-0 w-full h-full overflow-hidden" style={{ zIndex: 30 }}>
+    <div className="absolute inset-0 w-full h-full overflow-hidden" style={{ zIndex: 15 }}>
       {/* Top aurora glow */}
       <div 
         className="absolute top-0 left-0 w-full h-1/3"

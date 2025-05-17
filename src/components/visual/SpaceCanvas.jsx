@@ -1,3 +1,4 @@
+// 🛡️ STAR_LOCKED: Do not remove or alter – see STAR_LOCK_V1.md
 import { useEffect, useRef, useState } from 'react';
 
 export default function SpaceCanvas({ zone }) {

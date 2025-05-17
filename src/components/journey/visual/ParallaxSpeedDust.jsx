@@ -7,171 +7,193 @@ const metadata = {
   doc: 'contract_cosmic_visuals.md'
 };
 
-export default function ParallaxSpeedDust({ opacity, speed, density, fps }) {
+// Depth bands for parallax layers
+const DEPTH_BANDS = {
+  NEAR: 1.0,    // Full speed, highest opacity
+  MID: 0.85,    // Increased from 0.7
+  FAR: 0.65     // Increased from 0.4
+};
+
+export default function ParallaxSpeedDust({ opacity, speed, density, fps, scrollProgress }) {
   const canvasRef = useRef(null);
   const animationFrameRef = useRef(null);
   const lastFrameTimeRef = useRef(0);
   const containerRef = useRef(null);
-  const particlesRef = useRef(null); // Store particles in a ref to prevent reset on rerenders
-  const sceneTransitionRef = useRef({
-    active: false,
-    lastOpacity: opacity
-  });
+  const particlesRef = useRef(null);
+  const resizeObserverRef = useRef(null);
+  const isAnimatingRef = useRef(false);
   
-  // Force particles to be visible as soon as opacity > 0
-  // This ensures they appear at 190vh when the scene starts
-  const effectiveOpacity = opacity > 0 ? Math.max(opacity, 0.1) : 0;
-  
-  // Mobile detection
-  const isMobile = useRef(
-    typeof window !== 'undefined' && 
-    (window.innerWidth < 768 || 
-     /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent))
-  );
+  // Animation state management - more permissive range
+  const isInSceneRange = scrollProgress >= 0.25 && scrollProgress <= 0.85; // Wider range for persistence
 
-  // Handle canvas resize
-  useEffect(() => {
-    if (!canvasRef.current || !containerRef.current) return;
-    
-    const handleResize = () => {
-      const canvas = canvasRef.current;
-      const container = containerRef.current;
-      const dpr = window.devicePixelRatio || 1;
-      
-      // Set canvas size to match container
-      canvas.width = container.offsetWidth * dpr;
-      canvas.height = container.offsetHeight * dpr;
-      
-      // Apply CSS size to match container exactly
-      canvas.style.width = `${container.offsetWidth}px`;
-      canvas.style.height = `${container.offsetHeight}px`;
-    };
-    
-    // Initial size
-    handleResize();
-    
-    // Listen for window resize
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
+  // Initialize particles with depth bands and guaranteed minimum values
+  const initializeParticles = (canvas, dpr) => {
+    if (!canvas || canvas.width === 0 || canvas.height === 0) {
+      console.warn('ParallaxSpeedDust: Canvas not ready');
+      return null;
+    }
 
+    const count = Math.max(density, 75);
+    return Array.from({ length: count }, () => {
+      const depthRoll = Math.random();
+      const depth = depthRoll < 0.5 ? DEPTH_BANDS.NEAR : 
+                   depthRoll < 0.8 ? DEPTH_BANDS.MID : 
+                   DEPTH_BANDS.FAR;
+      
+      // Distribute particles across the entire canvas height
+      return {
+        x: Math.random() * (canvas.width / dpr),
+        y: (Math.random() * canvas.height * 1.5 - canvas.height * 0.25) / dpr, // Spread across 150% height
+        speed: Math.max(speed * (Math.random() * 0.5 + 0.75), 0.8) * depth,
+        length: Math.random() * 15 + 8,
+        phase: Math.random() * Math.PI * 2,
+        pulseSpeed: 0.5 + Math.random() * 1,
+        pulseStrength: 0.15 + Math.random() * 0.2,
+        depth
+      };
+    });
+  };
+
+  // Scene opacity calculation with smoother transitions
+  const calculateSceneOpacity = () => {
+    if (!isInSceneRange) return 0;
+    
+    // Wider ramp for smoother transitions
+    const rampUpProgress = Math.min(1, (scrollProgress - 0.25) / 0.1);
+    const rampDownProgress = Math.max(0, (0.85 - scrollProgress) / 0.1);
+    return Math.min(rampUpProgress, rampDownProgress) * opacity;
+  };
+
+  // Core animation function
+  const animate = (time) => {
+    const canvas = canvasRef.current;
+    const ctx = canvas?.getContext('2d');
+    
+    if (!canvas || !ctx || !particlesRef.current) {
+      isAnimatingRef.current = false;
+      return;
+    }
+
+    const dpr = window.devicePixelRatio || 1;
+    
+    // FPS limiting
+    if (time - lastFrameTimeRef.current < 1000 / fps) {
+      animationFrameRef.current = requestAnimationFrame(animate);
+      return;
+    }
+    
+    lastFrameTimeRef.current = time;
+
+    // Reset transform and clear
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    const sceneOpacity = calculateSceneOpacity();
+    const timeSeconds = time / 1000;
+    const scrollOffset = scrollProgress * (canvas.height / dpr);
+
+    // Always update particles even if opacity is 0
+    particlesRef.current.forEach(p => {
+      // Constant base movement
+      p.y += p.speed;
+      
+      const depthOffset = scrollOffset * (1 - p.depth);
+      const finalY = p.y + depthOffset;
+      
+      // Reset with better distribution
+      if (finalY > canvas.height / dpr) {
+        p.y = -p.length - (Math.random() * canvas.height * 0.2) / dpr - depthOffset;
+        p.x = Math.random() * (canvas.width / dpr);
+      }
+      if (p.x < -p.length || p.x > (canvas.width / dpr) + p.length) {
+        p.x = Math.random() * (canvas.width / dpr);
+      }
+
+      const breathFactor = 1 + (Math.sin(timeSeconds * p.pulseSpeed + p.phase) * p.pulseStrength);
+      const pulsingLength = p.length * breathFactor;
+      const pulsingOpacity = Math.min(Math.max(sceneOpacity * p.depth, 0.1) * (0.8 + (breathFactor * 0.2)), 1.0);
+
+      // Draw if there's any opacity
+      if (pulsingOpacity > 0) {
+        ctx.beginPath();
+        ctx.moveTo(p.x, finalY);
+        ctx.lineTo(p.x, finalY + pulsingLength);
+        ctx.strokeStyle = `rgba(255, 255, 255, ${pulsingOpacity})`;
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+      }
+    });
+
+    // Continue animation loop
+    animationFrameRef.current = requestAnimationFrame(animate);
+  };
+
+  // Ensure animation starts and stays running
+  const ensureAnimation = () => {
+    if (!isAnimatingRef.current && canvasRef.current) {
+      isAnimatingRef.current = true;
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
+      animationFrameRef.current = requestAnimationFrame(animate);
+    }
+  };
+
+  // Canvas setup
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    const container = containerRef.current;
     
-    const ctx = canvas.getContext('2d');
-    const dpr = window.devicePixelRatio || 1;
-
-    ctx.scale(dpr, dpr);
-
-    // Initialize particles only once
-    if (!particlesRef.current) {
-      // Use a fixed, reasonable particle count based on density
-      // This is more predictable than dynamic calculations
-      const baseCount = isMobile.current ? 
-        Math.floor(density * 0.4) : // 40% of density on mobile
-        density;                    // Full density on desktop
-        
-      // Create particles with varying speeds for parallax effect
-      particlesRef.current = Array.from({ length: baseCount }, () => ({
-        x: Math.random() * (canvas.width / dpr),
-        y: Math.random() * (canvas.height / dpr),
-        length: Math.random() * 10 + 5,
-        speed: (Math.random() * 0.5 + 0.5) * speed,
-        // Add breathing/pulsing properties
-        phase: Math.random() * Math.PI * 2, // Random starting phase
-        pulseSpeed: 0.5 + Math.random() * 1, // Random pulse speed
-        pulseStrength: 0.15 + Math.random() * 0.2 // Random pulse strength (15-35%)
-      }));
-    }
-
-    // Detect scene transitions - more sensitive (0.05 instead of 0.2)
-    // This ensures we catch the transition at exactly 190vh
-    if (Math.abs(opacity - sceneTransitionRef.current.lastOpacity) > 0.05) {
-      sceneTransitionRef.current.active = true;
-      
-      // If we're entering the scene (opacity changing from 0)
-      if (opacity > 0 && sceneTransitionRef.current.lastOpacity === 0) {
-        console.log('ParallaxSpeedDust: Entering scene at opacity', opacity);
-        const width = canvas.width / dpr;
-        const height = canvas.height / dpr;
-        
-        // Distribute particles from top of screen
-        particlesRef.current.forEach((p, i) => {
-          // Stagger particle positions vertically starting at top of viewport
-          const segment = height / particlesRef.current.length;
-          p.y = (i * segment) % height;
-          p.x = Math.random() * width;
-        });
-      }
-    } else {
-      sceneTransitionRef.current.active = false;
-    }
+    if (!canvas || !container) return;
     
-    // Update the last opacity for transition detection
-    sceneTransitionRef.current.lastOpacity = opacity;
-
-    // Animation loop with FPS throttling
-    const draw = (time) => {
-      if (time - lastFrameTimeRef.current < 1000 / fps) {
-        animationFrameRef.current = requestAnimationFrame(draw);
-        return;
+    // Setup ResizeObserver
+    resizeObserverRef.current = new ResizeObserver(entries => {
+      const entry = entries[0];
+      if (!entry) return;
+      
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = entry.contentRect.width * dpr;
+      canvas.height = entry.contentRect.height * dpr;
+      
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        particlesRef.current = initializeParticles(canvas, dpr);
+        ensureAnimation(); // Ensure animation is running after resize
       }
-      lastFrameTimeRef.current = time;
+    });
+    
+    resizeObserverRef.current.observe(container);
+    
+    // Initial animation start
+    ensureAnimation();
 
-      // Semi-transparent background for trail effect
-      ctx.fillStyle = 'rgba(25, 43, 58, 0.2)';
-      ctx.fillRect(0, 0, canvas.width / dpr, canvas.height / dpr);
-
-      // Draw particles
-      ctx.lineWidth = 1;
-      
-      // Update and draw each particle
-      const particles = particlesRef.current;
-      const timeSeconds = time / 1000;
-      
-      particles.forEach(p => {
-        // Move particle
-        p.y += p.speed;
-        if (p.y > canvas.height / dpr) p.y = -p.length;
-
-        // Calculate breathing/pulsing effect
-        const breathFactor = 1 + (Math.sin(timeSeconds * p.pulseSpeed + p.phase) * p.pulseStrength);
-        
-        // Apply breathing to both length and opacity
-        const pulsingLength = p.length * breathFactor;
-        const pulsingOpacity = effectiveOpacity * (0.8 + (breathFactor * 0.2));
-        
-        // Draw particle with breathing effect
-        ctx.beginPath();
-        ctx.moveTo(p.x, p.y);
-        ctx.lineTo(p.x, p.y + pulsingLength);
-        ctx.strokeStyle = `rgba(255, 255, 255, ${pulsingOpacity})`;
-        ctx.stroke();
-      });
-
-      animationFrameRef.current = requestAnimationFrame(draw);
+    return () => {
+      isAnimatingRef.current = false;
+      if (resizeObserverRef.current) {
+        resizeObserverRef.current.disconnect();
+      }
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
     };
+  }, [fps, speed, density]);
 
-    animationFrameRef.current = requestAnimationFrame(draw);
+  // Always ensure animation is running when in scene range
+  useEffect(() => {
+    if (isInSceneRange) {
+      ensureAnimation();
+    }
+  }, [isInSceneRange, scrollProgress]);
 
-    // Cleanup on unmount
-    return () => cancelAnimationFrame(animationFrameRef.current);
-  }, [opacity, speed, fps]); // Keep same dependency array to prevent resets
-
-  // Debug style to highlight z-index issues
-  const debugStyle = process.env.NODE_ENV === 'development' 
-    ? { outline: opacity > 0 ? '1px solid rgba(255,0,0,0.5)' : 'none' } 
-    : {};
-
-  // Use z-20 to ensure proper layering with existing elements
   return (
     <div 
       ref={containerRef} 
-      className="absolute inset-0 w-full h-full z-50" // Increased z-index
-      style={{
-        ...debugStyle,
-        pointerEvents: 'none'  // Allow clicks to pass through
+      className="absolute inset-0 w-full h-full overflow-hidden"
+      style={{ 
+        pointerEvents: 'none',
+        zIndex: 20
       }}
     >
       <canvas 
@@ -179,9 +201,10 @@ export default function ParallaxSpeedDust({ opacity, speed, density, fps }) {
         className="absolute inset-0 w-full h-full"
         style={{ 
           display: 'block',
-          visibility: opacity > 0 ? 'visible' : 'hidden' // Force visibility based on opacity
+          visibility: 'visible', // Always keep canvas visible
+          mixBlendMode: 'normal'
         }} 
       />
     </div>
   );
-} 
+}

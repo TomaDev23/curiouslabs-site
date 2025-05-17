@@ -86,11 +86,17 @@ export default function DormantBackdrop({ progress = 0 }) {
             height: '8.84vw',
             top: '12%',
             left: '15%',
-            background: 'radial-gradient(circle, rgba(255,255,252,1) 0%, rgba(250,250,245,1) 40%, rgba(245,245,240,1) 70%, rgba(240,240,235,1) 90%)',
+            background: `
+              radial-gradient(circle at 50% 50%, rgba(255,255,255,0.75) 75%, rgba(255,255,255,0.0) 100%),
+              radial-gradient(ellipse at 85% 55%, rgba(0,0,0,0.38) 40%, rgba(0,0,0,0.0) 70%),
+              url('/assets/images/planets/4k/moonmap2kSmall.jpg')
+            `,
+            backgroundSize: '180%',
+            backgroundPosition: 'center 0%',
+            filter: 'brightness(1.36) contrast(1.12)',
             boxShadow: `
-              inset -5px -5px 12px rgba(0,0,0,0.25),
-              0 0 80px 20px ${dormantColors.moon.glow},
-              0 0 120px 30px rgba(200,210,230,0.15)
+              0 0 100px 30px rgba(255,255,255,0.55),
+              0 0 120px 30px rgba(220,225,255,0.18)
             `,
             animation: 'moonGlow 15s infinite alternate ease-in-out',
             willChange: 'opacity, filter, transform'

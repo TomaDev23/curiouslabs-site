@@ -27,6 +27,7 @@ export const metadata = {
  * @property {number} [options.rotation] - Galaxy rotation in degrees
  * @property {number} [options.brightness] - Overall brightness multiplier
  * @property {number} [options.colorShift] - Color hue shift
+ * @property {boolean} [options.cameraMovementEnabled] - Whether camera movement is enabled
  * 
  * @param {StaticGalaxyProps} props
  */
@@ -47,7 +48,8 @@ export default function StaticGalaxy({
     cameraDistance: options.cameraDistance || 30,
     rotation: options.rotation || 0,
     brightness: options.brightness || 1.0,
-    colorShift: options.colorShift || 0
+    colorShift: options.colorShift || 0,
+    cameraMovementEnabled: options.cameraMovementEnabled !== undefined ? options.cameraMovementEnabled : true
   };
   
   // Generate sceneData from props instead of scroll
@@ -106,6 +108,7 @@ export default function StaticGalaxy({
         <div className="mb-1">Progress: {(progress * 100).toFixed(2)}%</div>
         <div className="mb-1">Camera: {processedOptions.cameraDistance}, {processedOptions.rotation}°</div>
         <div className="mb-1">Visual: {processedOptions.brightness.toFixed(1)}x, {processedOptions.colorShift}°</div>
+        <div className="mb-1">Camera Movement: {processedOptions.cameraMovementEnabled ? 'ON' : 'OFF'}</div>
         {sceneData.isExploding && (
           <div className="text-yellow-300">Explosion: {(sceneData.explosionProgress * 100).toFixed(2)}%</div>
         )}

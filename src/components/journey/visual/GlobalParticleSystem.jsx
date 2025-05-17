@@ -468,6 +468,7 @@ export default function GlobalParticleSystem({
             modPosition.x += sin(time * layerSpeed * 1.2 + randomOffset) * motionIntensity * 0.8;
             modPosition.y += cos(time * layerSpeed * 0.9 + randomOffset) * motionIntensity * 0.6;
           } else {
+            // ISSUE: Stuttering layer - Layer 2 has the fastest movement which likely causes stuttering
             // Layer 2 - fastest, farthest
             modPosition.x += sin(time * layerSpeed * 1.5 + randomOffset) * motionIntensity * 1.0;
             modPosition.y += cos(time * layerSpeed * 1.1 + randomOffset) * motionIntensity * 0.8;
@@ -921,7 +922,8 @@ export default function GlobalParticleSystem({
         break;
         
       case 'cosmicFlight':
-        // Full dust effect during flight
+        // ISSUE: Stuttering layer - Full dust effect during flight with high cosmicIntensity
+        // This scene has the highest motion intensity which likely contributes to stuttering
         opacity = 0.6 + (sceneProgress * 0.4);
         cosmicIntensity = 0.6 + (sceneProgress * 0.4);
         baseSize = 1.5 + (sceneProgress * 0.5);

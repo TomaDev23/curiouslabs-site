@@ -79,16 +79,7 @@ export default function BaseSpaceBackdrop({
   return (
     <div className="absolute inset-0 w-full h-full z-0 pointer-events-none overflow-hidden">
       {/* Fixed Background Layer (z-index: 0) */}
-      <div className="absolute inset-0 w-full h-full z-0">
-        {/* Deep space gradient background */}
-        <div 
-          className="absolute inset-0 w-full h-full" 
-          style={{
-            background: `radial-gradient(ellipse at center, ${colors.background.core} 0%, ${colors.background.mid} 30%, ${colors.background.outer} 60%, ${colors.background.edge} 100%)`,
-            backgroundSize: '200% 200%'
-          }}
-        />
-      </div>
+      <div className="absolute inset-0 w-full h-full z-1 bg-[radial-gradient(ellipse_at_center,_rgba(15,15,35,0.65)_0%,_rgba(0,0,0,0.8)_70%,_transparent_100%)]" />
       
       {/* ONLY moon layer keeps mouse parallax */}
       <div 

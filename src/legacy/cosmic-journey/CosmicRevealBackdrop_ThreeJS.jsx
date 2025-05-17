@@ -1,4 +1,5 @@
-import React, { useRef, useEffect } from 'react';
+// 🛡️ STAR_LOCKED: Do not remove or alter – see STAR_LOCK_V1.md
+import React, { useRef, useEffect, useState } from 'react';
 import * as THREE from 'three';
 
 // Metadata for LEGIT compliance
@@ -11,6 +12,8 @@ const metadata = {
 
 export default function CosmicRevealBackdropThreeJS({ progress = 0 }) {
   const containerRef = useRef(null);
+  // 🛠️ ADDED: Camera movement control state
+  const [cameraMovementEnabled, setCameraMovementEnabled] = useState(true);
   
   // Set up and animate Three.js scene
   useEffect(() => {
@@ -34,7 +37,8 @@ export default function CosmicRevealBackdropThreeJS({ progress = 0 }) {
     // Nebula particles function - Create first for better z-ordering
     const createNebula = () => {
       const geometry = new THREE.BufferGeometry();
-      const count = 15000; // More particles
+      // 🛠️ OPTIMIZED: Reduced particle count for better performance while maintaining visual density
+      const count = 8000; // Reduced from 15000 to improve performance
       
       const positions = new Float32Array(count * 3);
       const colors = new Float32Array(count * 3);
@@ -147,7 +151,8 @@ export default function CosmicRevealBackdropThreeJS({ progress = 0 }) {
             float dist = length(pos.xz);
             
             // Make galaxy rotate
-            float rotationSpeed = 0.1;
+            // 🛠️ OPTIMIZED: Reduced rotation speed for smoother animation
+            float rotationSpeed = 0.05; // Reduced from 0.1
             float rotation = time * rotationSpeed;
             float xNew = pos.x * cos(rotation) - pos.z * sin(rotation);
             float zNew = pos.x * sin(rotation) + pos.z * cos(rotation);
@@ -155,12 +160,14 @@ export default function CosmicRevealBackdropThreeJS({ progress = 0 }) {
             pos.z = zNew;
             
             // Add wavy motion
-            float waveFreq = 2.0;
-            float waveHeight = 0.7;
-            pos.y += sin(time * 0.5 + dist * waveFreq) * waveHeight;
+            // 🛠️ OPTIMIZED: Reduced wave frequency to stabilize vertical motion
+            float waveFreq = 0.3; // Further reduced from 0.7
+            float waveHeight = 0.5; // Reduced from 0.7
+            pos.y += sin(time * 0.3 + dist * waveFreq) * waveHeight; // Reduced time factor from 0.5 to 0.3
             
             // Add particle pulsing based on progress
-            float pulse = 1.0 + sin(time * 2.0 + dist * 0.2) * 0.3;
+            // 🛠️ OPTIMIZED: Reduced pulse frequency for smoother animation
+            float pulse = 1.0 + sin(time * 0.8 + dist * 0.1) * 0.2; // Reduced from 2.0 to 0.8 and amplitude from 0.3 to 0.2
             
             // Transform and project
             vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
@@ -208,7 +215,8 @@ export default function CosmicRevealBackdropThreeJS({ progress = 0 }) {
     // Stars background
     const createStars = () => {
       const geometry = new THREE.BufferGeometry();
-      const count = 2000;
+      // 🛠️ OPTIMIZED: Reduced star count for better performance
+      const count = 1200; // Reduced from 2000
       
       const positions = new Float32Array(count * 3);
       const colors = new Float32Array(count * 3);
@@ -357,9 +365,13 @@ export default function CosmicRevealBackdropThreeJS({ progress = 0 }) {
     
     // Animation
     let time = 0;
+    // 🛠️ ADDED: Store initial camera rotation to restore when movement is disabled
+    const initialRotation = { x: scene.rotation.x, z: scene.rotation.z };
+    
     const animate = function() {
       const animationId = requestAnimationFrame(animate);
-      time += 0.01;
+      // 🛠️ OPTIMIZED: Reduced time increment for smoother animation
+      time += 0.005; // Reduced from 0.01
       
       // Update uniforms
       stars.uniforms.time.value = time;
@@ -367,12 +379,21 @@ export default function CosmicRevealBackdropThreeJS({ progress = 0 }) {
       nebula.uniforms.progress.value = Math.max(0.3, progress); // Always some visibility
       
       // Make the galaxy core pulse
-      const pulse = 1.0 + Math.sin(time * 1.5) * 0.2;
+      // 🛠️ OPTIMIZED: Reduced pulse frequency and amplitude
+      const pulse = 1.0 + Math.sin(time * 0.8) * 0.15; // Reduced from 1.5 to 0.8 and 0.2 to 0.15
       galaxyCore.mesh.scale.set(pulse, pulse, 1);
       
-      // Rotate entire scene slightly for movement
-      scene.rotation.x = Math.sin(time * 0.05) * 0.05;
-      scene.rotation.z = Math.sin(time * 0.03) * 0.1;
+      // 🛠️ ADDED: Only apply camera movement if enabled
+      if (cameraMovementEnabled) {
+        // Rotate entire scene slightly for movement
+        // 🛠️ OPTIMIZED: Throttled global scene rotation to reduce composite jitter
+        scene.rotation.x = Math.sin(time * 0.02) * 0.02; // Further reduced from 0.03 to 0.02
+        scene.rotation.z = Math.sin(time * 0.015) * 0.04; // Further reduced from 0.02 to 0.015 and from 0.06 to 0.04
+      } else {
+        // Reset to fixed position when camera movement is disabled
+        scene.rotation.x = initialRotation.x;
+        scene.rotation.z = initialRotation.z;
+      }
       
       renderer.render(scene, camera);
     };
@@ -417,21 +438,62 @@ export default function CosmicRevealBackdropThreeJS({ progress = 0 }) {
       
       cancelAnimationFrame(animate);
     };
-  }, []);
+  }, [cameraMovementEnabled]); // Add cameraMovementEnabled as dependency
   
   // Update effect when progress changes
   useEffect(() => {
     // This will be handled by shader uniforms inside the main effect
   }, [progress]);
   
+  // 🛠️ ADDED: Direct DOM manipulation to ensure button is visible
+  useEffect(() => {
+    // Create backup button element using direct DOM manipulation
+    const backupButton = document.createElement('button');
+    backupButton.textContent = cameraMovementEnabled ? '🛑 STOP CAMERA' : '▶️ START CAMERA';
+    backupButton.style.position = 'fixed';
+    backupButton.style.top = '80px';
+    backupButton.style.right = '20px';
+    backupButton.style.zIndex = '99999';
+    backupButton.style.padding = '10px 20px';
+    backupButton.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+    backupButton.style.color = 'white';
+    backupButton.style.border = '3px solid #00aaff';
+    backupButton.style.borderRadius = '8px';
+    backupButton.style.fontSize = '18px';
+    backupButton.style.fontWeight = 'bold';
+    backupButton.style.cursor = 'pointer';
+    backupButton.style.boxShadow = '0 0 20px rgba(0, 170, 255, 0.7)';
+    
+    // Add click handler
+    backupButton.addEventListener('click', () => {
+      setCameraMovementEnabled(prev => !prev);
+      backupButton.textContent = !cameraMovementEnabled ? '🛑 STOP CAMERA' : '▶️ START CAMERA';
+    });
+    
+    // Add to body
+    document.body.appendChild(backupButton);
+    
+    // Cleanup
+    return () => {
+      document.body.removeChild(backupButton);
+    };
+  }, [cameraMovementEnabled]);
+  
+  // 🛠️ ADDED: Toggle camera movement function
+  const toggleCameraMovement = () => {
+    setCameraMovementEnabled(prev => !prev);
+  };
+  
   return (
-    <div 
-      ref={containerRef} 
-      className="absolute inset-0 w-full h-full"
-      style={{ 
-        opacity: 1, // Always visible
-        transition: 'opacity 0.5s ease-in-out'
-      }}
-    />
+    <>
+      <div 
+        ref={containerRef} 
+        className="absolute inset-0 w-full h-full"
+        style={{ 
+          opacity: 1, // Always visible
+          transition: 'opacity 0.5s ease-in-out'
+        }}
+      />
+    </>
   );
 } 

@@ -23,19 +23,10 @@ export default function DormantScene({ progress = 0, particleConfig = {} }) {
   
   return (
     <section className="h-screen w-screen relative overflow-hidden dormant-layer">
-      {/* Deep space backdrop with parallax */}
+      {/* Base layer with reduced opacity */}
       <div className="absolute inset-0 z-0">
+        <div className="absolute inset-0 bg-black opacity-50" />
         <DormantBackdrop progress={intensity} />
-      </div>
-      
-      {/* Robot character - static in dormant state */}
-      <div className="absolute bottom-1/4 left-1/2 transform -translate-x-1/2 text-8xl z-50">
-        🤖
-      </div>
-      
-      {/* Scene title for development */}
-      <div className="absolute bottom-10 right-10 text-white text-2xl font-bold opacity-70 z-50">
-        Scene: Dormant
       </div>
     </section>
   );
