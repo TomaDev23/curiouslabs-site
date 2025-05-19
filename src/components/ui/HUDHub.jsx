@@ -48,41 +48,50 @@ export function HUDProvider({ children }) {
   // Clear localStorage on first mount to reset any problematic state
   useEffect(() => {
     try {
-      // Only clear positions, not visibility
+      // Clear both positions and visibility
       localStorage.removeItem('draggable_HUDHub_position');
-      console.log('Cleared draggable position from localStorage');
+      localStorage.removeItem('hudVisibility');
+      console.log('Cleared HUD state from localStorage');
     } catch (error) {
       console.error('Error clearing localStorage:', error);
     }
   }, []);
   
-  // Load visibility state from localStorage
+  // Only load visibility state from localStorage in development
   useEffect(() => {
-    try {
-      const savedVisibility = localStorage.getItem('hudVisibility');
-      if (savedVisibility) {
-        const parsed = JSON.parse(savedVisibility);
-        if (parsed && typeof parsed === 'object') {
-          setHudVisibility(prev => ({
-            ...prev, // Keep defaults
-            ...parsed // Override with saved values
-          }));
-          console.log('Loaded HUD visibility from localStorage:', parsed);
+    if (process.env.NODE_ENV === 'development') {
+      try {
+        const savedVisibility = localStorage.getItem('hudVisibility');
+        if (savedVisibility) {
+          const parsed = JSON.parse(savedVisibility);
+          if (parsed && typeof parsed === 'object') {
+            // Ensure all HUDs start invisible regardless of saved state
+            const resetVisibility = {};
+            Object.keys(parsed).forEach(key => {
+              resetVisibility[key] = false;
+            });
+            setHudVisibility(prev => ({
+              ...prev,
+              ...resetVisibility
+            }));
+            console.log('Reset all HUDs to invisible');
+          }
         }
+      } catch (error) {
+        console.error('Error loading HUD visibility:', error);
       }
-    } catch (error) {
-      console.error('Error loading HUD visibility:', error);
-      // Don't overwrite state on error
     }
   }, []);
   
-  // Save visibility state changes to localStorage
+  // Save visibility state changes to localStorage only in development
   useEffect(() => {
-    try {
-      localStorage.setItem('hudVisibility', JSON.stringify(hudVisibility));
-      console.log('Saved HUD visibility to localStorage:', hudVisibility);
-    } catch (error) {
-      console.error('Error saving HUD visibility:', error);
+    if (process.env.NODE_ENV === 'development') {
+      try {
+        localStorage.setItem('hudVisibility', JSON.stringify(hudVisibility));
+        console.log('Saved HUD visibility to localStorage:', hudVisibility);
+      } catch (error) {
+        console.error('Error saving HUD visibility:', error);
+      }
     }
   }, [hudVisibility]);
   
@@ -90,6 +99,12 @@ export function HUDProvider({ children }) {
   const setHUDVisibility = (hudId, isVisible) => {
     try {
       if (!hudId) throw new Error('Missing hudId');
+      
+      // Only allow visibility changes in development
+      if (process.env.NODE_ENV !== 'development') {
+        console.log('HUD visibility changes disabled in production');
+        return;
+      }
       
       setHudVisibility(prev => {
         const newState = {

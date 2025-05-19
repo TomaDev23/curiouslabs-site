@@ -33,7 +33,7 @@ export const AtomicPageFrame = forwardRef(({ scenes = [], scrollProgress = 0 }, 
   const [isEditMode, setIsEditMode] = useState(false);
   
   // Track whether to show the admin panel
-  const [showAdminPanel, setShowAdminPanel] = useState(true); // Start visible by default
+  const [showAdminPanel, setShowAdminPanel] = useState(false); // Start invisible by default
   
   // Track hidden sections by ID
   const [hiddenSections, setHiddenSections] = useState(() => {
@@ -80,30 +80,31 @@ export const AtomicPageFrame = forwardRef(({ scenes = [], scrollProgress = 0 }, 
     return HOME_V5_SECTIONS;
   });
   
-  // Handle keyboard shortcut to toggle admin panel and HUDs
+  // Effect to handle keyboard shortcuts and development mode
   useEffect(() => {
+    // Only enable in development mode
+    if (process.env.NODE_ENV !== 'development') {
+      setShowAdminPanel(false);
+      return;
+    }
+
     const handleKeyDown = (e) => {
-      // Ctrl+Alt+P to toggle admin panel
+      // Toggle admin panel with Ctrl+Alt+P
       if (e.ctrlKey && e.altKey && e.key === 'p') {
-        setShowAdminPanel(prev => !prev);
-      }
-      
-      // Shift+H+1 to toggle HUD ATOMIC 1
-      if (e.shiftKey && e.key === 'H' && e.code === 'Digit1') {
         setShowAdminPanel(prev => !prev);
         console.log('[HUD ATOMIC 1] Visibility toggled with keyboard shortcut');
       }
     };
-    
-    // Listen for custom events from NavBar buttons
+
+    // Listen for custom event from NavBar button
     const handleToggleHudAtomic1 = () => {
       setShowAdminPanel(prev => !prev);
       console.log('[HUD ATOMIC 1] Visibility toggled from NavBar button');
     };
-    
+
     window.addEventListener('keydown', handleKeyDown);
     window.addEventListener('toggleHudAtomic1', handleToggleHudAtomic1);
-    
+
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('toggleHudAtomic1', handleToggleHudAtomic1);
@@ -231,7 +232,10 @@ export const AtomicPageFrame = forwardRef(({ scenes = [], scrollProgress = 0 }, 
         {/* Base Layer (z-0 to z-9): CosmicJourneyController */}
         <div className="fixed inset-0 z-0" data-legit-layer="base">
           <BaseStarfieldBackdrop />
-          <CosmicJourneyController />
+          <CosmicJourneyController 
+            scenes={scenes} 
+            scrollProgress={scrollProgress} 
+          />
         </div>
         
         {/* Navigation Layer (z-110 to z-119): NavBar */}

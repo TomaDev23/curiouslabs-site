@@ -40,5 +40,12 @@ start curiouslabs_mobile_report.html
 
 =======================================================================================================================
 
-grok
+lighthouse https://curiouslabs-site.vercel.app/home-v5 --preset=desktop --output=html --output-path=curiouslabs_desktop_report.html
 
+
+start curiouslabs_desktop_report.html
+
+lighthouse https://curiouslabs-site.vercel.app/home-v5 \
+  --output html \
+  --output-path curiouslabs_mobile_report.html \
+  --emulated-form-factor=mobile

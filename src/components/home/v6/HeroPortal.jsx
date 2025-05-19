@@ -91,45 +91,15 @@ const HeroPortal = () => {
       <section 
         id="hero" 
         ref={heroRef}
-        className="relative min-h-screen flex flex-col md:flex-row items-center justify-center pt-20 pb-10 px-4 sm:px-6 lg:px-8"
+        className="relative min-h-screen flex flex-col md:flex-row items-center justify-center pt-20 pb-10 px-4 sm:px-6 lg:px-8 overflow-visible"
       >
-        {/* Text Content - Left Side */}
-        <div className="w-full md:w-1/2 flex flex-col justify-center space-y-6 z-10">
-          <h1 
-            ref={titleRef}
-            className="font-serif text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight"
-          >
-            Curious<span className="text-lime-400">Labs</span>
-          </h1>
-          
-          <p 
-            ref={subtitleRef}
-            className="text-xl sm:text-2xl lg:text-3xl max-w-md text-gray-300 font-light"
-          >
-            Transforming development through AI innovation and community collaboration
-          </p>
-          
-          {/* CTA Button */}
-          <div className="pt-4">
-            <a 
-              href="#services"
-              className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-full text-black bg-lime-400 hover:bg-lime-300 transition-colors duration-150"
-            >
-              Explore Services
-              <svg className="ml-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
-            </a>
-          </div>
-        </div>
-        
         {/* Visual Content - Right Side */}
         <div 
           ref={visualRef}
-          className="w-full md:w-1/2 flex justify-center items-center mt-12 md:mt-0 z-10"
+          className="w-full md:w-2/3 flex justify-end items-center mt-12 md:mt-0 z-10 md:mr-[-120px] lg:mr-[-180px]"
         >
           {/* Cosmic sphere/planet visualization */}
-          <div className="relative">
+          <div className="relative md:mr-8 lg:mr-12">
             {/* Circles representing cosmic sphere with subtle glow */}
             <div className="absolute inset-0 rounded-full bg-lime-400 opacity-10 filter blur-xl"></div>
             <div 
@@ -165,17 +135,26 @@ const HeroPortal = () => {
             </div>
           </div>
         </div>
-        
-        {/* Scroll indicator */}
-        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex flex-col items-center animate-pulse">
-          <span className="text-xs text-gray-400 mb-2">Scroll to explore</span>
-          <svg className="w-6 h-6 text-lime-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-          </svg>
+
+        {/* Text Content - Bottom Left */}
+        <div className="absolute bottom-16 left-8 md:left-16 z-10 max-w-lg">
+          <h1 
+            ref={titleRef}
+            className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight mb-4"
+          >
+            Curious<span className="text-lime-400">Labs</span>
+          </h1>
+          
+          <p 
+            ref={subtitleRef}
+            className="text-lg sm:text-xl lg:text-2xl text-gray-300 font-light"
+          >
+            Transforming development through AI innovation and community collaboration
+          </p>
         </div>
       </section>
     </>
   );
 };
 
-export default HeroPortal; 
+export default HeroPortal;

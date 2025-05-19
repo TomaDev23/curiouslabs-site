@@ -34,6 +34,7 @@ const DevV4CosmicPage = lazy(() => import('./pages/dev_v4_cosmic.jsx'));
 const BackgroundSandbox = lazy(() => import('./pages/background_sandbox.jsx'));
 const BackgroundFinal = lazy(() => import('./pages/background_final.jsx'));
 const HomeV5AtomicPage = lazy(() => import('./pages/HomeV5AtomicPage.jsx'));
+const V6HomePage = lazy(() => import('./pages/v6_home.jsx'));
 import CosmicRevDev from './pages/CosmicRevDev';
 
 // Parallax test pages
@@ -350,6 +351,17 @@ export default function App() {
         <Route path="/dev/planet-sandbox-with-stars" element={
           <Suspense fallback={<LoadingFallback />}>
             <PlanetSandboxWithStars />
+          </Suspense>
+        } />
+        
+        {/* V6 Route */}
+        <Route path="/v6" element={
+          <Suspense fallback={<LoadingFallback />}>
+            <React.StrictMode>
+              <ErrorBoundary fallback={<SafeV4CosmicPage />}>
+                <V6HomePage />
+              </ErrorBoundary>
+            </React.StrictMode>
           </Suspense>
         } />
         

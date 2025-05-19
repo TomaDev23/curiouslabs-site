@@ -1,0 +1,224 @@
+# Component 1: SceneController.jsx
+
+I'll begin with the `SceneController.jsx` component as directed in your LEGIT development brief. This is the foundation that will orchestrate the entire hero experience.
+
+```jsx
+/**
+ * @metadata
+ * @component SceneController
+ * @description Root orchestrator that manages scroll, animation phasing, and performance detection
+ * @legit true
+ * @version 1.0.0
+ * @author CuriousLabs
+ */
+
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+
+// Define types for scene phases and performance tiers
+export const ScenePhases = {
+  VOID: 'void',
+  EMERGENCE: 'emergence',
+  ACTIVATION: 'activation'
+};
+
+export const PerformanceTiers = {
+  HIGH: 'high',
+  MEDIUM: 'medium',
+  LOW: 'low',
+  MINIMAL: 'minimal'
+};
+
+// Create the context with default values
+export const SceneContext = createContext({
+  scenePhase: ScenePhases.VOID,
+  deviceCapabilities: {
+    performanceTier: PerformanceTiers.HIGH,
+    prefersReducedMotion: false,
+    isMobile: false,
+    isTablet: false,
+    devicePixelRatio: 1
+  },
+  scrollPosition: 0,
+  horizontalScroll: 0,
+  handleHorizontalScroll: () => {},
+  advancePhase: () => {},
+  setPhase: () => {}
+});
+
+// Custom hook for accessing scene context
+export const useScene = () => useContext(SceneContext);
+
+const SceneController = ({ children }) => {
+  // Core state for scene management
+  const [scenePhase, setScenePhase] = useState(ScenePhases.VOID);
+  const [scrollPosition, setScrollPosition] = useState(0);
+  const [horizontalScroll, setHorizontalScroll] = useState(0);
+  
+  // Device capabilities state
+  const [deviceCapabilities, setDeviceCapabilities] = useState({
+    performanceTier: PerformanceTiers.HIGH,
+    prefersReducedMotion: false,
+    isMobile: false,
+    isTablet: false,
+    devicePixelRatio: window.devicePixelRatio || 1
+  });
+
+  // Detect device capabilities on component mount
+  useEffect(() => {
+    const detectCapabilities = () => {
+      // Check for reduced motion preference
+      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      
+      // Check device type
+      const isMobile = window.matchMedia('(max-width: 767px)').matches;
+      const isTablet = window.matchMedia('(min-width: 768px) and (max-width: 1023px)').matches;
+      
+      // Get device pixel ratio
+      const devicePixelRatio = window.devicePixelRatio || 1;
+      
+      // Try to detect memory (not supported in all browsers)
+      const memory = navigator.deviceMemory || 8; // Default to 8GB if not available
+      
+      // Determine performance tier based on device capabilities
+      let performanceTier = PerformanceTiers.HIGH;
+      
+      if (prefersReducedMotion) {
+        performanceTier = PerformanceTiers.MINIMAL;
+      } else if (isMobile && memory <= 2) {
+        performanceTier = PerformanceTiers.MINIMAL;
+      } else if (isMobile || (memory <= 4)) {
+        performanceTier = PerformanceTiers.LOW;
+      } else if (isTablet || (memory <= 6)) {
+        performanceTier = PerformanceTiers.MEDIUM;
+      }
+      
+      // Update device capabilities state
+      setDeviceCapabilities({
+        performanceTier,
+        prefersReducedMotion,
+        isMobile,
+        isTablet,
+        devicePixelRatio
+      });
+    };
+    
+    // Detect capabilities initially
+    detectCapabilities();
+    
+    // Re-detect on window resize
+    window.addEventListener('resize', detectCapabilities);
+    
+    // Cleanup
+    return () => {
+      window.removeEventListener('resize', detectCapabilities);
+    };
+  }, []);
+
+  // Handle automatic phase progression with appropriate timing
+  useEffect(() => {
+    // Skip animations if user prefers reduced motion
+    if (deviceCapabilities.prefersReducedMotion) {
+      setScenePhase(ScenePhases.ACTIVATION);
+      return;
+    }
+    
+    // Phase timing (in milliseconds)
+    const phaseTiming = {
+      [ScenePhases.VOID]: 1800,
+      [ScenePhases.EMERGENCE]: 2200
+    };
+    
+    // Only set timer if not already in final phase
+    if (scenePhase !== ScenePhases.ACTIVATION) {
+      const timer = setTimeout(() => {
+        // Advance to next phase
+        advancePhase();
+      }, phaseTiming[scenePhase]);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [scenePhase, deviceCapabilities.prefersReducedMotion]);
+```
+
+Let me continue with the scroll handling and horizontal scroll functions:
+
+```jsx
+  // Handle scroll position tracking
+  useEffect(() => {
+    const handleScroll = () => {
+      const newScrollPosition = window.scrollY;
+      setScrollPosition(newScrollPosition);
+      
+      // Handle scroll-based phase progression
+      // This provides a fallback for users who scroll before animations complete
+      if (newScrollPosition > 100 && scenePhase === ScenePhases.VOID) {
+        setScenePhase(ScenePhases.EMERGENCE);
+      } else if (newScrollPosition > 300 && scenePhase === ScenePhases.EMERGENCE) {
+        setScenePhase(ScenePhases.ACTIVATION);
+      }
+    };
+    
+    window.addEventListener('scroll', handleScroll);
+    
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, [scenePhase]);
+  
+  // Function to advance to the next phase
+  const advancePhase = useCallback(() => {
+    setScenePhase(prevPhase => {
+      switch (prevPhase) {
+        case ScenePhases.VOID:
+          return ScenePhases.EMERGENCE;
+        case ScenePhases.EMERGENCE:
+          return ScenePhases.ACTIVATION;
+        default:
+          return prevPhase;
+      }
+    });
+  }, []);
+  
+  // Function to set phase directly
+  const setPhase = useCallback((phase) => {
+    if (Object.values(ScenePhases).includes(phase)) {
+      setScenePhase(phase);
+    } else {
+      console.warn(`Invalid scene phase: ${phase}`);
+    }
+  }, []);
+  
+  // Handle horizontal scroll for product sections
+  const handleHorizontalScroll = useCallback((scrollPosition) => {
+    setHorizontalScroll(scrollPosition);
+  }, []);
+  
+  // Create context value
+  const contextValue = {
+    scenePhase,
+    deviceCapabilities,
+    scrollPosition,
+    horizontalScroll,
+    handleHorizontalScroll,
+    advancePhase,
+    setPhase
+  };
+  
+  return (
+    <SceneContext.Provider value={contextValue}>
+      {children}
+    </SceneContext.Provider>
+  );
+};
+
+export default SceneController;
+```
+
+This completes the `SceneController.jsx` component, which follows all the requirements in the development brief. It:
+
+1. Detects device performance capabilities and categorizes them into tiers
+2. Manages scene phases with automatic progression
+3. Handles scroll-based fallback for phase progression
+4. Provides context values for child components to consume
+5. Follows the LEGIT protocol with proper metadata, types, and fallbacks
+

@@ -30,10 +30,16 @@ function SceneBoundaryDebugContent({ scenes = [], scrollProgress = 0 }) {
   const [isExpanded, setIsExpanded] = useState(true);
   const [lastTransitionTime, setLastTransitionTime] = useState(null);
   const [currentSceneKey, setCurrentSceneKey] = useState('');
-  const [isVisible, setIsVisible] = useState(true); // Start visible by default
+  const [isVisible, setIsVisible] = useState(false); // Start invisible by default
   
   // Use keyboard shortcut to toggle visibility (Shift+H+2)
   useEffect(() => {
+    // Only enable in development mode
+    if (process.env.NODE_ENV !== 'development') {
+      setIsVisible(false);
+      return;
+    }
+
     const handleKeyDown = (e) => {
       // Check for Shift+H+2 combination
       if (e.shiftKey && e.key === 'H' && e.code === 'Digit2') {

@@ -1,8 +1,7 @@
-import React, { Suspense, useRef, useState, useEffect } from 'react';
+import React, { Suspense, useRef, useState, useEffect, useCallback } from 'react';
 import { AtomicPageFrame } from '../components/layouts/AtomicPageFrame';
 import HUDSystem from '../components/ui/HUDSystem';
 import SceneBoundaryDebug from '../components/journey/debug/SceneBoundaryDebug';
-import SceneFaderHUD from '../components/home/v5/SceneFaderHUD';
 
 const metadata = {
   id: 'home_v5_atomic_page',
@@ -19,21 +18,60 @@ export default function HomeV5AtomicPage() {
   const [scrollProgress, setScrollProgress] = useState(0);
   const [scenes, setScenes] = useState([]);
   
-  // Effect to track scroll progress
-  useEffect(() => {
-    const handleScroll = () => {
-      const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
-      if (scrollHeight <= 0) return;
+  // Refs for smooth scroll handling
+  const rafRef = useRef(null);
+  const targetScrollRef = useRef(0);
+  const currentScrollRef = useRef(0);
+  
+  // Smooth scroll progress updater
+  const updateScrollProgress = useCallback(() => {
+    const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
+    if (scrollHeight <= 0) return;
+    
+    // Calculate target scroll progress
+    targetScrollRef.current = Math.max(0, Math.min(1, window.scrollY / scrollHeight));
+    
+    // Smoothly interpolate current scroll to target
+    const updateScroll = () => {
+      // Smooth interpolation factor (adjust for desired smoothness)
+      const smoothFactor = 0.15;
       
-      const progress = Math.max(0, Math.min(1, window.scrollY / scrollHeight));
-      setScrollProgress(progress);
+      // Calculate difference and apply smooth interpolation
+      const diff = targetScrollRef.current - currentScrollRef.current;
+      currentScrollRef.current += diff * smoothFactor;
+      
+      // Update state only if change is significant
+      if (Math.abs(diff) > 0.0001) {
+        setScrollProgress(currentScrollRef.current);
+        rafRef.current = requestAnimationFrame(updateScroll);
+      } else {
+        // Snap to target when very close
+        setScrollProgress(targetScrollRef.current);
+      }
     };
     
+    // Start the smooth update loop
+    if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    rafRef.current = requestAnimationFrame(updateScroll);
+  }, []);
+  
+  // Optimized scroll handler
+  const handleScroll = useCallback(() => {
+    // Use RAF to avoid scroll jank
+    if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    rafRef.current = requestAnimationFrame(updateScrollProgress);
+  }, [updateScrollProgress]);
+  
+  // Effect to track scroll progress
+  useEffect(() => {
     window.addEventListener('scroll', handleScroll, { passive: true });
     handleScroll(); // Initial call
     
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    };
+  }, [handleScroll]);
   
   // Default scenes for SceneBoundaryDebug
   const DEFAULT_SCENES = [
@@ -52,9 +90,6 @@ export default function HomeV5AtomicPage() {
   
   return (
     <>
-      {/* Scene Fader HUD - Mounted at root level */}
-      <SceneFaderHUD />
-      
       <Suspense fallback={
         <div className="fixed inset-0 flex items-center justify-center bg-black text-white">
           <p className="text-xl">Loading...</p>
@@ -67,18 +102,20 @@ export default function HomeV5AtomicPage() {
         />
       </Suspense>
       
-      {/* Add HUD ATOMIC 2 - Scene Boundary Debug */}
-      <SceneBoundaryDebug 
-        scenes={scenes}
-        scrollProgress={scrollProgress}
-      />
-      
-      {/* Add HUD System for development with scroll and scene data */}
-      <HUDSystem 
-        devOnly={true}
-        scrollProgress={scrollProgress}
-        scenes={scenes}
-      />
+      {process.env.NODE_ENV === 'development' && (
+        <>
+          <SceneBoundaryDebug 
+            scenes={scenes}
+            scrollProgress={scrollProgress}
+          />
+          
+          <HUDSystem 
+            devOnly={true}
+            scrollProgress={scrollProgress}
+            scenes={scenes}
+          />
+        </>
+      )}
     </>
   );
 } 
