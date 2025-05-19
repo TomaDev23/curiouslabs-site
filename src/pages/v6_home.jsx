@@ -11,13 +11,14 @@
 import React, { useEffect } from 'react';
 import LayoutWrapper from '../components/home/v6/LayoutWrapper';
 import NavBarCosmic from '../components/home/v6/NavBarCosmic';
-import HeroSequenceV6 from '../components/home/v6/HeroSequenceV6';
+import HeroSequenceV6 from '../components/home/v6/HeroSequenceV6.jsx';
 import ServicesOrbital from '../components/home/v6/ServicesOrbital';
 import ProcessCards from '../components/home/v6/ProcessCards';
 import ContactTerminal from '../components/home/v6/ContactTerminal';
 import { useMission, MissionTiles } from '../components/home/v6/MissionTracker';
 import CosmicBackgroundSystemV6 from '../components/home/v6/CosmicBackgroundSystemV6';
 import HorizontalProductScrollV6 from '../components/home/v6/HorizontalProductScrollV6';
+import SceneControllerV6 from '../components/home/v6/SceneControllerV6';
 
 const V6HomePage = () => {
   const { markMissionComplete } = useMission();
@@ -31,28 +32,30 @@ const V6HomePage = () => {
   }, [markMissionComplete]);
   
   return (
-    <LayoutWrapper>
-      {/* Background System */}
-      <CosmicBackgroundSystemV6 />
-      
-      {/* Navigation */}
-      <NavBarCosmic />
-      
-      {/* Hero Section */}
-      <HeroSequenceV6 />
-      
-      {/* Services Section */}
-      <ServicesOrbital />
-      
-      {/* Product Showcase */}
-      <HorizontalProductScrollV6 />
-      
-      {/* Process Section */}
-      <ProcessCards />
-      
-      {/* Contact Section */}
-      <ContactTerminal />
-    </LayoutWrapper>
+    <SceneControllerV6>
+      <LayoutWrapper>
+        {/* Background System */}
+        <CosmicBackgroundSystemV6 />
+        
+        {/* Navigation */}
+        <NavBarCosmic />
+        
+        {/* Hero Section */}
+        <HeroSequenceV6 />
+        
+        {/* Services Section */}
+        <ServicesOrbital />
+        
+        {/* Product Showcase */}
+        <HorizontalProductScrollV6 />
+        
+        {/* Process Section */}
+        <ProcessCards />
+        
+        {/* Contact Section */}
+        <ContactTerminal />
+      </LayoutWrapper>
+    </SceneControllerV6>
   );
 };
 

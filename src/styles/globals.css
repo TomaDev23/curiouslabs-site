@@ -1,3 +1,16 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@keyframes orbitSlow {
+  0% { transform: rotate(0deg) scale(1); }
+  100% { transform: rotate(360deg) scale(1); }
+}
+
+.animate-orbit-slow {
+  animation: orbitSlow 60s linear infinite;
+}
+
 /* Glow Effect Utilities - Subtle Enhancement */
 .glow-on-hover {
   position: relative;
@@ -37,4 +50,25 @@
 .glow-on-hover:focus-visible {
   outline: none;
   box-shadow: 0 0 0 2px rgba(74, 222, 128, 0.4);
+}
+
+/* Add orbit animation keyframes for planet */
+@keyframes orbit1 {
+  0% { transform: rotate(0deg) scale(1.4); }
+  100% { transform: rotate(360deg) scale(1.4); }
+}
+
+@keyframes orbit2 {
+  0% { transform: rotate(30deg) scale(1.6); }
+  100% { transform: rotate(390deg) scale(1.6); }
+}
+
+@keyframes orbit3 {
+  0% { transform: rotate(60deg) scale(1.8); }
+  100% { transform: rotate(420deg) scale(1.8); }
+}
+
+/* Add radial vignette background */
+.bg-radial-vignette {
+  background: radial-gradient(circle at center, transparent 0%, rgba(10, 10, 15, 0.7) 80%, rgba(10, 10, 15, 0.8) 100%);
 } 
