@@ -20,7 +20,7 @@ A component is **LEGIT** only if it meets **all** of the following:
 | Area           | Requirement |
 |----------------|-------------|
 | ✅ Name         | Matches `contract_component_names.md` entry |
-| ✅ Location     | Lives under `src/components/home/v4/` or documented alias |
+| ✅ Location     | Lives under one of:<br>- `src/components/home/v4/`<br>- `src/components/atomic/` *(for V6 atomic rebuilds only)* |
 | ✅ Props        | Fully typed + documented in the component contract |
 | ✅ Animation    | Uses config from `animation_schema_v1.5.md` |
 | ✅ Layout       | Complies with `route-lock.md` placement and Tailwind spacing |
@@ -87,12 +87,12 @@ Each LEGIT component must declare metadata via:
 
 ```js
 export const metadata = {
-  id: 'hero_portal',
-  scs: 'SCS1',
-  type: 'visual',
-  doc: 'contract_hero_portal.md'
+  id: 'component_id',          // Following naming convention
+  scs: 'SCS-COMPONENT-TYPE',   // Security compliance tag
+  type: 'development|ui|core|atomic',  // Component type ('atomic' for V6 atomic components)
+  doc: 'contract_component_name.md' // Reference to contract
 }
-````
+```
 
 ---
 
@@ -124,6 +124,17 @@ All new components must:
 * ID: `hero_portal`
 * Contract: `contract_hero_portal.md`
 * Rendered in: `dev_v4_cosmic.jsx`
+* Verified ✅: Animation, Mobile, Layout, Docs, Props
+
+---
+
+## ✅ Example LEGIT Entry (Atomic Component)
+
+* Name: MissionAtomic
+* ID: `mission_atomic`
+* Contract: `contract_mission_atomic.md`
+* Type: `atomic`
+* Rendered in: `v6_atomic.jsx`
 * Verified ✅: Animation, Mobile, Layout, Docs, Props
 
 ---

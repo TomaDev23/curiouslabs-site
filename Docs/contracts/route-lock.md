@@ -46,6 +46,7 @@
 | `/dev_v4_cosmic`| `DevV4CosmicPage.jsx`     | 🧪 Dev     | Primary staging page (now `/`)     |
 | `/test_canvas` | `TestCanvasPage.jsx`       | 🧪 Dev     | Visual isolation route (for debug) |
 | `/home-v5`     | `HomeV5AtomicPage.jsx`     | 🧪 Dev     | Staging for homepage rebuild (v5)  |
+| `/v6_atomic`   | `V6AtomicPage.jsx`         | 🧪 Dev     | Atomic rebuild of v6 homepage      |
 | `/dev/mars-test`| `MarsTestPage.jsx`        | 🧪 Dev     | Mars component testing environment |
 | `/dev/combined-parallax-test` | `CombinedParallaxTest.jsx` | 🧪 Dev | Parallax effects with Moon testing |
 
