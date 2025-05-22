@@ -35,35 +35,44 @@ export const MissionTiles = {
     tasks: [
       'Planet 3D Implementation',
       'Adaptive Planet Component',
-      'Hero Sequence',
+      'Z-Pattern Layout',
       'Animation System'
     ]
   },
   TILE_D: {
     name: 'Product Showcase',
     tasks: [
-      'Product Section',
-      'Horizontal Scroll',
-      'Planet Visualization',
+      'Services Orbital Component',
+      'Card Rotation System',
+      'Service Details View',
       'Interactive Elements'
     ]
   },
   TILE_E: {
-    name: 'Testing & Optimization',
+    name: 'HUD System',
     tasks: [
-      'Performance Testing',
-      'Accessibility Checks',
-      'Cross-browser Testing',
-      'Mobile Optimization'
+      'Draggable HOC',
+      'HUD Hub Component',
+      'Mission Tracker Integration',
+      'Section Control Panel'
     ]
   },
   TILE_F: {
-    name: 'Final Integration',
+    name: 'Layout & Optimization',
     tasks: [
-      'Route Configuration',
-      'Analytics Integration',
-      'Final QA',
-      'Documentation'
+      'Z-Pattern Finalization',
+      'Responsive Layout',
+      'Performance Testing',
+      'Section Boundaries'
+    ]
+  },
+  TILE_G: {
+    name: 'Documentation',
+    tasks: [
+      'LEGIT Contracts',
+      'HUD Documentation',
+      'Developer Guides',
+      'Mission Reports'
     ]
   }
 };
@@ -80,9 +89,63 @@ const MissionContext = createContext({
 export const useMission = () => useContext(MissionContext);
 
 export const MissionProvider = ({ children }) => {
-  const [completedMissions, setCompletedMissions] = useState({});
-  const [completedTasks, setCompletedTasks] = useState({});
-  const [isDevMode, setIsDevMode] = useState(false);
+  // Initial state with predefined completed items
+  const initialMissions = {
+    'TILE_A': true,
+    'TILE_B': true,
+    'TILE_C': true, 
+    'TILE_D': true,
+    'TILE_E': true,
+    'TILE_F': false,
+    'TILE_G': false
+  };
+  
+  const initialTasks = {
+    // TILE_A: Core Foundation
+    'TILE_A_0': true, // Scene Controller Setup
+    'TILE_A_1': true, // Device Capability Detection
+    'TILE_A_2': true, // Performance Optimization
+    'TILE_A_3': true, // Mission Tracking System
+    
+    // TILE_B: Background System
+    'TILE_B_0': true, // Starfield Canvas
+    'TILE_B_1': true, // Grid Overlay
+    'TILE_B_2': true, // Nebula Effects
+    'TILE_B_3': true, // Performance Tiers
+    
+    // TILE_C: Hero Elements
+    'TILE_C_0': true, // Planet 3D Implementation
+    'TILE_C_1': true, // Adaptive Planet Component
+    'TILE_C_2': true, // Z-Pattern Layout
+    'TILE_C_3': true, // Animation System
+    
+    // TILE_D: Product Showcase
+    'TILE_D_0': true, // Services Orbital Component
+    'TILE_D_1': true, // Card Rotation System
+    'TILE_D_2': true, // Service Details View
+    'TILE_D_3': true, // Interactive Elements
+    
+    // TILE_E: HUD System
+    'TILE_E_0': true, // Draggable HOC
+    'TILE_E_1': true, // HUD Hub Component
+    'TILE_E_2': true, // Mission Tracker Integration
+    'TILE_E_3': false, // Section Control Panel
+    
+    // TILE_F: Layout & Optimization
+    'TILE_F_0': true, // Z-Pattern Finalization
+    'TILE_F_1': true, // Responsive Layout
+    'TILE_F_2': false, // Performance Testing
+    'TILE_F_3': false, // Section Boundaries
+    
+    // TILE_G: Documentation
+    'TILE_G_0': true, // LEGIT Contracts
+    'TILE_G_1': true, // HUD Documentation
+    'TILE_G_2': false, // Developer Guides
+    'TILE_G_3': true  // Mission Reports
+  };
+  
+  const [completedMissions, setCompletedMissions] = useState(initialMissions);
+  const [completedTasks, setCompletedTasks] = useState(initialTasks);
   
   // Load saved mission progress on mount
   useEffect(() => {
@@ -91,15 +154,24 @@ export const MissionProvider = ({ children }) => {
       const savedTasks = localStorage.getItem('v6_task_progress');
       
       if (savedMissions) {
-        setCompletedMissions(JSON.parse(savedMissions));
+        setCompletedMissions(prev => ({
+          ...prev,
+          ...JSON.parse(savedMissions)
+        }));
+      } else {
+        // Store initial values to localStorage if none exist
+        localStorage.setItem('v6_mission_progress', JSON.stringify(initialMissions));
       }
       
       if (savedTasks) {
-        setCompletedTasks(JSON.parse(savedTasks));
+        setCompletedTasks(prev => ({
+          ...prev,
+          ...JSON.parse(savedTasks)
+        }));
+      } else {
+        // Store initial values to localStorage if none exist
+        localStorage.setItem('v6_task_progress', JSON.stringify(initialTasks));
       }
-      
-      // Check if in development mode
-      setIsDevMode(process.env.NODE_ENV === 'development');
     } catch (err) {
       console.error('Failed to load mission progress:', err);
     }
@@ -156,34 +228,7 @@ export const MissionProvider = ({ children }) => {
     }}>
       {children}
       
-      {/* Developer mode mission tracker overlay */}
-      {isDevMode && (
-        <div className="fixed bottom-4 right-4 bg-opacity-80 bg-gray-900 p-4 rounded-lg shadow-lg z-50 text-sm">
-          <h3 className="font-bold text-purple-400 mb-2">V6 Mission Tracker</h3>
-          <div className="space-y-3">
-            {Object.entries(MissionTiles).map(([id, { name, tasks }]) => (
-              <div key={id}>
-                <div className="flex items-center mb-1">
-                  <span className={`w-3 h-3 rounded-full mr-2 ${
-                    completedMissions[id] ? 'bg-lime-400' : 'bg-gray-500'
-                  }`} />
-                  <span className="text-white font-medium">{name}</span>
-                </div>
-                <ul className="pl-5 space-y-1">
-                  {tasks.map((task, index) => (
-                    <li key={index} className="flex items-center text-xs">
-                      <span className={`w-2 h-2 rounded-full mr-2 ${
-                        completedTasks[`${id}_${index}`] ? 'bg-lime-400/50' : 'bg-gray-600'
-                      }`} />
-                      <span className="text-gray-400">{task}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+      {/* Mission tracker moved to V6HUDSystem as MissionTrackerHUD component */}
     </MissionContext.Provider>
   );
 };

@@ -62,9 +62,9 @@ const HeroSequenceV6 = () => {
 
   return (
     <section className="relative h-screen w-full overflow-hidden">
-      {/* Header at bottom-left */}
+      {/* Header positioned just above the milkyway image */}
       <div 
-        className="absolute bottom-10 left-8 z-10"
+        className="absolute bottom-[12vh] left-8 z-10"
         style={{
           opacity: 0.9,
         }}

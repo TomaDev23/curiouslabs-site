@@ -17,11 +17,11 @@ const products = [
   {
     id: 'aegis',
     name: 'AEGIS Runtime',
-    description: 'The powerful runtime core that powers our entire ecosystem. Hardened FSM for agentic processes with fallbacks and full telemetry.',
+    description: 'The powerful core that powers our entire ecosystem. Endless scenarios, Endless vectors.',
     color: '#84cc16', // lime
     features: [
       'Multi-agent architecture',
-      'State machine with formal transitions',
+      'State of the art FSM',
       'Error handling with recovery',
       'Full audit trail and telemetry',
     ],
@@ -29,14 +29,14 @@ const products = [
   },
   {
     id: 'opspipe',
-    name: 'OpsPipe',
-    description: 'AI-powered operations system with dynamic agent selection and capability-based scoring.',
+    name: '',
+    description: '',
     color: '#2563eb', // blue
     features: [
-      'Office in your pocket',
-      'Dynamic selection and fallback',
-      'Capability-based scoring',
-      'Audit trail for all operations',
+      '',
+      '',
+      '',
+      '',
     ],
     planetVariant: 'operations',
   },

@@ -8,11 +8,10 @@
  * @legit true - ProcessCards passes LEGIT protocol
  */
 
-import React, { useRef, useEffect } from 'react';
+import React from 'react';
 import { useBreakpoint } from '../../../hooks/useBreakpoint';
 
 const ProcessCards = () => {
-  const sectionRef = useRef(null);
   const { isMobile } = useBreakpoint();
   
   // Process steps data
@@ -46,42 +45,6 @@ const ProcessCards = () => {
       color: 'purple'
     }
   ];
-  
-  // Setup intersection observer for section animation
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('opacity-100');
-          entry.target.classList.remove('opacity-0', 'translate-y-10');
-          
-          // Trigger step-by-step card animations
-          const cards = entry.target.querySelectorAll('.process-card');
-          cards.forEach((card, index) => {
-            setTimeout(() => {
-              card.classList.add('opacity-100', 'translate-y-0');
-              card.classList.remove('opacity-0', 'translate-y-10');
-            }, 300 + index * 200); // Staggered animation
-          });
-        }
-      },
-      {
-        root: null,
-        threshold: 0.1,
-        rootMargin: '-50px'
-      }
-    );
-    
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
-    }
-    
-    return () => {
-      if (sectionRef.current) {
-        observer.unobserve(sectionRef.current);
-      }
-    };
-  }, []);
   
   // Get color class based on color name
   const getColorClass = (color, element) => {
@@ -118,8 +81,7 @@ const ProcessCards = () => {
   return (
     <section
       id="process"
-      ref={sectionRef}
-      className="min-h-screen flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8 py-20 opacity-0 translate-y-10 transition-all duration-1000 ease-out"
+      className="min-h-screen flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8 py-20 opacity-100"
     >
       {/* Section Header */}
       <div className="text-center mb-16 max-w-2xl mx-auto">
@@ -161,7 +123,7 @@ const ProcessCards = () => {
         {steps.map((step, index) => (
           <div
             key={step.id}
-            className={`process-card opacity-0 translate-y-10 transition-all duration-700 ease-out ${
+            className={`process-card opacity-100 ${
               isMobile 
                 ? 'w-full' 
                 : 'w-56 mx-8 transform'
