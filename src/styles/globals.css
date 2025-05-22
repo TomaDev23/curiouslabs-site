@@ -71,4 +71,15 @@
 /* Add radial vignette background */
 .bg-radial-vignette {
   background: radial-gradient(circle at center, transparent 0%, rgba(10, 10, 15, 0.7) 80%, rgba(10, 10, 15, 0.8) 100%);
+}
+
+/* Hide scrollbar for modern browsers */
+.scrollbar-hide {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+/* Chrome, Safari, and Opera */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
 } 

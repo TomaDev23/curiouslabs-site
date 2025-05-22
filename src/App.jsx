@@ -35,7 +35,12 @@ const BackgroundSandbox = lazy(() => import('./pages/background_sandbox.jsx'));
 const BackgroundFinal = lazy(() => import('./pages/background_final.jsx'));
 const HomeV5AtomicPage = lazy(() => import('./pages/HomeV5AtomicPage.jsx'));
 const V6HomePage = lazy(() => import('./pages/v6_home.jsx'));
+const V6AtomicPage = lazy(() => import('./pages/v6_atomic.jsx'));
+const V6ProductsPage = lazy(() => import('./pages/v6-products.tsx'));
+const V6ProductsPage2 = lazy(() => import('./pages/v6-products2.tsx'));
+const OurProductsPage = lazy(() => import('./pages/our-products.jsx'));
 import CosmicRevDev from './pages/CosmicRevDev';
+import HomeLayout from './layouts/HomeLayout';
 
 // Parallax test pages
 const ParallaxTest = lazy(() => import('./pages/dev/parallax-test.jsx'));
@@ -239,6 +244,14 @@ export default function App() {
             <Guardian />
           </Suspense>
         } />
+        
+        {/* Our Products - New unified products page */}
+        <Route path="/our-products" element={
+          <Suspense fallback={<LoadingFallback />}>
+            <OurProductsPage />
+          </Suspense>
+        } />
+        
         <Route path="/tools" element={
           <Suspense fallback={<LoadingFallback />}>
             <Tools />
@@ -362,6 +375,31 @@ export default function App() {
                 <V6HomePage />
               </ErrorBoundary>
             </React.StrictMode>
+          </Suspense>
+        } />
+        
+        {/* V6 Atomic Route */}
+        <Route path="/v6_atomic" element={
+          <Suspense fallback={<LoadingFallback />}>
+            <React.StrictMode>
+              <ErrorBoundary fallback={<SafeV4CosmicPage />}>
+                <V6AtomicPage />
+              </ErrorBoundary>
+            </React.StrictMode>
+          </Suspense>
+        } />
+        
+        {/* New V6 Products Dev Route */}
+        <Route path="/v6-products" element={
+          <Suspense fallback={<LoadingFallback />}>
+            <V6ProductsPage />
+          </Suspense>
+        } />
+        
+        {/* New V6 Products 2 Dev Route */}
+        <Route path="/v6-products2" element={
+          <Suspense fallback={<LoadingFallback />}>
+            <V6ProductsPage2 />
           </Suspense>
         } />
         
