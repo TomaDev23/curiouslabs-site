@@ -39,6 +39,7 @@ const V6AtomicPage = lazy(() => import('./pages/v6_atomic.jsx'));
 const V6ProductsPage = lazy(() => import('./pages/v6-products.tsx'));
 const V6ProductsPage2 = lazy(() => import('./pages/v6-products2.tsx'));
 const OurProductsPage = lazy(() => import('./pages/our-products.jsx'));
+const ProcessComparisonPage = lazy(() => import('./pages/process_comparison.jsx'));
 import CosmicRevDev from './pages/CosmicRevDev';
 import HomeLayout from './layouts/HomeLayout';
 
@@ -400,6 +401,13 @@ export default function App() {
         <Route path="/v6-products2" element={
           <Suspense fallback={<LoadingFallback />}>
             <V6ProductsPage2 />
+          </Suspense>
+        } />
+        
+        {/* Process Comparison Page */}
+        <Route path="/process-comparison" element={
+          <Suspense fallback={<LoadingFallback />}>
+            <ProcessComparisonPage />
           </Suspense>
         } />
         
