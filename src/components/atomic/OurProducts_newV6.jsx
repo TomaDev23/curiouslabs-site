@@ -9,8 +9,28 @@
  * @doc contract_horizontal_product_scroll_v6.md
  */
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+
+// Global animation delays - generated once and never change
+const PERSISTENT_ANIMATION_DELAYS = {
+  comet1: Math.random() * 3,
+  comet2: Math.random() * 3 + 1.5,
+  comet3: Math.random() * 3 + 2.8,
+  dust1: Math.random() * 3 + 0.8,
+  dust2: Math.random() * 3 + 1.2,
+  dust3: Math.random() * 3 + 2.2,
+  dust4: Math.random() * 3 + 3.5
+};
+
+/**
+ * @component OurProducts_newV6
+ * @description Enhanced product showcase with native Canvas ThoughtTrails
+ * @version 6.1.0
+ * @legit true
+ */
+
+const generateRandomDelay = () => Math.random() * 6 + 2.5;
 
 // Product data for the carousel
 const OPS_BENTO_ITEMS = [
@@ -636,318 +656,89 @@ const AegisPage = () => {
 
 // Products Page (Simple Static Version)
 const ProductsPage = () => {
-  const [activeIndex, setActiveIndex] = useState(0);
+  const [currentPage, setCurrentPage] = useState(0);
   const [hoveredCard, setHoveredCard] = useState(null);
 
-  // Product Info Panel - Enhanced version for the left side
-  const ProductInfoPanel = ({ activeProduct }) => (
-    <div className="h-full relative">
-      {/* Main info card */}
-      <motion.div 
-        className="backdrop-blur-xl bg-slate-900/40 rounded-2xl border border-white/20 p-8 h-full relative overflow-hidden"
-        style={{
-          boxShadow: '0 0 30px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(255, 255, 255, 0.05)'
-        }}
-        layoutId="info-panel"
-      >
-        {/* Animated background pattern */}
-        <div className="absolute inset-0 opacity-5">
-          <motion.div
-            className="w-full h-full"
-            style={{
-              backgroundImage: `radial-gradient(circle at 50% 50%, ${activeProduct.accentColor}40 0%, transparent 50%)`,
-              backgroundSize: '100px 100px',
-            }}
-            animate={{ 
-              backgroundPosition: ['0% 0%', '100% 100%'] 
-            }}
-            transition={{ duration: 20, repeat: Infinity }}
-          />
-        </div>
+  // Dispatch events to native ThoughtTrails system
+  useEffect(() => {
+    const activeProduct = OPS_BENTO_ITEMS[currentPage];
+    
+    // Small delay to ensure DOM has updated
+    const timeoutId = setTimeout(() => {
+      // Find the featured card element and get its bounds
+      const featuredCard = document.querySelector('[data-featured-card="true"]');
+      const cardBounds = featuredCard ? featuredCard.getBoundingClientRect() : null;
+      
+      console.log('🌟 Dispatching color update:', activeProduct.accentColor);
+      
+      // Dispatch event to native JS system
+      window.dispatchEvent(new CustomEvent('updateAccentColor', {
+        detail: {
+          color: activeProduct.accentColor,
+          cardBounds: cardBounds
+        }
+      }));
+    }, 50); // Small delay to ensure DOM update
+    
+    return () => clearTimeout(timeoutId);
+  }, [currentPage]);
 
-        <div className="relative z-10 h-full flex flex-col">
-          {/* Header with animated accent */}
-          <div className="space-y-4 mb-8">
-            <motion.div
-              className="flex items-center space-x-3"
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.5 }}
-            >
-              <motion.div 
-                className="w-3 h-3 rounded-full"
-                style={{ backgroundColor: activeProduct.accentColor }}
-                animate={{ scale: [1, 1.2, 1] }}
-                transition={{ duration: 2, repeat: Infinity }}
-              />
-              <span className="text-sm font-mono uppercase tracking-wider text-white/60">
-                Product Ecosystem
-              </span>
-            </motion.div>
-            
-            <motion.h3
-              className="text-4xl font-bold"
-              style={{ 
-                background: `linear-gradient(135deg, ${activeProduct.accentColor} 0%, #22d3ee 100%)`,
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent'
-              }}
-              key={activeProduct.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-            >
-              Our<br />Products
-            </motion.h3>
-          </div>
-
-          {/* Dynamic description based on active product */}
-          <motion.div 
-            className="space-y-4 flex-1"
-            key={activeProduct.id}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.3 }}
-          >
-            <p className="text-white/80 text-sm leading-relaxed">
-              Each system is a star in our galaxy — unique, powerful, and built to orbit around you.
-            </p>
-            
-            {/* Active product highlight */}
-            <div className="p-4 rounded-xl backdrop-blur-sm border border-white/10 bg-white/5">
-              <h4 
-                className="font-semibold text-lg mb-2"
-                style={{ color: activeProduct.accentColor }}
-              >
-                {activeProduct.title}
-              </h4>
-              <p className="text-white/70 text-sm mb-3">{activeProduct.summary}</p>
-              <p className="text-white/60 text-xs italic">{activeProduct.tagline}</p>
-            </div>
-
-            {/* Core principles */}
-            <div className="space-y-3 mt-6">
-              {[
-                'A shared AI core with emotional, operational, and creative agents',
-                'Interfaces that protect — never replace — human judgment',
-                'Bot-to-dashboard architecture, built for real-world workflows'
-              ].map((principle, index) => (
-                <motion.div
-                  key={index}
-                  className="flex items-start space-x-3"
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: index * 0.1, duration: 0.3 }}
-                >
-                  <div 
-                    className="w-2 h-2 rounded-full mt-2 flex-shrink-0"
-                    style={{ backgroundColor: activeProduct.accentColor }}
-                  />
-                  <span className="text-white/80 text-sm leading-relaxed">{principle}</span>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-
-          {/* Enhanced CTA */}
-          <motion.button
-            className="w-full mt-8 px-6 py-3 rounded-xl font-medium text-white text-sm relative overflow-hidden group"
-            style={{ backgroundColor: activeProduct.accentColor }}
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-          >
-            <span className="relative z-10">Explore {activeProduct.title}</span>
-            <motion.div
-              className="absolute inset-0 bg-white/20"
-              initial={{ x: '-100%' }}
-              whileHover={{ x: '100%' }}
-              transition={{ duration: 0.5 }}
-            />
-          </motion.button>
-        </div>
-      </motion.div>
-    </div>
-  );
-
-  // Product-specific background effects component
-  const ProductBackgroundEffect = ({ item }) => {
-    const getProductEffect = () => {
-      switch (item.title) {
-        case 'OPSPipe':
-          return (
-            <div className="absolute inset-0 opacity-20">
-              {/* Document flow animation */}
-              {Array.from({ length: 4 }).map((_, i) => (
-                <motion.div
-                  key={i}
-                  className="absolute w-8 h-1 bg-lime-400/60 rounded"
-                  style={{
-                    top: `${20 + i * 15}%`,
-                    left: '10%'
-                  }}
-                  animate={{
-                    x: [0, 100, 0],
-                    opacity: [0, 1, 0]
-                  }}
-                  transition={{
-                    duration: 3,
-                    repeat: Infinity,
-                    delay: i * 0.5
-                  }}
-                />
-              ))}
-            </div>
-          );
-        
-        case 'MoonSignal':
-          return (
-            <div className="absolute inset-0 opacity-20">
-              {/* Signal waves */}
-              <svg className="absolute inset-0 w-full h-full">
-                {Array.from({ length: 3 }).map((_, i) => (
-                  <motion.circle
-                    key={i}
-                    cx="80%"
-                    cy="20%"
-                    r={10 + i * 15}
-                    fill="none"
-                    stroke="#d946ef"
-                    strokeWidth="1"
-                    animate={{
-                      r: [10 + i * 15, 30 + i * 15, 10 + i * 15],
-                      opacity: [0, 0.6, 0]
-                    }}
-                    transition={{
-                      duration: 2,
-                      repeat: Infinity,
-                      delay: i * 0.3
-                    }}
-                  />
-                ))}
-              </svg>
-            </div>
-          );
-        
-        case 'Guardian':
-          return (
-            <div className="absolute inset-0 opacity-20">
-              {/* Shield effect */}
-              <motion.div
-                className="absolute top-1/4 right-1/4 w-16 h-16 border-2 border-purple-400 rounded-lg"
-                animate={{
-                  rotate: [0, 5, -5, 0],
-                  scale: [1, 1.1, 1]
-                }}
-                transition={{
-                  duration: 4,
-                  repeat: Infinity
-                }}
-              />
-            </div>
-          );
-        
-        case 'Curious':
-          return (
-            <div className="absolute inset-0 opacity-20">
-              {/* Conversation bubbles */}
-              {Array.from({ length: 3 }).map((_, i) => (
-                <motion.div
-                  key={i}
-                  className="absolute w-4 h-4 bg-lime-400 rounded-full"
-                  style={{
-                    top: `${30 + i * 20}%`,
-                    right: `${20 + i * 10}%`
-                  }}
-                  animate={{
-                    scale: [0, 1, 0],
-                    opacity: [0, 0.8, 0]
-                  }}
-                  transition={{
-                    duration: 2,
-                    repeat: Infinity,
-                    delay: i * 0.4
-                  }}
-                />
-              ))}
-            </div>
-          );
-        
-        default:
-          return null;
-      }
-    };
-
-    return getProductEffect();
-  };
-
-  // Product icon/visualization component
-  const ProductIcon = ({ item, isFeatured }) => {
-    return (
-      <div className={`relative ${isFeatured ? 'w-16 h-16' : 'w-10 h-10'} mx-auto mb-4`}>
-        <div 
-          className="absolute inset-0 rounded-full"
-          style={{
-            boxShadow: `0 0 20px ${item.accentColor}80`,
-            background: `radial-gradient(circle at 30% 30%, ${item.accentColor}, ${item.accentColor}90)`
-          }}
-        />
-        <div className="absolute w-[120%] h-[120%] -left-[10%] -top-[10%] rounded-full border border-white/10" />
-        
-        {/* Pulsing effect */}
-        <motion.div 
-          className="absolute inset-0 rounded-full border border-white/30"
-          animate={{ scale: [1, 1.2, 1], opacity: [0.7, 0.2, 0.7] }}
-          transition={{ duration: 2, repeat: Infinity }}
-        />
-        
-        <img
-          src={item.illustrationSrc}
-          alt={`${item.title} illustration`}
-          className="w-full h-full object-cover rounded-full"
-          onError={(e) => (e.target.src = '/assets/images/placeholder.png')}
-        />
-      </div>
-    );
-  };
-
-  // Enhanced product card component
+  // Enhanced product card component with NEW ThoughtTrails
   const EnhancedProductCard = ({ item, isActive, isFeatured, isHovered, onHover, onLeave }) => {
+    // Memoize dynamic styles to prevent unnecessary recalculations
+    const cardStyles = useMemo(() => ({
+      background: isFeatured 
+        ? `linear-gradient(135deg, rgba(15, 23, 42, 0.9), rgba(30, 41, 59, 0.7), ${item.accentColor}20)`
+        : 'linear-gradient(135deg, rgba(15, 23, 42, 0.8), rgba(30, 41, 59, 0.6))',
+      borderColor: isActive ? `${item.accentColor}aa` : 'rgba(255,255,255,0.2)',
+      boxShadow: isActive || isHovered
+        ? `0 0 30px ${item.accentColor}40, inset 0 0 20px rgba(255,255,255,0.1)`
+        : 'inset 0 0 5px rgba(255,255,255,0.05)',
+    }), [item.accentColor, isActive, isFeatured, isHovered]);
+
     return (
       <motion.div
         className="relative w-full h-full rounded-2xl overflow-hidden backdrop-blur-sm border cursor-pointer group"
-        style={{
-          background: isFeatured 
-            ? `linear-gradient(135deg, rgba(15, 23, 42, 0.9), rgba(30, 41, 59, 0.7), ${item.accentColor}20)`
-            : 'linear-gradient(135deg, rgba(15, 23, 42, 0.8), rgba(30, 41, 59, 0.6))',
-          borderColor: isActive ? `${item.accentColor}aa` : 'rgba(255,255,255,0.2)',
-          boxShadow: isActive || isHovered
-            ? `0 0 30px ${item.accentColor}40, inset 0 0 20px rgba(255,255,255,0.1)`
-            : 'inset 0 0 5px rgba(255,255,255,0.05)',
-        }}
+        style={cardStyles}
         onMouseEnter={onHover}
         onMouseLeave={onLeave}
         whileHover={{ scale: isFeatured ? 1.02 : 1.05 }}
-        transition={{ duration: 0.3 }}
+        transition={{ duration: 0.3, ease: "easeOut" }}
+        layout={false} // Prevent layout animations from interfering
+        data-featured-card={isFeatured ? "true" : "false"} // Add data attribute for positioning
       >
-        {/* Product-specific background effects */}
-        <ProductBackgroundEffect item={item} />
-        
-        {/* Noise Texture Overlay */}
+        {/* ThoughtTrails are now handled by the native Canvas system */}
+        {/* No React component needed - trails are positioned automatically */}
+
+        {/* Simplified background - no animations */}
         <div
           className="absolute inset-0 opacity-15 pointer-events-none"
           style={{
-            backgroundImage:
-              'url("data:image/svg+xml,%3Csvg width=\'100\' height=\'100\' viewBox=\'0 0 100 100\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noiseFilter\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.65\' numOctaves=\'3\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100\' height=\'100\' filter=\'url(%23noiseFilter)\'/%3E%3C/svg%3E")',
+            backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'100\' height=\'100\' viewBox=\'0 0 100 100\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noiseFilter\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.65\' numOctaves=\'3\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100\' height=\'100\' filter=\'url(%23noiseFilter)\'/%3E%3C/svg%3E")',
             mixBlendMode: 'overlay',
           }}
         />
         
-        {/* Content */}
+        {/* Content - no background animations */}
         <div className="relative z-10 p-6 h-full flex flex-col justify-between">
           {/* Header */}
           <div className="space-y-3">
-            {/* Product icon/visualization */}
-            <ProductIcon item={item} isFeatured={isFeatured} />
+            {/* Simplified icon - no complex animations */}
+            <div className={`relative ${isFeatured ? 'w-16 h-16' : 'w-10 h-10'} mx-auto mb-4`}>
+              <div 
+                className="absolute inset-0 rounded-full"
+                style={{
+                  boxShadow: `0 0 20px ${item.accentColor}60`,
+                  background: `radial-gradient(circle at 30% 30%, ${item.accentColor}, ${item.accentColor}90)`
+                }}
+              />
+              <img
+                src={item.illustrationSrc}
+                alt={`${item.title} illustration`}
+                className="w-full h-full object-cover rounded-full relative z-10"
+                onError={(e) => (e.target.src = '/assets/images/placeholder.png')}
+              />
+            </div>
             
             <div>
               <h3
@@ -962,15 +753,15 @@ const ProductsPage = () => {
             </div>
           </div>
 
-          {/* Features - only show in featured mode */}
-          <AnimatePresence>
+          {/* Features - stable animation */}
+          <AnimatePresence mode="wait">
             {isFeatured && (
               <motion.div
                 key={`features-${item.id}`}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ delay: 0.2 }}
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.3, ease: "easeOut" }}
                 className="space-y-2 my-4"
               >
                 {item.features.slice(0, 3).map((feature, index) => (
@@ -992,9 +783,8 @@ const ProductsPage = () => {
               <p className="text-sm italic text-white/60">{item.tagline}</p>
             )}
             
-            {/* Interaction hint */}
             <div className="flex items-center justify-between">
-              <span className={`font-mono uppercase tracking-wider text-white/40 ${isFeatured ? 'text-xs' : 'text-xs'}`}>
+              <span className="font-mono uppercase tracking-wider text-white/40 text-xs">
                 {isFeatured ? 'Featured' : 'View'}
               </span>
               <motion.div
@@ -1012,9 +802,143 @@ const ProductsPage = () => {
     );
   };
 
+  // Product Info Panel - Enhanced version for the left side
+  const ProductInfoPanel = ({ activeProduct }) => {
+    // Set CSS custom properties once at the top level to batch color updates
+    const cssVars = useMemo(() => ({
+      '--product-accent': activeProduct.accentColor,
+      '--product-accent-20': `${activeProduct.accentColor}20`,
+      '--product-accent-40': `${activeProduct.accentColor}40`,
+      '--product-accent-60': `${activeProduct.accentColor}60`,
+    }), [activeProduct.accentColor]);
+
+    return (
+      <div className="h-full relative" style={{
+        ...cssVars,
+        transition: 'all 0.6s ease', // Gentler color transitions
+      }}>
+        {/* Main info card */}
+        <motion.div 
+          className="backdrop-blur-xl bg-slate-900/40 rounded-2xl border border-white/20 p-8 h-full relative overflow-hidden"
+          style={{
+            boxShadow: '0 0 30px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(255, 255, 255, 0.05)'
+          }}
+        >
+          {/* Use CSS variables instead of dynamic inline styles */}
+          <div className="absolute inset-0 opacity-5">
+            <div
+              className="w-full h-full"
+              style={{
+                backgroundImage: 'radial-gradient(circle at 50% 50%, var(--product-accent-40) 0%, transparent 50%)',
+                backgroundSize: '100px 100px',
+              }}
+            />
+          </div>
+
+          <div className="relative z-10 h-full flex flex-col">
+            {/* Header with CSS variables - REMOVED initial animations */}
+            <div className="space-y-4 mb-8">
+              <motion.div
+                className="flex items-center space-x-3"
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5 }}
+              >
+                <motion.div 
+                  className="w-3 h-3 rounded-full"
+                  style={{ backgroundColor: 'var(--product-accent)' }}
+                  animate={{ scale: [1, 1.2, 1] }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                />
+                <span className="text-sm font-mono uppercase tracking-wider text-white/60">
+                  Product Ecosystem
+                </span>
+              </motion.div>
+              
+              <motion.h3
+                className="text-4xl font-bold"
+                style={{ 
+                  background: 'linear-gradient(135deg, var(--product-accent) 0%, #22d3ee 100%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  color: 'var(--product-accent)', // Fallback for unsupported browsers
+                }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+              >
+                Our<br />Products
+              </motion.h3>
+            </div>
+
+            {/* Dynamic description based on active product */}
+            <motion.div 
+              className="space-y-4 flex-1"
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.3 }}
+            >
+              <p className="text-white/80 text-sm leading-relaxed">
+                Each system is a star in our galaxy — unique, powerful, and built to orbit around you.
+              </p>
+              
+              {/* Active product highlight */}
+              <div className="p-4 rounded-xl backdrop-blur-sm border border-white/10 bg-white/5">
+                <h4 
+                  className="font-semibold text-lg mb-2"
+                  style={{ color: 'var(--product-accent)' }}
+                >
+                  {activeProduct.title}
+                </h4>
+                <p className="text-white/70 text-sm mb-3">{activeProduct.summary}</p>
+                <p className="text-white/60 text-xs italic">{activeProduct.tagline}</p>
+              </div>
+
+              {/* Core principles */}
+              <div className="space-y-3 mt-6">
+                {[
+                  'A shared AI core with emotional, operational, and creative agents',
+                  'Interfaces that protect — never replace — human judgment',
+                  'Bot-to-dashboard architecture, built for real-world workflows'
+                ].map((principle, index) => (
+                  <motion.div
+                    key={index}
+                    className="flex items-start space-x-3"
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: index * 0.1, duration: 0.3 }}
+                  >
+                    <div 
+                      className="w-2 h-2 rounded-full mt-2 flex-shrink-0"
+                      style={{ backgroundColor: 'var(--product-accent)' }}
+                    />
+                    <span className="text-white/80 text-sm leading-relaxed">{principle}</span>
+                  </motion.div>
+                ))}
+              </div>
+            </motion.div>
+
+            {/* Enhanced CTA */}
+            <motion.button
+              className="w-full mt-8 px-6 py-3 rounded-xl font-medium text-white text-sm relative overflow-hidden group"
+              style={{ backgroundColor: 'var(--product-accent)' }}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              <span className="relative z-10">Explore {activeProduct.title}</span>
+              <motion.div
+                className="absolute inset-0 bg-white/20"
+                initial={{ x: '-100%' }}
+                whileHover={{ x: '100%' }}
+                transition={{ duration: 0.5 }}
+              />
+            </motion.button>
+          </div>
+        </motion.div>
+      </div>
+    );
+  };
+
   // Product metrics panel component
   const ProductMetrics = ({ activeProduct }) => {
-    const metrics = {
+    // Memoize metrics data to prevent unnecessary re-renders
+    const allMetrics = useMemo(() => ({
       'OPSPipe': [
         { label: 'Automation Rate', value: '94%', trend: '+12%' },
         { label: 'Processing Speed', value: '2.3s', trend: '-0.4s' },
@@ -1035,18 +959,12 @@ const ProductsPage = () => {
         { label: 'Context Retention', value: '89%', trend: '+14%' },
         { label: 'User Engagement', value: '92%', trend: '+18%' }
       ]
-    };
+    }), []);
 
-    const productMetrics = metrics[activeProduct.title] || metrics['OPSPipe'];
+    const productMetrics = allMetrics[activeProduct.title] || allMetrics['OPSPipe'];
 
     return (
-      <motion.div 
-        className="backdrop-blur-sm bg-slate-900/30 rounded-xl border border-white/10 p-4 h-full"
-        key={activeProduct.id}
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3 }}
-      >
+      <div className="backdrop-blur-sm bg-slate-900/30 rounded-xl border border-white/10 p-4 h-full">
         <div className="flex items-center justify-between h-full">
           <div className="flex items-center space-x-2">
             <div 
@@ -1060,7 +978,16 @@ const ProductsPage = () => {
           
           <div className="flex space-x-8">
             {productMetrics.map((metric, index) => (
-              <div key={index} className="text-center">
+              <motion.div 
+                key={`${activeProduct.title}-${index}`} // Stable key
+                className="text-center"
+                animate={{ opacity: 1, y: 0 }} // Only animate, no initial
+                transition={{ 
+                  duration: 0.2, 
+                  delay: index * 0.05,
+                  ease: "easeOut"
+                }}
+              >
                 <div 
                   className="text-lg font-bold"
                   style={{ color: activeProduct.accentColor }}
@@ -1069,45 +996,43 @@ const ProductsPage = () => {
                 </div>
                 <div className="text-xs text-white/60">{metric.label}</div>
                 <div className="text-xs text-green-400">{metric.trend}</div>
-              </div>
+              </motion.div>
             ))}
           </div>
         </div>
-      </motion.div>
+      </div>
     );
   };
 
-  // Product grid component
-  const ProductGrid = ({ activeIndex, setActiveIndex, hoveredCard, setHoveredCard }) => {
+  // Product grid component with EXTERNAL ThoughtTrails
+  const ProductGrid = ({ currentPage, setCurrentPage, hoveredCard, setHoveredCard }) => {
     return (
-      <div className="relative h-full w-full">
+      <div className="relative h-full w-full" data-page="products">
         {/* Asymmetric grid layout */}
         <div className="grid grid-cols-6 grid-rows-4 gap-4 h-full">
           
-          {/* Featured Card (Large) */}
+          {/* Featured Card (Large) with EXTERNAL ThoughtTrails */}
           <motion.div 
-            className="col-span-4 row-span-3"
-            layoutId={`card-${activeIndex}`}
+            className="col-span-4 row-span-3 relative"
           >
             <EnhancedProductCard 
-              item={OPS_BENTO_ITEMS[activeIndex]} 
+              item={OPS_BENTO_ITEMS[currentPage]} 
               isActive={true}
               isFeatured={true}
-              onHover={() => setHoveredCard(activeIndex)}
+              onHover={() => setHoveredCard(currentPage)}
               onLeave={() => setHoveredCard(null)}
             />
           </motion.div>
           
           {/* Supporting Cards (Small) */}
           <div className="col-span-2 row-span-4 space-y-4">
-            {OPS_BENTO_ITEMS.filter((_, i) => i !== activeIndex).slice(0, 3).map((item, index) => {
+            {OPS_BENTO_ITEMS.filter((_, i) => i !== currentPage).slice(0, 3).map((item, index) => {
               const originalIndex = OPS_BENTO_ITEMS.findIndex(p => p.id === item.id);
               return (
                 <motion.div 
                   key={item.id}
-                  className="h-32"
-                  onClick={() => setActiveIndex(originalIndex)}
-                  layoutId={`card-${originalIndex}`}
+                  className="h-44 lg:h-48 min-h-[11rem]"
+                  onClick={() => setCurrentPage(originalIndex)}
                 >
                   <EnhancedProductCard 
                     item={item} 
@@ -1123,52 +1048,36 @@ const ProductsPage = () => {
           </div>
           
           {/* Stats/Metrics Panel */}
-          <motion.div 
-            className="col-span-4 row-span-1"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 }}
-          >
-            <ProductMetrics activeProduct={OPS_BENTO_ITEMS[activeIndex]} />
-          </motion.div>
+          <div className="col-span-4 row-span-1">
+            <ProductMetrics activeProduct={OPS_BENTO_ITEMS[currentPage]} />
+          </div>
         </div>
       </div>
     );
   };
 
-  // Connection lines between cards
-  const ProductConnections = ({ activeIndex }) => {
-    return (
-      <div className="absolute inset-0 pointer-events-none z-30">
-        <svg width="100%" height="100%" className="absolute inset-0">
-          {/* Animated connection paths */}
-          <motion.path 
-            d="M 120,120 Q 180,180 240,140" 
-            stroke={OPS_BENTO_ITEMS[activeIndex].accentColor}
-            strokeWidth="1"
-            strokeDasharray="5,5"
-            fill="none"
-            initial={{ pathLength: 0, opacity: 0 }}
-            animate={{ pathLength: 1, opacity: 0.6 }}
-            transition={{ duration: 1 }}
-          />
-          <motion.path 
-            d="M 240,240 Q 300,180 360,260" 
-            stroke={OPS_BENTO_ITEMS[activeIndex].accentColor}
-            strokeWidth="1"
-            strokeDasharray="5,5"
-            fill="none"
-            initial={{ pathLength: 0, opacity: 0 }}
-            animate={{ pathLength: 1, opacity: 0.6 }}
-            transition={{ duration: 1, delay: 0.2 }}
-          />
-        </svg>
-      </div>
-    );
-  };
+  // Dispatch event when page changes to control ThoughtTrails visibility
+  useEffect(() => {
+    // Dispatch event to notify ThoughtTrails system about page change
+    window.dispatchEvent(new CustomEvent('horizontalPageChange', {
+      detail: { pageIndex: currentPage }
+    }));
+    
+    console.log(`🌟 Horizontal page changed: ${currentPage}`);
+    
+    // Add data attribute to the current page for easier selection
+    const pages = document.querySelectorAll('section > .flex > .w-screen');
+    pages.forEach((page, index) => {
+      if (index === 1) { // Products page (second page)
+        page.setAttribute('data-page', 'products');
+      } else {
+        page.removeAttribute('data-page');
+      }
+    });
+  }, [currentPage]);
 
   return (
-    <div className="relative w-screen h-screen flex items-center justify-center overflow-hidden">
+    <div className="relative w-screen h-screen flex items-center justify-center overflow-hidden" data-page="products">
       {/* Enhanced Cosmic Background */}
       <div className="absolute inset-0 z-0">
         {/* Base gradient with more depth */}
@@ -1251,6 +1160,9 @@ const ProductsPage = () => {
         }}
         transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
       />
+
+      {/* ThoughtTrails Layer - positioned between background and content */}
+      <div className="absolute inset-0 z-5" data-thought-trails-layer="true"></div>
       
       {/* Main Content Area with Enhanced Layout */}
       <div className="relative z-10 w-full max-w-8xl mx-auto px-6 h-full flex items-center">
@@ -1258,20 +1170,17 @@ const ProductsPage = () => {
           
           {/* Left Panel - Enhanced Info Section */}
           <div className="col-span-4 flex flex-col justify-center space-y-6">
-            <ProductInfoPanel activeProduct={OPS_BENTO_ITEMS[activeIndex]} />
+            <ProductInfoPanel activeProduct={OPS_BENTO_ITEMS[currentPage]} />
           </div>
           
           {/* Right Panel - Enhanced Product Grid */}
           <div className="col-span-8 relative">
             <ProductGrid 
-              activeIndex={activeIndex} 
-              setActiveIndex={setActiveIndex}
+              currentPage={currentPage} 
+              setCurrentPage={setCurrentPage}
               hoveredCard={hoveredCard}
               setHoveredCard={setHoveredCard}
             />
-            
-            {/* Connection Lines Between Cards */}
-            <ProductConnections activeIndex={activeIndex} />
           </div>
         </div>
       </div>
@@ -1394,6 +1303,26 @@ const HorizontalProductScrollV6 = ({ className = '' }) => {
     if (currentPage === 2) setIsScrollLocked(false);
   };
 
+  // Dispatch event when page changes to control ThoughtTrails visibility
+  useEffect(() => {
+    // Dispatch event to notify ThoughtTrails system about page change
+    window.dispatchEvent(new CustomEvent('horizontalPageChange', {
+      detail: { pageIndex: currentPage }
+    }));
+    
+    console.log(`🌟 Horizontal page changed: ${currentPage}`);
+    
+    // Add data attribute to the current page for easier selection
+    const pages = document.querySelectorAll('section > .flex > .w-screen');
+    pages.forEach((page, index) => {
+      if (index === 1) { // Products page (second page)
+        page.setAttribute('data-page', 'products');
+      } else {
+        page.removeAttribute('data-page');
+      }
+    });
+  }, [currentPage]);
+
   return (
     <section 
       className={`relative w-full h-screen overflow-hidden ${className} ${isDebug ? 'debug-mode' : ''}`} 
@@ -1426,7 +1355,7 @@ const HorizontalProductScrollV6 = ({ className = '' }) => {
           <AegisPage />
         </motion.div>
         {/* Page 2: Products */}
-        <motion.div className="w-screen h-screen" variants={pageVariants} initial="initial" animate="animate" exit="exit">
+        <motion.div className="w-screen h-screen" data-page="products" variants={pageVariants} initial="initial" animate="animate" exit="exit">
           <ProductsPage />
         </motion.div>
         {/* Page 3: Services */}
@@ -1454,7 +1383,7 @@ const debugStyles = `
 .debug-mode * {
   outline: 1px dashed rgba(255, 0, 0, 0.2);
 }
-.debug-mode [style*="z-index"], .debug-mode [class*="z-"] {
+.debug-mode [style*="z-index"], .debug-mode [class*="z-"]:after {
   position: relative;
 }
 .debug-mode [style*="z-index"]:after, .debug-mode [class*="z-"]:after {
