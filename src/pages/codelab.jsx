@@ -8,7 +8,7 @@ import ScrollToTop from '../components/ScrollToTop';
 import CaseStudies from '../components/CaseStudies';
 import Testimonials from '../components/Testimonials';
 import ServiceModal from '../components/ServiceModal.jsx';
-import { services } from '../data/services.js';
+import { services } from '../../data/services.js';
 import { useReveal } from '../utils/useReveal.js';
 import CodelabFloatflowLayout from '../layouts/CodelabFloatflowLayout.jsx';
 import HeroSection from '../components/codelab/HeroSection';
