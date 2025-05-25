@@ -1,16 +1,50 @@
-I'll examine the v6_atomic.jsx page to map out its structure and components for contracts.
 
-Read file: src/pages/v6_atomic.jsx
+
+
+Hello! I'll examine the v6_atomic page and list all the components imported to it.
 
 Ran tool
 
-Read file: Docs/home_v6/atomic/ProductScrollAtomic_contract.md
+Read file: src/pages/v6_atomic.jsx
+Based on my examination of the `v6_atomic.jsx` page, here are all the components imported and used:
 
-Read file: Docs/home_v6/atomic/ServicesOrbitalAtomic_contract.md
+## Core Wrapper Components
+1. **SceneControllerV6** - Main page controller from `../components/home/v6/SceneControllerV6`
+2. **LayoutWrapper** - Layout structure handler from `../components/home/v6/LayoutWrapper`
+3. **CosmicBackgroundSystemV6** - Background effects from `../components/home/v6/CosmicBackgroundSystemV6`
+4. **NavBarCosmic** - Navigation bar from `../components/home/v6/NavBarCosmic`
 
-Read file: Docs/home_v6/atomic/MissionAtomic_contract.md
+## Atomic Components (Active)
+5. **HeroAtomic** - Hero section from `../components/atomic/HeroAtomic`
+6. **MissionAtomic** - Mission statement section from `../components/atomic/MissionAtomic`
+7. **OurProducts_newV6** - Products section from `../components/atomic/OurProducts_newV6`
+8. **ServicesOrbitalAtomic** - Services section from `../components/atomic/ServicesOrbitalAtomic`
+9. **ProcessLegacyAtomic** - Process steps section from `../components/atomic/ProcessLegacyAtomic`
+10. **ContactTerminalAtomic** - Contact section from `../components/atomic/ContactTerminalAtomic`
 
-Read file: Docs/home_v6/atomic/ProcessLegacyAtomic_contract.md
+## Component Structure in the Page
+The components are arranged in this order within the page:
+1. `SceneControllerV6` (wrapper)
+   - `LayoutWrapper` (wrapper)
+     - `CosmicBackgroundSystemV6`
+     - `NavBarCosmic`
+     - `HeroAtomic`
+     - `MissionAtomic`
+     - `OurProducts_newV6`
+     - `ServicesOrbitalAtomic`
+     - `ProcessLegacyAtomic`
+     - `ContactTerminalAtomic`
+
+## Notes
+- The page shows commented-out imports of the original V6 components that were replaced by atomic versions
+- `ProductScrollAtomic` is commented out and replaced with `OurProducts_newV6`
+- This is described as an "atomic rebuild" where each component is self-contained and independent
+
+The page follows a clean atomic architecture where each main content component is responsible for its own rendering and state management.
+
+
+
+
 
 Read file: Docs/home_v6/atomic/ContactTerminalAtomic_contract.md
 Based on my analysis of v6_atomic.jsx and the component contracts, here's a comprehensive mapping of the page and its components:
