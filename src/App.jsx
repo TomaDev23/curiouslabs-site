@@ -6,6 +6,9 @@ import ErrorBoundary from './components/ErrorBoundary';
 // Import BackgroundManager from sandbox (new implementation)
 import BackgroundManager from './components/sandbox/BackgroundManager';
 
+// Import native ThoughtTrails system
+import thoughtTrails from './lib/thoughtTrails';
+
 // Main Page (critical, keep eager loaded)
 import Home from './pages/index.jsx';
 import SafeV4CosmicPage from './pages/safe_v4_cosmic.jsx';
@@ -51,6 +54,7 @@ const MarsTestPage = lazy(() => import('./pages/dev/mars-test.jsx'));
 const PlanetSandboxPage = lazy(() => import('./pages/dev/planet-sandbox.jsx'));
 const PlanetSandboxWithStars = lazy(() => import('./pages/dev/PlanetSandboxWithStars.jsx'));
 const DevIndex = lazy(() => import('./pages/dev/index.jsx'));
+const StellarABTest = lazy(() => import('./pages/dev/stellar-ab-test.jsx'));
 
 // Performance monitoring context
 const PerformanceContext = React.createContext({
@@ -152,6 +156,32 @@ const BackgroundManagerWrapper = () => {
 };
 
 export default function App() {
+  // Initialize native ThoughtTrails system once
+  useEffect(() => {
+    console.log('🌟 App: Initializing ThoughtTrails system...');
+    
+    // Initialize the cosmic trail system
+    thoughtTrails.init();
+    
+    // Performance metrics
+    const startTime = performance.now();
+    
+    // Listen for ready event
+    const handleReady = () => {
+      const endTime = performance.now();
+      console.log(`🌟 ThoughtTrails ready in ${(endTime - startTime).toFixed(2)}ms`);
+    };
+    
+    window.addEventListener('thoughtTrailsReady', handleReady);
+    
+    // Cleanup on unmount
+    return () => {
+      window.removeEventListener('thoughtTrailsReady', handleReady);
+      thoughtTrails.destroy();
+      console.log('🌟 ThoughtTrails system cleaned up');
+    };
+  }, []); // Run once on mount
+  
   // Performance metrics state
   const [metrics, setMetrics] = useState({});
   
@@ -365,6 +395,12 @@ export default function App() {
         <Route path="/dev/planet-sandbox-with-stars" element={
           <Suspense fallback={<LoadingFallback />}>
             <PlanetSandboxWithStars />
+          </Suspense>
+        } />
+        
+        <Route path="/dev/stellar-ab-test" element={
+          <Suspense fallback={<LoadingFallback />}>
+            <StellarABTest />
           </Suspense>
         } />
         
