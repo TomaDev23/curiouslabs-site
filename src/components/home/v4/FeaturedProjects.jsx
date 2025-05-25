@@ -1,4 +1,4 @@
-import { metrics } from "../../../data/metrics";
+import { metrics } from "../../../../data/metrics";
 import { motion, useReducedMotion } from "framer-motion";
 import { useBreakpoint } from "../../../hooks/useBreakpoint.js";
 

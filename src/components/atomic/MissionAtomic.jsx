@@ -20,6 +20,7 @@ const MissionAtomic = () => {
   // Self-contained responsive state
   const [isMobile, setIsMobile] = useState(false);
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+  const [milkywayLoaded, setMilkywayLoaded] = useState(false);
   
   // Handle responsive behavior and reduced motion preference
   useEffect(() => {
@@ -39,15 +40,31 @@ const MissionAtomic = () => {
       }
     };
     
+    // Smooth fade-in for Milky Way background
+    const preloadMilkyway = () => {
+      const img = new Image();
+      img.src = "/assets/images/planets/4k/milkyway_Light.webp";
+      img.onload = () => {
+        setMilkywayLoaded(true);
+      };
+      img.onerror = () => {
+        console.warn("Milky Way image failed to load, using fallback");
+        setMilkywayLoaded(true); // Show component anyway
+      };
+    };
+    
     // Initial checks
     checkMobile();
     checkMotionPreference();
+    preloadMilkyway();
     
     // Add resize listener
     window.addEventListener('resize', checkMobile);
     
     // Cleanup
-    return () => window.removeEventListener('resize', checkMobile);
+    return () => {
+      window.removeEventListener('resize', checkMobile);
+    };
   }, []);
 
   // Self-contained mission points data
@@ -109,16 +126,47 @@ const MissionAtomic = () => {
   
   return (
     <motion.div 
-      className="relative w-full min-h-screen bg-curious-dark-900 py-24 overflow-hidden"
+      className="relative w-full bg-curious-dark-900 py-24 overflow-hidden"
+      style={{ 
+        minHeight: '110vh', // Extended from 100vh to 110vh
+        marginTop: '-10vh', // Overlap into hero section
+        mask: 'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.1) 8%, rgba(0,0,0,0.3) 15%, rgba(0,0,0,0.6) 25%, rgba(0,0,0,0.8) 35%, black 45%)',
+        WebkitMask: 'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.1) 8%, rgba(0,0,0,0.3) 15%, rgba(0,0,0,0.6) 25%, rgba(0,0,0,0.8) 35%, black 45%)'
+      }}
       initial="hidden"
       whileInView="visible"
       viewport={{ once: true, margin: "0px 0px -20% 0px" }}
       variants={sectionVariants}
     >
-      {/* Main content wrapper with proper spacing from top */}
-      <div className="relative w-full h-full">
+      {/* Background Image with 10vh dissolve mask - coordinated with nebula */}
+      <div 
+        className="absolute inset-0 z-0"
+        style={{
+          backgroundImage: 'url("/assets/images/planets/4k/milkyway_Light.webp")',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          backgroundAttachment: 'fixed',
+          opacity: milkywayLoaded ? 1 : 0,
+          transition: 'opacity 0.8s ease-in-out'
+        }}
+      />
+      
+      {/* Light glassmorphism overlay - much lighter to let image show through */}
+      <div 
+        className="absolute inset-0 w-full h-full"
+        style={{
+          background: 'rgba(0, 0, 0, 0.2)',
+          backdropFilter: 'blur(0.5px)',
+          WebkitBackdropFilter: 'blur(0.5px)',
+          zIndex: 2
+        }}
+      />
+
+      {/* Main content wrapper with conditional rendering based on image load - v6 style */}
+      <div className="relative w-full h-full opacity-100" style={{ zIndex: 10 }}>
         {/* Right Section with Numbered Mission Points */}
-        <div className={`${isMobile ? 'px-6' : 'md:ml-[45%] md:mr-[5%] pr-4 md:pr-8'} flex flex-col space-y-16 md:space-y-32 mt-[15vh]`}>
+        <div className={`${isMobile ? 'px-6' : 'md:ml-[45%] md:mr-[5%] pr-4 md:pr-8'} flex flex-col space-y-16 md:space-y-32 mt-[25vh]`}>
           {MISSION_POINTS.map((point, index) => (
             <motion.div 
               key={point.id}
@@ -166,6 +214,7 @@ const MissionAtomic = () => {
       <motion.div 
         className={`absolute ${isMobile ? 'bottom-8 left-1/2 -translate-x-1/2' : 'bottom-16 left-8 md:left-24'}`}
         variants={eclipseVariants}
+        style={{ zIndex: 15 }}
       >
         {/* Cosmic background effects - Bottom left corner nebula */}
         <div 
@@ -299,7 +348,7 @@ const MissionAtomic = () => {
       {/* Decorative elements */}
       {/* Metadata text - right side of the circle */}
       {!isMobile && (
-        <div className="absolute bottom-[45%] left-[34rem] text-white/50 text-xs font-mono">
+        <div className="absolute bottom-[45%] left-[34rem] text-white/50 text-xs font-mono" style={{ zIndex: 12 }}>
           limbo<br />
           {'}'}
           <div className="mt-6">
@@ -324,6 +373,7 @@ const MissionAtomic = () => {
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.5, duration: 0.3 }}
         viewport={{ once: true }}
+        style={{ zIndex: 12 }}
       >
         <div className="mr-3 flex space-x-1">
           <span className="w-5 h-5 rounded-full border border-white/20 flex items-center justify-center text-xs">⊕</span>
@@ -337,12 +387,12 @@ const MissionAtomic = () => {
       </motion.div>
       
       {/* Heart icon */}
-      <div className="absolute top-8 left-8 z-20">
+      <div className="absolute top-8 left-8 z-20" style={{ zIndex: 12 }}>
         <span className="text-white/70 text-xl">♡</span>
       </div>
       
       {/* Decorative slashes */}
-      <div className="absolute top-8 right-[30%] z-20 text-white/50 font-light">
+      <div className="absolute top-8 right-[30%] z-20 text-white/50 font-light" style={{ zIndex: 12 }}>
         //<br/>//<br/>//
       </div>
     </motion.div>

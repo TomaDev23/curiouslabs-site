@@ -11,6 +11,7 @@
 
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { StellarMessageComponent } from '../StellarMessageGrok';
 
 // Global animation delays - generated once and never change
 const PERSISTENT_ANIMATION_DELAYS = {
@@ -36,15 +37,24 @@ const generateRandomDelay = () => Math.random() * 6 + 2.5;
 const OPS_BENTO_ITEMS = [
   {
     id: 1,
-    title: 'OPSPipe',
-    summary: 'AI-powered operations stack',
+    title: 'OpsPipe',
+    summary: 'From paper mess to structured insight',
     features: [
-      'Document parsing & classification',
-      'Human-in-the-loop approval',
-      'Telemetry + audit trace',
+      'Inventory tracking, financial logs, recipes',
+      'Export-ready JSON, Markdown, and CLI pipelines', 
+      'Validated by dual-agent parsing + audit system'
     ],
-    tagline: 'Office-in-your-pocket with full control',
-    backContent: 'Automate workflows with AI precision and scale seamlessly.',
+    tagline: 'Originally built inside our ghost kitchen',
+    backContent: 'OpsPipe parses messy documents (like receipts, notes, PDFs) into structured data, metrics, and reports — delivered via Telegram, CLI, or API. Used in real kitchens. Ready for any ops mess.',
+    fullDescription: {
+      whatItIs: 'A battle-tested document parsing system with memory, fallback logic, agent routing, and full trace visibility.',
+      howItWorks: [
+        'Inventory tracking, financial logs, recipes',
+        'Export-ready JSON, Markdown, and CLI pipelines',
+        'Validated by dual-agent parsing + audit system'
+      ],
+      whyItMatters: 'Forget babysitting chatbots. OpsPipe turns messy operational data into a reliable work system — with repeatable results, auditable flows, and minimal chaos.'
+    },
     illustrationSrc: '/assets/images/planets/4k/Galaxy_1_v6.JPG',
     accentColor: '#84cc16', // Lime
     theme: 'lime',
@@ -52,15 +62,27 @@ const OPS_BENTO_ITEMS = [
   },
   {
     id: 2,
-    title: 'Guardian',
-    summary: 'Emotional AI for children',
+    title: 'Curious',
+    summary: 'Relational AI Presence',
     features: [
-      'Creative presence instead of screen addiction',
-      'Gentle nudging through games, stories, and art',
-      'Grows with the child',
+      'Synthetic memory that builds over time',
+      'Personality tuning and tone presets',
+      'Emotional mirroring + presence ("I\'m still here…")'
     ],
-    tagline: 'The screen friend that protects, not distracts',
-    backContent: 'Nurture creativity with an AI that cares and adapts.',
+    tagline: 'AI that "knows you." Finally.',
+    backContent: 'A responsive, emotionally aware AI designed for reflection, companionship, and creative thought. Think: memory-backed journaling, quiet presence, and personalized rituals — all in one living interface.',
+    fullDescription: {
+      whatItIs: 'A responsive, emotionally aware AI designed for reflection, companionship, and creative thought. Think: memory-backed journaling, quiet presence, and personalized rituals — all in one living interface.',
+      howItWorks: [
+        'Synthetic memory that builds over time',
+        'Personality tuning and tone presets',
+        'Emotional mirroring + presence ("I\'m still here…")',
+        'Multimodal rituals: journaling, thought prompts, gratitude',
+        'Session replay, mood history, and life event recall',
+        'User voice, mood, and behavior adapted to context'
+      ],
+      whyItMatters: 'Most AI tools are transactional. Curious is relational. It doesn\'t just respond — it remembers, reflects, and returns. This is AI that sticks with you.'
+    },
     illustrationSrc: '/assets/images/planets/4k/Galaxy_1_v6.JPG',
     accentColor: '#d946ef', // Magenta
     theme: 'magenta',
@@ -68,35 +90,59 @@ const OPS_BENTO_ITEMS = [
   },
   {
     id: 3,
-    title: 'MoonSignal',
-    summary: 'Quant bot logic redefined',
+    title: 'Guardian',
+    summary: 'Creative AI for kids',
     features: [
-      'Strategy modular blocks',
-      'Chart-driven automation',
-      'Risk scoring + fallback logic',
+      'Emotional presence with voice + micro-expressions',
+      'Adaptive personas (playmate → study buddy → teen mentor)',
+      'Curiosity quests, drawing games, music exploration'
     ],
-    tagline: 'Smarter signals for faster action',
-    backContent: 'Trade smarter with AI-driven insights and real-time data.',
+    tagline: 'A digital companion for your child — built to care, not capture.',
+    backContent: 'Guardian is a screen-based emotional companion designed for kids. It keeps them engaged with curiosity, creativity, and protection from toxic content — proving AEGIS can drive high-trust, emotionally nuanced, safety-critical AI.',
+    fullDescription: {
+      whatItIs: 'A screen-based emotional companion designed for kids — Guardian keeps them engaged with curiosity, creativity, and protection from toxic content.',
+      howItWorks: [
+        'Emotional presence with voice + micro-expressions',
+        'Adaptive personas (playmate → study buddy → teen mentor)',
+        'Curiosity quests, drawing games, music exploration',
+        'Built-in content filters to steer away from junk media',
+        'Parent dashboard for controls + insight',
+        'Memory that grows with the child'
+      ],
+      whyItMatters: 'Today\'s screens are addictive — not supportive. Guardian offers an alternative: a digital friend that cares, guides, and encourages healthy screen time — not just grabs attention. Built on the AEGIS runtime with a specialized safe-mode persona engine.'
+    },
+    illustrationSrc: '/assets/images/planets/4k/Galaxy_1_v6.JPG',
+    accentColor: '#f59e0b', // Amber
+    theme: 'amber',
+    bgGradient: 'from-amber-900/50 to-orange-700/30',
+  },
+  {
+    id: 4,
+    title: 'MoonSignal',
+    summary: 'AI Trading Intelligence',
+    features: [
+      'Custom parser agents trained on market formats',
+      'Trading state machine: setup → signal → fallback',
+      'Daily summary reports with regime detection'
+    ],
+    tagline: 'Trade like you\'ve got a team.',
+    backContent: 'A GPT-fused quant stack that analyzes price action, sentiment, and macro data — delivering signals to traders through CLI or Telegram. Think: a hedge fund brain in a small terminal.',
+    fullDescription: {
+      whatItIs: 'A GPT-fused quant stack that analyzes price action, sentiment, and macro data — delivering signals to traders through CLI or Telegram. Think: a hedge fund brain in a small terminal.',
+      howItWorks: [
+        'Custom parser agents trained on market formats',
+        'Trading state machine: setup → signal → fallback',
+        'Daily summary reports with regime detection',
+        'Real-time alerts for scalping, swing, and momentum',
+        'Backtestable YAML logic & test validation',
+        'API + manual oversight fallback chain'
+      ],
+      whyItMatters: 'Most bots spit random indicators. MoonSignal outputs structured, state-driven signals backed by testable logic. No more black box — just raw edge.'
+    },
     illustrationSrc: '/assets/images/planets/4k/Galaxy_1_v6.JPG',
     accentColor: '#22d3ee', // Cyan
     theme: 'cyan',
     bgGradient: 'from-cyan-900/50 to-teal-700/30',
-  },
-  {
-    id: 4,
-    title: 'Curious',
-    summary: 'A relational AI presence',
-    features: [
-      'Synthesized memory',
-      'Personality layers',
-      'Feels like it "knows you"',
-    ],
-    tagline: 'Emotional AI for real connection',
-    backContent: 'Your AI companion that truly understands and evolves with you.',
-    illustrationSrc: '/assets/images/planets/4k/Galaxy_1_v6.JPG',
-    accentColor: '#84cc16', // Lime
-    theme: 'lime',
-    bgGradient: 'from-lime-900/50 to-green-700/30',
   },
 ];
 
@@ -657,7 +703,6 @@ const AegisPage = () => {
 // Products Page (Simple Static Version)
 const ProductsPage = () => {
   const [currentPage, setCurrentPage] = useState(0);
-  const [hoveredCard, setHoveredCard] = useState(null);
 
   // Dispatch events to native ThoughtTrails system
   useEffect(() => {
@@ -684,17 +729,17 @@ const ProductsPage = () => {
   }, [currentPage]);
 
   // Enhanced product card component with NEW ThoughtTrails
-  const EnhancedProductCard = ({ item, isActive, isFeatured, isHovered, onHover, onLeave }) => {
+  const EnhancedProductCard = ({ item, isActive, isFeatured, onHover, onLeave }) => {
     // Memoize dynamic styles to prevent unnecessary recalculations
     const cardStyles = useMemo(() => ({
       background: isFeatured 
         ? `linear-gradient(135deg, rgba(15, 23, 42, 0.9), rgba(30, 41, 59, 0.7), ${item.accentColor}20)`
         : 'linear-gradient(135deg, rgba(15, 23, 42, 0.8), rgba(30, 41, 59, 0.6))',
       borderColor: isActive ? `${item.accentColor}aa` : 'rgba(255,255,255,0.2)',
-      boxShadow: isActive || isHovered
+      boxShadow: isActive
         ? `0 0 30px ${item.accentColor}40, inset 0 0 20px rgba(255,255,255,0.1)`
         : 'inset 0 0 5px rgba(255,255,255,0.05)',
-    }), [item.accentColor, isActive, isFeatured, isHovered]);
+    }), [item.accentColor, isActive, isFeatured]);
 
     return (
       <motion.div
@@ -702,7 +747,9 @@ const ProductsPage = () => {
         style={cardStyles}
         onMouseEnter={onHover}
         onMouseLeave={onLeave}
-        whileHover={{ scale: isFeatured ? 1.02 : 1.05 }}
+        whileHover={{ 
+          filter: "brightness(1.1)" // Only use filter - no scale to prevent layout recalc
+        }}
         transition={{ duration: 0.3, ease: "easeOut" }}
         layout={false} // Prevent layout animations from interfering
         data-featured-card={isFeatured ? "true" : "false"} // Add data attribute for positioning
@@ -753,29 +800,38 @@ const ProductsPage = () => {
             </div>
           </div>
 
-          {/* Features - stable animation */}
-          <AnimatePresence mode="wait">
-            {isFeatured && (
-              <motion.div
-                key={`features-${item.id}`}
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
-                transition={{ duration: 0.3, ease: "easeOut" }}
-                className="space-y-2 my-4"
-              >
-                {item.features.slice(0, 3).map((feature, index) => (
-                  <div key={index} className="flex items-start space-x-2">
-                    <div 
-                      className="w-1.5 h-1.5 rounded-full mt-2 flex-shrink-0"
-                      style={{ backgroundColor: item.accentColor }}
-                    />
-                    <span className="text-sm text-white/80">{feature}</span>
-                  </div>
-                ))}
-              </motion.div>
-            )}
-          </AnimatePresence>
+          {/* Features - NO animations to prevent text jumping */}
+          {isFeatured && (
+            <div className="space-y-4 my-4 transition-opacity duration-300">
+              {/* What It Is */}
+              <div className="space-y-2">
+                <h5 className="text-xs font-mono uppercase tracking-wider text-white/50">What It Is</h5>
+                <p className="text-sm text-white/80 leading-relaxed">{item.fullDescription.whatItIs}</p>
+              </div>
+
+              {/* How It Works */}
+              <div className="space-y-2">
+                <h5 className="text-xs font-mono uppercase tracking-wider text-white/50">How It Works</h5>
+                <div className="space-y-1">
+                  {item.fullDescription.howItWorks.map((feature, index) => (
+                    <div key={index} className="flex items-start space-x-2">
+                      <div 
+                        className="w-1.5 h-1.5 rounded-full mt-2 flex-shrink-0"
+                        style={{ backgroundColor: item.accentColor }}
+                      />
+                      <span className="text-sm text-white/75">{feature}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Why It Matters */}
+              <div className="space-y-2">
+                <h5 className="text-xs font-mono uppercase tracking-wider text-white/50">Why It Matters</h5>
+                <p className="text-sm text-white/80 leading-relaxed italic">{item.fullDescription.whyItMatters}</p>
+              </div>
+            </div>
+          )}
 
           {/* Footer */}
           <div className="space-y-3">
@@ -792,7 +848,7 @@ const ProductsPage = () => {
                 whileHover={{ scale: 1.1, borderColor: item.accentColor }}
               >
                 <svg className="w-3 h-3 text-white/60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 5l-7 7 7 7" />
                 </svg>
               </motion.div>
             </div>
@@ -802,210 +858,184 @@ const ProductsPage = () => {
     );
   };
 
-  // Product Info Panel - Enhanced version for the left side
-  const ProductInfoPanel = ({ activeProduct }) => {
-    // Set CSS custom properties once at the top level to batch color updates
-    const cssVars = useMemo(() => ({
-      '--product-accent': activeProduct.accentColor,
-      '--product-accent-20': `${activeProduct.accentColor}20`,
-      '--product-accent-40': `${activeProduct.accentColor}40`,
-      '--product-accent-60': `${activeProduct.accentColor}60`,
-    }), [activeProduct.accentColor]);
-
-    return (
-      <div className="h-full relative" style={{
-        ...cssVars,
-        transition: 'all 0.6s ease', // Gentler color transitions
-      }}>
-        {/* Main info card */}
-        <motion.div 
-          className="backdrop-blur-xl bg-slate-900/40 rounded-2xl border border-white/20 p-8 h-full relative overflow-hidden"
-          style={{
-            boxShadow: '0 0 30px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(255, 255, 255, 0.05)'
-          }}
-        >
-          {/* Use CSS variables instead of dynamic inline styles */}
-          <div className="absolute inset-0 opacity-5">
-            <div
-              className="w-full h-full"
-              style={{
-                backgroundImage: 'radial-gradient(circle at 50% 50%, var(--product-accent-40) 0%, transparent 50%)',
-                backgroundSize: '100px 100px',
+  // Product Info Panel - STATIC AEGIS Component (No re-renders, no prop changes)
+const ProductInfoPanel = React.memo(() => {
+  return (
+  <div className="h-full relative">
+      {/* Main AEGIS command card */}
+    <div 
+      className="backdrop-blur-xl bg-slate-900/40 rounded-2xl border border-white/20 p-8 h-full relative overflow-hidden"
+      style={{
+        boxShadow: '0 0 30px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(255, 255, 255, 0.05)'
+      }}
+    >
+      <div className="relative z-10 h-full flex flex-col">
+          {/* AEGIS Header */}
+        <div className="space-y-4 mb-8">
+          <div className="flex items-center space-x-3">
+            <motion.div 
+                  className="w-3 h-3 rounded-full bg-lime-400"
+                animate={{ scale: [1, 1.2, 1] }}
+                transition={{ duration: 2, repeat: Infinity }}
+              />
+              <span className="text-sm font-mono uppercase tracking-wider text-white/60">
+                  Core Runtime
+              </span>
+            </div>
+            
+            <h3
+              className="text-4xl font-bold"
+              style={{ 
+                  background: 'linear-gradient(135deg, #84cc16 0%, #22d3ee 100%)',
+              WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  color: '#84cc16', // Fallback
               }}
-            />
+            >
+                AEGIS<br />Command
+            </h3>
+        </div>
+
+          {/* Core Mission Statement */}
+        <div className="space-y-4 flex-1">
+            <p className="text-white/80 text-sm leading-relaxed font-medium">
+              Your AI team, led by you. Mission-based AI orchestration with human oversight at every decision point.
+            </p>
+            
+            {/* AEGIS Architecture Highlights */}
+            <div className="p-4 rounded-xl backdrop-blur-sm border border-lime-400/20 bg-lime-400/5">
+              <h4 className="font-semibold text-lg mb-3 text-lime-400">
+                Adaptive. Auditable. Alive.
+            </h4>
+              <p className="text-white/70 text-sm mb-3">
+                The thinking engine behind CuriousLabs — orchestrating AI, logic, and control across all products.
+              </p>
+              <div className="flex items-center space-x-2">
+                <div className="w-2 h-2 rounded-full bg-lime-400" />
+                <span className="text-white/60 text-xs italic">Multi-agent architecture with state machine control</span>
+              </div>
           </div>
 
-          <div className="relative z-10 h-full flex flex-col">
-            {/* Header with CSS variables - REMOVED initial animations */}
-            <div className="space-y-4 mb-8">
-              <motion.div
-                className="flex items-center space-x-3"
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.5 }}
+          {/* Core Principles */}
+          <div className="space-y-3 mt-6">
+            {[
+                'Real AI agents in parallel with roles, memory, and autonomy',
+                'Central mission engine governing every command',
+                'Complete logs, metrics, and traces for every execution'
+            ].map((principle, index) => (
+              <div
+                key={`principle-${index}`}
+                className="flex items-start space-x-3"
               >
-                <motion.div 
-                  className="w-3 h-3 rounded-full"
-                  style={{ backgroundColor: 'var(--product-accent)' }}
-                  animate={{ scale: [1, 1.2, 1] }}
-                  transition={{ duration: 2, repeat: Infinity }}
-                />
-                <span className="text-sm font-mono uppercase tracking-wider text-white/60">
-                  Product Ecosystem
-                </span>
-              </motion.div>
-              
-              <motion.h3
-                className="text-4xl font-bold"
-                style={{ 
-                  background: 'linear-gradient(135deg, var(--product-accent) 0%, #22d3ee 100%)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  color: 'var(--product-accent)', // Fallback for unsupported browsers
-                }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
-              >
-                Our<br />Products
-              </motion.h3>
-            </div>
+                  <div className="w-2 h-2 rounded-full mt-2 flex-shrink-0 bg-lime-400" />
+                <span className="text-white/80 text-sm leading-relaxed">{principle}</span>
+              </div>
+            ))}
+          </div>
 
-            {/* Dynamic description based on active product */}
-            <motion.div 
-              className="space-y-4 flex-1"
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.3 }}
-            >
-              <p className="text-white/80 text-sm leading-relaxed">
-                Each system is a star in our galaxy — unique, powerful, and built to orbit around you.
+          {/* AEGIS SDK Section */}
+          <div className="mt-6 p-4 rounded-xl backdrop-blur-sm border border-cyan-400/20 bg-cyan-400/5">
+              <div className="flex items-center space-x-2 mb-3">
+                <div className="w-2 h-2 rounded-full bg-cyan-400" />
+                <h4 className="font-semibold text-base text-cyan-400">
+                  AEGIS SDK
+                </h4>
+      </div>
+              <p className="text-white/70 text-sm mb-3">
+                Developer toolkit for integrating AEGIS into any application or workflow.
               </p>
               
-              {/* Active product highlight */}
-              <div className="p-4 rounded-xl backdrop-blur-sm border border-white/10 bg-white/5">
-                <h4 
-                  className="font-semibold text-lg mb-2"
-                  style={{ color: 'var(--product-accent)' }}
-                >
-                  {activeProduct.title}
-                </h4>
-                <p className="text-white/70 text-sm mb-3">{activeProduct.summary}</p>
-                <p className="text-white/60 text-xs italic">{activeProduct.tagline}</p>
-              </div>
-
-              {/* Core principles */}
-              <div className="space-y-3 mt-6">
+              {/* SDK Features */}
+              <div className="space-y-2">
                 {[
-                  'A shared AI core with emotional, operational, and creative agents',
-                  'Interfaces that protect — never replace — human judgment',
-                  'Bot-to-dashboard architecture, built for real-world workflows'
-                ].map((principle, index) => (
-                  <motion.div
-                    key={index}
-                    className="flex items-start space-x-3"
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.1, duration: 0.3 }}
+                  'Python & JavaScript client libraries',
+                  'REST API with WebSocket streaming',
+                  'Mission templates & agent blueprints'
+                ].map((feature, index) => (
+              <div
+                    key={`sdk-${index}`}
+                    className="flex items-start space-x-2"
                   >
-                    <div 
-                      className="w-2 h-2 rounded-full mt-2 flex-shrink-0"
-                      style={{ backgroundColor: 'var(--product-accent)' }}
-                    />
-                    <span className="text-white/80 text-sm leading-relaxed">{principle}</span>
-                  </motion.div>
-                ))}
-              </div>
-            </motion.div>
-
-            {/* Enhanced CTA */}
-            <motion.button
-              className="w-full mt-8 px-6 py-3 rounded-xl font-medium text-white text-sm relative overflow-hidden group"
-              style={{ backgroundColor: 'var(--product-accent)' }}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              <span className="relative z-10">Explore {activeProduct.title}</span>
-              <motion.div
-                className="absolute inset-0 bg-white/20"
-                initial={{ x: '-100%' }}
-                whileHover={{ x: '100%' }}
-                transition={{ duration: 0.5 }}
-              />
-            </motion.button>
+                    <div className="w-1 h-1 rounded-full mt-2 flex-shrink-0 bg-cyan-400/60" />
+                    <span className="text-white/60 text-xs leading-relaxed">{feature}</span>
+                  </div>
+            ))}
           </div>
-        </motion.div>
+
+                {/* Code snippet preview */}
+              <div className="mt-3 p-2 rounded bg-slate-800/50 border border-cyan-400/10">
+                  <code className="text-xs font-mono text-cyan-300/80">
+                    from aegis import Mission<br />
+                    mission = Mission("analyze_docs")<br />
+                    result = mission.execute()
+                  </code>
+                </div>
+              </div>
+            </div>
+
+            {/* AEGIS Status */}
+            <div className="mt-8 p-4 rounded-xl bg-slate-800/50 border border-lime-400/30">
+            <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-sm font-mono text-lime-400 uppercase tracking-wider">System Status</div>
+                  <div className="text-white/80 text-xs">All agents operational</div>
+                </div>
+                <div className="flex items-center space-x-2">
+              <motion.div
+                    className="w-2 h-2 rounded-full bg-lime-400"
+                    animate={{ opacity: [0.5, 1, 0.5] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                  />
+                  <span className="text-xs text-white/60">ACTIVE</span>
+            </div>
+          </div>
+            </div>
+        </div>
+      </div>
       </div>
     );
-  };
+  });
 
-  // Product metrics panel component
-  const ProductMetrics = ({ activeProduct }) => {
-    // Memoize metrics data to prevent unnecessary re-renders
-    const allMetrics = useMemo(() => ({
-      'OPSPipe': [
-        { label: 'Automation Rate', value: '94%', trend: '+12%' },
-        { label: 'Processing Speed', value: '2.3s', trend: '-0.4s' },
-        { label: 'Accuracy', value: '99.7%', trend: '+0.3%' }
-      ],
-      'Guardian': [
-        { label: 'Screen Time Reduced', value: '67%', trend: '+23%' },
-        { label: 'Creative Sessions', value: '1.2k', trend: '+340' },
-        { label: 'Parent Satisfaction', value: '96%', trend: '+8%' }
-      ],
-      'MoonSignal': [
-        { label: 'Signal Accuracy', value: '87%', trend: '+15%' },
-        { label: 'Execution Time', value: '0.8s', trend: '-0.2s' },
-        { label: 'Risk Mitigation', value: '91%', trend: '+7%' }
-      ],
-      'Curious': [
-        { label: 'Response Quality', value: '93%', trend: '+11%' },
-        { label: 'Context Retention', value: '89%', trend: '+14%' },
-        { label: 'User Engagement', value: '92%', trend: '+18%' }
-      ]
-    }), []);
-
-    const productMetrics = allMetrics[activeProduct.title] || allMetrics['OPSPipe'];
+  // Product metrics panel component - STATIC VERSION (No re-renders)
+  const ProductMetrics = React.memo(() => {
+    // Static metrics for OpsPipe - no dynamic data to prevent re-renders
+    const staticMetrics = [
+      { label: 'Automation Rate', value: '94%', trend: '+12%' },
+      { label: 'Processing Speed', value: '2.3s', trend: '-0.4s' },
+      { label: 'Accuracy', value: '99.7%', trend: '+0.3%' }
+    ];
 
     return (
       <div className="backdrop-blur-sm bg-slate-900/30 rounded-xl border border-white/10 p-4 h-full">
         <div className="flex items-center justify-between h-full">
           <div className="flex items-center space-x-2">
-            <div 
-              className="w-2 h-2 rounded-full"
-              style={{ backgroundColor: activeProduct.accentColor }}
-            />
+            <div className="w-2 h-2 rounded-full bg-lime-400" />
             <span className="text-sm font-mono text-white/60 uppercase tracking-wider">
               Live Metrics
             </span>
           </div>
           
           <div className="flex space-x-8">
-            {productMetrics.map((metric, index) => (
-              <motion.div 
-                key={`${activeProduct.title}-${index}`} // Stable key
+            {staticMetrics.map((metric, index) => (
+              <div 
+                key={`static-metric-${index}`}
                 className="text-center"
-                animate={{ opacity: 1, y: 0 }} // Only animate, no initial
-                transition={{ 
-                  duration: 0.2, 
-                  delay: index * 0.05,
-                  ease: "easeOut"
-                }}
               >
-                <div 
-                  className="text-lg font-bold"
-                  style={{ color: activeProduct.accentColor }}
-                >
+                <div className="text-lg font-bold text-lime-400">
                   {metric.value}
                 </div>
                 <div className="text-xs text-white/60">{metric.label}</div>
                 <div className="text-xs text-green-400">{metric.trend}</div>
-              </motion.div>
+              </div>
             ))}
           </div>
         </div>
       </div>
     );
-  };
+  });
 
   // Product grid component with EXTERNAL ThoughtTrails
-  const ProductGrid = ({ currentPage, setCurrentPage, hoveredCard, setHoveredCard }) => {
+  const ProductGrid = ({ currentPage, setCurrentPage }) => {
     return (
       <div className="relative h-full w-full" data-page="products">
         {/* Asymmetric grid layout */}
@@ -1019,29 +1049,101 @@ const ProductsPage = () => {
               item={OPS_BENTO_ITEMS[currentPage]} 
               isActive={true}
               isFeatured={true}
-              onHover={() => setHoveredCard(currentPage)}
-              onLeave={() => setHoveredCard(null)}
+              onHover={() => {}} // Empty hover handler to prevent re-renders
+              onLeave={() => {}} // Empty leave handler to prevent re-renders
             />
           </motion.div>
           
           {/* Supporting Cards (Small) */}
-          <div className="col-span-2 row-span-4 space-y-4">
+          <div className="col-span-2 row-span-4 flex flex-col gap-4">
             {OPS_BENTO_ITEMS.filter((_, i) => i !== currentPage).slice(0, 3).map((item, index) => {
               const originalIndex = OPS_BENTO_ITEMS.findIndex(p => p.id === item.id);
               return (
                 <motion.div 
                   key={item.id}
-                  className="h-44 lg:h-48 min-h-[11rem]"
+                  className="flex-1"
                   onClick={() => setCurrentPage(originalIndex)}
                 >
-                  <EnhancedProductCard 
-                    item={item} 
-                    isActive={false}
-                    isFeatured={false}
-                    isHovered={hoveredCard === originalIndex}
-                    onHover={() => setHoveredCard(originalIndex)}
-                    onLeave={() => setHoveredCard(null)}
-                  />
+                  {/* Enhanced Supporting Card - Clean Arrow Style */}
+                  <motion.div
+                    className="relative w-full h-full rounded-xl overflow-hidden backdrop-blur-sm border border-white/10 cursor-pointer group hover:border-white/20"
+                    style={{
+                      background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.7), rgba(30, 41, 59, 0.5))',
+                    }}
+                    whileHover={{ scale: 1.02, x: -5 }}
+                    transition={{ duration: 0.2, ease: "easeOut" }}
+                  >
+                    {/* Simplified background */}
+                    <div
+                      className="absolute inset-0 opacity-10"
+                      style={{
+                        backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noiseFilter\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.4\' numOctaves=\'2\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noiseFilter)\'/%3E%3C/svg%3E")',
+                        mixBlendMode: 'overlay',
+                      }}
+                    />
+                    
+                    {/* Content - Clean & Minimal */}
+                    <div className="relative z-10 p-4 h-full flex items-center justify-between">
+                      {/* Left: Product Info */}
+                      <div className="flex-1">
+                        <h4
+                          className="text-lg font-bold uppercase tracking-wide mb-1"
+                          style={{ color: item.accentColor, textShadow: `0 0 8px ${item.accentColor}40` }}
+                        >
+                          {item.title}
+                        </h4>
+                        <p className="text-sm font-medium text-white/70 mb-2">
+                          {item.summary}
+                        </p>
+                        
+                        {/* Quick Bullets */}
+                        <div className="space-y-1">
+                          {item.features.slice(0, 2).map((feature, idx) => (
+                            <div key={idx} className="flex items-start space-x-2">
+                              <div 
+                                className="w-1 h-1 rounded-full mt-2 flex-shrink-0"
+                                style={{ backgroundColor: item.accentColor }}
+                              />
+                              <span className="text-xs text-white/60 leading-relaxed">{feature}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Right: Arrow Pointing Left */}
+                      <div className="flex flex-col items-center space-y-2 ml-4">
+                        <motion.div
+                          className="flex items-center justify-center w-8 h-8 rounded-full border border-white/20"
+                          style={{ borderColor: `${item.accentColor}40` }}
+                          whileHover={{ 
+                            scale: 1.1, 
+                            borderColor: item.accentColor,
+                            backgroundColor: `${item.accentColor}20`
+                          }}
+                          transition={{ duration: 0.2 }}
+                        >
+                          <svg className="w-4 h-4 text-white/50 group-hover:text-white/80" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                          </svg>
+                        </motion.div>
+                        
+                        {/* Hint Text */}
+                        <span className="text-xs font-mono text-white/30 uppercase tracking-wider">
+                          View
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Subtle glow on hover */}
+                    <motion.div
+                      className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100"
+                      style={{
+                        background: `linear-gradient(135deg, ${item.accentColor}10, transparent)`,
+                        boxShadow: `inset 0 0 20px ${item.accentColor}20`
+                      }}
+                      transition={{ duration: 0.3 }}
+                    />
+                  </motion.div>
                 </motion.div>
               );
             })}
@@ -1049,9 +1151,9 @@ const ProductsPage = () => {
           
           {/* Stats/Metrics Panel */}
           <div className="col-span-4 row-span-1">
-            <ProductMetrics activeProduct={OPS_BENTO_ITEMS[currentPage]} />
-          </div>
+            <ProductMetrics />
         </div>
+      </div>
       </div>
     );
   };
@@ -1060,10 +1162,14 @@ const ProductsPage = () => {
   useEffect(() => {
     // Dispatch event to notify ThoughtTrails system about page change
     window.dispatchEvent(new CustomEvent('horizontalPageChange', {
-      detail: { pageIndex: currentPage }
+      detail: { 
+        pageIndex: currentPage,
+        pageName: 'products',
+        timestamp: Date.now()
+      }
     }));
     
-    console.log(`🌟 Horizontal page changed: ${currentPage}`);
+    console.log(`🌟 Horizontal page changed: ${currentPage} (products)`);
     
     // Add data attribute to the current page for easier selection
     const pages = document.querySelectorAll('section > .flex > .w-screen');
@@ -1084,7 +1190,7 @@ const ProductsPage = () => {
         <motion.div
           className="absolute inset-0"
           style={{
-            background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 25%, #312e81 50%, rgba(162, 52, 179, 0.4) 75%, rgba(186, 86, 16, 0.3) 100%)',
+            background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 25%, #2d1b4f 50%, rgba(162, 52, 179, 0.4) 75%, rgba(186, 86, 16, 0.3) 100%)',
           }}
           animate={{ 
             backgroundPosition: ['0% 0%', '100% 100%'] 
@@ -1170,7 +1276,7 @@ const ProductsPage = () => {
           
           {/* Left Panel - Enhanced Info Section */}
           <div className="col-span-4 flex flex-col justify-center space-y-6">
-            <ProductInfoPanel activeProduct={OPS_BENTO_ITEMS[currentPage]} />
+            <ProductInfoPanel />
           </div>
           
           {/* Right Panel - Enhanced Product Grid */}
@@ -1178,8 +1284,6 @@ const ProductsPage = () => {
             <ProductGrid 
               currentPage={currentPage} 
               setCurrentPage={setCurrentPage}
-              hoveredCard={hoveredCard}
-              setHoveredCard={setHoveredCard}
             />
           </div>
         </div>
@@ -1191,61 +1295,640 @@ const ProductsPage = () => {
 // Services Page
 const ServicesPage = ({ onScrollRelease }) => {
   const [text, setText] = useState('');
+  const [isStellarActive, setIsStellarActive] = useState(false);
+  const [stellarPhase, setStellarPhase] = useState('materialization');
+  const [stellarProgress, setStellarProgress] = useState(0);
+  const [showFloatingWords, setShowFloatingWords] = useState(false);
+  const [canSkip, setCanSkip] = useState(false);
+  const [typewriterComplete, setTypewriterComplete] = useState(false);
+  const [showStellarHint, setShowStellarHint] = useState(false);
   const fullText = 'We Care, We Create: Ethical, responsible products with humans at the core.';
 
+  // Listen for stellar message activation and phase updates
   useEffect(() => {
+    const handleStellarActivation = (e) => {
+      if (e.detail.pageIndex === 2) {
+        setIsStellarActive(true);
+        setText(''); // Clear the text when stellar is active
+        setShowFloatingWords(true);
+        setShowStellarHint(false);
+      } else {
+        setIsStellarActive(false);
+        setShowFloatingWords(false);
+      }
+    };
+
+    // Listen for stellar phase updates
+    const handleStellarPhase = (e) => {
+      if (e.detail.phase) {
+        setStellarPhase(e.detail.phase);
+        setStellarProgress(e.detail.progress || 0);
+      }
+    };
+
+    // Listen for stellar sequence completion
+    const handleStellarComplete = () => {
+      if (isStellarActive) {
+        console.log('🌌 Stellar sequence completed in ServicesPage');
+        setTimeout(() => {
+          onScrollRelease();
+        }, 1000); // Brief delay before releasing scroll
+      }
+    };
+
+    // Simple pause control for StellarMessage
+    const handleKeyPress = (e) => {
+      if (isStellarActive && e.key === 'p') {
+        e.preventDefault();
+        // Find and pause the stellar message
+        const stellarButtons = document.querySelectorAll('button');
+        const pauseButton = Array.from(stellarButtons).find(btn => 
+          btn.textContent.includes('Pause') || btn.textContent.includes('Resume')
+        );
+        if (pauseButton) {
+          pauseButton.click();
+          console.log('🎬 Stellar message paused/resumed');
+        }
+      }
+    };
+
+    window.addEventListener('horizontalPageChange', handleStellarActivation);
+    window.addEventListener('stellarPhaseUpdate', handleStellarPhase);
+    window.addEventListener('stellarSequenceComplete', handleStellarComplete);
+    window.addEventListener('keydown', handleKeyPress);
+    
+    return () => {
+      window.removeEventListener('horizontalPageChange', handleStellarActivation);
+      window.removeEventListener('stellarPhaseUpdate', handleStellarPhase);
+      window.removeEventListener('stellarSequenceComplete', handleStellarComplete);
+      window.removeEventListener('keydown', handleKeyPress);
+    };
+  }, [isStellarActive, onScrollRelease]);
+
+  // Enhanced typewriter effect with skip functionality
+  useEffect(() => {
+    // Only run typewriter if stellar is not active
+    if (isStellarActive) return;
+    
     let index = 0;
     const interval = setInterval(() => {
       setText(fullText.slice(0, index));
       index++;
+      
+      // Enable skip after 25% of text is shown
+      if (index >= Math.floor(fullText.length * 0.25) && !canSkip) {
+        setCanSkip(true);
+      }
+      
       if (index > fullText.length) {
         clearInterval(interval);
-        onScrollRelease();
+        setTypewriterComplete(true);
+        setShowStellarHint(true);
+        // Show floating words briefly
+        setShowFloatingWords(true);
       }
     }, 50);
     return () => clearInterval(interval);
-  }, [onScrollRelease]);
+  }, [onScrollRelease, isStellarActive, canSkip, fullText.length]);
+
+  // Keyboard controls for skip and stellar activation
+  useEffect(() => {
+    const handleKeyPress = (e) => {
+      // Skip typewriter if allowed
+      if (canSkip && !typewriterComplete && ['Space', 'Enter', 'ArrowRight'].includes(e.code)) {
+        e.preventDefault();
+        setText(fullText);
+        setTypewriterComplete(true);
+        setShowStellarHint(true);
+        setShowFloatingWords(true);
+        return;
+      }
+      
+      // Activate stellar message after typewriter completes
+      if (typewriterComplete && e.code === 'Enter') {
+        e.preventDefault();
+        // Dispatch the stellar activation event
+        window.dispatchEvent(new CustomEvent('horizontalPageChange', {
+          detail: { pageIndex: 2 }
+        }));
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, [canSkip, typewriterComplete, fullText]);
+
+  // Enhanced Cosmic Environment Component
+  const CosmicEnvironment = () => (
+    <div className="absolute inset-0 overflow-hidden">
+      {/* Layer 1: Enhanced Base Gradient */}
+      <motion.div
+        className="absolute inset-0"
+        style={{
+          background: `
+            linear-gradient(135deg, #0f172a 0%, #1e293b 20%, #2d1b4f 40%, rgba(255, 107, 53, 0.15) 70%, rgba(255, 140, 66, 0.1) 100%),
+            radial-gradient(ellipse at 20% 80%, rgba(244, 81, 30, 0.2) 0%, transparent 50%),
+            radial-gradient(ellipse at 80% 20%, rgba(255, 107, 53, 0.15) 0%, transparent 40%)
+          `,
+          backgroundSize: '200% 200%, 100% 100%, 100% 100%',
+        }}
+        animate={{ 
+          backgroundPosition: ['0% 0%, 0% 0%, 0% 0%', '100% 100%, 10% 10%, -10% -10%'] 
+        }}
+        transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+      />
+      
+      {/* Layer 2: Floating Cosmic Orbs */}
+      {Array.from({ length: 8 }).map((_, i) => {
+        const size = 20 + Math.random() * 60;
+        const colors = ['#FF6B35', '#FF8C42', '#F4511E'];
+        const color = colors[i % 3];
+
+  return (
+      <motion.div
+            key={`cosmic-orb-${i}`}
+            className="absolute rounded-full pointer-events-none"
+        style={{
+              width: `${size}px`,
+              height: `${size}px`,
+              background: `radial-gradient(circle, ${color}40 0%, ${color}20 30%, transparent 70%)`,
+              top: `${Math.random() * 100}%`,
+              left: `${Math.random() * 100}%`,
+              filter: 'blur(1px)',
+            }}
+            animate={{
+              y: [0, -40, 0],
+              x: [0, 20, 0],
+              scale: [1, 1.3, 1],
+              opacity: [0.2, 0.6, 0.2]
+            }}
+            transition={{
+              duration: 12 + Math.random() * 8,
+              repeat: Infinity,
+              delay: Math.random() * 5,
+              ease: "easeInOut"
+            }}
+          />
+        );
+      })}
+      
+      {/* Layer 3: Enhanced Cosmic Grid */}
+      <div className="absolute inset-0 opacity-20">
+        <svg width="100%" height="100%" viewBox="0 0 1000 1000" className="absolute inset-0">
+          {/* Horizontal perspective grid lines */}
+          {Array.from({ length: 12 }).map((_, i) => {
+            const y = 100 + (i * 80);
+            const curve = Math.sin(i * 0.3) * 20;
+            return (
+              <motion.path
+                key={`grid-h-${i}`}
+                d={`M 0,${y} Q 500,${y + curve} 1000,${y}`}
+                stroke="#FF8C42"
+                strokeOpacity="0.3"
+                strokeWidth="0.5"
+                fill="none"
+                strokeDasharray="4,12"
+                animate={{
+                  strokeOpacity: [0.1, 0.4, 0.1],
+                  strokeDashoffset: [0, -16]
+                }}
+                transition={{
+                  duration: 6,
+                  repeat: Infinity,
+                  delay: i * 0.2,
+                  ease: "linear"
+                }}
+              />
+            );
+          })}
+          
+          {/* Vertical perspective grid lines */}
+          {Array.from({ length: 8 }).map((_, i) => {
+            const x = 100 + (i * 120);
+            const curve = Math.cos(i * 0.4) * 15;
+            return (
+              <motion.path
+                key={`grid-v-${i}`}
+                d={`M ${x},0 Q ${x + curve},500 ${x},1000`}
+                stroke="#F4511E"
+                strokeOpacity="0.25"
+                strokeWidth="0.5"
+                fill="none"
+                strokeDasharray="3,15"
+                animate={{
+                  strokeOpacity: [0.1, 0.3, 0.1],
+                  strokeDashoffset: [0, -18]
+                }}
+                transition={{
+                  duration: 8,
+                  repeat: Infinity,
+                  delay: i * 0.3,
+                  ease: "linear"
+                }}
+              />
+            );
+          })}
+          
+          {/* Central cosmic nexus */}
+          <motion.circle
+            cx="500"
+            cy="500"
+            r="3"
+            fill="#FF6B35"
+            animate={{
+              r: [2, 8, 2],
+              opacity: [0.3, 0.8, 0.3]
+            }}
+            transition={{
+              duration: 4,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+          />
+        </svg>
+      </div>
+      
+      {/* Layer 4: Enhanced Nebula Effects */}
+      <motion.div
+        className="absolute inset-0"
+        style={{
+          background: 'radial-gradient(ellipse at 25% 40%, rgba(255, 107, 53, 0.3) 0%, rgba(255, 140, 66, 0.15) 40%, transparent 70%)',
+          filter: 'blur(60px)',
+        }}
+        animate={{ 
+          scale: [1, 1.2, 1],
+          x: [0, 40, 0],
+          y: [0, -30, 0]
+        }}
+        transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
+      />
+      
+        <motion.div
+        className="absolute inset-0"
+        style={{
+          background: 'radial-gradient(ellipse at 75% 60%, rgba(244, 81, 30, 0.25) 0%, rgba(255, 107, 53, 0.12) 35%, transparent 60%)',
+          filter: 'blur(80px)',
+        }}
+        animate={{ 
+          scale: [1.1, 0.9, 1.1],
+          x: [-20, 20, -20],
+          y: [10, -10, 10]
+        }}
+        transition={{ duration: 16, repeat: Infinity, ease: "easeInOut" }}
+      />
+      
+      {/* Layer 5: Dynamic Noise Texture */}
+      <div 
+        className="absolute inset-0 opacity-5 mix-blend-overlay"
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='200' height='200' viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='cosmicNoise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23cosmicNoise)' opacity='0.4'/%3E%3C/svg%3E")`,
+          backgroundSize: '200px 200px'
+        }}
+      />
+    </div>
+  );
+
+  // Integrated Typography Component
+  const IntegratedTypography = () => (
+    <div className="absolute inset-0 flex items-center justify-center z-10">
+      {/* Ghost Text Background - subtle depth layer */}
+      <motion.div
+        className="absolute text-4xl lg:text-6xl font-bold text-center opacity-5 pointer-events-none"
+        style={{
+          background: 'linear-gradient(45deg, #FF6B35, #FF8C42)',
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
+          filter: 'blur(2px)',
+          transform: 'scale(1.2)',
+          lineHeight: 1.2
+        }}
+        animate={{
+          scale: [1.2, 1.25, 1.2],
+          opacity: isStellarActive ? [0.02, 0.08, 0.02] : 0.05
+        }}
+        transition={{
+          duration: 8,
+          repeat: Infinity,
+          ease: "easeInOut"
+        }}
+      >
+        We Care, We Create:<br/>
+        Ethical, responsible products<br/>
+        with humans at the core.
+      </motion.div>
+      
+      {/* Floating Context Words */}
+      <AnimatePresence>
+        {showFloatingWords && ['Innovation', 'Ethics', 'Humanity', 'Purpose', 'Future', 'Trust'].map((word, i) => (
+          <motion.div
+            key={`context-${word}`}
+            className="absolute text-sm lg:text-lg font-light text-white/40 pointer-events-none select-none"
+            style={{
+              top: `${15 + (i * 12) + Math.random() * 20}%`,
+              left: `${10 + (i * 14) + Math.random() * 60}%`,
+              fontWeight: 300,
+              letterSpacing: '0.1em'
+            }}
+            initial={{ opacity: 0, scale: 0.8, y: 20 }}
+            animate={{ 
+              opacity: stellarPhase === 'breathing' ? [0.2, 0.6, 0.2] : [0.1, 0.3, 0.1],
+              y: [0, -15, 0],
+              scale: [0.8, 1.1, 0.8]
+            }}
+            exit={{ opacity: 0, scale: 0.6, y: -30 }}
+            transition={{
+              duration: 6 + Math.random() * 4,
+              repeat: Infinity,
+              delay: i * 0.8,
+              ease: "easeInOut"
+            }}
+          >
+            {word}
+          </motion.div>
+        ))}
+      </AnimatePresence>
+    </div>
+  );
+
+  // Cosmic UI Elements Component
+  const CosmicUI = () => (
+    <div className="absolute inset-0 pointer-events-none z-20">
+      {/* Phase Indicator - Top Left */}
+      <AnimatePresence>
+        {isStellarActive && (
+          <motion.div 
+            className="absolute top-8 left-8 flex items-center space-x-3"
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            transition={{ duration: 0.5 }}
+          >
+            <motion.div 
+              className="w-2 h-2 rounded-full bg-orange-400"
+              animate={{ 
+                scale: [1, 1.3, 1],
+                opacity: [0.6, 1, 0.6]
+              }}
+              transition={{ duration: 2, repeat: Infinity }}
+            />
+            <span className="text-sm font-mono text-white/70 uppercase tracking-wider">
+              {stellarPhase === 'materialization' && 'Initializing System...'}
+              {stellarPhase === 'constellation' && 'Connecting Networks...'}
+              {stellarPhase === 'breathing' && 'System Active...'}
+              {stellarPhase === 'dissolution' && 'Transcending...'}
+            </span>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Progress Visualization - Bottom Center */}
+      <AnimatePresence>
+        {isStellarActive && (
+          <motion.div 
+            className="absolute bottom-12 left-1/2 transform -translate-x-1/2"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+          >
+            <svg width="120" height="60" viewBox="0 0 120 60">
+              {/* Background arc */}
+              <path
+                d="M 10,50 Q 60,10 110,50"
+                fill="none"
+                stroke="rgba(255,255,255,0.15)"
+                strokeWidth="1"
+              />
+              {/* Progress arc */}
+              <motion.path
+                d="M 10,50 Q 60,10 110,50"
+                fill="none"
+                stroke="#FF6B35"
+                strokeWidth="2"
+                strokeDasharray="100"
+                strokeLinecap="round"
+                animate={{
+                  strokeDashoffset: 100 - (stellarProgress * 100),
+                  strokeOpacity: [0.6, 1, 0.6]
+                }}
+                transition={{
+                  strokeDashoffset: { duration: 0.5, ease: "easeOut" },
+                  strokeOpacity: { duration: 2, repeat: Infinity }
+                }}
+              />
+              {/* Progress indicator */}
+              <motion.circle
+                cx={10 + (stellarProgress * 100)}
+                cy={50 - Math.sin(stellarProgress * Math.PI) * 40}
+                r="2"
+                fill="#FF8C42"
+                animate={{
+                  scale: [1, 1.5, 1],
+                  opacity: [0.8, 1, 0.8]
+                }}
+                transition={{
+                  duration: 1.5,
+                  repeat: Infinity,
+                  ease: "easeInOut"
+                }}
+              />
+            </svg>
+            
+            {/* Progress percentage */}
+            <div className="text-center mt-2">
+              <motion.span 
+                className="text-xs font-mono text-white/50"
+                animate={{ opacity: [0.5, 0.8, 0.5] }}
+                transition={{ duration: 2, repeat: Infinity }}
+              >
+                {Math.round(stellarProgress * 100)}%
+              </motion.span>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Mission Statement Enhancement - Only during typewriter */}
+      <AnimatePresence>
+        {!isStellarActive && text.length > 20 && (
+          <motion.div
+            className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 1 }}
+          >
+            {/* Subtle emphasis lines */}
+            <motion.div
+              className="absolute -left-8 top-0 w-1 h-full bg-gradient-to-b from-transparent via-orange-400 to-transparent"
+              animate={{
+                opacity: [0.2, 0.6, 0.2],
+                scaleY: [0.8, 1.2, 0.8]
+              }}
+              transition={{
+                duration: 3,
+                repeat: Infinity,
+                ease: "easeInOut"
+              }}
+            />
+            <motion.div
+              className="absolute -right-8 top-0 w-1 h-full bg-gradient-to-b from-transparent via-orange-400 to-transparent"
+              animate={{
+                opacity: [0.2, 0.6, 0.2],
+                scaleY: [1.2, 0.8, 1.2]
+              }}
+              transition={{
+                duration: 3,
+                repeat: Infinity,
+                delay: 1.5,
+                ease: "easeInOut"
+              }}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Skip Hint - after typewriter completes */}
+      <AnimatePresence>
+        {!isStellarActive && canSkip && !typewriterComplete && (
+          <motion.div
+            className="absolute bottom-8 left-8 text-xs text-white/40 font-mono"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ delay: 0.5, duration: 0.5 }}
+          >
+            <motion.span
+              animate={{ opacity: [0.4, 0.8, 0.4] }}
+              transition={{ duration: 2, repeat: Infinity }}
+            >
+              Press SPACE to skip →
+            </motion.span>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Stellar Activation Hint - after typewriter completes */}
+      <AnimatePresence>
+        {!isStellarActive && typewriterComplete && showStellarHint && (
+          <motion.div
+            className="absolute bottom-8 right-8 text-sm text-white/60 font-mono"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ delay: 1, duration: 0.5 }}
+          >
+            <motion.div
+              className="flex items-center space-x-2"
+              animate={{ opacity: [0.6, 1, 0.6] }}
+              transition={{ duration: 2, repeat: Infinity }}
+            >
+              <span>Press ENTER for Stellar Message</span>
+              <motion.div
+                className="w-1 h-1 rounded-full bg-orange-400"
+                animate={{ 
+                  scale: [1, 1.5, 1],
+                  opacity: [0.6, 1, 0.6]
+                }}
+                transition={{ duration: 1.5, repeat: Infinity }}
+              />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
 
   return (
     <div className="relative w-screen h-screen flex items-center justify-center overflow-hidden">
-      {/* Cosmic Background */}
-      <motion.div
-        className="absolute inset-0 z-0"
-        style={{
-          background: 'linear-gradient(135deg, #1e293b, #2c3e55, rgba(186, 86, 16, 0.3) 40%)',
-          backgroundSize: '200% 200%',
-        }}
-        animate={{ backgroundPosition: ['0% 0%', '100% 100%'] }}
-        transition={{ duration: 20, repeat: Infinity }}
-      />
-      {/* Nebula Effect */}
-      <motion.div
-        className="absolute inset-0 opacity-10 z-1"
-        style={{
-          background: 'radial-gradient(circle at 50% 50%, rgba(186, 86, 16, 0.3), transparent 60%)',
-          filter: 'blur(35px)',
-        }}
-        variants={nebulaVariants}
-        animate="animate"
-      />
-      {/* Particles */}
-      {[...Array(10)].map((_, i) => (
+      {/* Enhanced Cosmic Environment */}
+      <CosmicEnvironment />
+      
+      {/* Integrated Typography Layer */}
+      <IntegratedTypography />
+      
+      {/* Enhanced Particles - hide when stellar is active */}
+      {!isStellarActive && Array.from({ length: 15 }).map((_, i) => (
         <motion.div
-          key={`particle-${i}`}
-          className="absolute w-1 h-1 bg-white rounded-full z-2"
-          style={{ top: `${Math.random() * 100}%`, left: `${Math.random() * 100}%` }}
-          variants={particleVariants}
-          animate="animate"
+          key={`cosmic-particle-${i}`}
+          className="absolute rounded-full z-5"
+          style={{ 
+            width: Math.random() * 4 + 1 + 'px',
+            height: Math.random() * 4 + 1 + 'px',
+            backgroundColor: i % 3 === 0 ? '#FF6B35' : i % 3 === 1 ? '#FF8C42' : '#ffffff',
+            top: `${Math.random() * 100}%`, 
+            left: `${Math.random() * 100}%`,
+            boxShadow: `0 0 ${Math.random() * 8 + 4}px currentColor`
+          }}
+          animate={{
+            y: [0, -15, 0],
+            opacity: [0, 1, 0],
+            scale: [0.5, 1.2, 0.5]
+          }}
+          transition={{ 
+            duration: 3 + Math.random() * 4, 
+            repeat: Infinity, 
+            repeatDelay: Math.random() * 2,
+            ease: "easeInOut" 
+          }}
         />
       ))}
-      {/* Text Reveal */}
+      
+      {/* Shooting Star Effects - hide when stellar is active */}
+      {!isStellarActive && Array.from({ length: 3 }).map((_, i) => (
+        <motion.div
+          key={`shooting-star-${i}`}
+          className="absolute w-px h-20 z-5"
+          style={{
+            background: `linear-gradient(to bottom, #FF6B35, transparent)`,
+            top: `${Math.random() * 40}%`,
+            left: `${Math.random() * 100}%`,
+            filter: 'blur(0.5px)'
+          }}
+          animate={{
+            x: ['0vw', '100vw'],
+            y: ['0vh', '50vh'],
+            opacity: [0, 1, 0],
+          }}
+          transition={{
+            duration: 4 + Math.random() * 2,
+            repeat: Infinity,
+            repeatDelay: Math.random() * 8 + 6,
+            ease: "easeOut"
+          }}
+        />
+      ))}
+      
+      {/* Main Text Reveal - hide when stellar is active */}
+      {!isStellarActive && (
       <motion.h2
-        className="text-3xl lg:text-4xl font-bold text-white text-center max-w-2xl z-10"
-        style={{ textShadow: '0 0 8px #d946ef80' }}
+          className="text-3xl lg:text-4xl font-bold text-white text-center max-w-2xl z-15 relative"
+          style={{ 
+            textShadow: '0 0 20px rgba(255, 107, 53, 0.6), 0 0 40px rgba(255, 140, 66, 0.3)',
+            lineHeight: 1.3
+          }}
       >
         {text}
-        <span className="animate-blink">|</span>
+          <motion.span 
+            className="inline-block ml-1"
+            animate={{ opacity: [1, 0, 1] }}
+            transition={{ duration: 1, repeat: Infinity }}
+            style={{ color: '#FF6B35' }}
+          >
+            |
+          </motion.span>
       </motion.h2>
+      )}
+
+      {/* Cosmic UI Elements */}
+      <CosmicUI />
+
+      {/* StellarMessage Component - ONLY active on third page */}
+      {isStellarActive && (
+        <div className="absolute inset-0 z-50">
+          <StellarMessageComponent />
+        </div>
+      )}
     </div>
   );
 };
@@ -1275,6 +1958,26 @@ const HorizontalProductScrollV6 = ({ className = '' }) => {
   const [isScrollLocked, setIsScrollLocked] = useState(true);
   const containerRef = useRef(null);
   const isDebug = useDebugMode();
+
+  // Page data attributes mapping
+  const pageDataAttributes = {
+    0: 'aegis',
+    1: 'products', 
+    2: 'services'
+  };
+
+  // Handle stellar sequence completion
+  useEffect(() => {
+    const handleStellarComplete = () => {
+      if (currentPage === 2) {
+        console.log('🌌 Stellar sequence completed - releasing scroll lock');
+        setIsScrollLocked(false);
+      }
+    };
+    
+    window.addEventListener('stellarSequenceComplete', handleStellarComplete);
+    return () => window.removeEventListener('stellarSequenceComplete', handleStellarComplete);
+  }, [currentPage]);
 
   useEffect(() => {
     const handleWheel = (e) => {
@@ -1307,10 +2010,14 @@ const HorizontalProductScrollV6 = ({ className = '' }) => {
   useEffect(() => {
     // Dispatch event to notify ThoughtTrails system about page change
     window.dispatchEvent(new CustomEvent('horizontalPageChange', {
-      detail: { pageIndex: currentPage }
+      detail: { 
+        pageIndex: currentPage,
+        pageName: pageDataAttributes[currentPage],
+        timestamp: Date.now()
+      }
     }));
     
-    console.log(`🌟 Horizontal page changed: ${currentPage}`);
+    console.log(`🌟 Horizontal page changed: ${currentPage} (${pageDataAttributes[currentPage]})`);
     
     // Add data attribute to the current page for easier selection
     const pages = document.querySelectorAll('section > .flex > .w-screen');
@@ -1359,7 +2066,7 @@ const HorizontalProductScrollV6 = ({ className = '' }) => {
           <ProductsPage />
         </motion.div>
         {/* Page 3: Services */}
-        <motion.div className="w-screen h-screen" variants={pageVariants} initial="initial" animate="animate" exit="exit">
+        <motion.div className="w-screen h-screen" data-page="services" variants={pageVariants} initial="initial" animate="animate" exit="exit">
           <ServicesPage onScrollRelease={handleScrollRelease} />
         </motion.div>
       </motion.div>

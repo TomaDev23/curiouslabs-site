@@ -8,7 +8,8 @@
  * @legit true
  */
 
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useId } from 'react';
+import { motion } from 'framer-motion';
 
 // Internal performance detection
 const useDeviceCapabilities = () => {
@@ -154,109 +155,154 @@ const StarfieldCanvas = ({ performanceTier, prefersReducedMotion }) => {
   );
 };
 
-// Grid Overlay Component
-const GridOverlay = ({ performanceTier }) => {
-  const canvasRef = useRef(null);
-  
+// Animated Grid Pattern Component
+const AnimatedGridPattern = ({ 
+  width = 40,
+  height = 40,
+  x = -1,
+  y = -1,
+  strokeDasharray = 0,
+  numSquares = 50,
+  className = "",
+  maxOpacity = 0.3,
+  duration = 4,
+  repeatDelay = 0.5,
+  performanceTier = 'high',
+  prefersReducedMotion = false
+}) => {
+  const id = useId();
+  const containerRef = useRef(null);
+  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+  const [squares, setSquares] = useState([]);
+
+  // Adjust grid settings based on performance tier
+  const getGridConfig = () => {
+    switch (performanceTier) {
+      case 'high':
+        return { width: 40, height: 40, numSquares: 50, maxOpacity: 0.15 };
+      case 'medium':
+        return { width: 50, height: 50, numSquares: 35, maxOpacity: 0.125 };
+      case 'low':
+        return { width: 60, height: 60, numSquares: 20, maxOpacity: 0.1 };
+      default:
+        return { width: 80, height: 80, numSquares: 10, maxOpacity: 0.075 };
+    }
+  };
+
+  const config = getGridConfig();
+
+  function getPos() {
+    return [
+      Math.floor((Math.random() * dimensions.width) / config.width),
+      Math.floor((Math.random() * dimensions.height) / config.height),
+    ];
+  }
+
+  function generateSquares(count) {
+    return Array.from({ length: count }, (_, i) => ({
+      id: i,
+      pos: getPos(),
+    }));
+  }
+
+  const updateSquarePosition = (id) => {
+    setSquares((currentSquares) =>
+      currentSquares.map((sq) =>
+        sq.id === id
+          ? {
+              ...sq,
+              pos: getPos(),
+            }
+          : sq,
+      ),
+    );
+  };
+
+  // Update squares when dimensions change
   useEffect(() => {
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
-    
-    // Set canvas size
-    const setCanvasSize = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    };
-    
-    setCanvasSize();
-    window.addEventListener('resize', setCanvasSize);
-    
-    // Grid configuration based on performance tier
-    const getGridConfig = () => {
-      const base = {
-        cellSize: 50,
-        fadeStart: 0.2,
-        fadeEnd: 0.8,
-        lineWidth: 1
-      };
-      
-      switch (performanceTier) {
-        case 'high':
-          return { ...base, cellSize: 40, lineWidth: 1 };
-        case 'medium':
-          return { ...base, cellSize: 50, lineWidth: 1 };
-        case 'low':
-          return { ...base, cellSize: 60, lineWidth: 1 };
-        default:
-          return { ...base, cellSize: 80, lineWidth: 1 };
+    if (dimensions.width && dimensions.height) {
+      setSquares(generateSquares(config.numSquares));
+    }
+  }, [dimensions, config.numSquares]);
+
+  // Resize observer to update container dimensions
+  useEffect(() => {
+    const resizeObserver = new ResizeObserver((entries) => {
+      for (let entry of entries) {
+        setDimensions({
+          width: entry.contentRect.width,
+          height: entry.contentRect.height,
+        });
       }
-    };
-    
-    // Draw grid
-    const drawGrid = () => {
-      const config = getGridConfig();
-      const { width, height } = canvas;
-      
-      // Clear canvas
-      ctx.clearRect(0, 0, width, height);
-      
-      // Set line style
-      ctx.strokeStyle = 'rgba(132, 204, 22, 0.1)'; // Lime color
-      ctx.lineWidth = config.lineWidth;
-      
-      // Calculate grid dimensions
-      const cols = Math.ceil(width / config.cellSize);
-      const rows = Math.ceil(height / config.cellSize);
-      
-      // Draw vertical lines
-      for (let i = 0; i <= cols; i++) {
-        const x = i * config.cellSize;
-        const opacity = Math.min(
-          1,
-          Math.abs(x - width / 2) / (width / 2) * 0.5
-        );
-        
-        ctx.beginPath();
-        ctx.moveTo(x, 0);
-        ctx.lineTo(x, height);
-        ctx.globalAlpha = 1 - opacity;
-        ctx.stroke();
-      }
-      
-      // Draw horizontal lines
-      for (let i = 0; i <= rows; i++) {
-        const y = i * config.cellSize;
-        const opacity = Math.min(
-          1,
-          Math.abs(y - height / 2) / (height / 2) * 0.5
-        );
-        
-        ctx.beginPath();
-        ctx.moveTo(0, y);
-        ctx.lineTo(width, y);
-        ctx.globalAlpha = 1 - opacity;
-        ctx.stroke();
-      }
-    };
-    
-    // Initial draw
-    drawGrid();
-    
-    // Redraw on resize
-    window.addEventListener('resize', drawGrid);
-    
+    });
+
+    if (containerRef.current) {
+      resizeObserver.observe(containerRef.current);
+    }
+
     return () => {
-      window.removeEventListener('resize', setCanvasSize);
-      window.removeEventListener('resize', drawGrid);
+      if (containerRef.current) {
+        resizeObserver.unobserve(containerRef.current);
+      }
     };
-  }, [performanceTier]);
-  
+  }, []);
+
   return (
-    <canvas
-      ref={canvasRef}
-      className="fixed inset-0 w-full h-full pointer-events-none"
+    <svg
+      ref={containerRef}
       aria-hidden="true"
-    />
+      className={`pointer-events-none fixed inset-0 h-[200%] w-full fill-lime-400/10 stroke-lime-400/10 skew-y-12 animate-pulse ${className}`}
+      style={{ 
+        zIndex: 1,
+        maskImage: 'radial-gradient(800px circle at center, white, transparent)',
+        WebkitMaskImage: 'radial-gradient(800px circle at center, white, transparent)',
+        top: '-30%',
+        animation: 'shimmer 3s ease-in-out infinite alternate'
+      }}
+    >
+      <defs>
+        <pattern
+          id={id}
+          width={config.width}
+          height={config.height}
+          patternUnits="userSpaceOnUse"
+          x={x}
+          y={y}
+        >
+          <path
+            d={`M.5 ${config.height}V.5H${config.width}`}
+            fill="none"
+            strokeDasharray={strokeDasharray}
+          />
+        </pattern>
+      </defs>
+      <rect width="100%" height="100%" fill={`url(#${id})`} />
+      <svg x={x} y={y} className="overflow-visible">
+        {squares.map(({ pos: [x, y], id }, index) => (
+          <motion.rect
+            initial={{ opacity: 0 }}
+            animate={{ 
+              opacity: prefersReducedMotion ? config.maxOpacity : [0, config.maxOpacity, config.maxOpacity * 0.3, config.maxOpacity]
+            }}
+            transition={{
+              duration: prefersReducedMotion ? 0.1 : 6,
+              repeat: prefersReducedMotion ? 0 : Infinity,
+              delay: prefersReducedMotion ? 0 : index * 0.2,
+              repeatType: "loop",
+              ease: "easeInOut"
+            }}
+            onAnimationComplete={() => !prefersReducedMotion && updateSquarePosition(id)}
+            key={`${x}-${y}-${index}`}
+            width={config.width - 1}
+            height={config.height - 1}
+            x={x * config.width + 1}
+            y={y * config.height + 1}
+            fill="currentColor"
+            strokeWidth="0"
+          />
+        ))}
+      </svg>
+    </svg>
   );
 };
 
@@ -271,6 +317,38 @@ export const metadata = {
 const BackgroundLayerAtomic = ({ phase = 'activation' }) => {
   const { performanceTier, prefersReducedMotion } = useDeviceCapabilities();
   
+  // Add breathing animation styles
+  useEffect(() => {
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes nebulaBreath {
+        0% { 
+          opacity: 1; 
+          transform: scale(1);
+        }
+        100% { 
+          opacity: 0.7; 
+          transform: scale(1.05);
+        }
+      }
+      @keyframes nebulaBreathCentered {
+        0% { 
+          opacity: 1; 
+          transform: scale(1) translateY(-50%);
+        }
+        100% { 
+          opacity: 0.7; 
+          transform: scale(1.05) translateY(-50%);
+        }
+      }
+    `;
+    document.head.appendChild(style);
+    
+    return () => {
+      document.head.removeChild(style);
+    };
+  }, []);
+  
   return (
     <div className="fixed inset-0 w-full h-full pointer-events-none" aria-hidden="true">
       {/* Base gradient background */}
@@ -279,6 +357,74 @@ const BackgroundLayerAtomic = ({ phase = 'activation' }) => {
           ${phase === 'void' ? 'opacity-100' : 'opacity-80'}`}
       />
       
+      {/* Moon Light Nebula - Left border half circle - Extended and Taller */}
+      <div 
+        className="absolute left-0 top-0 w-[500px] h-[120vh] pointer-events-none"
+        style={{
+          background: 'radial-gradient(ellipse 500px 120vh at 0% 50%, rgba(255, 255, 255, 0.15) 0%, rgba(200, 220, 255, 0.12) 20%, rgba(150, 180, 255, 0.08) 40%, rgba(120, 160, 255, 0.04) 60%, transparent 80%)',
+          filter: 'blur(25px)',
+          zIndex: 2,
+          top: '-10vh',
+          animation: 'nebulaBreath 8s ease-in-out infinite alternate'
+        }}
+      />
+      
+      {/* Additional moon glow layer for more intensity - Extended */}
+      <div 
+        className="absolute left-0 top-0 w-[350px] h-[120vh] pointer-events-none"
+        style={{
+          background: 'radial-gradient(ellipse 350px 120vh at 0% 50%, rgba(255, 255, 255, 0.08) 0%, rgba(220, 235, 255, 0.06) 30%, rgba(180, 200, 255, 0.03) 50%, transparent 70%)',
+          filter: 'blur(50px)',
+          zIndex: 1,
+          top: '-10vh',
+          animation: 'nebulaBreath 10s ease-in-out infinite alternate-reverse'
+        }}
+      />
+
+      {/* Directional Lighting - Left to Right illumination */}
+      <div 
+        className="absolute inset-0 w-full h-full pointer-events-none"
+        style={{
+          background: 'linear-gradient(to right, rgba(255, 255, 255, 0.06) 0%, rgba(220, 235, 255, 0.04) 15%, rgba(180, 200, 255, 0.03) 30%, rgba(150, 180, 255, 0.015) 45%, transparent 60%)',
+          filter: 'blur(30px)',
+          zIndex: 3
+        }}
+      />
+
+      {/* Focused Globe Lighting - Concentrated beam towards center */}
+      <div 
+        className="absolute left-0 top-1/2 w-[700px] h-80 pointer-events-none"
+        style={{
+          background: 'radial-gradient(ellipse 700px 320px at 0% 50%, rgba(255, 255, 255, 0.08) 0%, rgba(200, 220, 255, 0.05) 25%, rgba(150, 180, 255, 0.025) 50%, transparent 75%)',
+          filter: 'blur(40px)',
+          zIndex: 4,
+          animation: 'nebulaBreathCentered 12s ease-in-out infinite alternate'
+        }}
+      />
+      
+      {/* Nebula Tail Extension - for page transition dissolve */}
+      <div 
+        className="absolute left-0 w-full h-[25vh] pointer-events-none"
+        style={{
+          top: '100vh',
+          background: 'linear-gradient(to right, rgba(255, 255, 255, 0.03) 0%, rgba(200, 220, 255, 0.02) 20%, rgba(150, 180, 255, 0.015) 40%, rgba(120, 160, 255, 0.01) 60%, transparent 80%)',
+          filter: 'blur(40px)',
+          zIndex: 5
+        }}
+      />
+
+      {/* Enhanced Transition Zone - coordinates with next page 10vh dissolve */}
+      <div 
+        className="absolute left-0 w-[600px] h-[20vh] pointer-events-none"
+        style={{
+          top: '95vh',
+          background: 'radial-gradient(ellipse 600px 200px at 0% 0%, rgba(255, 255, 255, 0.06) 0%, rgba(200, 220, 255, 0.04) 30%, rgba(150, 180, 255, 0.02) 60%, transparent 100%)',
+          filter: 'blur(35px)',
+          zIndex: 6,
+          animation: 'nebulaBreath 15s ease-in-out infinite alternate'
+        }}
+      />
+
       {/* Starfield layer */}
       <div className={`transition-opacity duration-1000 ${phase === 'void' ? 'opacity-0' : 'opacity-100'}`}>
         <StarfieldCanvas 
@@ -289,7 +435,10 @@ const BackgroundLayerAtomic = ({ phase = 'activation' }) => {
       
       {/* Grid overlay */}
       <div className={`transition-opacity duration-1000 ${phase === 'void' ? 'opacity-0' : 'opacity-100'}`}>
-        <GridOverlay performanceTier={performanceTier} />
+        <AnimatedGridPattern 
+          performanceTier={performanceTier} 
+          prefersReducedMotion={prefersReducedMotion}
+        />
       </div>
       
       {/* Nebula effect - only show on high performance devices */}
