@@ -11,7 +11,7 @@
 import React from 'react';
 import { useScene } from './SceneControllerV6';
 import StarfieldCanvasV6 from './StarfieldCanvasV6';
-import GridOverlayV6 from './GridOverlayV6';
+// import GridOverlayV6 from './GridOverlayV6'; // REMOVED: Grid overlay
 
 const CosmicBackgroundSystemV6 = () => {
   const { deviceCapabilities, scenePhase } = useScene();
@@ -29,10 +29,10 @@ const CosmicBackgroundSystemV6 = () => {
         <StarfieldCanvasV6 />
       </div>
       
-      {/* Grid overlay */}
-      <div className={`transition-opacity duration-1000 ${scenePhase === 'void' ? 'opacity-0' : 'opacity-100'}`}>
+      {/* Grid overlay - REMOVED */}
+      {/* <div className={`transition-opacity duration-1000 ${scenePhase === 'void' ? 'opacity-0' : 'opacity-100'}`}>
         <GridOverlayV6 />
-      </div>
+      </div> */}
       
       {/* Nebula effect - only show on high performance devices */}
       {deviceCapabilities.performanceTier === 'high' && (
@@ -47,14 +47,6 @@ const CosmicBackgroundSystemV6 = () => {
           }}
         />
       )}
-      
-      {/* Vignette effect */}
-      <div 
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          background: 'radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.4) 100%)'
-        }}
-      />
     </div>
   );
 };
