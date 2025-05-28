@@ -9,7 +9,7 @@ import { motion } from 'framer-motion';
 export const ScrollHint: React.FC = () => {
   return (
     <motion.div 
-      className="fixed bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-3 text-white/60 pointer-events-none select-none z-50"
+      className="fixed bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-3 text-white/60 pointer-events-none select-none z-[240]"
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8, delay: 1 }}
