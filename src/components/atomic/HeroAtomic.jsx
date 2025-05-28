@@ -1,6 +1,6 @@
 /**
  * @component HeroAtomic
- * @description Self-contained hero section with planet visual and animated headline
+ * @description Self-contained hero section with planet visual and static content - ANIMATION PURGED
  * 
  * @metadata
  * @version 1.0.0
@@ -8,10 +8,10 @@
  * @legit true
  */
 
-import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import React, { useState } from 'react';
 import HeroVisualPlanet from './HeroVisualPlanet';
 import BackgroundLayerAtomic from './BackgroundLayerAtomic';
+import HeroStageManager from './hero/HeroStageManager';
 
 // Export metadata for LEGIT compliance
 export const metadata = {
@@ -22,156 +22,65 @@ export const metadata = {
 };
 
 const HeroAtomic = () => {
-  // Internal phase state management
-  const [phase, setPhase] = useState('void');
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
-  
-  // Check for reduced motion preference
-  useEffect(() => {
-    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-    setPrefersReducedMotion(mediaQuery.matches);
-    
-    // Listen for changes to the prefers-reduced-motion media query
-    const handleMediaChange = (e) => {
-      setPrefersReducedMotion(e.matches);
-    };
-    
-    mediaQuery.addEventListener('change', handleMediaChange);
-    return () => {
-      mediaQuery.removeEventListener('change', handleMediaChange);
-    };
-  }, []);
-  
-  // Automatic phase progression
-  useEffect(() => {
-    // Skip animations if user prefers reduced motion
-    if (prefersReducedMotion) {
-      setPhase('activation');
-      return;
-    }
-    
-    // Phase timing (in milliseconds)
-    const emergenceDelay = 1000;
-    const activationDelay = 2500;
-    
-    // Schedule phase transitions
-    const emergenceTimer = setTimeout(() => {
-      setPhase('emergence');
-    }, emergenceDelay);
-    
-    const activationTimer = setTimeout(() => {
-      setPhase('activation');
-    }, activationDelay);
-    
-    // Clean up timers on unmount
-    return () => {
-      clearTimeout(emergenceTimer);
-      clearTimeout(activationTimer);
-    };
-  }, [prefersReducedMotion]);
-  
-  // Header text animation variant
-  const headerTextVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.04,
-      }
-    }
-  };
-  
-  // Character animation variant
-  const characterVariants = {
-    hidden: { 
-      opacity: 0,
-      y: 20
-    },
-    visible: { 
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.3,
-        ease: "easeOut"
-      }
-    }
-  };
-  
-  // Split header text into characters for animation
-  const headerText = "We bring you a universe of solutions";
-  const headerCharacters = headerText.split("");
-  
-  // Determine if elements should be visible based on phase
-  const isHeaderVisible = phase !== 'void';
-  
+  const [sceneStep, setSceneStep] = useState(8);
+
   return (
-    <section className="relative min-h-screen w-full flex flex-col items-center justify-center overflow-hidden">
-      {/* Background layer */}
-      <BackgroundLayerAtomic phase={phase} />
+    <>
+      {/* HUD and Hero Stage Manager */}
+      <HeroStageManager setSceneStep={setSceneStep} />
       
-      {/* Main content container */}
-      <div className="relative z-10 flex flex-col md:flex-row items-center justify-center w-full max-w-7xl mx-auto px-4 py-16">
-        {/* Left side: Planet visualization */}
-        <div className="relative w-full md:w-1/2 flex justify-center mb-8 md:mb-0">
-          <HeroVisualPlanet 
-            phase={phase} 
-            className="w-[45vmin] h-[45vmin] md:w-[50vmin] md:h-[50vmin]"
-            size={400}
-          />
-        </div>
+      {/* Debug HUD - shows current scene step */}
+      <div className="fixed top-4 right-4 z-[100] bg-black/80 text-lime-400 px-3 py-2 rounded-md font-mono text-sm">
+        Scene: {sceneStep}
+      </div>
+      
+      <section className="relative min-h-screen w-full flex flex-col items-center justify-center overflow-hidden">
+        {/* Background layer */}
+        <BackgroundLayerAtomic />
         
-        {/* Right side: Text content */}
-        <div className="w-full md:w-1/2 flex flex-col items-start max-w-md">
-          {/* Animated header with letter-by-letter animation */}
-          <motion.h1 
-            className="text-4xl md:text-5xl font-bold mb-6 text-white"
-            variants={headerTextVariants}
-            initial="hidden"
-            animate={isHeaderVisible ? "visible" : "hidden"}
+        {/* Controlled Planet Bloom - Atmospheric glow behind planet - EFFECTS TIER */}
+        <div
+          className="absolute z-[15] w-[600px] h-[600px] rounded-full blur-3xl pointer-events-none"
+          style={{
+            top: '60%',
+            left: '75%',
+            transform: 'translate(-50%, -50%)',
+            background: 'radial-gradient(ellipse, rgba(255,255,255,0.05) 0%, transparent 70%)'
+          }}
+        />
+        
+        {/* Planet - positioned absolutely in top-right */}
+        <HeroVisualPlanet 
+          sceneStep={sceneStep}
+          className="w-[400px] h-[400px]"
+          size={400}
+        />
+        
+        {/* Text content - positioned in bottom-left - ELEVATED TO FOREGROUND TIER */}
+        <div className="absolute bottom-[6%] left-[4%] max-w-[450px] z-[250]">
+          {/* Static header */}
+          <h1 
+            className="text-3xl md:text-4xl font-bold mb-5 text-white leading-tight tracking-tight"
             role="heading"
             aria-level={1}
           >
-            {headerCharacters.map((char, index) => (
-              <motion.span 
-                key={`char-${index}`} 
-                variants={characterVariants}
-                className="inline-block"
-              >
-                {char === " " ? "\u00A0" : char}
-              </motion.span>
-            ))}
-          </motion.h1>
+            We bring you a universe of solutions
+          </h1>
           
-          {/* Animated paragraph */}
-          <motion.p 
-            className="text-xl text-white/80 mb-8 max-w-lg"
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ 
-              opacity: phase === 'activation' ? 1 : 0, 
-              y: phase === 'activation' ? 0 : 15 
-            }}
-            transition={{ duration: 0.5, ease: "easeOut" }}
-          >
+          {/* Static paragraph */}
+          <p className="text-lg text-white/85 mb-6 max-w-md leading-relaxed tracking-wide">
             We're building next-generation digital experiences powered by cutting-edge AI technology. Join us in shaping tomorrow's web.
-          </motion.p>
+          </p>
           
-          {/* Animated call-to-action button */}
-          <motion.button
-            className="px-6 py-3 bg-gradient-to-r from-lime-400 to-emerald-500 text-curious-dark-900 font-medium rounded-full hover:shadow-lg hover:shadow-lime-400/20 transition-shadow"
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ 
-              opacity: phase === 'activation' ? 1 : 0, 
-              scale: phase === 'activation' ? 1 : 0.9 
-            }}
-            transition={{ duration: 0.4, ease: "easeOut" }}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.98 }}
+          {/* Static call-to-action button */}
+          <button
+            className="px-5 py-2.5 bg-gradient-to-r from-lime-400 to-emerald-500 text-curious-dark-900 font-medium text-sm rounded-full hover:shadow-lg hover:shadow-lime-400/20 transition-shadow hover:scale-105 active:scale-98 tracking-wide"
           >
             Explore Our Universe
-          </motion.button>
+          </button>
         </div>
-      </div>
-    </section>
+      </section>
+    </>
   );
 };
 

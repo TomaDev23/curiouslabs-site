@@ -10,6 +10,7 @@
 
 import React, { Suspense, lazy, useState, useEffect } from 'react';
 import { Canvas } from '@react-three/fiber';
+import { motion } from 'framer-motion';
 
 // Lazy load 3D implementation
 const AegisPlanet3DV6 = lazy(() => import('../home/v6/AegisPlanet3DV6'));
@@ -75,15 +76,20 @@ const LoadingPlaceholder = () => (
 );
 
 // Fallback 2D implementation using CSS/SVG
-const FallbackPlanet2D = ({ phase = 'void', className = '' }) => {
+const FallbackPlanet2D = ({ sceneStep = 0, className = '' }) => {
+  const shouldRotate = sceneStep >= 2;
+  
   return (
     <div 
-      className={`relative w-full h-full ${className} ${
-        phase === 'void' ? 'opacity-0 scale-50' : 'opacity-100 scale-100'
-      } transition-all duration-1000`}
+      className={`relative w-full h-full opacity-100 scale-100 ${className}`}
     >
-      {/* Base planet circle */}
-      <div className="absolute inset-0 rounded-full bg-gradient-to-br from-blue-600 to-blue-800 shadow-xl" />
+      {/* Base planet circle with rotation */}
+      <div 
+        className="absolute inset-0 rounded-full bg-gradient-to-br from-blue-600 to-blue-800 shadow-xl"
+        style={{
+          animation: shouldRotate ? 'spin 20s linear infinite' : 'none',
+        }}
+      />
       
       {/* Atmospheric glow */}
       <div className="absolute inset-0 rounded-full bg-lime-500 opacity-20 blur-xl transform scale-110" />
@@ -91,15 +97,24 @@ const FallbackPlanet2D = ({ phase = 'void', className = '' }) => {
       {/* Surface details */}
       <div className="absolute inset-0 rounded-full overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-tr from-blue-700 via-blue-600 to-blue-500 opacity-80" />
+        {/* Surface pattern that rotates with planet */}
+        <div 
+          className="absolute top-1/4 left-1/3 w-8 h-8 bg-blue-400/30 rounded-full blur-sm"
+          style={{
+            animation: shouldRotate ? 'spin 25s linear infinite' : 'none',
+          }}
+        />
       </div>
       
-      {/* Orbital rings */}
-      {phase === 'activation' && (
-        <>
-          <div className="absolute inset-0 rounded-full border-2 border-lime-500/20 transform scale-[1.4] rotate-12" />
-          <div className="absolute inset-0 rounded-full border border-blue-500/15 transform scale-[1.6] -rotate-6" />
-        </>
-      )}
+      {/* Global CSS for spin animation */}
+      <style dangerouslySetInnerHTML={{
+        __html: `
+          @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+          }
+        `
+      }} />
     </div>
   );
 };
@@ -112,42 +127,69 @@ export const metadata = {
   doc: 'contract_hero_visual_planet.md'
 };
 
-const HeroVisualPlanet = ({ phase = 'void', className = '', size = 400 }) => {
+const HeroVisualPlanet = ({ sceneStep = 0, className = '', size = 400 }) => {
   const { performanceTier, prefersReducedMotion } = useDeviceCapabilities();
   const use3D = performanceTier !== 'minimal' && !prefersReducedMotion;
   
-  const scaleClass = phase === 'void' 
-    ? 'scale-50 opacity-0' 
-    : phase === 'emergence' 
-      ? 'scale-90 opacity-80' 
-      : 'scale-100 opacity-100';
-  
   return (
     <div 
-      className={`transform-gpu transition-all duration-1000 ${scaleClass} ${className}`}
-      style={{ width: size, height: size }}
+      className={`absolute top-[10%] right-[10%] pointer-events-none ${className}`}
+      style={{ 
+        width: size, 
+        height: size,
+        zIndex: 140
+      }}
       aria-hidden="true"
     >
+      {/* Planet Nebula Lighting - moves with planet - EFFECTS TIER */}
+      <div 
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          width: size * 3,
+          height: size * 3,
+          left: -size,
+          top: -size,
+          background: 'radial-gradient(ellipse 700px 320px at 50% 50%, rgba(255, 255, 255, 0.04) 0%, rgba(200, 220, 255, 0.025) 25%, rgba(150, 180, 255, 0.0125) 50%, transparent 75%)',
+          filter: 'blur(40px)',
+          zIndex: 15
+        }}
+      />
+      
+      {/* Planet Atmospheric Glow - EFFECTS TIER */}
+      <div 
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          width: size * 2,
+          height: size * 2,
+          left: -size * 0.5,
+          top: -size * 0.5,
+          background: 'radial-gradient(circle at 50% 50%, rgba(200, 220, 255, 0.075) 0%, rgba(150, 180, 255, 0.04) 30%, rgba(120, 160, 255, 0.02) 60%, transparent 80%)',
+          filter: 'blur(25px)',
+          zIndex: 15
+        }}
+      />
+
       {use3D ? (
         <Canvas camera={{ position: [0, 0, 4], fov: 45 }}>
           <ambientLight intensity={0.5} />
           <pointLight position={[10, 10, 10]} />
           <Suspense fallback={null}>
-            <AegisPlanet3DV6 />
+            <AegisPlanet3DV6 sceneStep={sceneStep} />
           </Suspense>
         </Canvas>
       ) : (
-        <FallbackPlanet2D phase={phase} />
+        <FallbackPlanet2D sceneStep={sceneStep} />
       )}
       
-      {/* Orbit rings - static positioning */}
+      {/* Orbit rings - INTERACTIVE TIER */}
       <div 
         className="absolute inset-0 pointer-events-none"
         style={{
           width: '100%',
           height: '100%',
           top: '0',
-          left: '0'
+          left: '0',
+          zIndex: 130
         }}
       >
         {/* First orbit ring */}
