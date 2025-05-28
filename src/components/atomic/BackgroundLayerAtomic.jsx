@@ -199,163 +199,109 @@ const AnimatedGridPattern = ({
   }
 
   function generateSquares(count) {
-    return Array.from({ length: count }, (_, i) => ({
-      id: i,
-      pos: getPos(),
-    }));
+    return Array.from({ length: count }, (_, i) => {
+      const [x, y] = getPos();
+      return {
+        id: i,
+        x,
+        y,
+        opacity: 0,
+      };
+    });
   }
 
   const updateSquarePosition = (id) => {
-    setSquares((currentSquares) =>
-      currentSquares.map((sq) =>
-        sq.id === id
-          ? {
-              ...sq,
-              pos: getPos(),
-            }
-          : sq,
-      ),
+    setSquares(currentSquares =>
+      currentSquares.map(square =>
+        square.id === id
+          ? { ...square, ...getPos().reduce((acc, coord, index) => ({ ...acc, [index === 0 ? 'x' : 'y']: coord }), {}) }
+          : square
+      )
     );
   };
 
-  // Update squares when dimensions change
+  useEffect(() => {
+    const updateDimensions = () => {
+      if (containerRef.current) {
+        const rect = containerRef.current.getBoundingClientRect();
+        setDimensions({ width: rect.width, height: rect.height });
+      }
+    };
+
+    updateDimensions();
+    window.addEventListener('resize', updateDimensions);
+
+    return () => window.removeEventListener('resize', updateDimensions);
+  }, []);
+
   useEffect(() => {
     if (dimensions.width && dimensions.height) {
       setSquares(generateSquares(config.numSquares));
     }
   }, [dimensions, config.numSquares]);
 
-  // Resize observer to update container dimensions
-  useEffect(() => {
-    const resizeObserver = new ResizeObserver((entries) => {
-      for (let entry of entries) {
-        setDimensions({
-          width: entry.contentRect.width,
-          height: entry.contentRect.height,
-        });
-      }
-    });
-
-    if (containerRef.current) {
-      resizeObserver.observe(containerRef.current);
-    }
-
-    return () => {
-      if (containerRef.current) {
-        resizeObserver.unobserve(containerRef.current);
-      }
-    };
-  }, []);
-
   return (
-    <svg
+    <div 
       ref={containerRef}
-      aria-hidden="true"
-      className={`pointer-events-none fixed inset-0 h-[200%] w-full fill-lime-400/10 stroke-lime-400/10 skew-y-12 animate-pulse ${className}`}
-      style={{ 
-        zIndex: 1,
-        maskImage: 'radial-gradient(800px circle at center, white, transparent)',
-        WebkitMaskImage: 'radial-gradient(800px circle at center, white, transparent)',
-        top: '-30%',
-        animation: 'shimmer 3s ease-in-out infinite alternate'
-      }}
+      className={`pointer-events-none absolute inset-0 ${className}`}
     >
-      <defs>
-        <pattern
-          id={id}
-          width={config.width}
-          height={config.height}
-          patternUnits="userSpaceOnUse"
-          x={x}
-          y={y}
-        >
-          <path
-            d={`M.5 ${config.height}V.5H${config.width}`}
-            fill="none"
-            strokeDasharray={strokeDasharray}
-          />
-        </pattern>
-      </defs>
-      <rect width="100%" height="100%" fill={`url(#${id})`} />
-      <svg x={x} y={y} className="overflow-visible">
-        {squares.map(({ pos: [x, y], id }, index) => (
-          <motion.rect
-            initial={{ opacity: 0 }}
-            animate={{ 
-              opacity: prefersReducedMotion ? config.maxOpacity : [0, config.maxOpacity, config.maxOpacity * 0.3, config.maxOpacity]
-            }}
-            transition={{
-              duration: prefersReducedMotion ? 0.1 : 6,
-              repeat: prefersReducedMotion ? 0 : Infinity,
-              delay: prefersReducedMotion ? 0 : index * 0.2,
-              repeatType: "loop",
-              ease: "easeInOut"
-            }}
-            onAnimationComplete={() => !prefersReducedMotion && updateSquarePosition(id)}
-            key={`${x}-${y}-${index}`}
-            width={config.width - 1}
-            height={config.height - 1}
-            x={x * config.width + 1}
-            y={y * config.height + 1}
-            fill="currentColor"
-            strokeWidth="0"
-          />
-        ))}
+      <svg 
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 h-full w-full fill-gray-400/30 stroke-gray-400/30"
+        style={{ opacity: 0.5 }}
+      >
+        <defs>
+          <pattern
+            id={id}
+            width={config.width}
+            height={config.height}
+            patternUnits="userSpaceOnUse"
+            x={x}
+            y={y}
+          >
+            <path 
+              d={`M.5 ${config.height}V.5H${config.width}`} 
+              fill="none"
+              strokeDasharray={strokeDasharray}
+            />
+          </pattern>
+        </defs>
+        <rect width="100%" height="100%" fill={`url(#${id})`} />
       </svg>
-    </svg>
+      {!prefersReducedMotion && squares.map((square) => (
+        <motion.div
+          key={square.id}
+          className="absolute bg-lime-500"
+          style={{
+            left: square.x * config.width,
+            top: square.y * config.height,
+            width: config.width,
+            height: config.height,
+          }}
+          initial={{ opacity: 0 }}
+          animate={{
+            opacity: [0, config.maxOpacity, 0],
+          }}
+          transition={{
+            duration,
+            repeat: Infinity,
+            repeatDelay,
+            delay: Math.random() * duration,
+          }}
+          onAnimationComplete={() => updateSquarePosition(square.id)}
+        />
+      ))}
+    </div>
   );
 };
 
-// Main component
-export const metadata = {
-  id: 'background_layer_atomic',
-  scs: 'SCS-BG-COSMIC',
-  type: 'atomic',
-  doc: 'contract_background_atomic.md'
-};
-
-const BackgroundLayerAtomic = ({ phase = 'activation' }) => {
+const BackgroundLayerAtomic = () => {
   const { performanceTier, prefersReducedMotion } = useDeviceCapabilities();
-  
-  // Add breathing animation styles
-  useEffect(() => {
-    const style = document.createElement('style');
-    style.textContent = `
-      @keyframes nebulaBreath {
-        0% { 
-          opacity: 1; 
-          transform: scale(1);
-        }
-        100% { 
-          opacity: 0.7; 
-          transform: scale(1.05);
-        }
-      }
-      @keyframes nebulaBreathCentered {
-        0% { 
-          opacity: 1; 
-          transform: scale(1) translateY(-50%);
-        }
-        100% { 
-          opacity: 0.7; 
-          transform: scale(1.05) translateY(-50%);
-        }
-      }
-    `;
-    document.head.appendChild(style);
-    
-    return () => {
-      document.head.removeChild(style);
-    };
-  }, []);
   
   return (
     <div className="fixed inset-0 w-full h-full pointer-events-none" aria-hidden="true">
       {/* Base gradient background */}
-      <div 
-        className={`absolute inset-0 bg-gradient-to-b from-curious-dark-900 via-curious-dark-800 to-curious-dark-900 transition-opacity duration-1000
-          ${phase === 'void' ? 'opacity-100' : 'opacity-80'}`}
-      />
+      <div className="absolute inset-0 bg-gradient-to-b from-curious-dark-900 via-curious-dark-800 to-curious-dark-900 opacity-80" />
       
       {/* Moon Light Nebula - Left border half circle - Extended and Taller */}
       <div 
@@ -363,9 +309,8 @@ const BackgroundLayerAtomic = ({ phase = 'activation' }) => {
         style={{
           background: 'radial-gradient(ellipse 500px 120vh at 0% 50%, rgba(255, 255, 255, 0.15) 0%, rgba(200, 220, 255, 0.12) 20%, rgba(150, 180, 255, 0.08) 40%, rgba(120, 160, 255, 0.04) 60%, transparent 80%)',
           filter: 'blur(25px)',
-          zIndex: 2,
-          top: '-10vh',
-          animation: 'nebulaBreath 8s ease-in-out infinite alternate'
+          zIndex: 30,
+          top: '-10vh'
         }}
       />
       
@@ -375,9 +320,8 @@ const BackgroundLayerAtomic = ({ phase = 'activation' }) => {
         style={{
           background: 'radial-gradient(ellipse 350px 120vh at 0% 50%, rgba(255, 255, 255, 0.08) 0%, rgba(220, 235, 255, 0.06) 30%, rgba(180, 200, 255, 0.03) 50%, transparent 70%)',
           filter: 'blur(50px)',
-          zIndex: 1,
-          top: '-10vh',
-          animation: 'nebulaBreath 10s ease-in-out infinite alternate-reverse'
+          zIndex: 28,
+          top: '-10vh'
         }}
       />
 
@@ -387,18 +331,7 @@ const BackgroundLayerAtomic = ({ phase = 'activation' }) => {
         style={{
           background: 'linear-gradient(to right, rgba(255, 255, 255, 0.06) 0%, rgba(220, 235, 255, 0.04) 15%, rgba(180, 200, 255, 0.03) 30%, rgba(150, 180, 255, 0.015) 45%, transparent 60%)',
           filter: 'blur(30px)',
-          zIndex: 3
-        }}
-      />
-
-      {/* Focused Globe Lighting - Concentrated beam towards center */}
-      <div 
-        className="absolute left-0 top-1/2 w-[700px] h-80 pointer-events-none"
-        style={{
-          background: 'radial-gradient(ellipse 700px 320px at 0% 50%, rgba(255, 255, 255, 0.08) 0%, rgba(200, 220, 255, 0.05) 25%, rgba(150, 180, 255, 0.025) 50%, transparent 75%)',
-          filter: 'blur(40px)',
-          zIndex: 4,
-          animation: 'nebulaBreathCentered 12s ease-in-out infinite alternate'
+          zIndex: 32
         }}
       />
       
@@ -409,7 +342,7 @@ const BackgroundLayerAtomic = ({ phase = 'activation' }) => {
           top: '100vh',
           background: 'linear-gradient(to right, rgba(255, 255, 255, 0.03) 0%, rgba(200, 220, 255, 0.02) 20%, rgba(150, 180, 255, 0.015) 40%, rgba(120, 160, 255, 0.01) 60%, transparent 80%)',
           filter: 'blur(40px)',
-          zIndex: 5
+          zIndex: 3
         }}
       />
 
@@ -420,22 +353,13 @@ const BackgroundLayerAtomic = ({ phase = 'activation' }) => {
           top: '95vh',
           background: 'radial-gradient(ellipse 600px 200px at 0% 0%, rgba(255, 255, 255, 0.06) 0%, rgba(200, 220, 255, 0.04) 30%, rgba(150, 180, 255, 0.02) 60%, transparent 100%)',
           filter: 'blur(35px)',
-          zIndex: 6,
-          animation: 'nebulaBreath 15s ease-in-out infinite alternate'
+          zIndex: 2
         }}
       />
 
       {/* Starfield layer */}
-      <div className={`transition-opacity duration-1000 ${phase === 'void' ? 'opacity-0' : 'opacity-100'}`}>
+      <div className="opacity-100">
         <StarfieldCanvas 
-          performanceTier={performanceTier} 
-          prefersReducedMotion={prefersReducedMotion}
-        />
-      </div>
-      
-      {/* Grid overlay */}
-      <div className={`transition-opacity duration-1000 ${phase === 'void' ? 'opacity-0' : 'opacity-100'}`}>
-        <AnimatedGridPattern 
           performanceTier={performanceTier} 
           prefersReducedMotion={prefersReducedMotion}
         />
@@ -444,8 +368,7 @@ const BackgroundLayerAtomic = ({ phase = 'activation' }) => {
       {/* Nebula effect - only show on high performance devices */}
       {performanceTier === 'high' && (
         <div 
-          className={`absolute inset-0 mix-blend-screen opacity-30 transition-opacity duration-1000
-            ${phase === 'void' ? 'opacity-0' : 'opacity-30'}`}
+          className="absolute inset-0 mix-blend-screen opacity-30"
           style={{
             backgroundImage: 'url("/images/nebula-texture.png")',
             backgroundSize: 'cover',
@@ -455,13 +378,17 @@ const BackgroundLayerAtomic = ({ phase = 'activation' }) => {
         />
       )}
       
-      {/* Vignette effect */}
-      <div 
-        className="absolute inset-0 pointer-events-none"
+      {/* Main Full Page Black Mask - Primary page darkening overlay - z-[25] */}
+      <div
+        className="fixed w-[100vw] h-[300vh] pointer-events-none"
         style={{
-          background: 'radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.4) 100%)'
+          top: '0',
+          left: '0',
+          background: 'radial-gradient(ellipse 65% 60% at 75% 45%, transparent 5%, rgba(0,0,0,0.3) 25%, rgba(0,0,0,0.6) 45%, rgba(0,0,0,0.8) 65%, rgba(0,0,0,0.95) 80%)',
+          zIndex: 25
         }}
       />
+      
     </div>
   );
 };

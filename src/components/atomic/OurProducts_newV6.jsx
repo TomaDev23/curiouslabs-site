@@ -431,7 +431,7 @@ const AegisPage = () => {
         {/* Connection lines between core and hovered node */}
         {hoveredNode && (
           <div
-            className="absolute w-px h-20 bg-gradient-to-b from-lime-400 to-transparent z-2"
+            className="absolute w-px h-20 bg-gradient-to-b from-lime-400 to-transparent z-[2]"
             style={{
               top: 'calc(50% - 10px)',
               left: `calc(50% + ${Math.cos((hoveredNode.angle * Math.PI) / 180) * 60}px)`,
@@ -478,7 +478,7 @@ const AegisPage = () => {
         ))}
         
         {/* Add global keyframes for animations */}
-        <style jsx>{`
+        <style jsx="true">{`
           @keyframes pulse {
             0% { opacity: 0.5; transform: scale(0.95); }
             50% { opacity: 1; transform: scale(1.05); }
@@ -492,7 +492,7 @@ const AegisPage = () => {
   return (
     <div className="relative w-screen h-screen flex items-center justify-start px-8 lg:px-16 overflow-hidden">
       {/* Enhanced Cosmic Background with Grid */}
-      <div className="absolute inset-0 z-0">
+      <div className="absolute inset-0 z-[5]">
         {/* Base gradient */}
         <div
           className="absolute inset-0"
@@ -542,7 +542,7 @@ const AegisPage = () => {
 
       {/* Enhanced Nebula Effect with Multiple Layers */}
       <div
-        className="absolute inset-0 z-1"
+        className="absolute inset-0 z-[2]"
         style={{
           background: 'radial-gradient(ellipse at 25% 40%, rgba(98, 153, 16, 0.25) 0%, rgba(98, 153, 16, 0.1) 40%, transparent 70%)',
           filter: 'blur(40px)',
@@ -550,7 +550,7 @@ const AegisPage = () => {
       />
 
       <div
-        className="absolute inset-0 z-1"
+        className="absolute inset-0 z-[1]"
         style={{
           background: 'radial-gradient(ellipse at 70% 60%, rgba(34, 211, 238, 0.15) 0%, rgba(34, 211, 238, 0.08) 35%, transparent 60%)',
           filter: 'blur(60px)',
@@ -558,7 +558,7 @@ const AegisPage = () => {
       />
       
       {/* Enhanced Content Layout */}
-      <div className="relative z-10 w-full max-w-7xl mx-auto px-8 lg:px-16 h-full flex items-center">
+      <div className="relative z-[10] w-full max-w-7xl mx-auto px-8 lg:px-16 h-full flex items-center">
         <div className="grid grid-cols-12 gap-8 w-full">
           
           {/* Left Column - Main Content */}
@@ -662,7 +662,7 @@ const AegisPage = () => {
       {Array.from({ length: 15 }).map((_, i) => (
         <div
           key={`particle-${i}`}
-          className="absolute rounded-full z-2"
+          className="absolute rounded-full z-[2]"
           style={{ 
             width: Math.random() * 3 + 1 + 'px',
             height: Math.random() * 3 + 1 + 'px',
@@ -678,7 +678,7 @@ const AegisPage = () => {
       {Array.from({ length: 5 }).map((_, i) => (
         <motion.div
           key={`stream-${i}`}
-          className="absolute w-px h-20 bg-gradient-to-t from-lime-400 to-transparent z-2"
+          className="absolute w-px h-20 bg-gradient-to-t from-lime-400 to-transparent z-[2]"
           style={{
             bottom: `-20px`,
             left: `${Math.random() * 100}%`,
@@ -767,7 +767,7 @@ const ProductsPage = () => {
         />
         
         {/* Content - no background animations */}
-        <div className="relative z-10 p-6 h-full flex flex-col justify-between">
+        <div className="relative z-[10] p-6 h-full flex flex-col justify-between">
           {/* Header */}
           <div className="space-y-3">
             {/* Simplified icon - no complex animations */}
@@ -782,7 +782,7 @@ const ProductsPage = () => {
               <img
                 src={item.illustrationSrc}
                 alt={`${item.title} illustration`}
-                className="w-full h-full object-cover rounded-full relative z-10"
+                className="w-full h-full object-cover rounded-full relative z-[10]"
                 onError={(e) => (e.target.src = '/assets/images/placeholder.png')}
               />
             </div>
@@ -869,7 +869,7 @@ const ProductInfoPanel = React.memo(() => {
         boxShadow: '0 0 30px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(255, 255, 255, 0.05)'
       }}
     >
-      <div className="relative z-10 h-full flex flex-col">
+      <div className="relative z-[10] h-full flex flex-col">
           {/* AEGIS Header */}
         <div className="space-y-4 mb-8">
           <div className="flex items-center space-x-3">
@@ -1083,7 +1083,7 @@ const ProductInfoPanel = React.memo(() => {
                     />
                     
                     {/* Content - Clean & Minimal */}
-                    <div className="relative z-10 p-4 h-full flex items-center justify-between">
+                    <div className="relative z-[10] p-4 h-full flex items-center justify-between">
                       {/* Left: Product Info */}
                       <div className="flex-1">
                         <h4
@@ -1158,34 +1158,10 @@ const ProductInfoPanel = React.memo(() => {
     );
   };
 
-  // Dispatch event when page changes to control ThoughtTrails visibility
-  useEffect(() => {
-    // Dispatch event to notify ThoughtTrails system about page change
-    window.dispatchEvent(new CustomEvent('horizontalPageChange', {
-      detail: { 
-        pageIndex: currentPage,
-        pageName: 'products',
-        timestamp: Date.now()
-      }
-    }));
-    
-    console.log(`🌟 Horizontal page changed: ${currentPage} (products)`);
-    
-    // Add data attribute to the current page for easier selection
-    const pages = document.querySelectorAll('section > .flex > .w-screen');
-    pages.forEach((page, index) => {
-      if (index === 1) { // Products page (second page)
-        page.setAttribute('data-page', 'products');
-      } else {
-        page.removeAttribute('data-page');
-      }
-    });
-  }, [currentPage]);
-
   return (
-    <div className="relative w-screen h-screen flex items-center justify-center overflow-hidden" data-page="products">
+    <div className="relative w-screen h-screen flex items-center justify-center overflow-hidden z-[3]" data-page="products">
       {/* Enhanced Cosmic Background */}
-      <div className="absolute inset-0 z-0">
+      <div className="absolute inset-0 z-[-1]">
         {/* Base gradient with more depth */}
         <motion.div
           className="absolute inset-0"
@@ -1253,25 +1229,27 @@ const ProductInfoPanel = React.memo(() => {
       </div>
 
       {/* Enhanced Nebula Effects */}
-      <motion.div
-        className="absolute inset-0 z-1"
+      <div
+        className="absolute inset-0 z-[-1]"
         style={{
-          background: 'radial-gradient(ellipse at 20% 30%, rgba(162, 52, 179, 0.3) 0%, rgba(186, 86, 16, 0.2) 50%, transparent 70%)',
-          filter: 'blur(45px)',
+          background: 'radial-gradient(ellipse at 25% 40%, rgba(98, 153, 16, 0.25) 0%, rgba(98, 153, 16, 0.1) 40%, transparent 70%)',
+          filter: 'blur(40px)',
         }}
-        animate={{ 
-          scale: [1, 1.2, 1],
-          x: [0, 30, 0],
-          y: [0, -20, 0]
-        }}
-        transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
       />
 
-      {/* ThoughtTrails Layer - positioned between background and content */}
-      <div className="absolute inset-0 z-5" data-thought-trails-layer="true"></div>
+      <div
+        className="absolute inset-0 z-[-1]"
+        style={{
+          background: 'radial-gradient(ellipse at 70% 60%, rgba(34, 211, 238, 0.15) 0%, rgba(34, 211, 238, 0.08) 35%, transparent 60%)',
+          filter: 'blur(60px)',
+        }}
+      />
       
-      {/* Main Content Area with Enhanced Layout */}
-      <div className="relative z-10 w-full max-w-8xl mx-auto px-6 h-full flex items-center">
+      {/* ThoughtTrails Layer - positioned between background and content */}
+      <div className="absolute inset-0 z-[5]" data-thought-trails-layer="true"></div>
+      
+      {/* Enhanced Content Layout */}
+      <div className="relative z-[10] w-full max-w-8xl mx-auto px-6 h-full flex items-center">
         <div className="w-full grid grid-cols-12 gap-8 h-5/6">
           
           {/* Left Panel - Enhanced Info Section */}
@@ -1407,10 +1385,10 @@ const ServicesPage = ({ onScrollRelease }) => {
       // Activate stellar message after typewriter completes
       if (typewriterComplete && e.code === 'Enter') {
         e.preventDefault();
-        // Dispatch the stellar activation event
-        window.dispatchEvent(new CustomEvent('horizontalPageChange', {
-          detail: { pageIndex: 2 }
-        }));
+        // The main component handles page changes, no need to dispatch here
+        // window.dispatchEvent(new CustomEvent('horizontalPageChange', {
+        //   detail: { pageIndex: 2 }
+        // }));
       }
     };
 
@@ -1531,9 +1509,10 @@ const ServicesPage = ({ onScrollRelease }) => {
           
           {/* Central cosmic nexus */}
           <motion.circle
-            cx="500"
-            cy="500"
-            r="3"
+            key="cosmic-nexus"
+            cx={500}
+            cy={500}
+            r={2}
             fill="#FF6B35"
             animate={{
               r: [2, 8, 2],
@@ -1543,6 +1522,9 @@ const ServicesPage = ({ onScrollRelease }) => {
               duration: 4,
               repeat: Infinity,
               ease: "easeInOut"
+            }}
+            style={{
+              willChange: 'transform'
             }}
           />
         </svg>
@@ -1590,7 +1572,7 @@ const ServicesPage = ({ onScrollRelease }) => {
 
   // Integrated Typography Component
   const IntegratedTypography = () => (
-    <div className="absolute inset-0 flex items-center justify-center z-10">
+    <div className="absolute inset-0 flex items-center justify-center z-[10]">
       {/* Ghost Text Background - subtle depth layer */}
       <motion.div
         className="absolute text-4xl lg:text-6xl font-bold text-center opacity-5 pointer-events-none"
@@ -1652,7 +1634,7 @@ const ServicesPage = ({ onScrollRelease }) => {
 
   // Cosmic UI Elements Component
   const CosmicUI = () => (
-    <div className="absolute inset-0 pointer-events-none z-20">
+    <div className="absolute inset-0 pointer-events-none z-[20]">
       {/* Phase Indicator - Top Left */}
       <AnimatePresence>
         {isStellarActive && (
@@ -1718,9 +1700,10 @@ const ServicesPage = ({ onScrollRelease }) => {
               />
               {/* Progress indicator */}
               <motion.circle
-                cx={10 + (stellarProgress * 100)}
-                cy={50 - Math.sin(stellarProgress * Math.PI) * 40}
-                r="2"
+                key="progress-indicator"
+                cx={Math.max(10, Math.min(110, 10 + ((stellarProgress || 0) * 100)))}
+                cy={Math.max(10, Math.min(50, 50 - Math.sin((stellarProgress || 0) * Math.PI) * 40))}
+                r={2}
                 fill="#FF8C42"
                 animate={{
                   scale: [1, 1.5, 1],
@@ -1851,7 +1834,7 @@ const ServicesPage = ({ onScrollRelease }) => {
       {!isStellarActive && Array.from({ length: 15 }).map((_, i) => (
         <motion.div
           key={`cosmic-particle-${i}`}
-          className="absolute rounded-full z-5"
+          className="absolute rounded-full z-[5]"
           style={{ 
             width: Math.random() * 4 + 1 + 'px',
             height: Math.random() * 4 + 1 + 'px',
@@ -1878,7 +1861,7 @@ const ServicesPage = ({ onScrollRelease }) => {
       {!isStellarActive && Array.from({ length: 3 }).map((_, i) => (
         <motion.div
           key={`shooting-star-${i}`}
-          className="absolute w-px h-20 z-5"
+          className="absolute w-px h-20 z-[5]"
           style={{
             background: `linear-gradient(to bottom, #FF6B35, transparent)`,
             top: `${Math.random() * 40}%`,
@@ -1902,7 +1885,7 @@ const ServicesPage = ({ onScrollRelease }) => {
       {/* Main Text Reveal - hide when stellar is active */}
       {!isStellarActive && (
       <motion.h2
-          className="text-3xl lg:text-4xl font-bold text-white text-center max-w-2xl z-15 relative"
+          className="text-3xl lg:text-4xl font-bold text-white text-center max-w-2xl z-[15] relative"
           style={{ 
             textShadow: '0 0 20px rgba(255, 107, 53, 0.6), 0 0 40px rgba(255, 140, 66, 0.3)',
             lineHeight: 1.3
@@ -1925,7 +1908,7 @@ const ServicesPage = ({ onScrollRelease }) => {
 
       {/* StellarMessage Component - ONLY active on third page */}
       {isStellarActive && (
-        <div className="absolute inset-0 z-50">
+        <div className="absolute inset-0 z-[50]">
           <StellarMessageComponent />
         </div>
       )}
@@ -1955,9 +1938,26 @@ const useDebugMode = () => {
 // Main Component
 const HorizontalProductScrollV6 = ({ className = '' }) => {
   const [currentPage, setCurrentPage] = useState(0);
-  const [isScrollLocked, setIsScrollLocked] = useState(true);
+  const [isScrollLocked, setIsScrollLocked] = useState(false);
   const containerRef = useRef(null);
   const isDebug = useDebugMode();
+
+  // Component mount effect - ensure ThoughtTrails detects the page
+  useEffect(() => {
+    // Initial ThoughtTrails detection when component mounts
+    const initThoughtTrails = () => {
+      if (window.thoughtTrails && typeof window.thoughtTrails.checkRouteAndActivate === 'function') {
+        console.log('🌟 Initial ThoughtTrails detection on component mount');
+        window.thoughtTrails.checkRouteAndActivate();
+      }
+    };
+
+    // Run immediately and after a delay to ensure DOM is ready
+    initThoughtTrails();
+    const timer = setTimeout(initThoughtTrails, 500);
+    
+    return () => clearTimeout(timer);
+  }, []);
 
   // Page data attributes mapping
   const pageDataAttributes = {
@@ -2028,6 +2028,13 @@ const HorizontalProductScrollV6 = ({ className = '' }) => {
         page.removeAttribute('data-page');
       }
     });
+
+    // Trigger ThoughtTrails detection after a short delay to ensure DOM is ready
+    setTimeout(() => {
+      if (window.thoughtTrails && typeof window.thoughtTrails.checkRouteAndActivate === 'function') {
+        window.thoughtTrails.checkRouteAndActivate();
+      }
+    }, 100);
   }, [currentPage]);
 
   return (
@@ -2037,7 +2044,7 @@ const HorizontalProductScrollV6 = ({ className = '' }) => {
     >
       {/* Debug Grid Overlay */}
       {isDebug && (
-        <div className="fixed inset-0 z-50 pointer-events-none">
+        <div className="fixed inset-0 z-[50] pointer-events-none">
           <div className="w-full h-full grid grid-cols-12 gap-4">
             {[...Array(12)].map((_, i) => (
               <div key={i} className="h-full border border-red-500 opacity-20" />
@@ -2066,12 +2073,12 @@ const HorizontalProductScrollV6 = ({ className = '' }) => {
           <ProductsPage />
         </motion.div>
         {/* Page 3: Services */}
-        <motion.div className="w-screen h-screen" data-page="services" variants={pageVariants} initial="initial" animate="animate" exit="exit">
+        <motion.div className="w-screen h-screen z-[3]" data-page="services" variants={pageVariants} initial="initial" animate="animate" exit="exit">
           <ServicesPage onScrollRelease={handleScrollRelease} />
         </motion.div>
       </motion.div>
       {/* Only pagination in the component - at the main level */}
-      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex space-x-3 z-30">
+      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex space-x-3 z-[30]">
         {[0, 1, 2].map((index) => (
           <motion.div
             key={index}
@@ -2102,7 +2109,7 @@ const debugStyles = `
   color: white;
   font-size: 8px;
   padding: 2px;
-  z-index: 9999;
+  z-index: [9999];
 }
 `;
 

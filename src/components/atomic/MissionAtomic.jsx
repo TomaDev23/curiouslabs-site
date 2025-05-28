@@ -6,7 +6,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, useAnimation } from 'framer-motion';
 
 // Component metadata for LEGIT compliance
 export const metadata = {
@@ -16,11 +16,71 @@ export const metadata = {
   doc: 'contract_mission_atomic.md'
 };
 
+// Advanced Neon Arc Animation Component
+const NeonArcAnimation = ({ children, sceneStep }) => {
+  const controls = useAnimation();
+  
+  // Check reduced motion preference
+  const prefersReducedMotion = typeof window !== 'undefined' ? 
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches : false;
+
+  // Trigger neon glow animation
+  useEffect(() => {
+    // Always show base neon effect with higher opacity
+    controls.set({ 
+      opacity: 1.0, // Increased from 0.8 to 1.0
+      textShadow: '0 0 8px rgba(0, 255, 255, 0.6), 0 0 16px rgba(0, 255, 255, 0.3)' 
+    });
+
+    // Skip advanced effects only if reduced motion is preferred
+    if (prefersReducedMotion) {
+      return;
+    }
+    
+    const glowInterval = setInterval(() => {
+      // Gentle neon flicker and glow with brighter range
+      controls.start({
+        opacity: [1.0, 1.3, 0.9, 1.4, 1.0], // Increased from [0.8, 1.1, 0.7, 1.2, 0.8]
+        textShadow: [
+          '0 0 8px rgba(0, 255, 255, 0.6), 0 0 16px rgba(0, 255, 255, 0.3)',
+          '0 0 18px rgba(0, 255, 255, 1), 0 0 32px rgba(255, 105, 180, 0.6), 0 0 48px rgba(255, 255, 255, 0.3)',
+          '0 0 10px rgba(0, 255, 255, 0.7), 0 0 20px rgba(0, 255, 255, 0.4)',
+          '0 0 22px rgba(0, 255, 255, 1.1), 0 0 38px rgba(255, 105, 180, 0.8), 0 0 56px rgba(255, 255, 255, 0.4)',
+          '0 0 8px rgba(0, 255, 255, 0.6), 0 0 16px rgba(0, 255, 255, 0.3)',
+        ],
+        transition: { duration: 0.4, times: [0, 0.15, 0.35, 0.65, 1], ease: 'easeInOut' },
+      });
+    }, 1500 + Math.random() * 1000); // Random interval 1.5-2.5s
+
+    return () => {
+      clearInterval(glowInterval);
+    };
+  }, [controls, prefersReducedMotion]);
+
+  return (
+    <div className="relative">
+      <motion.div
+        className="text-white/80 text-xs font-mono" // Increased from text-white/50 to text-white/80
+        style={{ 
+          zIndex: 155,
+          willChange: 'opacity, text-shadow',
+          filter: 'drop-shadow(0 0 4px rgba(0, 255, 255, 0.3))',
+          position: 'relative'
+        }}
+        animate={controls}
+      >
+        {children}
+      </motion.div>
+    </div>
+  );
+};
+
 const MissionAtomic = () => {
   // Self-contained responsive state
   const [isMobile, setIsMobile] = useState(false);
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
   const [milkywayLoaded, setMilkywayLoaded] = useState(false);
+  const [sceneStep, setSceneStep] = useState(6); // Enable neon effects by default
   
   // Handle responsive behavior and reduced motion preference
   useEffect(() => {
@@ -126,12 +186,14 @@ const MissionAtomic = () => {
   
   return (
     <motion.div 
-      className="relative w-full bg-curious-dark-900 py-24 overflow-hidden"
+      className="relative w-full bg-curious-dark-900 overflow-hidden"
       style={{ 
-        minHeight: '110vh', // Extended from 100vh to 110vh
-        marginTop: '-10vh', // Overlap into hero section
-        mask: 'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.1) 8%, rgba(0,0,0,0.3) 15%, rgba(0,0,0,0.6) 25%, rgba(0,0,0,0.8) 35%, black 45%)',
-        WebkitMask: 'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.1) 8%, rgba(0,0,0,0.3) 15%, rgba(0,0,0,0.6) 25%, rgba(0,0,0,0.8) 35%, black 45%)'
+        minHeight: '140vh', // Extended from 110vh to 140vh (+30vh)
+        marginTop: '-30vh', // Extended from -10vh to -30vh (+20vh into hero)
+        paddingTop: '6rem', // py-24 equivalent
+        paddingBottom: 'calc(6rem + 80vh)', // Extended from 50vh to 80vh (+30vh spacer)
+        mask: 'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.1) 8%, rgba(0,0,0,0.3) 15%, rgba(0,0,0,0.6) 25%, rgba(0,0,0,0.8) 35%, black 45%, black 100%)',
+        WebkitMask: 'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.1) 8%, rgba(0,0,0,0.3) 15%, rgba(0,0,0,0.6) 25%, rgba(0,0,0,0.8) 35%, black 45%, black 100%)'
       }}
       initial="hidden"
       whileInView="visible"
@@ -148,7 +210,8 @@ const MissionAtomic = () => {
           backgroundRepeat: 'no-repeat',
           backgroundAttachment: 'fixed',
           opacity: milkywayLoaded ? 1 : 0,
-          transition: 'opacity 0.8s ease-in-out'
+          transition: 'opacity 0.8s ease-in-out',
+          zIndex: 50
         }}
       />
       
@@ -159,14 +222,14 @@ const MissionAtomic = () => {
           background: 'rgba(0, 0, 0, 0.2)',
           backdropFilter: 'blur(0.5px)',
           WebkitBackdropFilter: 'blur(0.5px)',
-          zIndex: 2
+          zIndex: 60
         }}
       />
 
       {/* Main content wrapper with conditional rendering based on image load - v6 style */}
-      <div className="relative w-full h-full opacity-100" style={{ zIndex: 10 }}>
+      <div className="relative w-full h-full opacity-100" style={{ zIndex: 70 }}>
         {/* Right Section with Numbered Mission Points */}
-        <div className={`${isMobile ? 'px-6' : 'md:ml-[45%] md:mr-[5%] pr-4 md:pr-8'} flex flex-col space-y-16 md:space-y-32 mt-[25vh]`}>
+        <div className={`${isMobile ? 'px-6' : 'md:ml-[45%] md:mr-[5%] pr-4 md:pr-8'} flex flex-col space-y-16 md:space-y-32 mt-[35vh]`}>
           {MISSION_POINTS.map((point, index) => (
             <motion.div 
               key={point.id}
@@ -212,9 +275,9 @@ const MissionAtomic = () => {
       
       {/* Eclipse/Circle with Mission Statement - Bottom Left */}
       <motion.div 
-        className={`absolute ${isMobile ? 'bottom-8 left-1/2 -translate-x-1/2' : 'bottom-16 left-8 md:left-24'}`}
+        className={`absolute ${isMobile ? 'bottom-[calc(2rem+60vh)] left-1/2 -translate-x-1/2' : 'bottom-[calc(4rem+75vh)] left-8 md:left-24'}`}
         variants={eclipseVariants}
-        style={{ zIndex: 15 }}
+        style={{ zIndex: 80 }}
       >
         {/* Cosmic background effects - Bottom left corner nebula */}
         <div 
@@ -345,24 +408,27 @@ const MissionAtomic = () => {
         </div>
       </motion.div>
       
-      {/* Decorative elements */}
       {/* Metadata text - right side of the circle */}
       {!isMobile && (
-        <div className="absolute bottom-[45%] left-[34rem] text-white/50 text-xs font-mono" style={{ zIndex: 12 }}>
-          limbo<br />
-          {'}'}
-          <div className="mt-6">
-            this is not<br />
-            a hobby<br />
-            it is a mission;
-          </div>
-          <div className="mt-6">
-            {'})'}
-            <br />
-            humanly digital
-            <br />
-            ------------
-          </div>
+        <div 
+          className="absolute bottom-[calc(45%+48vh)] left-[34rem] z-[85]"
+        >
+          <NeonArcAnimation sceneStep={sceneStep}>
+            limbo<br />
+            {'}'}
+            <div className="mt-6">
+              this is not<br />
+              a hobby<br />
+              it is a mission;
+            </div>
+            <div className="mt-6">
+              {'})'}
+              <br />
+              humanly digital
+              <br />
+              ------------
+            </div>
+          </NeonArcAnimation>
         </div>
       )}
       
@@ -373,7 +439,7 @@ const MissionAtomic = () => {
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.5, duration: 0.3 }}
         viewport={{ once: true }}
-        style={{ zIndex: 12 }}
+        style={{ zIndex: 85 }}
       >
         <div className="mr-3 flex space-x-1">
           <span className="w-5 h-5 rounded-full border border-white/20 flex items-center justify-center text-xs">⊕</span>
@@ -387,14 +453,38 @@ const MissionAtomic = () => {
       </motion.div>
       
       {/* Heart icon */}
-      <div className="absolute top-8 left-8 z-20" style={{ zIndex: 12 }}>
+      <div className="absolute top-8 left-8 z-20" style={{ zIndex: 85 }}>
         <span className="text-white/70 text-xl">♡</span>
       </div>
       
       {/* Decorative slashes */}
-      <div className="absolute top-8 right-[30%] z-20 text-white/50 font-light" style={{ zIndex: 12 }}>
+      <div className="absolute top-8 right-[30%] z-20 text-white/50 font-light" style={{ zIndex: 85 }}>
         //<br/>//<br/>//
       </div>
+
+      {/* Transition art between Mission and Products */}
+      <div
+        className="absolute bottom-0 w-full h-[60vh] pointer-events-none"
+        style={{
+          backgroundImage: 'url(/assets/images/general/transition_item1.png)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center 70%',
+          backgroundRepeat: 'no-repeat',
+          opacity: 0.6,
+          zIndex: 85,
+          mask: 'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.3) 10vh, black 20vh)',
+          WebkitMask: 'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.3) 10vh, black 20vh)'
+        }}
+      />
+
+      {/* Smolder transition gradient for AEGIS handoff */}
+      <div
+        className="absolute bottom-0 w-full h-[50vh] pointer-events-none"
+        style={{
+          background: 'linear-gradient(to bottom, transparent 0%, #0f172a 100%)',
+          zIndex: 90
+        }}
+      />
     </motion.div>
   );
 };
