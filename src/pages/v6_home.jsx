@@ -8,10 +8,10 @@
  * @legit true - V6 Home Page passes LEGIT protocol
  */
 
-import React, { useEffect, useState, useCallback, useRef } from 'react';
+import React, { useEffect, useState, useCallback, useRef, Suspense, lazy } from 'react';
 import LayoutWrapper from '../components/home/v6/LayoutWrapper';
 import NavBarCosmic from '../components/home/v6/NavBarCosmic';
-import HeroSequenceV6 from '../components/home/v6/HeroSequenceV6.jsx';
+const HeroSequenceV6 = lazy(() => import('../components/home/v6/HeroSequenceV6.jsx'));
 import ServicesOrbital from '../components/home/v6/ServicesOrbital';
 import ProcessCards from '../components/home/v6/ProcessCards';
 import ContactTerminal from '../components/home/v6/ContactTerminal';
@@ -132,7 +132,15 @@ const V6HomePage = () => {
         <NavBarCosmic />
         
         {/* Render sections based on visibility status */}
-        {isSectionVisible('hero') && <HeroSequenceV6 />}
+        {isSectionVisible('hero') && (
+          <Suspense fallback={
+            <div className="relative min-h-screen flex items-center justify-center">
+              <div className="text-curious-blue-400 text-lg">Loading Hero Section...</div>
+            </div>
+          }>
+            <HeroSequenceV6 />
+          </Suspense>
+        )}
         
         {/* Cosmic Lore Panel */}
         <section className="relative overflow-hidden" style={{ marginTop: '-10vh', minHeight: 'calc(110vh + 10vh)' }}>
