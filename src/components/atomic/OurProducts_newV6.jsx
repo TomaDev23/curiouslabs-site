@@ -222,6 +222,9 @@ const useReducedMotion = () => {
 
 // AEGIS Page
 const AegisPage = () => {
+  // Add flag to control visualization rendering
+  const [showVisualization, setShowVisualization] = useState(false);
+  
   // Add AegisCore component for the AEGIS visualization
   const AegisCore = () => {
     // Add state for data flow particles
@@ -490,57 +493,49 @@ const AegisPage = () => {
   };
 
   return (
-    <div className="relative w-screen h-screen flex items-center justify-start px-8 lg:px-16 overflow-hidden">
+    <div 
+      className="relative w-screen h-screen flex items-center justify-start px-8 lg:px-16 overflow-hidden"
+      style={{
+        mask: 'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.1) 2vh, rgba(0,0,0,0.3) 4vh, rgba(0,0,0,0.6) 6vh, rgba(0,0,0,0.8) 8vh, black 10vh)',
+        WebkitMask: 'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.1) 2vh, rgba(0,0,0,0.3) 4vh, rgba(0,0,0,0.6) 6vh, rgba(0,0,0,0.8) 8vh, black 10vh)'
+      }}
+    >
       {/* Enhanced Cosmic Background with Grid */}
-      <div className="absolute inset-0 z-[5]">
-        {/* Base gradient */}
+      <div className="absolute inset-0 z-[1]">
+        {/* Base gradient - SET TO 0.4 OPACITY */}
         <div
-          className="absolute inset-0"
+          className="absolute inset-0 opacity-40"
           style={{
             background: 'linear-gradient(135deg, #060b14 0%, #0a1120 30%, #131c2f 60%, rgba(98, 153, 16, 0.15) 100%)',
           }}
         />
         
-        {/* Perspective Grid */}
-        <div className="absolute inset-0 opacity-20">
-          <svg width="100%" height="100%" viewBox="0 0 1000 1000" className="absolute inset-0">
-            {/* Horizontal grid lines with perspective */}
-            {Array.from({ length: 20 }).map((_, i) => (
-              <path 
-                key={`h-${i}`} 
-                d={`M 0,${500 + (i - 10) * 50} Q 500,${480 + (i - 10) * 55} 1000,${500 + (i - 10) * 50}`} 
-                stroke="#84cc16" 
-                strokeOpacity="0.3" 
-                strokeWidth="0.5" 
-                fill="none" 
-              />
-            ))}
-            
-            {/* Vertical grid lines with perspective */}
-            {Array.from({ length: 20 }).map((_, i) => (
-              <path 
-                key={`v-${i}`} 
-                d={`M ${(i) * 50},0 Q ${(i) * 50 + Math.sin(i) * 10},500 ${(i) * 50},1000`} 
-                stroke="#84cc16" 
-                strokeOpacity="0.2" 
-                strokeWidth="0.5" 
-                fill="none" 
-              />
-            ))}
-          </svg>
-        </div>
-        
-        {/* Dynamic noise texture */}
-        <div 
-          className="absolute inset-0 opacity-10"
+        {/* AEGIS Background Asset Layer */}
+        <div
+          className="absolute inset-0 opacity-30 z-[2]"
           style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23noiseFilter)' opacity='0.3'/%3E%3C/svg%3E")`,
+            backgroundImage: 'url(/assets/images/general/Aegis_Background.avif)',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center right',
+            backgroundRepeat: 'no-repeat',
+            mixBlendMode: 'overlay',
+            filter: 'brightness(0.8) contrast(1.2)',
+            maskImage: 'linear-gradient(to left, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 25%, rgba(0,0,0,0.8) 35%, rgba(0,0,0,0.4) 55%, rgba(0,0,0,0.1) 70%, rgba(0,0,0,0) 85%)',
+            WebkitMaskImage: 'linear-gradient(to left, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 25%, rgba(0,0,0,0.8) 35%, rgba(0,0,0,0.4) 55%, rgba(0,0,0,0.1) 70%, rgba(0,0,0,0) 85%)',
+          }}
+        />
+        
+        {/* Dynamic noise texture - STRONGER EFFECT */}
+        <div 
+          className="absolute inset-0 opacity-40 z-[8]"
+          style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23noiseFilter)' opacity='0.8'/%3E%3C/svg%3E")`,
             mixBlendMode: 'overlay'
           }}
         />
       </div>
 
-      {/* Enhanced Nebula Effect with Multiple Layers */}
+      {/* Enhanced Nebula Effect with Multiple Layers - MOVED UP */}
       <div
         className="absolute inset-0 z-[2]"
         style={{
@@ -550,7 +545,7 @@ const AegisPage = () => {
       />
 
       <div
-        className="absolute inset-0 z-[1]"
+        className="absolute inset-0 z-[3]"
         style={{
           background: 'radial-gradient(ellipse at 70% 60%, rgba(34, 211, 238, 0.15) 0%, rgba(34, 211, 238, 0.08) 35%, transparent 60%)',
           filter: 'blur(60px)',
@@ -653,7 +648,7 @@ const AegisPage = () => {
 
           {/* Right Column - AEGIS Core Visualization */}
           <div className="col-span-12 lg:col-span-5 flex items-center justify-center">
-            <AegisCore />
+            {showVisualization && <AegisCore />}
           </div>
         </div>
       </div>
@@ -703,10 +698,16 @@ const AegisPage = () => {
 // Products Page (Simple Static Version)
 const ProductsPage = () => {
   const [currentPage, setCurrentPage] = useState(0);
+  const prevColorRef = useRef(null);
 
   // Dispatch events to native ThoughtTrails system
   useEffect(() => {
     const activeProduct = OPS_BENTO_ITEMS[currentPage];
+    
+    // Only dispatch if color has actually changed
+    if (prevColorRef.current === activeProduct.accentColor) {
+      return;
+    }
     
     // Small delay to ensure DOM has updated
     const timeoutId = setTimeout(() => {
@@ -723,6 +724,9 @@ const ProductsPage = () => {
           cardBounds: cardBounds
         }
       }));
+      
+      // Update the ref to track this color
+      prevColorRef.current = activeProduct.accentColor;
     }, 50); // Small delay to ensure DOM update
     
     return () => clearTimeout(timeoutId);
@@ -1161,10 +1165,10 @@ const ProductInfoPanel = React.memo(() => {
   return (
     <div className="relative w-screen h-screen flex items-center justify-center overflow-hidden z-[3]" data-page="products">
       {/* Enhanced Cosmic Background */}
-      <div className="absolute inset-0 z-[-1]">
+      <div className="absolute inset-0 z-[-20]">
         {/* Base gradient with more depth */}
         <motion.div
-          className="absolute inset-0"
+          className="absolute inset-0 opacity-40"
           style={{
             background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 25%, #2d1b4f 50%, rgba(162, 52, 179, 0.4) 75%, rgba(186, 86, 16, 0.3) 100%)',
           }}
@@ -1173,64 +1177,11 @@ const ProductInfoPanel = React.memo(() => {
           }}
           transition={{ duration: 25, repeat: Infinity }}
         />
-        
-        {/* Dynamic grid pattern */}
-        <div className="absolute inset-0 opacity-15">
-          <svg width="100%" height="100%" viewBox="0 0 1000 1000">
-            {/* Hexagonal grid pattern */}
-            {Array.from({ length: 8 }).map((_, row) =>
-              Array.from({ length: 12 }).map((_, col) => {
-                const x = col * 80 + (row % 2) * 40;
-                const y = row * 70;
-                return (
-                  <motion.polygon
-                    key={`hex-${row}-${col}`}
-                    points={`${x},${y+20} ${x+20},${y} ${x+40},${y} ${x+60},${y+20} ${x+40},${y+40} ${x+20},${y+40}`}
-                    fill="none"
-                    stroke="#8b5cf6"
-                    strokeWidth="0.5"
-                    strokeOpacity="0.3"
-                    animate={{
-                      strokeOpacity: [0.1, 0.4, 0.1],
-                    }}
-                    transition={{
-                      duration: Math.random() * 3 + 2,
-                      repeat: Infinity,
-                      delay: Math.random() * 2
-                    }}
-                  />
-                );
-              })
-            )}
-          </svg>
-        </div>
-        
-        {/* Floating geometric shapes */}
-        {Array.from({ length: 6 }).map((_, i) => (
-          <motion.div
-            key={`geo-${i}`}
-            className="absolute w-16 h-16 border border-purple-400/20 rotate-45"
-            style={{
-              top: `${Math.random() * 80 + 10}%`,
-              left: `${Math.random() * 80 + 10}%`,
-            }}
-            animate={{
-              rotate: [45, 135, 45],
-              scale: [1, 1.2, 1],
-              opacity: [0.1, 0.3, 0.1]
-            }}
-            transition={{
-              duration: Math.random() * 8 + 6,
-              repeat: Infinity,
-              ease: "easeInOut"
-            }}
-          />
-        ))}
       </div>
 
       {/* Enhanced Nebula Effects */}
       <div
-        className="absolute inset-0 z-[-1]"
+        className="absolute inset-0 z-[-19]"
         style={{
           background: 'radial-gradient(ellipse at 25% 40%, rgba(98, 153, 16, 0.25) 0%, rgba(98, 153, 16, 0.1) 40%, transparent 70%)',
           filter: 'blur(40px)',
@@ -1238,7 +1189,7 @@ const ProductInfoPanel = React.memo(() => {
       />
 
       <div
-        className="absolute inset-0 z-[-1]"
+        className="absolute inset-0 z-[-18]"
         style={{
           background: 'radial-gradient(ellipse at 70% 60%, rgba(34, 211, 238, 0.15) 0%, rgba(34, 211, 238, 0.08) 35%, transparent 60%)',
           filter: 'blur(60px)',
@@ -1266,6 +1217,15 @@ const ProductInfoPanel = React.memo(() => {
           </div>
         </div>
       </div>
+      
+      {/* Products Page Dynamic Noise Texture */}
+      <div 
+        className="absolute inset-0 opacity-40 mix-blend-overlay z-[-17]"
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='200' height='200' viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='productsNoise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23productsNoise)' opacity='0.8'/%3E%3C/svg%3E")`,
+          backgroundSize: '180px 180px'
+        }}
+      />
     </div>
   );
 };
@@ -1396,12 +1356,12 @@ const ServicesPage = ({ onScrollRelease }) => {
     return () => window.removeEventListener('keydown', handleKeyPress);
   }, [canSkip, typewriterComplete, fullText]);
 
-  // Enhanced Cosmic Environment Component
-  const CosmicEnvironment = () => (
-    <div className="absolute inset-0 overflow-hidden">
-      {/* Layer 1: Enhanced Base Gradient */}
+  // Page 3 (Services) Cosmic Environment Component
+  const ServicesCosmicEnvironment = () => (
+    <div className="absolute inset-0 overflow-hidden z-[-20]">
+      {/* Layer 1: Services Page Enhanced Base Gradient */}
       <motion.div
-        className="absolute inset-0"
+        className="absolute inset-0 opacity-40"
         style={{
           background: `
             linear-gradient(135deg, #0f172a 0%, #1e293b 20%, #2d1b4f 40%, rgba(255, 107, 53, 0.15) 70%, rgba(255, 140, 66, 0.1) 100%),
@@ -1416,7 +1376,7 @@ const ServicesPage = ({ onScrollRelease }) => {
         transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
       />
       
-      {/* Layer 2: Floating Cosmic Orbs */}
+      {/* Layer 2: Services Page Floating Cosmic Orbs */}
       {Array.from({ length: 8 }).map((_, i) => {
         const size = 20 + Math.random() * 60;
         const colors = ['#FF6B35', '#FF8C42', '#F4511E'];
@@ -1424,7 +1384,7 @@ const ServicesPage = ({ onScrollRelease }) => {
 
   return (
       <motion.div
-            key={`cosmic-orb-${i}`}
+            key={`services-cosmic-orb-${i}`}
             className="absolute rounded-full pointer-events-none"
         style={{
               width: `${size}px`,
@@ -1450,87 +1410,9 @@ const ServicesPage = ({ onScrollRelease }) => {
         );
       })}
       
-      {/* Layer 3: Enhanced Cosmic Grid */}
-      <div className="absolute inset-0 opacity-20">
-        <svg width="100%" height="100%" viewBox="0 0 1000 1000" className="absolute inset-0">
-          {/* Horizontal perspective grid lines */}
-          {Array.from({ length: 12 }).map((_, i) => {
-            const y = 100 + (i * 80);
-            const curve = Math.sin(i * 0.3) * 20;
-            return (
-              <motion.path
-                key={`grid-h-${i}`}
-                d={`M 0,${y} Q 500,${y + curve} 1000,${y}`}
-                stroke="#FF8C42"
-                strokeOpacity="0.3"
-                strokeWidth="0.5"
-                fill="none"
-                strokeDasharray="4,12"
-                animate={{
-                  strokeOpacity: [0.1, 0.4, 0.1],
-                  strokeDashoffset: [0, -16]
-                }}
-                transition={{
-                  duration: 6,
-                  repeat: Infinity,
-                  delay: i * 0.2,
-                  ease: "linear"
-                }}
-              />
-            );
-          })}
-          
-          {/* Vertical perspective grid lines */}
-          {Array.from({ length: 8 }).map((_, i) => {
-            const x = 100 + (i * 120);
-            const curve = Math.cos(i * 0.4) * 15;
-            return (
-              <motion.path
-                key={`grid-v-${i}`}
-                d={`M ${x},0 Q ${x + curve},500 ${x},1000`}
-                stroke="#F4511E"
-                strokeOpacity="0.25"
-                strokeWidth="0.5"
-                fill="none"
-                strokeDasharray="3,15"
-                animate={{
-                  strokeOpacity: [0.1, 0.3, 0.1],
-                  strokeDashoffset: [0, -18]
-                }}
-                transition={{
-                  duration: 8,
-                  repeat: Infinity,
-                  delay: i * 0.3,
-                  ease: "linear"
-                }}
-              />
-            );
-          })}
-          
-          {/* Central cosmic nexus */}
-          <motion.circle
-            key="cosmic-nexus"
-            cx={500}
-            cy={500}
-            r={2}
-            fill="#FF6B35"
-            animate={{
-              r: [2, 8, 2],
-              opacity: [0.3, 0.8, 0.3]
-            }}
-            transition={{
-              duration: 4,
-              repeat: Infinity,
-              ease: "easeInOut"
-            }}
-            style={{
-              willChange: 'transform'
-            }}
-          />
-        </svg>
-      </div>
+      {/* Layer 3: Services Page Enhanced Cosmic Grid - REMOVED */}
       
-      {/* Layer 4: Enhanced Nebula Effects */}
+      {/* Layer 4: Services Page Enhanced Nebula Effects */}
       <motion.div
         className="absolute inset-0"
         style={{
@@ -1561,10 +1443,10 @@ const ServicesPage = ({ onScrollRelease }) => {
       
       {/* Layer 5: Dynamic Noise Texture */}
       <div 
-        className="absolute inset-0 opacity-5 mix-blend-overlay"
+        className="absolute inset-0 opacity-40 mix-blend-overlay"
         style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg width='200' height='200' viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='cosmicNoise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23cosmicNoise)' opacity='0.4'/%3E%3C/svg%3E")`,
-          backgroundSize: '200px 200px'
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='200' height='200' viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='cosmicNoise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23cosmicNoise)' opacity='0.8'/%3E%3C/svg%3E")`,
+          backgroundSize: '180px 180px'
         }}
       />
     </div>
@@ -1825,7 +1707,7 @@ const ServicesPage = ({ onScrollRelease }) => {
   return (
     <div className="relative w-screen h-screen flex items-center justify-center overflow-hidden">
       {/* Enhanced Cosmic Environment */}
-      <CosmicEnvironment />
+      <ServicesCosmicEnvironment />
       
       {/* Integrated Typography Layer */}
       <IntegratedTypography />
@@ -2040,8 +1922,66 @@ const HorizontalProductScrollV6 = ({ className = '' }) => {
   return (
     <section 
       className={`relative w-full h-screen overflow-hidden ${className} ${isDebug ? 'debug-mode' : ''}`} 
+      style={{ marginTop: '-10vh' }}
       ref={containerRef}
     >
+      {/* Spanning Background Gradient - Smooth transitions across all three pages */}
+      <motion.div 
+        className="absolute inset-0 w-[300vw] h-full z-[-10]"
+        animate={{ x: `-${currentPage * 100}vw` }}
+        transition={{ type: 'spring', stiffness: 100, damping: 20 }}
+      >
+        <div
+          className="absolute inset-0"
+          style={{
+            background: `
+              linear-gradient(
+                to right,
+                /* AEGIS Page (0-33.33%) */
+                #060b14 0%,
+                #0a1120 8%,
+                #131c2f 16%,
+                rgba(98, 153, 16, 0.15) 25%,
+                rgba(19, 28, 47, 0.8) 30%,
+                
+                /* Transition to Products (30-40%) */
+                rgba(15, 23, 42, 0.9) 33.33%,
+                rgba(30, 41, 59, 0.8) 35%,
+                rgba(45, 27, 79, 0.7) 38%,
+                
+                /* Products Page (33.33-66.66%) */
+                #0f172a 40%,
+                #1e293b 45%,
+                #2d1b4f 55%,
+                rgba(162, 52, 179, 0.4) 60%,
+                rgba(186, 86, 16, 0.3) 63%,
+                
+                /* Transition to Services (63-70%) */
+                rgba(15, 23, 42, 0.8) 66.66%,
+                rgba(30, 41, 59, 0.7) 68%,
+                rgba(45, 27, 79, 0.6) 70%,
+                
+                /* Services Page (66.66-100%) */
+                #0f172a 72%,
+                #1e293b 78%,
+                #2d1b4f 85%,
+                rgba(255, 107, 53, 0.15) 92%,
+                rgba(255, 140, 66, 0.1) 100%
+              )
+            `,
+          }}
+        />
+        
+        {/* Spanning Noise Texture - Consistent across all pages */}
+        <div 
+          className="absolute inset-0 opacity-20 mix-blend-overlay"
+          style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='180' height='180' viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='spanningNoise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23spanningNoise)' opacity='0.8'/%3E%3C/svg%3E")`,
+            backgroundSize: '180px 180px'
+          }}
+        />
+      </motion.div>
+
       {/* Debug Grid Overlay */}
       {isDebug && (
         <div className="fixed inset-0 z-[50] pointer-events-none">

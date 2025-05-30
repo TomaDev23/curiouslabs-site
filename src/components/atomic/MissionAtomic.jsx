@@ -5,8 +5,12 @@
  * @type atomic
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { motion, useAnimation } from 'framer-motion';
+import MoonSphereProxy from './proxies/MoonSphereProxy';
+
+// Lazy load MoonSphere to prevent Three.js contamination
+// const MoonSphere = lazy(() => import('./Planetary/MoonSphere'));
 
 // Component metadata for LEGIT compliance
 export const metadata = {
@@ -76,56 +80,66 @@ const NeonArcAnimation = ({ children, sceneStep }) => {
 };
 
 const MissionAtomic = () => {
-  // Self-contained responsive state
   const [isMobile, setIsMobile] = useState(false);
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
-  const [milkywayLoaded, setMilkywayLoaded] = useState(false);
-  const [sceneStep, setSceneStep] = useState(6); // Enable neon effects by default
+  const [useSimpleEclipse, setUseSimpleEclipse] = useState(false);
+  const controls = useAnimation();
+  const moonControls = useAnimation();
   
-  // Handle responsive behavior and reduced motion preference
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-    
-    const checkMotionPreference = () => {
+  // Check if mobile device
+  const checkMobile = () => {
+    setIsMobile(window.innerWidth < 768);
+  };
+  
+  // Check if user prefers reduced motion
+  const checkMotionPreference = () => {
+    if (typeof window !== 'undefined') {
       const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
       setPrefersReducedMotion(mediaQuery.matches);
       
-      // Listen for changes
       const handleChange = (e) => setPrefersReducedMotion(e.matches);
-      if (mediaQuery.addEventListener) {
-        mediaQuery.addEventListener('change', handleChange);
-        return () => mediaQuery.removeEventListener('change', handleChange);
+      mediaQuery.addEventListener('change', handleChange);
+      return () => mediaQuery.removeEventListener('change', handleChange);
+    }
+  };
+  
+  // Check device performance capabilities
+  const checkDeviceCapabilities = () => {
+    // Simple heuristic: mobile + reduced motion preference
+    // A more sophisticated implementation could check for GPU capabilities
+    setUseSimpleEclipse(isMobile && prefersReducedMotion);
+    
+    // Check for URL param for testing both versions
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('forceEclipse') === 'true') {
+        setUseSimpleEclipse(true);
       }
-    };
-    
-    // Smooth fade-in for Milky Way background
-    const preloadMilkyway = () => {
-      const img = new Image();
-      img.src = "/assets/images/planets/4k/milkyway_Light.webp";
-      img.onload = () => {
-        setMilkywayLoaded(true);
-      };
-      img.onerror = () => {
-        console.warn("Milky Way image failed to load, using fallback");
-        setMilkywayLoaded(true); // Show component anyway
-      };
-    };
-    
-    // Initial checks
+    }
+  };
+  
+  useEffect(() => {
     checkMobile();
-    checkMotionPreference();
-    preloadMilkyway();
-    
-    // Add resize listener
+    const cleanupMotion = checkMotionPreference();
     window.addEventListener('resize', checkMobile);
     
-    // Cleanup
     return () => {
       window.removeEventListener('resize', checkMobile);
+      if (cleanupMotion) cleanupMotion();
     };
   }, []);
+  
+  useEffect(() => {
+    checkDeviceCapabilities();
+  }, [isMobile, prefersReducedMotion]);
+  
+  // Preload milkyway image
+  const preloadMilkyway = () => {
+    if (typeof window !== 'undefined') {
+      const img = new Image();
+      img.src = '/assets/images/cosmic/milkyway_compressed.jpg';
+    }
+  };
 
   // Self-contained mission points data
   const MISSION_POINTS = [
@@ -192,15 +206,30 @@ const MissionAtomic = () => {
         marginTop: '-30vh', // Extended from -10vh to -30vh (+20vh into hero)
         paddingTop: '6rem', // py-24 equivalent
         paddingBottom: 'calc(6rem + 80vh)', // Extended from 50vh to 80vh (+30vh spacer)
-        mask: 'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.1) 8%, rgba(0,0,0,0.3) 15%, rgba(0,0,0,0.6) 25%, rgba(0,0,0,0.8) 35%, black 45%, black 100%)',
-        WebkitMask: 'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.1) 8%, rgba(0,0,0,0.3) 15%, rgba(0,0,0,0.6) 25%, rgba(0,0,0,0.8) 35%, black 45%, black 100%)'
+        mask: 'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.1) 8%, rgba(0,0,0,0.3) 15%, rgba(0,0,0,0.6) 25%, rgba(0,0,0,0.8) 35%, black 45%, black calc(100% - 50vh), rgba(0,0,0,0.7) calc(100% - 30vh), rgba(0,0,0,0.3) calc(100% - 15vh), transparent 100%)',
+        WebkitMask: 'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.1) 8%, rgba(0,0,0,0.3) 15%, rgba(0,0,0,0.6) 25%, rgba(0,0,0,0.8) 35%, black 45%, black calc(100% - 50vh), rgba(0,0,0,0.7) calc(100% - 30vh), rgba(0,0,0,0.3) calc(100% - 15vh), transparent 100%)'
       }}
       initial="hidden"
       whileInView="visible"
       viewport={{ once: true, margin: "0px 0px -20% 0px" }}
       variants={sectionVariants}
     >
-      {/* Background Image with 10vh dissolve mask - coordinated with nebula */}
+      {/* Progressive Background Loading - Lightweight fallback first */}
+      <div 
+        className="absolute inset-0 z-0"
+        style={{
+          background: 'linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 25%, #16213e 50%, #0f3460 75%, #0a0a0a 100%)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          backgroundAttachment: 'fixed',
+          opacity: 1,
+          transition: 'opacity 0.8s ease-in-out',
+          zIndex: 50
+        }}
+      />
+      
+      {/* High-quality background - lazy loaded after LCP */}
       <div 
         className="absolute inset-0 z-0"
         style={{
@@ -209,9 +238,28 @@ const MissionAtomic = () => {
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
           backgroundAttachment: 'fixed',
-          opacity: milkywayLoaded ? 1 : 0,
-          transition: 'opacity 0.8s ease-in-out',
-          zIndex: 50
+          opacity: 0,
+          transition: 'opacity 1.2s ease-in-out',
+          zIndex: 51
+        }}
+        onLoad={(e) => {
+          // Fade in the high-quality background after it loads
+          setTimeout(() => {
+            e.target.style.opacity = '1';
+          }, 100);
+        }}
+        ref={(el) => {
+          if (el && !el.dataset.loaded) {
+            // Lazy load the background image after a delay
+            setTimeout(() => {
+              const img = new Image();
+              img.onload = () => {
+                el.style.opacity = '1';
+                el.dataset.loaded = 'true';
+              };
+              img.src = '/assets/images/planets/4k/milkyway_Light.webp';
+            }, 1000); // Load after 1 second delay
+          }
         }}
       />
       
@@ -275,7 +323,7 @@ const MissionAtomic = () => {
       
       {/* Eclipse/Circle with Mission Statement - Bottom Left */}
       <motion.div 
-        className={`absolute ${isMobile ? 'bottom-[calc(2rem+60vh)] left-1/2 -translate-x-1/2' : 'bottom-[calc(4rem+75vh)] left-8 md:left-24'}`}
+        className={`absolute ${isMobile ? 'bottom-[calc(2rem+60vh)] left-1/2 -translate-x-1/2' : 'bottom-[calc(4rem+75vh)] left-4 md:left-16'}`}
         variants={eclipseVariants}
         style={{ zIndex: 80 }}
       >
@@ -350,70 +398,61 @@ const MissionAtomic = () => {
           }}
         ></div>
 
-        {/* Outer glow layers - multiple layers for realistic effect */}
-        <div 
-          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full opacity-10 blur-3xl bg-white"
-          style={{ 
-            width: '180%', 
-            height: '180%', 
-            filter: 'blur(80px)'
-          }}
-        ></div>
-        <div 
-          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full opacity-20 blur-2xl bg-white"
-          style={{ 
-            width: '170%', 
-            height: '170%', 
-            filter: 'blur(60px)'
-          }}
-        ></div>
-        <div 
-          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full opacity-30 blur-xl bg-white"
-          style={{ 
-            width: '160%', 
-            height: '160%', 
-            filter: 'blur(40px)'
-          }}
-        ></div>
-
-        {/* Main black circle */}
-        <div 
-          className="relative w-[340px] h-[340px] md:w-[400px] md:h-[400px] rounded-full flex items-center justify-center"
-          style={{
-            background: 'radial-gradient(ellipse at center, rgba(20,20,20,1) 40%, rgba(20,20,20,0.5) 70%, rgba(0,0,0,0) 100%)'
-          }}
-        >
-          {/* Fuzzy Crescent Shadow Layer for depth */}
-          <div
-            style={{
-              position: 'absolute',
-              width: '100%',
-              height: '100%',
-              borderRadius: '50%',
-              background: 'radial-gradient(circle at 80% 20%, rgba(0,0,0,0.35) 0%, transparent 50%)',
-              filter: 'blur(20px)',
-              pointerEvents: 'none'
-            }}
-          ></div>
-          {/* Text content container */}
-          <div className="relative z-20 text-center max-w-[320px]">
-            <p className="uppercase tracking-widest text-sm text-white/50">
-              <span className="inline-block mr-1">↗</span> our mission
-            </p>
-            <h2 className="text-3xl font-light mt-2 mb-4">Human-first AI</h2>
-            <p className="text-sm text-white/70 leading-relaxed">
-              We are building responsible, ethical systems for a future where technology aligns with human well-being.
-            </p>
+        {/* Main black circle - REPLACED WITH CINEMATIC MOON */}
+        <div className="relative flex items-center justify-center transform -translate-x-4 -translate-y-4">
+          <div className="w-[700px] h-[700px] md:w-[780px] md:h-[780px]">
+            <Suspense fallback={
+              <div className="w-full h-full flex items-center justify-center">
+                <div className="w-[400px] h-[400px] rounded-full bg-gradient-to-br from-gray-800 to-gray-900 border border-white/10 flex items-center justify-center">
+                  <div className="text-white/60 text-sm">Loading Moon...</div>
+                </div>
+              </div>
+            }>
+              <MoonSphereProxy className="w-[400px] h-[400px]" />
+            </Suspense>
           </div>
+          
+          {/* Text content container - MOVED TO BOTTOM LEFT */}
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.5 }}
+            className="absolute bottom-[2%] left-[8%] z-20 text-left max-w-[460px] p-6 rounded-lg backdrop-blur-sm bg-black/10"
+          >
+            <motion.p 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5, delay: 0.9 }}
+              className="uppercase tracking-widest text-sm text-white/60 mb-1 font-medium"
+            >
+              <span className="inline-block mr-1 transform rotate-45">↑</span> our mission
+            </motion.p>
+            <motion.h2 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5, delay: 1.1 }}
+              className="text-4xl font-light mb-3 tracking-wide"
+            >
+              Human-first AI
+            </motion.h2>
+            <motion.p 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5, delay: 1.3 }}
+              className="text-sm text-white/90 leading-relaxed max-w-[400px]"
+            >
+              We are building responsible, ethical systems for a future where technology aligns with human well-being.
+            </motion.p>
+          </motion.div>
         </div>
       </motion.div>
       
       {/* Metadata text - right side of the circle */}
       {!isMobile && (
         <div 
-          className="absolute bottom-[calc(45%+48vh)] left-[34rem] z-[85]"
+          className="absolute bottom-[calc(45%+48vh)] left-[44rem] z-[85]"
         >
-          <NeonArcAnimation sceneStep={sceneStep}>
+          <NeonArcAnimation sceneStep={6}>
             limbo<br />
             {'}'}
             <div className="mt-6">
@@ -472,8 +511,31 @@ const MissionAtomic = () => {
           backgroundRepeat: 'no-repeat',
           opacity: 0.6,
           zIndex: 85,
-          mask: 'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.3) 10vh, black 20vh)',
-          WebkitMask: 'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.3) 10vh, black 20vh)'
+          mask: 'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.2) 8vh, rgba(0,0,0,0.6) 15vh, rgba(0,0,0,0.9) 25vh, black 35vh, black 50vh, rgba(0,0,0,0.8) 60vh, rgba(0,0,0,0.4) 70vh, transparent 80vh)',
+          WebkitMask: 'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.2) 8vh, rgba(0,0,0,0.6) 15vh, rgba(0,0,0,0.9) 25vh, black 35vh, black 50vh, rgba(0,0,0,0.8) 60vh, rgba(0,0,0,0.4) 70vh, transparent 80vh)'
+        }}
+      />
+
+      {/* Mission Noise Texture Layer - overlays the transition asset */}
+      <div 
+        className="absolute bottom-0 w-full h-[60vh] pointer-events-none opacity-25 mix-blend-soft-light"
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='200' height='200' viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='missionNoise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='5' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23missionNoise)' opacity='0.8'/%3E%3C/svg%3E")`,
+          backgroundSize: '160px 160px',
+          zIndex: 86,
+          mask: 'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.1) 5vh, rgba(0,0,0,0.4) 12vh, rgba(0,0,0,0.8) 22vh, black 32vh)',
+          WebkitMask: 'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.1) 5vh, rgba(0,0,0,0.4) 12vh, rgba(0,0,0,0.8) 22vh, black 32vh)'
+        }}
+      />
+
+      {/* Additional Dissolve Layer for smoother transition */}
+      <div 
+        className="absolute bottom-0 w-full h-[60vh] pointer-events-none opacity-15 mix-blend-multiply"
+        style={{
+          background: 'radial-gradient(ellipse at center bottom, rgba(15, 23, 42, 0.8) 0%, rgba(30, 41, 59, 0.6) 40%, transparent 70%)',
+          zIndex: 87,
+          mask: 'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.3) 10vh, rgba(0,0,0,0.7) 20vh, black 30vh)',
+          WebkitMask: 'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.3) 10vh, rgba(0,0,0,0.7) 20vh, black 30vh)'
         }}
       />
 
@@ -481,7 +543,7 @@ const MissionAtomic = () => {
       <div
         className="absolute bottom-0 w-full h-[50vh] pointer-events-none"
         style={{
-          background: 'linear-gradient(to bottom, transparent 0%, #0f172a 100%)',
+          background: 'linear-gradient(to bottom, transparent 0%, rgba(15, 23, 42, 0.3) 20%, rgba(15, 23, 42, 0.7) 60%, #0f172a 100%)',
           zIndex: 90
         }}
       />
