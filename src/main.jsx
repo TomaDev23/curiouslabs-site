@@ -7,10 +7,10 @@ import './index.css'
 import initializePerformance from './utils/initializePerformance'
 import { ScrollProvider } from './context/ScrollContext'
 
-// Initialize performance monitoring
-if (process.env.NODE_ENV === 'development') {
-  initializePerformance();
-}
+// ⛔ Performance monitor temporarily disabled for audit
+// if (process.env.NODE_ENV === 'development') {
+//   initializePerformance();
+// }
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>

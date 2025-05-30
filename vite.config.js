@@ -50,6 +50,19 @@ export default defineConfig({
         drop_console: false,
         drop_debugger: true
       }
+    },
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          // Force Three.js and related libraries into separate chunks
+          'three-core': ['three'],
+          'react-three-fiber': ['@react-three/fiber'],
+          'react-three-drei': ['@react-three/drei'],
+          // Group other large dependencies
+          'vendor-react': ['react', 'react-dom'],
+          'vendor-motion': ['framer-motion']
+        }
+      }
     }
   }
 });
