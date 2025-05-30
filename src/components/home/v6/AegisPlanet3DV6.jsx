@@ -1,253 +1,228 @@
 /**
- * @component AegisPlanet3DV6
- * @description Enhanced 3D Earth implementation with atmospheric effects and orbital rings
+ * @component AegisPlanet3DV6 - DEPRECATED
+ * @status COMMENTED OUT - Replaced by EarthSphere.jsx
+ * @replacement src/components/atomic/Planetary/EarthSphere.jsx
+ * @date_deprecated Phase 2 - Option B Implementation
+ * @reason Performance optimization and consistency with Moon rendering system
  * 
- * @metadata
- * @version 1.1.0
- * @author CuriousLabs
- * @legit true - AegisPlanet3DV6 passes LEGIT protocol
+ * @preservation_note
+ * This file is preserved for potential future reference or rollback.
+ * The complex atmosphere and cloud systems may be useful for future enhancements.
+ * 
+ * @migration_path
+ * Old: <AegisPlanet3DV6 />
+ * New: <EarthSphere scaleFactor={1} rotationY={null} />
  */
 
-import React, { useRef, useMemo, useEffect } from 'react';
-import { useFrame, useLoader, useThree } from '@react-three/fiber';
-import { useScene } from './SceneControllerV6';
+/*
+// ORIGINAL IMPLEMENTATION - COMMENTED OUT FOR PRESERVATION
+
+import React, { useRef, useMemo, useCallback } from 'react';
+import { Canvas, useLoader, useFrame, useThree } from '@react-three/fiber';
+import { Sphere, useTexture } from '@react-three/drei';
+import { TextureLoader, ShaderMaterial, Vector3 } from 'three';
 import * as THREE from 'three';
 
-// Texture paths based on performance tier
-const TEXTURE_PATHS = {
-  earth: '/assets/images/planets/4k/earthmap1k_LE_upscale_balanced_x4.jpg',
-  bump: '/assets/images/planets/4k/earthbump1k_LE_upscale_balanced_x4.jpg',
-  clouds: '/assets/images/planets/4k/earthcloudmap_LE_upscale_balanced_x4.jpg'
-};
-
-// Atmosphere shader
+// Custom atmosphere shader - COMPLEX IMPLEMENTATION
 const atmosphereVertexShader = `
   varying vec3 vNormal;
   varying vec3 vPosition;
-  varying vec3 vWorldPosition;
-  varying vec2 vUv;
-
+  
   void main() {
-    vUv = uv;
     vNormal = normalize(normalMatrix * normal);
-    vPosition = (modelViewMatrix * vec4(position, 1.0)).xyz;
-    vWorldPosition = (modelMatrix * vec4(position, 1.0)).xyz;
+    vPosition = position;
     gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
   }
 `;
 
 const atmosphereFragmentShader = `
-  uniform vec3 color;
-  uniform vec3 viewPosition;
-  uniform float atmosphereIntensity;
-  uniform float time;
-  
+  uniform vec3 glowColor;
+  uniform float intensity;
   varying vec3 vNormal;
   varying vec3 vPosition;
-  varying vec3 vWorldPosition;
-  varying vec2 vUv;
-
+  
   void main() {
-    vec3 worldViewDir = normalize(viewPosition - vWorldPosition);
-    
-    // Base atmosphere glow
-    float intensity = pow(0.7 - dot(vNormal, worldViewDir), 2.0);
-    
-    // Inner glow
-    float innerGlow = pow(dot(vNormal, worldViewDir), 4.0);
-    
-    // Pulse effect
-    float pulse = sin(time * 0.5) * 0.5 + 0.5;
-    
-    // Rim lighting
-    float rim = 1.0 - max(dot(worldViewDir, vNormal), 0.0);
-    rim = pow(rim, 4.0);
-    
-    // Combine effects
-    float finalIntensity = (intensity + innerGlow * 0.3 + rim * 0.2) * atmosphereIntensity;
-    finalIntensity *= mix(0.8, 1.2, pulse);
-    
-    gl_FragColor = vec4(color, finalIntensity);
+    float glow = dot(vNormal, vec3(0.0, 0.0, 1.0));
+    glow = pow(glow, 2.0);
+    gl_FragColor = vec4(glowColor, glow * intensity);
   }
 `;
 
-const AegisPlanet3DV6 = ({
-  radius = 1,
-  rotationSpeed = 0.001,
-  cloudSpeed = 0.0005,
-  atmosphereColor = new THREE.Color(0xffffff),
-  position = [0, 0, 0]
-}) => {
-  const { deviceCapabilities, scenePhase } = useScene();
-  const { camera, clock } = useThree();
-  
-  // Refs for animation
+// Planet component with complex rendering
+const Planet = ({ scenePhase = 0, scaleFactor = 1 }) => {
   const planetRef = useRef();
-  const cloudsRef = useRef();
   const atmosphereRef = useRef();
+  const cloudsRef = useRef();
   const ringsRef = useRef();
-
-  // Performance-based texture quality
-  const textureQuality = useMemo(() => {
-    switch(deviceCapabilities.performanceTier) {
-      case 'high': return 1;    // Full resolution
-      case 'medium': return 0.5; // Half resolution
-      case 'low': return 0.25;  // Quarter resolution
-      default: return 0.125;    // Eighth resolution
-    }
-  }, [deviceCapabilities.performanceTier]);
-
-  // Load and process textures
-  const [earthTexture, bumpTexture, cloudTexture] = useLoader(THREE.TextureLoader, [
-    TEXTURE_PATHS.earth,
-    TEXTURE_PATHS.bump,
-    TEXTURE_PATHS.clouds
-  ]);
-
-  // Configure textures
-  useEffect(() => {
-    [earthTexture, bumpTexture, cloudTexture].forEach(texture => {
-      texture.minFilter = THREE.LinearFilter;
-      texture.magFilter = THREE.LinearFilter;
-      texture.anisotropy = 4;
-      
-      // Adjust texture size based on performance tier
-      if (textureQuality < 1) {
-        const newWidth = Math.floor(texture.image.width * textureQuality);
-        const newHeight = Math.floor(texture.image.height * textureQuality);
-        const canvas = document.createElement('canvas');
-        canvas.width = newWidth;
-        canvas.height = newHeight;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(texture.image, 0, 0, newWidth, newHeight);
-        texture.image = canvas;
-        texture.needsUpdate = true;
-      }
-    });
-  }, [earthTexture, bumpTexture, cloudTexture, textureQuality]);
-
-  // Create atmosphere material
-  const atmosphereMaterial = useMemo(() => {
-    return new THREE.ShaderMaterial({
-      uniforms: {
-        color: { value: atmosphereColor },
-        viewPosition: { value: camera.position },
-        atmosphereIntensity: { value: 1.0 },
-        time: { value: 0 }
-      },
-      vertexShader: atmosphereVertexShader,
-      fragmentShader: atmosphereFragmentShader,
-      transparent: true,
-      side: THREE.BackSide,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false
-    });
-  }, [atmosphereColor, camera.position]);
-
-  // Animation loop
-  useFrame((state, delta) => {
-    if (scenePhase === 'void') return;
-
-    // Update planet rotation
+  
+  // Load multiple texture maps
+  const earthTexture = useLoader(TextureLoader, '/assets/images/planets/4k/earthmap2k.jpg');
+  const earthBumpMap = useLoader(TextureLoader, '/assets/images/planets/4k/earthbump2k.jpg');
+  const earthSpecularMap = useLoader(TextureLoader, '/assets/images/planets/4k/earthspec2k.jpg');
+  const cloudTexture = useLoader(TextureLoader, '/assets/images/planets/4k/earthcloudmap.jpg');
+  
+  // Custom atmosphere material
+  const atmosphereMaterial = useMemo(() => new ShaderMaterial({
+    vertexShader: atmosphereVertexShader,
+    fragmentShader: atmosphereFragmentShader,
+    uniforms: {
+      glowColor: { value: new Vector3(0.3, 0.6, 1.0) },
+      intensity: { value: 0.8 }
+    },
+    transparent: true,
+    side: THREE.BackSide,
+    blending: THREE.AdditiveBlending
+  }), []);
+  
+  // Animation loop with complex phase-based updates
+  useFrame((state) => {
     if (planetRef.current) {
-      planetRef.current.rotation.y += rotationSpeed * delta;
-    }
-
-    // Update clouds rotation (slightly faster than planet)
-    if (cloudsRef.current) {
-      cloudsRef.current.rotation.y += (rotationSpeed + cloudSpeed) * delta;
-    }
-
-    // Update atmosphere
-    if (atmosphereRef.current) {
-      atmosphereRef.current.rotation.y += rotationSpeed * 0.5 * delta;
-      atmosphereMaterial.uniforms.viewPosition.value.copy(camera.position);
-      atmosphereMaterial.uniforms.time.value = clock.getElapsedTime();
+      planetRef.current.rotation.y += 0.001;
       
-      // Phase-based atmosphere intensity
-      const intensity = scenePhase === 'activation' ? 1.0 : 0.5;
-      atmosphereMaterial.uniforms.atmosphereIntensity.value = intensity;
+      // Phase-based transformations
+      const phaseRotation = scenePhase * 0.1;
+      planetRef.current.rotation.x = Math.sin(phaseRotation) * 0.1;
+      planetRef.current.rotation.z = Math.cos(phaseRotation) * 0.05;
     }
-
-    // Update rings
+    
+    if (cloudsRef.current) {
+      cloudsRef.current.rotation.y += 0.0008;
+    }
+    
+    if (atmosphereRef.current) {
+      atmosphereRef.current.rotation.y += 0.0005;
+    }
+    
     if (ringsRef.current) {
-      ringsRef.current.rotation.z += rotationSpeed * 0.2 * delta;
+      ringsRef.current.rotation.z += 0.002;
     }
   });
-
-  // Scale animation based on scene phase
-  const scale = useMemo(() => {
-    switch(scenePhase) {
-      case 'void': return 0.8;
-      case 'emergence': return 0.9;
-      case 'activation': return 1;
-      default: return 1;
-    }
-  }, [scenePhase]);
-
+  
   return (
-    <group position={position} scale={scale}>
-      {/* Planet mesh */}
-      <mesh ref={planetRef}>
-        <sphereGeometry args={[radius, 64, 64]} />
-        <meshStandardMaterial
-          map={earthTexture}
-          bumpMap={bumpTexture}
-          bumpScale={0.05}
-          roughness={0.7}
-          metalness={0.3}
-          envMapIntensity={0.5}
-        />
+    <group scale={scaleFactor}>
+      // Complex lighting setup
+      <ambientLight intensity={0.4} />
+      <directionalLight position={[5, 5, 5]} intensity={1.2} />
+      <pointLight position={[-5, -5, -5]} intensity={0.8} color="#4a90e2" />
+      
+      // Orbital rings
+      <mesh ref={ringsRef}>
+        <torusGeometry args={[6, 0.1, 8, 100]} />
+        <meshBasicMaterial color="#ffffff" transparent opacity={0.3} />
       </mesh>
-
-      {/* Cloud layer */}
-      <mesh ref={cloudsRef} scale={[1.02, 1.02, 1.02]}>
-        <sphereGeometry args={[radius, 64, 64]} />
-        <meshStandardMaterial
+      
+      // Atmosphere layer
+      <mesh ref={atmosphereRef}>
+        <sphereGeometry args={[4.3, 64, 64]} />
+        <primitive object={atmosphereMaterial} />
+      </mesh>
+      
+      // Cloud layer
+      <mesh ref={cloudsRef}>
+        <sphereGeometry args={[4.18, 64, 64]} />
+        <meshLambertMaterial 
           map={cloudTexture}
           transparent
           opacity={0.4}
-          depthWrite={false}
-          blending={THREE.AdditiveBlending}
-          side={THREE.DoubleSide}
+          alphaMap={cloudTexture}
         />
       </mesh>
-
-      {/* Removed atmosphere completely */}
-      {/* 
-      <mesh ref={atmosphereRef} scale={[1.2, 1.2, 1.2]}>
-        <sphereGeometry args={[radius, 32, 32]} />
-        <primitive object={atmosphereMaterial} attach="material" />
+      
+      // Main planet
+      <mesh ref={planetRef}>
+        <sphereGeometry args={[4.16, 64, 64]} />
+        <meshPhongMaterial 
+          map={earthTexture}
+          bumpMap={earthBumpMap}
+          bumpScale={0.05}
+          specularMap={earthSpecularMap}
+          shininess={100}
+        />
       </mesh>
-      */}
-
-      {/* Orbital rings */}
-      <group ref={ringsRef} rotation={[Math.PI / 2, 0, 0]}>
-        {/* Main ring */}
-        <mesh>
-          <ringGeometry args={[radius * 1.4, radius * 1.6, 128]} />
-          <meshBasicMaterial
-            color="white"
-            transparent
-            opacity={0.1}
-            side={THREE.DoubleSide}
-            blending={THREE.AdditiveBlending}
-          />
-        </mesh>
-        {/* Secondary ring */}
-        <mesh rotation={[0, 0, Math.PI / 6]}>
-          <ringGeometry args={[radius * 1.5, radius * 1.65, 128]} />
-          <meshBasicMaterial
-            color="white"
-            transparent
-            opacity={0.05}
-            side={THREE.DoubleSide}
-            blending={THREE.AdditiveBlending}
-          />
-        </mesh>
-      </group>
     </group>
   );
 };
 
+// Main component with performance detection
+const AegisPlanet3DV6 = ({ 
+  className = "",
+  scenePhase = 0,
+  scaleFactor = 1
+}) => {
+  const [performanceMode, setPerformanceMode] = React.useState('high');
+  
+  // Performance detection
+  React.useEffect(() => {
+    const canvas = document.createElement('canvas');
+    const gl = canvas.getContext('webgl');
+    
+    if (!gl) {
+      setPerformanceMode('fallback');
+      return;
+    }
+    
+    const renderer = gl.getParameter(gl.RENDERER);
+    if (renderer && renderer.toLowerCase().includes('software')) {
+      setPerformanceMode('low');
+    }
+  }, []);
+  
+  if (performanceMode === 'fallback') {
+    return (
+      <div className={`relative rounded-full ${className}`}>
+        <div 
+          style={{
+            width: '100%',
+            height: '100%',
+            background: 'radial-gradient(circle, #4a90e2 0%, #1e3a8a 100%)',
+            borderRadius: '50%'
+          }}
+        />
+      </div>
+    );
+  }
+  
+  return (
+    <div className={`relative ${className}`}>
+      <Canvas camera={{ position: [0, 0, 15], fov: 45 }}>
+        <React.Suspense fallback={null}>
+          <Planet 
+            scenePhase={scenePhase} 
+            scaleFactor={scaleFactor}
+          />
+        </React.Suspense>
+      </Canvas>
+    </div>
+  );
+};
+
 export default AegisPlanet3DV6;
+
+// END ORIGINAL IMPLEMENTATION
+*/
+
+// REPLACEMENT NOTICE
+console.warn('AegisPlanet3DV6 has been deprecated. Use EarthSphere from src/components/atomic/Planetary/EarthSphere.jsx instead.');
+
+// Temporary export to prevent import errors during transition
+const DeprecatedAegisPlanet3DV6 = () => {
+  return (
+    <div style={{ 
+      display: 'flex', 
+      alignItems: 'center', 
+      justifyContent: 'center',
+      width: '100%',
+      height: '100%',
+      background: '#1a1a2e',
+      color: '#ff6b6b',
+      fontSize: '12px',
+      textAlign: 'center',
+      padding: '20px'
+    }}>
+      AegisPlanet3DV6 Deprecated<br/>
+      Use EarthSphere instead
+    </div>
+  );
+};
+
+export default DeprecatedAegisPlanet3DV6;

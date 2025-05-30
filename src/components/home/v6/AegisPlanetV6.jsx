@@ -9,11 +9,15 @@
  */
 
 import React, { Suspense, lazy } from 'react';
-import { Canvas } from '@react-three/fiber';
+// import { Canvas } from '@react-three/fiber'; // REMOVED: Unused import causing Three.js contamination
 import { useScene } from './SceneControllerV6';
+// import EarthSphere from '../../atomic/Planetary/EarthSphere';
 
-// Lazy load 3D implementation
-const AegisPlanet3DV6 = lazy(() => import('./AegisPlanet3DV6'));
+// Lazy load EarthSphere to prevent Three.js contamination
+const EarthSphere = lazy(() => import('../../atomic/Planetary/EarthSphere'));
+
+// TEMPORARY: Using fallback only until EarthSphere integration
+// const AegisPlanet3DV6 = lazy(() => import('./AegisPlanet3DV6'));
 
 // Loading placeholder for 3D component
 const LoadingPlaceholder = () => (
@@ -28,46 +32,35 @@ const PlanetFallback = ({ className = '' }) => {
   
   return (
     <div 
-      className={`relative w-full h-full ${className} ${
-        scenePhase === 'void' ? 'opacity-0 scale-50' : 'opacity-100 scale-100'
-      } transition-all duration-1000`}
+      className={`relative w-full h-full ${className} opacity-0 transition-all duration-1000`}
     >
-      {/* Base planet circle */}
-      <div className="absolute inset-0 rounded-full bg-gradient-to-br from-blue-600 to-blue-800 shadow-xl" />
+      {/* TEMPORARY: Completely hidden until EarthSphere integration */}
+      {/* <div className="absolute inset-0 rounded-full bg-gradient-to-br from-blue-600/20 to-blue-800/20 border border-blue-500/10" /> */}
       
-      {/* Atmospheric glow */}
-      <div className="absolute inset-0 rounded-full bg-lime-500 opacity-20 blur-xl transform scale-110" />
-      
-      {/* Surface details */}
-      <div className="absolute inset-0 rounded-full overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-tr from-blue-700 via-blue-600 to-blue-500 opacity-80" />
-      </div>
-      
-      {/* Orbital rings */}
+      {/* Orbital rings - COMMENTED OUT */}
+      {/*
       {scenePhase === 'activation' && (
         <>
           <div className="absolute inset-0 rounded-full border-2 border-lime-500/20 transform scale-[1.4] rotate-12" />
           <div className="absolute inset-0 rounded-full border border-blue-500/15 transform scale-[1.6] -rotate-6" />
         </>
       )}
+      */}
     </div>
   );
 };
 
 const AegisPlanetV6 = ({ className = '', size = 300 }) => {
   const { deviceCapabilities } = useScene();
+  // Enable 3D based on performance tier
   const use3D = deviceCapabilities.performanceTier !== 'minimal';
   
   if (use3D) {
     return (
       <div style={{ width: size, height: size }} className={className}>
-        <Canvas camera={{ position: [0, 0, 4], fov: 45 }}>
-          <ambientLight intensity={0.5} />
-          <pointLight position={[10, 10, 10]} />
-          <Suspense fallback={null}>
-            <AegisPlanet3DV6 />
-          </Suspense>
-        </Canvas>
+        <Suspense fallback={<LoadingPlaceholder />}>
+          <EarthSphere className="w-full h-full" />
+        </Suspense>
       </div>
     );
   }
