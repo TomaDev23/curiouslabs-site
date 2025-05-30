@@ -8,18 +8,22 @@
  * @legit true
  */
 
-import React, { useState } from 'react';
-import HeroVisualPlanet from './HeroVisualPlanet';
+import React, { useState, Suspense, lazy } from 'react';
+// import HeroVisualPlanet from './HeroVisualPlanet';
+
+// Lazy load HeroVisualPlanet to prevent Three.js from contaminating main bundle
+const HeroVisualPlanet = lazy(() => import('./HeroVisualPlanet'));
+
 import BackgroundLayerAtomic from './BackgroundLayerAtomic';
 import HeroStageManager from './hero/HeroStageManager';
 
 // Export metadata for LEGIT compliance
-export const metadata = {
-  id: 'hero_atomic',
-  scs: 'SCS-HERO-AEGIS',
-  type: 'atomic',
-  doc: 'contract_heroAtomic.md'
-};
+// export const metadata = {
+//   id: 'hero_atomic',
+//   scs: 'SCS-HERO-AEGIS',
+//   type: 'atomic',
+//   doc: 'contract_heroAtomic.md'
+// };
 
 const HeroAtomic = () => {
   const [sceneStep, setSceneStep] = useState(8);
@@ -49,12 +53,16 @@ const HeroAtomic = () => {
           }}
         />
         
-        {/* Planet - positioned absolutely in top-right */}
-        <HeroVisualPlanet 
-          sceneStep={sceneStep}
-          className="w-[400px] h-[400px]"
-          size={400}
-        />
+        {/* Planet visual - positioned absolutely in top-right */}
+        <Suspense fallback={
+          <div className="w-[400px] h-[400px] rounded-full bg-gradient-to-br from-indigo-900/30 via-purple-900/30 to-violet-800/30 animate-pulse" />
+        }>
+          <HeroVisualPlanet 
+            sceneStep={sceneStep}
+            className="w-[400px] h-[400px]"
+            size={400}
+          />
+        </Suspense>
         
         {/* Text content - positioned in bottom-left - ELEVATED TO FOREGROUND TIER */}
         <div className="absolute bottom-[6%] left-[4%] max-w-[450px] z-[250]">
