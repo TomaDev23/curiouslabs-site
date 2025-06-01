@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { motion } from 'framer-motion';
-import NavBar from '../components/NavBar';
+import MissionControlNavbar from '../components/navigation/MissionControlNavbar';
+// LEGACY: import NavBar from '../components/NavBar';
 import FooterMain from '../components/FooterMain';
 import useDeviceProfile from '../hooks/useDeviceProfile';
 import HomepageSectionDebug from '../components/debug/HomepageSectionDebug';
@@ -35,7 +36,7 @@ const HomeFloatflowLayout = ({ children }) => {
   
   return (
     <div className="relative w-full overflow-x-hidden bg-black" ref={mainContainerRef}>
-      <NavBar />
+      <MissionControlNavbar />
       
       {/* Main content container with scrollY, isLoaded, and device profile state passed down */}
       <main className="min-h-screen">

@@ -225,276 +225,9 @@ const AegisPage = () => {
   // Add flag to control visualization rendering
   const [showVisualization, setShowVisualization] = useState(false);
   
-  // Add AegisCore component for the AEGIS visualization
-  const AegisCore = () => {
-    // Add state for data flow particles
-    const [particles, setParticles] = useState([]);
-    // Add state for orbital rotations
-    const [rotations, setRotations] = useState([0, 0, 0]);
-    // Add state for hover effects
-    const [hoveredNode, setHoveredNode] = useState(null);
-    // Add state for core pulse
-    const [pulseWaves, setPulseWaves] = useState([]);
-    
-    // Generate new particles periodically
-    useEffect(() => {
-      // Generate initial particles
-      const initialParticles = Array.from({ length: 12 }).map(() => createParticle());
-      setParticles(initialParticles);
-      
-      // Add new particles periodically
-      const interval = setInterval(() => {
-        setParticles(prev => {
-          // Remove old particles and add new ones
-          const filtered = prev.filter(p => p.lifeTime > 0);
-          return [
-            ...filtered.map(p => ({
-              ...p,
-              progress: p.progress + p.speed,
-              lifeTime: p.lifeTime - 1
-            })),
-            createParticle()
-          ];
-        });
-      }, 200);
-      
-      return () => clearInterval(interval);
-    }, []);
-    
-    // Animate orbital rings
-    useEffect(() => {
-      const interval = setInterval(() => {
-        setRotations(prev => prev.map((r, i) => r + (i + 1) * 0.01));
-      }, 10);
-      
-      return () => clearInterval(interval);
-    }, []);
-    
-    // Generate pulse waves
-    useEffect(() => {
-      // Generate initial pulse waves
-      const initialWaves = Array.from({ length: 3 }).map((_, i) => ({
-        id: `initial-${i}`,
-        scale: 0.1 + (i * 0.3),
-        opacity: 0.8 - (i * 0.2),
-      }));
-      
-      setPulseWaves(initialWaves);
-      
-      // Add new pulse waves periodically
-      const interval = setInterval(() => {
-        setPulseWaves(prev => {
-          // Remove waves that have expanded beyond visibility
-          const filtered = prev.filter(wave => wave.scale < 2.0);
-          
-          // Add a new wave if needed
-          const needNewWave = filtered.every(wave => wave.scale > 0.5);
-          
-          return [
-            ...filtered.map(wave => ({
-              ...wave,
-              scale: wave.scale + 0.01,
-              opacity: Math.max(0, 0.8 - wave.scale * 0.4)
-            })),
-            ...(needNewWave ? [{ 
-              id: `wave-${Date.now()}`, 
-              scale: 0.1, 
-              opacity: 0.8 
-            }] : [])
-          ];
-        });
-      }, 50);
-      
-      return () => clearInterval(interval);
-    }, []);
-    
-    // Helper function to create a new particle
-    function createParticle() {
-      const orbitalRing = Math.floor(Math.random() * 3);
-      const scale = [1.2, 1.4, 1.6][orbitalRing];
-      const startAngle = Math.random() * 360;
-      
-      return {
-        id: Math.random().toString(36).substr(2, 9),
-        ring: orbitalRing,
-        scale,
-        startAngle,
-        progress: 0,
-        speed: 0.01 + Math.random() * 0.02,
-        color: Math.random() > 0.7 ? '#84cc16' : '#22d3ee',
-        size: 1 + Math.random() * 2,
-        lifeTime: 100 + Math.floor(Math.random() * 150)
-      };
-    }
-
-    // Define product nodes with more detailed information
-    const productNodes = [
-      { angle: 0, color: '#84cc16', label: 'Core', description: 'The heart of the system, managing all operations.' },
-      { angle: 90, color: '#2563eb', label: 'Ops', description: 'Handles document parsing, approval, and telemetry.' },
-      { angle: 180, color: '#d946ef', label: 'Signal', description: 'Provides strategy modular blocks and chart-driven automation.' },
-      { angle: 270, color: '#22d3ee', label: 'Guard', description: 'Emotional AI for children, promoting creativity and growth.' }
-    ];
-
     return (
-      <div className="relative w-80 h-80">
-        {/* Core Planet with Enhanced Effects */}
-        <div
-          className="absolute inset-0 rounded-full"
-          style={{
-            background: 'radial-gradient(circle at 30% 30%, #84cc16, #65a30d, #166534)',
-            boxShadow: '0 0 50px rgba(132, 204, 22, 0.4), inset 0 0 50px rgba(0, 0, 0, 0.3)'
-          }}
-        >
-          {/* Surface Details */}
-          <div 
-            className="absolute inset-0 rounded-full opacity-30"
-            style={{
-              background: 'radial-gradient(circle at 20% 20%, rgba(255,255,255,0.6) 0%, transparent 30%), radial-gradient(circle at 80% 60%, rgba(0,0,0,0.4) 0%, transparent 25%)',
-            }}
-          />
-          
-          {/* Core Glow Effect */}
-          <div
-            className="absolute inset-0 rounded-full"
-            style={{
-              background: 'radial-gradient(circle at center, rgba(132, 204, 22, 0.8) 0%, transparent 70%)',
-              filter: 'blur(8px)',
-              animation: 'pulse 4s infinite ease-in-out'
-            }}
-          />
-          
-          {/* Core Pulse Rings */}
-          <div className="absolute inset-8 rounded-full border-2 border-lime-200/50 animate-pulse" />
-          
-          {/* Energy Hotspots */}
-          {[30, 150, 270].map((angle, i) => (
-            <div
-              key={`hotspot-${i}`}
-              className="absolute w-4 h-4 rounded-full"
-              style={{
-                background: 'radial-gradient(circle, rgba(255,255,255,0.9) 0%, rgba(132, 204, 22, 0.6) 50%, transparent 100%)',
-                left: `calc(50% + ${Math.cos((angle * Math.PI) / 180) * 20}px)`,
-                top: `calc(50% + ${Math.sin((angle * Math.PI) / 180) * 20}px)`,
-                transform: 'translate(-50%, -50%)',
-                animation: `pulse ${1 + i * 0.5}s infinite alternate ease-in-out`
-              }}
-            />
-          ))}
-        </div>
-        
-        {/* Pulse Waves Emanating from Core */}
-        {pulseWaves.map(wave => (
-          <div
-            key={wave.id}
-            className="absolute inset-0 rounded-full border border-lime-400"
-            style={{ 
-              transform: `scale(${wave.scale})`,
-              opacity: wave.opacity,
-              transition: 'transform 0.1s linear, opacity 0.1s linear'
-            }}
-          />
-        ))}
-
-        {/* Animated Orbital Rings */}
-        {[1.2, 1.4, 1.6].map((scale, index) => (
-          <div
-            key={index}
-            className="absolute inset-0 rounded-full border border-lime-400/20"
-            style={{ 
-              transform: `scale(${scale}) rotate(${rotations[index]}turn)`,
-              borderStyle: 'dashed',
-              borderWidth: '1px'
-            }}
-          />
-        ))}
-
-        {/* Orbiting Nodes (representing products) with hover effects */}
-        {productNodes.map((node, index) => (
-          <div
-            key={index}
-            className="absolute w-4 h-4 rounded-full border-2 border-white/50"
-            style={{
-              backgroundColor: node.color,
-              boxShadow: `0 0 10px ${node.color}`,
-              left: `calc(50% + ${Math.cos((node.angle * Math.PI) / 180) * 120}px)`,
-              top: `calc(50% + ${Math.sin((node.angle * Math.PI) / 180) * 120}px)`,
-              marginLeft: '-8px',
-              marginTop: '-8px',
-            }}
-            onMouseEnter={() => setHoveredNode(node)}
-            onMouseLeave={() => setHoveredNode(null)}
-          >
-            {/* Node label */}
-            <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2">
-              <span className="text-xs text-white/60 font-mono">{node.label}</span>
-            </div>
-          </div>
-        ))}
-
-        {/* Connection lines between core and hovered node */}
-        {hoveredNode && (
-          <div
-            className="absolute w-px h-20 bg-gradient-to-b from-lime-400 to-transparent z-[2]"
-            style={{
-              top: 'calc(50% - 10px)',
-              left: `calc(50% + ${Math.cos((hoveredNode.angle * Math.PI) / 180) * 60}px)`,
-              transform: `rotate(${hoveredNode.angle}deg)`,
-              transformOrigin: 'top'
-            }}
-          />
-        )}
-
-        {/* Dynamic Data Flow Particles */}
-        {particles.map(particle => {
-          const currentAngle = particle.startAngle + (particle.progress * 360);
-          const radius = particle.scale * 40;
-          
-          return (
-            <div
-              key={particle.id}
-              className="absolute rounded-full"
-              style={{
-                backgroundColor: particle.color,
-                width: `${particle.size}px`,
-                height: `${particle.size}px`,
-                left: `calc(50% + ${Math.cos((currentAngle * Math.PI) / 180) * radius}px)`,
-                top: `calc(50% + ${Math.sin((currentAngle * Math.PI) / 180) * radius}px)`,
-                boxShadow: `0 0 ${particle.size * 2}px ${particle.color}`,
-                opacity: Math.min(1, particle.lifeTime / 50),
-                transform: 'translate(-50%, -50%)',
-              }}
-            />
-          );
-        })}
-
-        {/* Static Data Flow Particles (fallback) */}
-        {[0, 45, 90, 135, 180, 225, 270, 315].map((angle, i) => (
-          <div
-            key={`data-${i}`}
-            className="absolute w-1 h-1 bg-lime-300 rounded-full"
-            style={{
-              left: `calc(50% + ${Math.cos((angle * Math.PI) / 180) * 60}px)`,
-              top: `calc(50% + ${Math.sin((angle * Math.PI) / 180) * 60}px)`,
-              opacity: 0.7
-            }}
-          />
-        ))}
-        
-        {/* Add global keyframes for animations */}
-        <style jsx="true">{`
-          @keyframes pulse {
-            0% { opacity: 0.5; transform: scale(0.95); }
-            50% { opacity: 1; transform: scale(1.05); }
-            100% { opacity: 0.5; transform: scale(0.95); }
-          }
-        `}</style>
-      </div>
-    );
-  };
-
-  return (
     <div 
-      className="relative w-screen h-screen flex items-center justify-start px-8 lg:px-16 overflow-hidden"
+      className="relative w-screen h-screen flex items-center justify-start overflow-hidden"
       style={{
         mask: 'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.1) 2vh, rgba(0,0,0,0.3) 4vh, rgba(0,0,0,0.6) 6vh, rgba(0,0,0,0.8) 8vh, black 10vh)',
         WebkitMask: 'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.1) 2vh, rgba(0,0,0,0.3) 4vh, rgba(0,0,0,0.6) 6vh, rgba(0,0,0,0.8) 8vh, black 10vh)'
@@ -552,24 +285,40 @@ const AegisPage = () => {
         }}
       />
       
-      {/* Enhanced Content Layout */}
-      <div className="relative z-[10] w-full max-w-7xl mx-auto px-8 lg:px-16 h-full flex items-center">
-        <div className="grid grid-cols-12 gap-8 w-full">
+      {/* ThoughtTrails Layer */}
+      <div className="absolute inset-0 z-[5]" data-thought-trails-layer="true"></div>
+      
+      {/* Enhanced Content Layout - FULL WIDTH USAGE */}
+      <div className="relative z-[10] w-full h-full flex items-center">
+        <div className="w-full h-full grid grid-cols-12 gap-16 px-12 lg:px-20">
           
-          {/* Left Column - Main Content */}
-          <div className="col-span-12 lg:col-span-7 space-y-8">
+          {/* Left Column - Main Content - EXPANDED */}
+          <div className="col-span-12 lg:col-span-8 space-y-8 flex flex-col justify-center pr-8">
             
             {/* Header Section with Enhanced Typography */}
-            <div className="space-y-4">
-              <div
-                className="inline-flex items-center space-x-3 mb-4"
-              >
-                <div className="w-3 h-3 rounded-full bg-lime-400" />
-                <span className="text-lime-400/80 text-sm font-mono uppercase tracking-wider">Core Runtime</span>
+            <div className="space-y-6">
+              {/* Mission Control Badge */}
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center space-x-3">
+                  <motion.div 
+                    className="w-3 h-3 rounded-full bg-lime-400"
+                    animate={{ scale: [1, 1.2, 1], opacity: [0.7, 1, 0.7] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                  />
+                  <span className="text-lime-400/80 text-sm font-mono uppercase tracking-wider">Mission Control</span>
+                </div>
+                <div className="text-right">
+                  <div className="text-xs font-mono text-lime-400 uppercase tracking-wider">
+                    OPERATIONAL
+                  </div>
+                  <div className="text-xs text-white/50 font-mono">
+                    v2.1.0
+                  </div>
+                </div>
               </div>
               
               <h2
-                className="text-5xl lg:text-7xl font-bold uppercase tracking-tight leading-none"
+                className="text-6xl lg:text-8xl font-bold uppercase tracking-tight leading-none"
                 style={{ 
                   background: 'linear-gradient(135deg, #84cc16 0%, #65a30d 50%, #22d3ee 100%)',
                   WebkitBackgroundClip: 'text',
@@ -578,77 +327,467 @@ const AegisPage = () => {
                 }}
               >
                 AEGIS<br />
-                <span className="text-white/90 text-4xl lg:text-5xl normal-case">Runtime</span>
+              <span className="text-white/90 text-5xl lg:text-6xl normal-case">Runtime</span>
               </h2>
               
               <p
-                className="text-xl lg:text-2xl font-medium text-white/80 max-w-lg leading-relaxed"
+                className="text-2xl lg:text-3xl font-medium text-white/80 max-w-2xl leading-relaxed"
               >
                 The smart core powering everything we build.
               </p>
             </div>
 
-            {/* Tagline with Enhanced Styling */}
-            <div
-              className="relative"
-            >
+            {/* Mission Statement with Enhanced Styling */}
+            <div className="relative max-w-3xl">
               <div className="absolute -left-4 top-0 w-1 h-full bg-gradient-to-b from-cyan-400 to-lime-400 rounded-full" />
-              <h3 className="text-3xl lg:text-4xl font-semibold text-cyan-400 leading-tight">
+              <h3 className="text-4xl lg:text-5xl font-semibold text-cyan-400 leading-tight">
                 Adaptive. Auditable. Alive.
               </h3>
-              <p className="text-lg text-white/70 mt-3 max-w-lg leading-relaxed">
+              <p className="text-xl text-white/70 mt-4 max-w-2xl leading-relaxed">
                 AEGIS is the thinking engine behind CuriousLabs — a precision system built to orchestrate AI, logic, and control across all products.
               </p>
             </div>
 
-            {/* Enhanced Feature Cards */}
-            <div
-              className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8"
-            >
+            {/* Enhanced Architecture Cards with Status Indicators - WIDER LAYOUT */}
+            <div className="space-y-6">
+              <div className="flex items-center space-x-3 mb-6">
+                <div className="w-2 h-2 rounded-full bg-cyan-400" />
+                <h4 className="text-base font-mono uppercase tracking-wider text-white/70">
+                  System Architecture
+                </h4>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {[
                 { 
                   title: 'Multi-Agent Architecture', 
                   desc: 'Real AI agents in parallel with roles, memory, and autonomy',
-                  icon: '🤖'
+                    icon: '🤖',
+                    status: 'ACTIVE',
+                    metric: '12 agents',
+                    uptime: '99.7%'
                 },
                 { 
                   title: 'State Machine Control', 
                   desc: 'Central mission engine governing every command',
-                  icon: '⚙️'
+                    icon: '⚙️',
+                    status: 'OPERATIONAL',
+                    metric: '2.3M ops',
+                    uptime: '100%'
                 },
                 { 
                   title: 'Audit-First Protocol', 
                   desc: 'Complete logs, metrics, and traces for every execution',
-                  icon: '📊'
+                    icon: '📊',
+                    status: 'MONITORING',
+                    metric: '847K events',
+                    uptime: '99.9%'
                 },
                 { 
                   title: 'Modular & Scalable', 
                   desc: 'Inject only what you need, scale sideways not up',
-                  icon: '🔧'
+                    icon: '🔧',
+                    status: 'READY',
+                    metric: '8 modules',
+                    uptime: '100%'
                 }
               ].map((feature, index) => (
-                <div
+                  <motion.div
                   key={index}
-                  className="group relative p-4 rounded-xl backdrop-blur-sm border border-white/10 hover:border-lime-400/30 transition-all duration-300"
+                    className="group relative p-5 rounded-xl backdrop-blur-sm border border-white/10 hover:border-lime-400/30 transition-all duration-300"
                   style={{
-                    background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.6), rgba(30, 41, 59, 0.4))',
-                  }}
-                >
-                  <div className="flex items-start space-x-3">
-                    <span className="text-2xl">{feature.icon}</span>
+                      background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.8), rgba(30, 41, 59, 0.6))',
+                      boxShadow: 'inset 0 0 20px rgba(255, 255, 255, 0.05)'
+                    }}
+                    whileHover={{ 
+                      scale: 1.02,
+                      boxShadow: `0 0 20px rgba(132, 204, 22, 0.2), inset 0 0 20px rgba(255, 255, 255, 0.1)`
+                    }}
+                  >
+                    {/* Status Indicator */}
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center space-x-2">
+                        <motion.div
+                          className="w-2 h-2 rounded-full bg-lime-400"
+                          animate={{ opacity: [0.5, 1, 0.5] }}
+                          transition={{ duration: 2, repeat: Infinity, delay: index * 0.5 }}
+                        />
+                        <span className="text-xs font-mono text-lime-400 uppercase tracking-wider">
+                          {feature.status}
+                        </span>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-xs text-white/60 font-mono">{feature.metric}</div>
+                        <div className="text-xs text-lime-400 font-mono">{feature.uptime}</div>
+                      </div>
+                    </div>
+                    
+                    {/* Main Content */}
+                    <div className="flex flex-col space-y-3">
+                      <span className="text-3xl">{feature.icon}</span>
                     <div>
-                      <h4 className="text-white font-semibold text-sm mb-1">{feature.title}</h4>
-                      <p className="text-white/60 text-xs leading-relaxed">{feature.desc}</p>
+                        <h5 className="text-white font-semibold text-sm mb-2">{feature.title}</h5>
+                        <p className="text-white/70 text-xs leading-relaxed">{feature.desc}</p>
                     </div>
                   </div>
+
+                    {/* Hover Enhancement */}
+                    <motion.div
+                      className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 pointer-events-none"
+                      style={{
+                        background: `linear-gradient(135deg, rgba(132, 204, 22, 0.1), transparent)`,
+                        boxShadow: `inset 0 0 20px rgba(132, 204, 22, 0.2)`
+                      }}
+                      transition={{ duration: 0.3 }}
+                    />
+                  </motion.div>
+                ))}
                 </div>
-              ))}
+            </div>
+
+            {/* Developer Toolkit Section - WIDER */}
+            <div className="space-y-6 max-w-4xl">
+              <div className="flex items-center space-x-3 mb-6">
+                <div className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
+                <h4 className="text-base font-mono uppercase tracking-wider text-white/70">
+                  Developer Toolkit
+                </h4>
+              </div>
+
+              {/* Enhanced AEGIS SDK Section */}
+              <div className="group/sdk">
+                <motion.div 
+                  className="p-6 rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm cursor-pointer transition-all duration-300 hover:border-cyan-400/30 hover:bg-white/10"
+                  style={{ 
+                    borderColor: 'rgba(34, 211, 238, 0.2)',
+                    background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.7), rgba(30, 41, 59, 0.5))'
+                  }}
+                  whileHover={{ scale: 1.01 }}
+                >
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center space-x-3">
+                      <motion.div
+                        className="w-2.5 h-2.5 rounded-full bg-cyan-400"
+                        animate={{ opacity: [0.5, 1, 0.5], scale: [1, 1.1, 1] }}
+                        transition={{ duration: 2, repeat: Infinity }}
+                      />
+                      <div>
+                        <h5 className="text-lg font-semibold text-cyan-400">
+                          AEGIS SDK
+                        </h5>
+                        <p className="text-sm text-white/60">
+                          Developer toolkit for mission-critical AI
+                        </p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-xs font-mono text-cyan-400 uppercase tracking-wider">
+                        STABLE
+                      </div>
+                      <div className="text-xs text-white/50 font-mono">
+                        v1.2.0
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Collapsible Content */}
+                  <div className="overflow-hidden max-h-0 group-hover/sdk:max-h-60 transition-all duration-500 ease-in-out opacity-0 group-hover/sdk:opacity-100">
+                    <div className="pt-4 space-y-4 border-t border-cyan-400/20">
+                      {/* SDK Features */}
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        {[
+                          { label: 'Python & JavaScript libraries', status: 'STABLE', icon: '📚' },
+                          { label: 'REST API with WebSocket streaming', status: 'ACTIVE', icon: '🔌' },
+                          { label: 'Mission templates & blueprints', status: 'BETA', icon: '📋' }
+                        ].map((feature, index) => (
+                          <motion.div
+                            key={`sdk-${index}`}
+                            className="flex items-center justify-between p-3 rounded bg-slate-800/50 border border-cyan-400/10"
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ 
+                              opacity: 1, 
+                              y: 0,
+                              transition: { delay: index * 0.1, duration: 0.3 }
+                            }}
+                          >
+                            <div className="flex items-center space-x-3">
+                              <span className="text-lg">{feature.icon}</span>
+                              <span className="text-sm text-white/80">{feature.label}</span>
+                            </div>
+                            <span className="text-xs text-cyan-400 font-mono">{feature.status}</span>
+                          </motion.div>
+                        ))}
+                      </div>
+
+                      {/* Quick Code Example */}
+                      <motion.div 
+                        className="p-4 rounded bg-slate-900/80 border border-cyan-400/20"
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ 
+                          opacity: 1, 
+                          y: 0,
+                          transition: { delay: 0.4, duration: 0.3 }
+                        }}
+                      >
+                        <div className="flex items-center space-x-2 mb-3">
+                          <div className="w-1 h-1 rounded-full bg-cyan-400" />
+                          <span className="text-sm font-mono text-cyan-400 uppercase tracking-wider">
+                            Quick Start
+                          </span>
+                        </div>
+                        <code className="text-sm font-mono text-cyan-300/90 leading-relaxed block">
+                          <span className="text-purple-400">from</span> aegis <span className="text-purple-400">import</span> Mission<br />
+                          <span className="text-yellow-400">mission</span> = Mission(<span className="text-green-400">"analyze"</span>)<br />
+                          <span className="text-yellow-400">result</span> = mission.execute()
+                        </code>
+                      </motion.div>
+                    </div>
+                  </div>
+                </motion.div>
+              </div>
             </div>
           </div>
 
-          {/* Right Column - AEGIS Core Visualization */}
-          <div className="col-span-12 lg:col-span-5 flex items-center justify-center">
-            {showVisualization && <AegisCore />}
+          {/* Right Column - AEGIS Core Visualization - POSITIONED TO RIGHT EDGE */}
+          <div className="col-span-12 lg:col-span-4 flex items-center justify-end">
+            {/* Architecture Diagram Header */}
+            <div className="w-full max-w-md space-y-4">
+              <div className="space-y-2">
+                <div className="flex items-center space-x-3">
+                  <div className="w-2 h-2 rounded-full bg-lime-400 animate-pulse" />
+                  <h4 className="text-sm font-mono uppercase tracking-wider text-white/80">
+                    System Architecture Flow
+                  </h4>
+          </div>
+                <p className="text-xs text-white/60 leading-relaxed">
+                  Real-time visualization of AEGIS orchestration layers and data flow patterns
+                </p>
+              </div>
+              
+              {/* Enhanced Architecture Diagram - MUCH MORE OPAQUE BACKGROUND */}
+              <div className="relative p-4 rounded-2xl backdrop-blur-sm border border-white/20 bg-slate-900/95 overflow-hidden">
+                {/* Background Grid - SUBTLE */}
+                <div 
+                  className="absolute inset-0 opacity-10"
+                  style={{
+                    backgroundImage: `
+                      linear-gradient(rgba(132, 204, 22, 0.3) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(132, 204, 22, 0.3) 1px, transparent 1px)
+                    `,
+                    backgroundSize: '15px 15px'
+                  }}
+                />
+                
+                {/* Diagram Content - COMPACT */}
+                <div className="relative z-10 space-y-3">
+                  
+                  {/* Input Layer */}
+                  <div className="text-center">
+                    <motion.div 
+                      className="inline-block p-2 rounded-lg border border-orange-400/40 bg-orange-400/20"
+                      whileHover={{ scale: 1.05, borderColor: '#ff7f00' }}
+                    >
+                      <div className="text-xs font-mono text-orange-300 uppercase tracking-wider mb-1">Input Layer</div>
+                      <div className="text-xs text-white/80">TelegramBot • File Upload • POS Adapter</div>
+                    </motion.div>
+                  </div>
+
+                  {/* Flow Arrow */}
+                  <div className="flex justify-center">
+                    <motion.div 
+                      className="w-px h-4 bg-gradient-to-b from-orange-400 to-cyan-400"
+                      animate={{ opacity: [0.5, 1, 0.5] }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                    />
+                  </div>
+
+                  {/* Command Center & Decision Layer */}
+                  <div className="grid grid-cols-3 gap-2">
+                    <motion.div 
+                      className="p-2 rounded-lg border border-cyan-400/40 bg-cyan-400/20 text-center"
+                      whileHover={{ scale: 1.05, borderColor: '#44aaff' }}
+                    >
+                      <div className="text-xs font-mono text-cyan-300 uppercase tracking-wider mb-1">Command Center</div>
+                      <div className="text-xs text-white/80">Registry</div>
+                    </motion.div>
+                    
+                    <motion.div 
+                      className="p-2 rounded-lg border border-lime-400/40 bg-lime-400/20 text-center"
+                      whileHover={{ scale: 1.05, borderColor: '#84cc16' }}
+                    >
+                      <div className="text-xs font-mono text-lime-300 uppercase tracking-wider mb-1">Decision Engine</div>
+                      <div className="text-xs text-white/80">AI Orchestration</div>
+                    </motion.div>
+                    
+                    <motion.div 
+                      className="p-2 rounded-lg border border-cyan-400/40 bg-cyan-400/20 text-center"
+                      whileHover={{ scale: 1.05, borderColor: '#44aaff' }}
+                    >
+                      <div className="text-xs font-mono text-cyan-300 uppercase tracking-wider mb-1">Recovery Manager</div>
+                      <div className="text-xs text-white/80">Fault Tolerance</div>
+                    </motion.div>
+                  </div>
+
+                  {/* Flow Arrows */}
+                  <div className="flex justify-center space-x-4">
+                    {[0, 1, 2].map((i) => (
+                      <motion.div 
+                        key={i}
+                        className="w-px h-3 bg-gradient-to-b from-cyan-400 to-lime-400"
+                        animate={{ opacity: [0.5, 1, 0.5] }}
+                        transition={{ duration: 2, repeat: Infinity, delay: i * 0.3 }}
+                      />
+                    ))}
+                  </div>
+
+                  {/* Processing Layer */}
+                  <div className="grid grid-cols-3 gap-2">
+                    <motion.div 
+                      className="p-2 rounded-lg border border-lime-400/40 bg-lime-400/20 text-center"
+                      whileHover={{ scale: 1.05, borderColor: '#84cc16' }}
+                    >
+                      <div className="text-xs font-mono text-lime-300 uppercase tracking-wider mb-1">Agent Loop</div>
+                      <div className="text-xs text-white/80">Multi-Agent</div>
+                    </motion.div>
+                    
+                    <motion.div 
+                      className="p-2 rounded-lg border border-cyan-400/40 bg-cyan-400/20 text-center"
+                      whileHover={{ scale: 1.05, borderColor: '#44aaff' }}
+                    >
+                      <div className="text-xs font-mono text-cyan-300 uppercase tracking-wider mb-1">FSM + Trace</div>
+                      <div className="text-xs text-white/80">State Machine</div>
+                    </motion.div>
+                    
+                    <motion.div 
+                      className="p-2 rounded-lg border border-cyan-400/40 bg-cyan-400/20 text-center"
+                      whileHover={{ scale: 1.05, borderColor: '#44aaff' }}
+                    >
+                      <div className="text-xs font-mono text-cyan-300 uppercase tracking-wider mb-1">Recovery System</div>
+                      <div className="text-xs text-white/80">Fallback Logic</div>
+                    </motion.div>
+                  </div>
+
+                  {/* Flow Arrow */}
+                  <div className="flex justify-center">
+                    <motion.div 
+                      className="w-px h-3 bg-gradient-to-b from-lime-400 to-purple-400"
+                      animate={{ opacity: [0.5, 1, 0.5] }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                    />
+                  </div>
+
+                  {/* Output Layer */}
+                  <div className="grid grid-cols-3 gap-2">
+                    <motion.div 
+                      className="p-2 rounded-lg border border-purple-400/40 bg-purple-400/20 text-center"
+                      whileHover={{ scale: 1.05, borderColor: '#a855f7' }}
+                    >
+                      <div className="text-xs font-mono text-purple-300 uppercase tracking-wider mb-1">Data Exports</div>
+                      <div className="text-xs text-white/80">/logs/ /docs/</div>
+                    </motion.div>
+                    
+                    <motion.div 
+                      className="p-2 rounded-lg border border-purple-400/40 bg-purple-400/20 text-center"
+                      whileHover={{ scale: 1.05, borderColor: '#a855f7' }}
+                    >
+                      <div className="text-xs font-mono text-purple-300 uppercase tracking-wider mb-1">Knowledge Base</div>
+                      <div className="text-xs text-white/80">/cards/ /kb/</div>
+                    </motion.div>
+                    
+                    <motion.div 
+                      className="p-2 rounded-lg border border-orange-400/40 bg-orange-400/20 text-center"
+                      whileHover={{ scale: 1.05, borderColor: '#ff7f00' }}
+                    >
+                      <div className="text-xs font-mono text-orange-300 uppercase tracking-wider mb-1">Human Layer</div>
+                      <div className="text-xs text-white/80">Interfaces</div>
+                    </motion.div>
+                  </div>
+
+                  {/* Connection Lines - SUBTLE */}
+                  <div className="absolute inset-0 pointer-events-none">
+                    {/* Animated connection lines */}
+                    <svg className="w-full h-full" style={{ zIndex: 1 }}>
+                      <defs>
+                        <linearGradient id="flowGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                          <stop offset="0%" stopColor="#84cc16" stopOpacity="0.4"/>
+                          <stop offset="50%" stopColor="#22d3ee" stopOpacity="0.5"/>
+                          <stop offset="100%" stopColor="#a855f7" stopOpacity="0.4"/>
+                        </linearGradient>
+                      </defs>
+                      
+                      {/* Flowing data lines */}
+                      <motion.path
+                        d="M 50 30 Q 120 60 200 90 Q 280 120 350 150"
+                        stroke="url(#flowGradient)"
+                        strokeWidth="1"
+                        fill="none"
+                        strokeDasharray="2,2"
+                        animate={{
+                          strokeDashoffset: [0, -8],
+                          opacity: [0.3, 0.7, 0.3]
+                        }}
+                        transition={{
+                          duration: 3,
+                          repeat: Infinity,
+                          ease: "linear"
+                        }}
+                      />
+                    </svg>
+                  </div>
+                </div>
+
+                {/* Diagram Legend */}
+                <div className="mt-3 pt-3 border-t border-white/20">
+                  <div className="flex items-center justify-between text-xs">
+                    <div className="flex items-center space-x-2">
+                      <div className="flex items-center space-x-1">
+                        <div className="w-1.5 h-1.5 rounded-full bg-orange-400" />
+                        <span className="text-white/70">User</span>
+                      </div>
+                      <div className="flex items-center space-x-1">
+                        <div className="w-1.5 h-1.5 rounded-full bg-cyan-400" />
+                        <span className="text-white/70">Code</span>
+                      </div>
+                      <div className="flex items-center space-x-1">
+                        <div className="w-1.5 h-1.5 rounded-full bg-lime-400" />
+                        <span className="text-white/70">Agent</span>
+                      </div>
+                      <div className="flex items-center space-x-1">
+                        <div className="w-1.5 h-1.5 rounded-full bg-purple-400" />
+                        <span className="text-white/70">Data</span>
+                      </div>
+                    </div>
+                    <div className="text-white/50 font-mono text-xs">
+                      v2.1.0
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* System Metrics Panel - COMPACT */}
+              <div className="grid grid-cols-2 gap-2">
+                {[
+                  { label: 'Throughput', value: '2.3K/sec', color: 'lime' },
+                  { label: 'Latency', value: '45ms', color: 'cyan' },
+                  { label: 'Agents', value: '12 active', color: 'purple' },
+                  { label: 'Uptime', value: '99.7%', color: 'orange' }
+                ].map((metric, index) => (
+                  <motion.div
+                    key={index}
+                    className="p-2 rounded-lg backdrop-blur-sm border border-white/10 bg-slate-900/60 text-center"
+                    whileHover={{ scale: 1.05 }}
+                    style={{ borderColor: `var(--${metric.color}-400, rgba(255,255,255,0.1))` }}
+                  >
+                    <div className={`text-sm font-bold text-${metric.color}-400`}>
+                      {metric.value}
+                    </div>
+                    <div className="text-xs text-white/60 uppercase tracking-wider">
+                      {metric.label}
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -695,9 +834,10 @@ const AegisPage = () => {
   );
 };
 
-// Products Page (Simple Static Version)
+// Products Page (Enhanced Mission Control Version)
 const ProductsPage = () => {
   const [currentPage, setCurrentPage] = useState(0);
+  const [selectedProduct, setSelectedProduct] = useState(null);
   const prevColorRef = useRef(null);
 
   // Dispatch events to native ThoughtTrails system
@@ -732,8 +872,8 @@ const ProductsPage = () => {
     return () => clearTimeout(timeoutId);
   }, [currentPage]);
 
-  // Enhanced product card component with NEW ThoughtTrails
-  const EnhancedProductCard = ({ item, isActive, isFeatured, onHover, onLeave }) => {
+  // Enhanced product card component with mission control styling
+  const EnhancedProductCard = ({ item, isActive, isFeatured, onHover, onLeave, onClick }) => {
     // Memoize dynamic styles to prevent unnecessary recalculations
     const cardStyles = useMemo(() => ({
       background: isFeatured 
@@ -751,17 +891,39 @@ const ProductsPage = () => {
         style={cardStyles}
         onMouseEnter={onHover}
         onMouseLeave={onLeave}
+        onClick={onClick}
         whileHover={{ 
-          filter: "brightness(1.1)" // Only use filter - no scale to prevent layout recalc
+          filter: "brightness(1.1)",
+          scale: 1.02
         }}
         transition={{ duration: 0.3, ease: "easeOut" }}
-        layout={false} // Prevent layout animations from interfering
-        data-featured-card={isFeatured ? "true" : "false"} // Add data attribute for positioning
+        layout={false}
+        data-featured-card={isFeatured ? "true" : "false"}
       >
-        {/* ThoughtTrails are now handled by the native Canvas system */}
-        {/* No React component needed - trails are positioned automatically */}
+        {/* Status Indicator */}
+        <div className="absolute top-4 right-4 z-20">
+          <div className="flex items-center space-x-2 bg-black/50 backdrop-blur-sm rounded-full px-3 py-1">
+            <div 
+              className="w-2 h-2 rounded-full animate-pulse"
+              style={{ backgroundColor: item.accentColor }}
+            />
+            <span className="text-xs font-mono text-white/80">
+              {isActive ? 'ACTIVE' : 'STANDBY'}
+            </span>
+          </div>
+        </div>
 
-        {/* Simplified background - no animations */}
+        {/* Click indicator */}
+        <div className="absolute bottom-4 right-4 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          <div className="flex items-center space-x-2 bg-black/50 backdrop-blur-sm rounded-full px-3 py-1">
+            <span className="text-xs font-mono text-white/80">CLICK TO EXPAND</span>
+            <svg className="w-3 h-3 text-white/60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+            </svg>
+          </div>
+        </div>
+
+        {/* Simplified background texture */}
         <div
           className="absolute inset-0 opacity-15 pointer-events-none"
           style={{
@@ -770,12 +932,12 @@ const ProductsPage = () => {
           }}
         />
         
-        {/* Content - no background animations */}
+        {/* Content */}
         <div className="relative z-[10] p-6 h-full flex flex-col justify-between">
           {/* Header */}
           <div className="space-y-3">
-            {/* Simplified icon - no complex animations */}
-            <div className={`relative ${isFeatured ? 'w-16 h-16' : 'w-10 h-10'} mx-auto mb-4`}>
+            {/* Icon */}
+            <div className="relative w-16 h-16 mx-auto mb-4">
               <div 
                 className="absolute inset-0 rounded-full"
                 style={{
@@ -791,397 +953,289 @@ const ProductsPage = () => {
               />
             </div>
             
-            <div>
+            <div className="text-center">
               <h3
-                className={`font-bold uppercase tracking-wide mb-2 ${isFeatured ? 'text-2xl' : 'text-lg'}`}
+                className="text-2xl font-bold uppercase tracking-wide mb-2"
                 style={{ color: item.accentColor, textShadow: `0 0 10px ${item.accentColor}60` }}
               >
                 {item.title}
               </h3>
-              <p className={`font-medium text-white/80 ${isFeatured ? 'text-base' : 'text-sm'}`}>
+              <p className="text-base font-medium text-white/80 leading-relaxed px-2">
                 {item.summary}
               </p>
             </div>
           </div>
 
-          {/* Features - NO animations to prevent text jumping */}
-          {isFeatured && (
-            <div className="space-y-4 my-4 transition-opacity duration-300">
-              {/* What It Is */}
-              <div className="space-y-2">
-                <h5 className="text-xs font-mono uppercase tracking-wider text-white/50">What It Is</h5>
-                <p className="text-sm text-white/80 leading-relaxed">{item.fullDescription.whatItIs}</p>
-              </div>
-
-              {/* How It Works */}
-              <div className="space-y-2">
-                <h5 className="text-xs font-mono uppercase tracking-wider text-white/50">How It Works</h5>
-                <div className="space-y-1">
-                  {item.fullDescription.howItWorks.map((feature, index) => (
-                    <div key={index} className="flex items-start space-x-2">
-                      <div 
-                        className="w-1.5 h-1.5 rounded-full mt-2 flex-shrink-0"
-                        style={{ backgroundColor: item.accentColor }}
-                      />
-                      <span className="text-sm text-white/75">{feature}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Why It Matters */}
-              <div className="space-y-2">
-                <h5 className="text-xs font-mono uppercase tracking-wider text-white/50">Why It Matters</h5>
-                <p className="text-sm text-white/80 leading-relaxed italic">{item.fullDescription.whyItMatters}</p>
-              </div>
-            </div>
-          )}
-
-          {/* Footer */}
-          <div className="space-y-3">
-            {isFeatured && (
-              <p className="text-sm italic text-white/60">{item.tagline}</p>
-            )}
-            
-            <div className="flex items-center justify-between">
-              <span className="font-mono uppercase tracking-wider text-white/40 text-xs">
-                {isFeatured ? 'Featured' : 'View'}
-              </span>
-              <motion.div
-                className="w-6 h-6 rounded-full border border-white/30 flex items-center justify-center"
-                whileHover={{ scale: 1.1, borderColor: item.accentColor }}
+          {/* Quick features preview */}
+          <div className="space-y-2 mt-4">
+            {item.features.slice(0, 2).map((feature, index) => (
+              <div 
+                key={index} 
+                className="flex items-start space-x-2"
               >
-                <svg className="w-3 h-3 text-white/60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 5l-7 7 7 7" />
-                </svg>
-              </motion.div>
-            </div>
+                <div 
+                  className="w-1.5 h-1.5 rounded-full mt-2 flex-shrink-0"
+                  style={{ backgroundColor: item.accentColor }}
+                />
+                <span className="text-sm text-white/75 leading-relaxed">{feature}</span>
+              </div>
+            ))}
           </div>
         </div>
       </motion.div>
     );
   };
 
-  // Product Info Panel - STATIC AEGIS Component (No re-renders, no prop changes)
-const ProductInfoPanel = React.memo(() => {
-  return (
-  <div className="h-full relative">
-      {/* Main AEGIS command card */}
-    <div 
-      className="backdrop-blur-xl bg-slate-900/40 rounded-2xl border border-white/20 p-8 h-full relative overflow-hidden"
-      style={{
-        boxShadow: '0 0 30px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(255, 255, 255, 0.05)'
-      }}
-    >
-      <div className="relative z-[10] h-full flex flex-col">
-          {/* AEGIS Header */}
-        <div className="space-y-4 mb-8">
-          <div className="flex items-center space-x-3">
-            <motion.div 
-                  className="w-3 h-3 rounded-full bg-lime-400"
-                animate={{ scale: [1, 1.2, 1] }}
-                transition={{ duration: 2, repeat: Infinity }}
-              />
-              <span className="text-sm font-mono uppercase tracking-wider text-white/60">
-                  Core Runtime
-              </span>
-            </div>
-            
-            <h3
-              className="text-4xl font-bold"
-              style={{ 
-                  background: 'linear-gradient(135deg, #84cc16 0%, #22d3ee 100%)',
-              WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  color: '#84cc16', // Fallback
-              }}
-            >
-                AEGIS<br />Command
-            </h3>
-        </div>
-
-          {/* Core Mission Statement */}
-        <div className="space-y-4 flex-1">
-            <p className="text-white/80 text-sm leading-relaxed font-medium">
-              Your AI team, led by you. Mission-based AI orchestration with human oversight at every decision point.
-            </p>
-            
-            {/* AEGIS Architecture Highlights */}
-            <div className="p-4 rounded-xl backdrop-blur-sm border border-lime-400/20 bg-lime-400/5">
-              <h4 className="font-semibold text-lg mb-3 text-lime-400">
-                Adaptive. Auditable. Alive.
-            </h4>
-              <p className="text-white/70 text-sm mb-3">
-                The thinking engine behind CuriousLabs — orchestrating AI, logic, and control across all products.
-              </p>
-              <div className="flex items-center space-x-2">
-                <div className="w-2 h-2 rounded-full bg-lime-400" />
-                <span className="text-white/60 text-xs italic">Multi-agent architecture with state machine control</span>
-              </div>
-          </div>
-
-          {/* Core Principles */}
-          <div className="space-y-3 mt-6">
-            {[
-                'Real AI agents in parallel with roles, memory, and autonomy',
-                'Central mission engine governing every command',
-                'Complete logs, metrics, and traces for every execution'
-            ].map((principle, index) => (
-              <div
-                key={`principle-${index}`}
-                className="flex items-start space-x-3"
-              >
-                  <div className="w-2 h-2 rounded-full mt-2 flex-shrink-0 bg-lime-400" />
-                <span className="text-white/80 text-sm leading-relaxed">{principle}</span>
-              </div>
-            ))}
-          </div>
-
-          {/* AEGIS SDK Section */}
-          <div className="mt-6 p-4 rounded-xl backdrop-blur-sm border border-cyan-400/20 bg-cyan-400/5">
-              <div className="flex items-center space-x-2 mb-3">
-                <div className="w-2 h-2 rounded-full bg-cyan-400" />
-                <h4 className="font-semibold text-base text-cyan-400">
-                  AEGIS SDK
-                </h4>
-      </div>
-              <p className="text-white/70 text-sm mb-3">
-                Developer toolkit for integrating AEGIS into any application or workflow.
-              </p>
-              
-              {/* SDK Features */}
-              <div className="space-y-2">
-                {[
-                  'Python & JavaScript client libraries',
-                  'REST API with WebSocket streaming',
-                  'Mission templates & agent blueprints'
-                ].map((feature, index) => (
-              <div
-                    key={`sdk-${index}`}
-                    className="flex items-start space-x-2"
-                  >
-                    <div className="w-1 h-1 rounded-full mt-2 flex-shrink-0 bg-cyan-400/60" />
-                    <span className="text-white/60 text-xs leading-relaxed">{feature}</span>
-                  </div>
-            ))}
-          </div>
-
-                {/* Code snippet preview */}
-              <div className="mt-3 p-2 rounded bg-slate-800/50 border border-cyan-400/10">
-                  <code className="text-xs font-mono text-cyan-300/80">
-                    from aegis import Mission<br />
-                    mission = Mission("analyze_docs")<br />
-                    result = mission.execute()
-                  </code>
-                </div>
-              </div>
-            </div>
-
-            {/* AEGIS Status */}
-            <div className="mt-8 p-4 rounded-xl bg-slate-800/50 border border-lime-400/30">
-            <div className="flex items-center justify-between">
-                <div>
-                  <div className="text-sm font-mono text-lime-400 uppercase tracking-wider">System Status</div>
-                  <div className="text-white/80 text-xs">All agents operational</div>
-                </div>
-                <div className="flex items-center space-x-2">
-              <motion.div
-                    className="w-2 h-2 rounded-full bg-lime-400"
-                    animate={{ opacity: [0.5, 1, 0.5] }}
-                    transition={{ duration: 2, repeat: Infinity }}
-                  />
-                  <span className="text-xs text-white/60">ACTIVE</span>
-            </div>
-          </div>
-            </div>
-        </div>
-      </div>
-      </div>
-    );
-  });
-
-  // Product metrics panel component - STATIC VERSION (No re-renders)
-  const ProductMetrics = React.memo(() => {
-    // Static metrics for OpsPipe - no dynamic data to prevent re-renders
-    const staticMetrics = [
-      { label: 'Automation Rate', value: '94%', trend: '+12%' },
-      { label: 'Processing Speed', value: '2.3s', trend: '-0.4s' },
-      { label: 'Accuracy', value: '99.7%', trend: '+0.3%' }
-    ];
+  // Product Detail Modal
+  const ProductDetailModal = ({ product, onClose }) => {
+    if (!product) return null;
 
     return (
-      <div className="backdrop-blur-sm bg-slate-900/30 rounded-xl border border-white/10 p-4 h-full">
-        <div className="flex items-center justify-between h-full">
-          <div className="flex items-center space-x-2">
-            <div className="w-2 h-2 rounded-full bg-lime-400" />
-            <span className="text-sm font-mono text-white/60 uppercase tracking-wider">
-              Live Metrics
-            </span>
-          </div>
-          
-          <div className="flex space-x-8">
-            {staticMetrics.map((metric, index) => (
-              <div 
-                key={`static-metric-${index}`}
-                className="text-center"
-              >
-                <div className="text-lg font-bold text-lime-400">
-                  {metric.value}
-                </div>
-                <div className="text-xs text-white/60">{metric.label}</div>
-                <div className="text-xs text-green-400">{metric.trend}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    );
-  });
+      <motion.div
+        className="fixed inset-0 z-50 flex items-center justify-center p-4"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        onClick={onClose}
+      >
+        {/* Backdrop */}
+        <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" />
+        
+        {/* Modal Content */}
+        <motion.div
+          className="relative w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-2xl border border-white/20"
+          style={{
+            background: `linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.9), ${product.accentColor}10)`,
+            boxShadow: `0 0 50px ${product.accentColor}40, inset 0 0 30px rgba(255,255,255,0.1)`
+          }}
+          initial={{ scale: 0.8, y: 50 }}
+          animate={{ scale: 1, y: 0 }}
+          exit={{ scale: 0.8, y: 50 }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          {/* Close Button */}
+          <button
+            onClick={onClose}
+            className="absolute top-4 right-4 z-10 w-8 h-8 rounded-full bg-black/50 backdrop-blur-sm border border-white/20 flex items-center justify-center hover:bg-white/10 transition-colors"
+          >
+            <svg className="w-4 h-4 text-white/80" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
 
-  // Product grid component with EXTERNAL ThoughtTrails
+          <div className="p-8">
+            {/* Header */}
+            <div className="flex items-start space-x-6 mb-8">
+              <div className="relative w-20 h-20 flex-shrink-0">
+                <div 
+                  className="absolute inset-0 rounded-full"
+                  style={{
+                    boxShadow: `0 0 30px ${product.accentColor}60`,
+                    background: `radial-gradient(circle at 30% 30%, ${product.accentColor}, ${product.accentColor}90)`
+                  }}
+                />
+                <img
+                  src={product.illustrationSrc}
+                  alt={`${product.title} illustration`}
+                  className="w-full h-full object-cover rounded-full relative z-[10]"
+                  onError={(e) => (e.target.src = '/assets/images/placeholder.png')}
+                />
+              </div>
+              
+              <div className="flex-1">
+                <h2
+                  className="text-4xl font-bold uppercase tracking-wide mb-3"
+                  style={{ color: product.accentColor, textShadow: `0 0 15px ${product.accentColor}60` }}
+                >
+                  {product.title}
+                </h2>
+                <p className="text-xl text-white/80 mb-4">
+                  {product.summary}
+                </p>
+                
+                {/* What It Is - Secondary Title */}
+                <h3 
+                  className="text-xl font-bold font-mono tracking-wider leading-relaxed uppercase"
+                  style={{ color: product.accentColor }}
+                >
+                  {product.title === 'OpsPipe' && (
+                    <>
+                      Battle-tested document parsing<br />
+                      with memory and full visibility
+                    </>
+                  )}
+                  {product.title === 'Curious' && (
+                    <>
+                      Emotionally aware AI designed<br />
+                      for reflection and companionship
+                    </>
+                  )}
+                  {product.title === 'Guardian' && (
+                    <>
+                      Screen-based emotional companion<br />
+                      designed for kids and creativity
+                    </>
+                  )}
+                  {product.title === 'MoonSignal' && (
+                    <>
+                      GPT-fused quant stack analyzing<br />
+                      price action and market data
+                    </>
+                  )}
+                </h3>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              {/* How It Works */}
+              <div className="space-y-4">
+                <h4 className="text-lg font-semibold text-white mb-4 flex items-center space-x-2">
+                  <div 
+                    className="w-2 h-2 rounded-full"
+                    style={{ backgroundColor: product.accentColor }}
+                  />
+                  <span>How It Works</span>
+                </h4>
+                <div className="space-y-3">
+                  {product.fullDescription.howItWorks.map((feature, index) => (
+                    <div 
+                      key={index} 
+                      className="flex items-start space-x-3 p-3 rounded-lg bg-white/5 border border-white/10"
+                    >
+                      <div 
+                        className="w-1.5 h-1.5 rounded-full mt-2 flex-shrink-0"
+                        style={{ backgroundColor: product.accentColor }}
+                      />
+                      <span className="text-sm text-white/80 leading-relaxed">{feature}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Why It Matters */}
+              <div className="space-y-4">
+                <h4 className="text-lg font-semibold text-white mb-4 flex items-center space-x-2">
+                  <div 
+                    className="w-2 h-2 rounded-full"
+                    style={{ backgroundColor: product.accentColor }}
+                  />
+                  <span>Why It Matters</span>
+                </h4>
+                <div 
+                  className="p-4 rounded-lg bg-white/5 border border-white/10"
+                >
+                  <p 
+                    className="text-sm leading-relaxed italic"
+                    style={{ color: `${product.accentColor}dd` }}
+                  >
+                    {product.fullDescription.whyItMatters}
+                  </p>
+              </div>
+            </div>
+            </div>
+
+            {/* All Features */}
+            <div className="mt-8">
+              <h4 className="text-lg font-semibold text-white mb-4 flex items-center space-x-2">
+                <div 
+                  className="w-2 h-2 rounded-full"
+                  style={{ backgroundColor: product.accentColor }}
+                />
+                <span>Key Features</span>
+              </h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {product.features.map((feature, index) => (
+                  <div 
+                    key={index} 
+                    className="flex items-start space-x-3 p-3 rounded-lg bg-white/5 border border-white/10"
+                  >
+                    <div 
+                      className="w-1.5 h-1.5 rounded-full mt-2 flex-shrink-0"
+                      style={{ backgroundColor: product.accentColor }}
+                    />
+                    <span className="text-sm text-white/80 leading-relaxed">{feature}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Tagline */}
+            {product.tagline && (
+              <div className="mt-8 text-center">
+                <p className="text-lg italic text-white/70 font-medium">
+                  "{product.tagline}"
+                </p>
+              </div>
+            )}
+          </div>
+        </motion.div>
+      </motion.div>
+    );
+  };
+
+  // Clean product grid with proper layout
   const ProductGrid = ({ currentPage, setCurrentPage }) => {
     return (
-      <div className="relative h-full w-full" data-page="products">
-        {/* Asymmetric grid layout */}
-        <div className="grid grid-cols-6 grid-rows-4 gap-4 h-full">
+      <div className="grid grid-cols-2 grid-rows-2 gap-6 h-full">
+        {OPS_BENTO_ITEMS.map((item, index) => {
+          const isActive = index === currentPage;
+          const isFeatured = index === currentPage;
           
-          {/* Featured Card (Large) with EXTERNAL ThoughtTrails */}
-          <motion.div 
-            className="col-span-4 row-span-3 relative"
-          >
-            <EnhancedProductCard 
-              item={OPS_BENTO_ITEMS[currentPage]} 
-              isActive={true}
-              isFeatured={true}
-              onHover={() => {}} // Empty hover handler to prevent re-renders
-              onLeave={() => {}} // Empty leave handler to prevent re-renders
-            />
-          </motion.div>
-          
-          {/* Supporting Cards (Small) */}
-          <div className="col-span-2 row-span-4 flex flex-col gap-4">
-            {OPS_BENTO_ITEMS.filter((_, i) => i !== currentPage).slice(0, 3).map((item, index) => {
-              const originalIndex = OPS_BENTO_ITEMS.findIndex(p => p.id === item.id);
-              return (
-                <motion.div 
-                  key={item.id}
-                  className="flex-1"
-                  onClick={() => setCurrentPage(originalIndex)}
-                >
-                  {/* Enhanced Supporting Card - Clean Arrow Style */}
-                  <motion.div
-                    className="relative w-full h-full rounded-xl overflow-hidden backdrop-blur-sm border border-white/10 cursor-pointer group hover:border-white/20"
-                    style={{
-                      background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.7), rgba(30, 41, 59, 0.5))',
-                    }}
-                    whileHover={{ scale: 1.02, x: -5 }}
-                    transition={{ duration: 0.2, ease: "easeOut" }}
-                  >
-                    {/* Simplified background */}
-                    <div
-                      className="absolute inset-0 opacity-10"
-                      style={{
-                        backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noiseFilter\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.4\' numOctaves=\'2\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noiseFilter)\'/%3E%3C/svg%3E")',
-                        mixBlendMode: 'overlay',
-                      }}
-                    />
-                    
-                    {/* Content - Clean & Minimal */}
-                    <div className="relative z-[10] p-4 h-full flex items-center justify-between">
-                      {/* Left: Product Info */}
-                      <div className="flex-1">
-                        <h4
-                          className="text-lg font-bold uppercase tracking-wide mb-1"
-                          style={{ color: item.accentColor, textShadow: `0 0 8px ${item.accentColor}40` }}
-                        >
-                          {item.title}
-                        </h4>
-                        <p className="text-sm font-medium text-white/70 mb-2">
-                          {item.summary}
-                        </p>
-                        
-                        {/* Quick Bullets */}
-                        <div className="space-y-1">
-                          {item.features.slice(0, 2).map((feature, idx) => (
-                            <div key={idx} className="flex items-start space-x-2">
-                              <div 
-                                className="w-1 h-1 rounded-full mt-2 flex-shrink-0"
-                                style={{ backgroundColor: item.accentColor }}
-                              />
-                              <span className="text-xs text-white/60 leading-relaxed">{feature}</span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-
-                      {/* Right: Arrow Pointing Left */}
-                      <div className="flex flex-col items-center space-y-2 ml-4">
-                        <motion.div
-                          className="flex items-center justify-center w-8 h-8 rounded-full border border-white/20"
-                          style={{ borderColor: `${item.accentColor}40` }}
-                          whileHover={{ 
-                            scale: 1.1, 
-                            borderColor: item.accentColor,
-                            backgroundColor: `${item.accentColor}20`
-                          }}
-                          transition={{ duration: 0.2 }}
-                        >
-                          <svg className="w-4 h-4 text-white/50 group-hover:text-white/80" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                          </svg>
-                        </motion.div>
-                        
-                        {/* Hint Text */}
-                        <span className="text-xs font-mono text-white/30 uppercase tracking-wider">
-                          View
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Subtle glow on hover */}
-                    <motion.div
-                      className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100"
-                      style={{
-                        background: `linear-gradient(135deg, ${item.accentColor}10, transparent)`,
-                        boxShadow: `inset 0 0 20px ${item.accentColor}20`
-                      }}
-                      transition={{ duration: 0.3 }}
-                    />
-                  </motion.div>
-                </motion.div>
-              );
-            })}
-          </div>
-          
-          {/* Stats/Metrics Panel */}
-          <div className="col-span-4 row-span-1">
-            <ProductMetrics />
-        </div>
-      </div>
-      </div>
+          return (
+              <motion.div
+              key={item.id}
+              className="relative"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.1 }}
+            >
+              <EnhancedProductCard
+                item={item}
+                isActive={isActive}
+                isFeatured={isFeatured}
+                onHover={() => setCurrentPage(index)}
+                onLeave={() => {}}
+                onClick={() => setSelectedProduct(item)}
+              />
+              </motion.div>
+          );
+        })}
+            </div>
     );
   };
 
   return (
-    <div className="relative w-screen h-screen flex items-center justify-center overflow-hidden z-[3]" data-page="products">
+    <div 
+      className="relative w-screen h-screen flex items-center justify-center overflow-hidden z-[3]" 
+      data-page="products"
+      style={{
+        maskImage: 'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.1) 2vh, rgba(0,0,0,0.3) 4vh, rgba(0,0,0,0.6) 6vh, rgba(0,0,0,0.8) 8vh, black 10vh)',
+        WebkitMask: 'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.1) 2vh, rgba(0,0,0,0.3) 4vh, rgba(0,0,0,0.6) 6vh, rgba(0,0,0,0.8) 8vh, black 10vh)'
+      }}
+    >
       {/* Enhanced Cosmic Background */}
-      <div className="absolute inset-0 z-[-20]">
-        {/* Base gradient with more depth */}
-        <motion.div
+      <div className="absolute inset-0 z-[1]">
+        {/* Base gradient */}
+        <div
           className="absolute inset-0 opacity-40"
           style={{
-            background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 25%, #2d1b4f 50%, rgba(162, 52, 179, 0.4) 75%, rgba(186, 86, 16, 0.3) 100%)',
+            background: 'linear-gradient(135deg, #060b14 0%, #0a1120 30%, #131c2f 60%, rgba(98, 153, 16, 0.15) 100%)',
           }}
-          animate={{ 
-            backgroundPosition: ['0% 0%', '100% 100%'] 
+        />
+        
+        {/* Dynamic noise texture */}
+        <div 
+          className="absolute inset-0 opacity-40 z-[8]"
+          style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23noiseFilter)' opacity='0.8'/%3E%3C/svg%3E")`,
+            mixBlendMode: 'overlay'
           }}
-          transition={{ duration: 25, repeat: Infinity }}
         />
       </div>
 
       {/* Enhanced Nebula Effects */}
       <div
-        className="absolute inset-0 z-[-19]"
+        className="absolute inset-0 z-[2]"
         style={{
           background: 'radial-gradient(ellipse at 25% 40%, rgba(98, 153, 16, 0.25) 0%, rgba(98, 153, 16, 0.1) 40%, transparent 70%)',
           filter: 'blur(40px)',
@@ -1189,43 +1243,366 @@ const ProductInfoPanel = React.memo(() => {
       />
 
       <div
-        className="absolute inset-0 z-[-18]"
+        className="absolute inset-0 z-[3]"
         style={{
           background: 'radial-gradient(ellipse at 70% 60%, rgba(34, 211, 238, 0.15) 0%, rgba(34, 211, 238, 0.08) 35%, transparent 60%)',
           filter: 'blur(60px)',
         }}
       />
       
-      {/* ThoughtTrails Layer - positioned between background and content */}
+      {/* ThoughtTrails Layer */}
       <div className="absolute inset-0 z-[5]" data-thought-trails-layer="true"></div>
       
-      {/* Enhanced Content Layout */}
-      <div className="relative z-[10] w-full max-w-8xl mx-auto px-6 h-full flex items-center">
-        <div className="w-full grid grid-cols-12 gap-8 h-5/6">
+      {/* Enhanced Content Layout - Two Column like AEGIS */}
+      <div className="relative z-[10] w-full max-w-7xl mx-auto px-8 lg:px-16 h-full flex items-center">
+        <div className="grid grid-cols-12 gap-12 w-full">
           
-          {/* Left Panel - Enhanced Info Section */}
-          <div className="col-span-4 flex flex-col justify-center space-y-6">
-            <ProductInfoPanel />
+          {/* Left Column - Product Info Panel */}
+          <div className="col-span-12 lg:col-span-4 space-y-8">
+            <div className="h-full relative">
+              {/* Main AEGIS command card */}
+              <div 
+                className="backdrop-blur-xl bg-slate-900/80 rounded-2xl border border-white/25 p-7 h-full relative overflow-hidden"
+                style={{
+                  boxShadow: '0 0 30px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(255, 255, 255, 0.05)',
+                  background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.92), rgba(30, 41, 59, 0.8))'
+                }}
+              >
+                <div className="relative z-[10] h-full flex flex-col">
+                  {/* Enhanced AEGIS Header */}
+                  <div className="space-y-5 mb-7">
+                    {/* Mission Control Badge */}
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-3">
+                        <motion.div 
+                          className="w-3 h-3 rounded-full bg-lime-400"
+                          animate={{ scale: [1, 1.2, 1], opacity: [0.7, 1, 0.7] }}
+                          transition={{ duration: 2, repeat: Infinity }}
+                        />
+                        <span className="text-sm font-mono uppercase tracking-wider text-white/60">
+                          MISSION CONTROL
+                        </span>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-xs font-mono text-lime-400 uppercase tracking-wider">
+                          OPERATIONAL
+                        </div>
+                        <div className="text-xs text-white/50 font-mono">
+                          v2.1.0
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Enhanced Title */}
+                    <div className="space-y-3">
+                      <h3
+                        className="text-3xl font-bold leading-tight"
+                        style={{ 
+                          background: 'linear-gradient(135deg, #84cc16 0%, #22d3ee 100%)',
+                          WebkitBackgroundClip: 'text',
+                          WebkitTextFillColor: 'transparent',
+                        }}
+                      >
+                        AEGIS<br />Command
+                      </h3>
+                      
+                      <div className="relative">
+                        <div className="absolute -left-3 top-0 w-1 h-full bg-gradient-to-b from-cyan-400 to-lime-400 rounded-full" />
+                        <p className="text-white/80 text-sm leading-relaxed font-medium pl-4">
+                          Your AI team, led by you. Mission-based orchestration with human oversight at every decision point.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Enhanced Mission Statement */}
+                  <div className="space-y-5 flex-1 overflow-y-auto">
+                    {/* Core Philosophy Card */}
+                    <div className="p-4 rounded-xl backdrop-blur-sm border border-lime-400/25 bg-lime-400/8">
+                      <div className="flex items-center space-x-3 mb-2">
+                        <div className="w-2 h-2 rounded-full bg-lime-400" />
+                        <h4 className="font-semibold text-base text-lime-400">
+                          Adaptive. Auditable. Alive.
+                        </h4>
+                      </div>
+                      <p className="text-white/80 text-xs leading-relaxed">
+                        The thinking engine behind CuriousLabs — orchestrating AI, logic, and control across all products.
+                      </p>
+                    </div>
+
+                    {/* Core Principles Grid */}
+                    <div className="space-y-3">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-2 h-2 rounded-full bg-cyan-400" />
+                        <h5 className="text-xs font-mono uppercase tracking-wider text-white/70">
+                          CORE PRINCIPLES
+                        </h5>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        {[
+                          { 
+                            text: 'Real AI agents in parallel with roles, memory, and autonomy',
+                            status: 'ACTIVE',
+                            metric: '12 agents'
+                          },
+                          { 
+                            text: 'Central mission engine governing every command',
+                            status: 'OPERATIONAL', 
+                            metric: '99.7% uptime'
+                          },
+                          { 
+                            text: 'Complete logs, metrics, and traces for every execution',
+                            status: 'MONITORING',
+                            metric: '2.3M events'
+                          }
+                        ].map((principle, index) => (
+                          <div 
+                            key={`principle-${index}`}
+                            className="group p-3 rounded-lg bg-slate-800/40 border border-white/15 hover:border-lime-400/35 transition-all duration-300"
+                          >
+                            <div className="flex items-start justify-between">
+                              <div className="flex items-start space-x-2 flex-1 min-w-0">
+                                <div className="w-1.5 h-1.5 rounded-full mt-1.5 flex-shrink-0 bg-lime-400" />
+                                <span className="text-white/80 text-xs leading-relaxed">{principle.text}</span>
+                              </div>
+                              <div className="text-right ml-2 flex-shrink-0">
+                                <div className="text-xs font-mono text-lime-400 uppercase tracking-wider">
+                                  {principle.status}
+                                </div>
+                                <div className="text-xs text-white/50 font-mono">
+                                  {principle.metric}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Enhanced AEGIS SDK Section */}
+                    <div className="group/aegis-sdk">
+                      <div 
+                        className="p-3 rounded-xl border border-white/15 bg-white/8 backdrop-blur-sm cursor-pointer transition-all duration-300 hover:border-cyan-400/35 hover:bg-white/12"
+                        style={{ borderColor: 'rgba(34, 211, 238, 0.25)' }}
+                      >
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="flex items-center space-x-2 min-w-0 flex-1">
+                            <div className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse flex-shrink-0" />
+                            <div className="min-w-0">
+                              <h4 className="text-sm font-semibold text-cyan-400 truncate">
+                                AEGIS SDK
+                              </h4>
+                              <p className="text-xs text-white/60 truncate">
+                                Developer toolkit for mission-critical AI
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* System Status */}
+                  <div className="mt-5 pt-5 border-t border-white/15">
+                    <div className="p-3 rounded-xl bg-slate-800/60 border border-lime-400/35">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-3">
+                          <motion.div
+                            className="w-2.5 h-2.5 rounded-full bg-lime-400"
+                            animate={{ opacity: [0.5, 1, 0.5], scale: [1, 1.1, 1] }}
+                            transition={{ duration: 2, repeat: Infinity }}
+                          />
+                          <div>
+                            <div className="text-xs font-mono text-lime-400 uppercase tracking-wider">System Status</div>
+                            <div className="text-white/80 text-xs">All agents operational</div>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-xs text-lime-400 font-mono font-bold">ACTIVE</div>
+                          <div className="text-xs text-white/50 font-mono">24/7</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
           
-          {/* Right Panel - Enhanced Product Grid */}
-          <div className="col-span-8 relative">
-            <ProductGrid 
-              currentPage={currentPage} 
-              setCurrentPage={setCurrentPage}
-            />
+          {/* Right Column - Product Grid */}
+          <div className="col-span-12 lg:col-span-8 relative">
+            {/* Header Section */}
+            <div className="space-y-6 mb-10">
+              {/* Mission Control Badge */}
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center space-x-3">
+                  <motion.div 
+                    className="w-3 h-3 rounded-full bg-lime-400"
+                    animate={{ scale: [1, 1.2, 1], opacity: [0.7, 1, 0.7] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                  />
+                  <span className="text-lime-400/80 text-sm font-mono uppercase tracking-wider">Products Grid</span>
+                </div>
+                <div className="text-right">
+                  <div className="text-xs font-mono text-lime-400 uppercase tracking-wider">
+                    ACTIVE
+                  </div>
+                  <div className="text-xs text-white/50 font-mono">
+                    {OPS_BENTO_ITEMS.length} Systems
+                  </div>
+                </div>
+              </div>
+              
+              <h2
+                className="text-5xl lg:text-7xl font-bold uppercase tracking-tight leading-none"
+                style={{ 
+                  background: 'linear-gradient(135deg, #84cc16 0%, #65a30d 50%, #22d3ee 100%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  textShadow: '0 0 30px rgba(132, 204, 22, 0.5)'
+                }}
+              >
+                MISSION<br />
+                <span className="text-white/90 text-4xl lg:text-5xl normal-case">Products</span>
+              </h2>
+              
+              <p className="text-xl text-white/70 max-w-2xl leading-relaxed">
+                Advanced operational systems designed for mission-critical environments.
+              </p>
+            </div>
+
+            {/* Product Grid - Moderately Larger and Better Spaced */}
+            <div className="h-[550px]">
+              <div className="grid grid-cols-2 grid-rows-2 gap-8 h-full">
+                {OPS_BENTO_ITEMS.map((item, index) => {
+                  const isActive = index === currentPage;
+                  const isFeatured = index === currentPage;
+                  
+                  return (
+                    <motion.div
+                      key={item.id}
+                      className="relative"
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: index * 0.1 }}
+                    >
+                      <div
+                        className="relative w-full h-full rounded-2xl overflow-hidden backdrop-blur-sm border cursor-pointer group"
+                        style={{
+                          background: isFeatured 
+                            ? `linear-gradient(135deg, rgba(15, 23, 42, 0.9), rgba(30, 41, 59, 0.7), ${item.accentColor}20)`
+                            : 'linear-gradient(135deg, rgba(15, 23, 42, 0.8), rgba(30, 41, 59, 0.6))',
+                          borderColor: isActive ? `${item.accentColor}aa` : 'rgba(255,255,255,0.25)',
+                          boxShadow: isActive
+                            ? `0 0 30px ${item.accentColor}40, inset 0 0 20px rgba(255,255,255,0.1)`
+                            : 'inset 0 0 5px rgba(255,255,255,0.05)',
+                        }}
+                        onMouseEnter={() => setCurrentPage(index)}
+                        onMouseLeave={() => {}}
+                        onClick={() => setSelectedProduct(item)}
+                      >
+                        {/* Status Indicator */}
+                        <div className="absolute top-6 right-6 z-20">
+                          <div className="flex items-center space-x-2 bg-black/50 backdrop-blur-sm rounded-full px-4 py-2">
+                            <div 
+                              className="w-2 h-2 rounded-full animate-pulse"
+                              style={{ backgroundColor: item.accentColor }}
+                            />
+                            <span className="text-sm font-mono text-white/80">
+                              {isActive ? 'ACTIVE' : 'STANDBY'}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Click indicator */}
+                        <div className="absolute bottom-6 right-6 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                          <div className="flex items-center space-x-2 bg-black/50 backdrop-blur-sm rounded-full px-4 py-2">
+                            <span className="text-sm font-mono text-white/80">CLICK TO EXPAND</span>
+                            <svg className="w-4 h-4 text-white/60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+                            </svg>
+                          </div>
+                        </div>
+
+                        {/* Background texture */}
+                        <div
+                          className="absolute inset-0 opacity-15 pointer-events-none"
+                          style={{
+                            backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'100\' height=\'100\' viewBox=\'0 0 100 100\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noiseFilter\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.65\' numOctaves=\'3\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100\' height=\'100\' filter=\'url(%23noiseFilter)\'/%3E%3C/svg%3E")',
+                            mixBlendMode: 'overlay',
+                          }}
+                        />
+                        
+                        {/* Content */}
+                        <div className="relative z-[10] p-8 h-full flex flex-col justify-between">
+                          {/* Header */}
+                          <div className="space-y-4">
+                            {/* Icon */}
+                            <div className="relative w-20 h-20 mx-auto mb-6">
+                              <div 
+                                className="absolute inset-0 rounded-full"
+                                style={{
+                                  boxShadow: `0 0 25px ${item.accentColor}60`,
+                                  background: `radial-gradient(circle at 30% 30%, ${item.accentColor}, ${item.accentColor}90)`
+                                }}
+                              />
+                              <img
+                                src={item.illustrationSrc}
+                                alt={`${item.title} illustration`}
+                                className="w-full h-full object-cover rounded-full relative z-[10]"
+                                onError={(e) => (e.target.src = '/assets/images/placeholder.png')}
+                              />
+                            </div>
+                            
+                            <div className="text-center">
+                              <h3
+                                className="text-3xl font-bold uppercase tracking-wide mb-3"
+                                style={{ color: item.accentColor, textShadow: `0 0 15px ${item.accentColor}60` }}
+                              >
+                                {item.title}
+                              </h3>
+                              <p className="text-base font-medium text-white/80 leading-relaxed px-2">
+                                {item.summary}
+                              </p>
+                            </div>
+                          </div>
+
+                          {/* Quick features preview */}
+                          <div className="space-y-3 mt-6">
+                            {item.features.slice(0, 2).map((feature, featureIndex) => (
+                              <div 
+                                key={featureIndex} 
+                                className="flex items-start space-x-3"
+                              >
+                                <div 
+                                  className="w-2 h-2 rounded-full mt-2 flex-shrink-0"
+                                  style={{ backgroundColor: item.accentColor }}
+                                />
+                                <span className="text-sm text-white/75 leading-relaxed">{feature}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    </motion.div>
+                  );
+                })}
+              </div>
+            </div>
           </div>
         </div>
       </div>
-      
-      {/* Products Page Dynamic Noise Texture */}
-      <div 
-        className="absolute inset-0 opacity-40 mix-blend-overlay z-[-17]"
-        style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg width='200' height='200' viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='productsNoise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23productsNoise)' opacity='0.8'/%3E%3C/svg%3E")`,
-          backgroundSize: '180px 180px'
-        }}
-      />
+
+      {/* Product Detail Modal */}
+      <AnimatePresence>
+        {selectedProduct && (
+          <ProductDetailModal 
+            product={selectedProduct} 
+            onClose={() => setSelectedProduct(null)} 
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 };

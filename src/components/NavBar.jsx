@@ -1,3 +1,16 @@
+/**
+ * LEGACY COMPONENT - DEPRECATED
+ * 
+ * This NavBar component has been replaced by MissionControlNavbar
+ * Located at: src/components/navigation/MissionControlNavbar.jsx
+ * 
+ * This file is kept for reference and rollback purposes only.
+ * Do not use this component in new development.
+ * 
+ * Migration completed: [Current Date]
+ * Replacement: MissionControlNavbar with Mission Control theme
+ */
+
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { IMAGES } from '../utils/assets';

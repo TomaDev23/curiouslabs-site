@@ -1,19 +1,16 @@
 /**
  * @component HeroVisualPlanet
- * @description Self-contained planet visualization with 3D and 2D implementations
- * 
- * @metadata
+ * @description Hero section planet with conditional 3D/2D rendering
  * @version 1.0.0
- * @author CuriousLabs
- * @legit true
+ * @type atomic
  */
 
-import React, { Suspense, lazy, useState, useEffect } from 'react';
+import React, { Suspense, useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useScene } from '../scene/SceneControllerV6';
 
-// ✅ Strategic re-entry: EarthSphere with conditional loading - FIXED: Import from clean /3d/ folder
-const EarthSphere = lazy(() => import('../3d/EarthSphere'));
+// ✅ Static import for dev environment
+import EarthSphereProxy from '../proxies/EarthSphereProxy';
 
 // ✅ Strategic device capability detection
 const use3DCapability = () => {
@@ -31,17 +28,19 @@ const use3DCapability = () => {
     // Check device capabilities
     const isMobile = /Mobi|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     const isTablet = window.matchMedia('(min-width: 768px) and (max-width: 1023px)').matches;
-    const isLowMemory = navigator.deviceMemory && navigator.deviceMemory <= 4;
+    const isLowMemory = navigator.deviceMemory && navigator.deviceMemory < 4;
     
-    // Check performance tier
-    const isDesktopClass = window.innerWidth >= 1024 && !isMobile && !isTablet;
+    // Check performance tier - ALLOW TABLETS for preview
+    const isDesktopClass = window.innerWidth >= 1024 && !isMobile;
+    const isTabletClass = isTablet && !isMobile;
     const hasGoodPerformance = !isLowMemory && !prefersReducedMotion;
     
-    // Final capability decision
-    const shouldUse3D = isDesktopClass && hasGoodPerformance && !isLighthouse;
+    // Final capability decision - Allow tablets AND desktop
+    const shouldUse3D = (isDesktopClass || isTabletClass) && hasGoodPerformance && !isLighthouse;
     
     console.log('🌍 3D Capability Check:', {
       isDesktopClass,
+      isTabletClass,
       hasGoodPerformance,
       isLighthouse,
       shouldUse3D
@@ -111,14 +110,12 @@ const HeroVisualPlanet = ({ sceneStep = 0, className = '', size = 400 }) => {
       aria-hidden="true"
     >
       {use3D ? (
-        <Suspense fallback={
-          <div className="w-full h-full flex items-center justify-center">
-            <div className="w-[400px] h-[400px] rounded-full bg-gradient-to-br from-indigo-900/30 via-purple-900/30 to-violet-800/30 animate-pulse flex items-center justify-center">
-              <div className="text-white/60 text-sm">Loading Earth...</div>
-            </div>
-          </div>
-        }>
-          <EarthSphere sceneStep={sceneStep} className="w-full h-full" />
+        <Suspense fallback={<div className="text-white/50">Loading Earth...</div>}>
+          <EarthSphereProxy 
+            enabled={true}
+            sceneStep={sceneStep} 
+            className="w-full h-full" 
+          />
         </Suspense>
       ) : (
         <FallbackPlanet2D sceneStep={sceneStep} />

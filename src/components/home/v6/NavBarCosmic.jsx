@@ -1,4 +1,17 @@
 /**
+ * LEGACY COMPONENT - DEPRECATED
+ * 
+ * This NavBarCosmic component has been replaced by MissionControlNavbar
+ * Located at: src/components/navigation/MissionControlNavbar.jsx
+ * 
+ * This file is kept for reference and rollback purposes only.
+ * Do not use this component in new development.
+ * 
+ * Migration completed: [Current Date]
+ * Replacement: MissionControlNavbar with Mission Control theme
+ */
+
+/**
  * @component NavBarCosmic
  * @description Main navigation for V6 site with cosmic styling
  * 

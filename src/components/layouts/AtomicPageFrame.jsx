@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, forwardRef } from 'react';
-import NavBar from '../NavBar';
+import MissionControlNavbar from '../navigation/MissionControlNavbar';
 import FooterExperience from '../home/v4/FooterExperience';
 import CosmicJourneyController from '../journey/CosmicJourneyController';
 import { ContentLayer } from './ContentLayer';
@@ -240,7 +240,7 @@ export const AtomicPageFrame = forwardRef(({ scenes = [], scrollProgress = 0 }, 
         
         {/* Navigation Layer (z-110 to z-119): NavBar */}
         <div className="z-[110]" data-legit-layer="navigation">
-          <NavBar />
+          <MissionControlNavbar />
         </div>
         
         {/* Content Layer (z-10 to z-50): ContentLayer */}

@@ -132,31 +132,23 @@ const MissionAtomic = () => {
   useEffect(() => {
     checkDeviceCapabilities();
   }, [isMobile, prefersReducedMotion]);
-  
-  // Preload milkyway image
-  const preloadMilkyway = () => {
-    if (typeof window !== 'undefined') {
-      const img = new Image();
-      img.src = '/assets/images/cosmic/milkyway_compressed.jpg';
-    }
-  };
 
   // Self-contained mission points data
   const MISSION_POINTS = [
     {
       id: "01",
-      title: "Research & Analyze",
-      description: "Understanding your vision and requirements is our first step. We dive deep to analyze the market, audience, and technical needs."
+      title: "Intelligence with memory",
+      description: "Our systems don't just execute—they learn, evolve, and genuinely understand you."
     },
     {
-      id: "02",
-      title: "Concept & Sketch",
-      description: "Translating ideas into visual concepts and architectural plans. We create the blueprint for your digital solution."
+      id: "02", 
+      title: "Judgment with humanity",
+      description: "Every interface we craft keeps the human in command—enhancing, not replacing, your intuition."
     },
     {
       id: "03",
-      title: "Design & Build",
-      description: "From concept to code, we craft every aspect with precision. Our development process ensures quality and performance."
+      title: "Innovation with conscience", 
+      description: "We fuse ethical clarity into code and design—because responsible AI isn't optional, it's foundational."
     }
   ];
 
@@ -214,54 +206,34 @@ const MissionAtomic = () => {
       viewport={{ once: true, margin: "0px 0px -20% 0px" }}
       variants={sectionVariants}
     >
-      {/* Progressive Background Loading - Lightweight fallback first */}
-      <div 
-        className="absolute inset-0 z-0"
-        style={{
-          background: 'linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 25%, #16213e 50%, #0f3460 75%, #0a0a0a 100%)',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
-          backgroundAttachment: 'fixed',
-          opacity: 1,
-          transition: 'opacity 0.8s ease-in-out',
-          zIndex: 50
-        }}
-      />
-      
-      {/* High-quality background - lazy loaded after LCP */}
-      <div 
-        className="absolute inset-0 z-0"
-        style={{
-          backgroundImage: 'url("/assets/images/planets/4k/milkyway_Light.webp")',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
-          backgroundAttachment: 'fixed',
-          opacity: 0,
-          transition: 'opacity 1.2s ease-in-out',
-          zIndex: 51
-        }}
-        onLoad={(e) => {
-          // Fade in the high-quality background after it loads
-          setTimeout(() => {
-            e.target.style.opacity = '1';
-          }, 100);
-        }}
-        ref={(el) => {
-          if (el && !el.dataset.loaded) {
-            // Lazy load the background image after a delay
-            setTimeout(() => {
-              const img = new Image();
-              img.onload = () => {
-                el.style.opacity = '1';
-                el.dataset.loaded = 'true';
-              };
-              img.src = '/assets/images/planets/4k/milkyway_Light.webp';
-            }, 1000); // Load after 1 second delay
-          }
-        }}
-      />
+      {/* Critical LCP Image - Responsive with srcSet */}
+      <div className="absolute inset-0">
+        <img
+          src="/assets/images/planets/milkyway_Light_mobile.webp"
+          srcSet="
+            /assets/images/planets/milkyway_Light_mobile.webp 1000w,
+            /assets/images/planets/milkyway_Light_tablet.webp 1400w,
+            /assets/images/planets/4k/milkyway_Light.webp 2560w
+          "
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 100vw, 100vw"
+          alt="Milky Way Background"
+          className="w-full h-full"
+          loading="eager"
+          fetchpriority="high"
+          decoding="sync"
+          style={{ 
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            objectPosition: 'center center',
+            transform: 'scale(1.2)',
+            zIndex: 0
+          }}
+        />
+      </div>
       
       {/* Light glassmorphism overlay - much lighter to let image show through */}
       <div 
@@ -270,52 +242,84 @@ const MissionAtomic = () => {
           background: 'rgba(0, 0, 0, 0.2)',
           backdropFilter: 'blur(0.5px)',
           WebkitBackdropFilter: 'blur(0.5px)',
-          zIndex: 60
+          zIndex: 1
         }}
       />
 
-      {/* Main content wrapper with conditional rendering based on image load - v6 style */}
-      <div className="relative w-full h-full opacity-100" style={{ zIndex: 70 }}>
+      {/* Main content wrapper - Clean z-index */}
+      <div className="relative w-full h-full opacity-100" style={{ zIndex: 50 }}>
         {/* Right Section with Numbered Mission Points */}
         <div className={`${isMobile ? 'px-6' : 'md:ml-[45%] md:mr-[5%] pr-4 md:pr-8'} flex flex-col space-y-16 md:space-y-32 mt-[35vh]`}>
           {MISSION_POINTS.map((point, index) => (
             <motion.div 
               key={point.id}
-              className="grid grid-cols-12 items-center gap-4"
+              className="grid grid-cols-12 items-center gap-4 group cursor-pointer relative"
+              style={{ zIndex: 60 }}
               custom={index}
               variants={missionPointVariants}
+              whileHover={{ 
+                scale: 1.02,
+                transition: { duration: 0.3, ease: "easeOut" }
+              }}
             >
+              {/* Hover background glow */}
+              <div className="absolute inset-0 bg-gradient-to-r from-lime-400/5 via-emerald-500/5 to-cyan-400/5 rounded-xl opacity-0 group-hover:opacity-100 transition-all duration-500 blur-sm -z-10" />
+              <div className="absolute inset-0 border border-lime-400/10 rounded-xl opacity-0 group-hover:opacity-100 group-hover:border-lime-400/30 transition-all duration-500 -z-10" />
+              
               {/* For odd indices (or all on mobile) */}
               {(index % 2 === 0 && !isMobile) ? (
                 <>
-                  <div className="col-span-7 col-start-1 pr-4">
-                    <div className="text-right">
-                      <h3 className="text-white text-xl md:text-2xl mb-2">{point.title}</h3>
-                      <p className="text-white/70 text-xs md:text-sm">{point.description}</p>
+                  <div className="col-span-7 col-start-1 pr-4 relative z-10">
+                    <div className="text-right transform group-hover:translate-x-[-8px] transition-transform duration-300">
+                      <h3 className="text-white text-xl md:text-2xl mb-2 group-hover:text-lime-400 transition-colors duration-300 relative">
+                        {point.title}
+                        <div className="absolute bottom-0 right-0 h-0.5 bg-gradient-to-l from-lime-400 to-emerald-500 w-0 group-hover:w-full transition-all duration-500" />
+                      </h3>
+                      <p className="text-white/70 text-xs md:text-sm group-hover:text-white/90 transition-colors duration-300 leading-relaxed">
+                        {point.description}
+                      </p>
                     </div>
                   </div>
-                  <div className="col-span-5 col-start-8 pl-4">
-                    <div className="text-white text-[80px] md:text-[120px] font-light opacity-90">{point.id}</div>
+                  <div className="col-span-5 col-start-8 pl-4 relative z-10">
+                    <div className="text-white text-[80px] md:text-[120px] font-light opacity-90 group-hover:opacity-100 group-hover:text-lime-400 transition-all duration-300 transform group-hover:scale-110 group-hover:drop-shadow-[0_0_20px_rgba(132,204,22,0.6)]">
+                      {point.id}
+                    </div>
                   </div>
                 </>
               ) : (
                 <>
                   {!isMobile && (
-                    <div className="col-span-5 col-start-1 pr-4">
-                      <div className="text-white text-[80px] md:text-[120px] font-light opacity-90 text-right">{point.id}</div>
+                    <div className="col-span-5 col-start-1 pr-4 relative z-10">
+                      <div className="text-white text-[80px] md:text-[120px] font-light opacity-90 text-right group-hover:opacity-100 group-hover:text-lime-400 transition-all duration-300 transform group-hover:scale-110 group-hover:drop-shadow-[0_0_20px_rgba(132,204,22,0.6)]">
+                        {point.id}
+                      </div>
                     </div>
                   )}
-                  <div className={`${isMobile ? 'col-span-12' : 'col-span-7 col-start-6'} pl-4`}>
+                  <div className={`${isMobile ? 'col-span-12' : 'col-span-7 col-start-6'} pl-4 relative z-10`}>
                     {isMobile && (
-                      <div className="text-white text-[60px] font-light opacity-90 mb-2">{point.id}</div>
+                      <div className="text-white text-[60px] font-light opacity-90 mb-2 group-hover:opacity-100 group-hover:text-lime-400 transition-all duration-300 transform group-hover:scale-110 group-hover:drop-shadow-[0_0_20px_rgba(132,204,22,0.6)]">
+                        {point.id}
+                      </div>
                     )}
-                    <div>
-                      <h3 className="text-white text-xl md:text-2xl mb-2">{point.title}</h3>
-                      <p className="text-white/70 text-xs md:text-sm">{point.description}</p>
+                    <div className="transform group-hover:translate-x-2 transition-transform duration-300">
+                      <h3 className="text-white text-xl md:text-2xl mb-2 group-hover:text-lime-400 transition-colors duration-300 relative">
+                        {point.title}
+                        <div className="absolute bottom-0 left-0 h-0.5 bg-gradient-to-r from-lime-400 to-emerald-500 w-0 group-hover:w-full transition-all duration-500" />
+                      </h3>
+                      <p className="text-white/70 text-xs md:text-sm group-hover:text-white/90 transition-colors duration-300 leading-relaxed">
+                        {point.description}
+                      </p>
                     </div>
                   </div>
                 </>
               )}
+              
+              {/* Hover particles effect */}
+              <div className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                <div className="absolute top-4 left-8 w-1 h-1 bg-lime-400 rounded-full animate-ping" style={{ animationDelay: '0s' }} />
+                <div className="absolute top-12 right-12 w-1 h-1 bg-emerald-400 rounded-full animate-ping" style={{ animationDelay: '0.3s' }} />
+                <div className="absolute bottom-8 left-16 w-1 h-1 bg-cyan-400 rounded-full animate-ping" style={{ animationDelay: '0.6s' }} />
+              </div>
             </motion.div>
           ))}
         </div>
@@ -325,7 +329,7 @@ const MissionAtomic = () => {
       <motion.div 
         className={`absolute ${isMobile ? 'bottom-[calc(2rem+60vh)] left-1/2 -translate-x-1/2' : 'bottom-[calc(4rem+75vh)] left-4 md:left-16'}`}
         variants={eclipseVariants}
-        style={{ zIndex: 80 }}
+        style={{ zIndex: 3 }}
       >
         {/* Cosmic background effects - Bottom left corner nebula */}
         <div 
@@ -450,7 +454,8 @@ const MissionAtomic = () => {
       {/* Metadata text - right side of the circle */}
       {!isMobile && (
         <div 
-          className="absolute bottom-[calc(45%+48vh)] left-[44rem] z-[85]"
+          className="absolute bottom-[calc(45%+48vh)] left-[44rem]"
+          style={{ zIndex: 4 }}
         >
           <NeonArcAnimation sceneStep={6}>
             limbo<br />
@@ -478,7 +483,7 @@ const MissionAtomic = () => {
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.5, duration: 0.3 }}
         viewport={{ once: true }}
-        style={{ zIndex: 85 }}
+        style={{ zIndex: 4 }}
       >
         <div className="mr-3 flex space-x-1">
           <span className="w-5 h-5 rounded-full border border-white/20 flex items-center justify-center text-xs">⊕</span>
@@ -492,12 +497,12 @@ const MissionAtomic = () => {
       </motion.div>
       
       {/* Heart icon */}
-      <div className="absolute top-8 left-8 z-20" style={{ zIndex: 85 }}>
+      <div className="absolute top-8 left-8 z-20" style={{ zIndex: 4 }}>
         <span className="text-white/70 text-xl">♡</span>
       </div>
       
       {/* Decorative slashes */}
-      <div className="absolute top-8 right-[30%] z-20 text-white/50 font-light" style={{ zIndex: 85 }}>
+      <div className="absolute top-8 right-[30%] z-20 text-white/50 font-light" style={{ zIndex: 4 }}>
         //<br/>//<br/>//
       </div>
 
@@ -510,7 +515,7 @@ const MissionAtomic = () => {
           backgroundPosition: 'center 70%',
           backgroundRepeat: 'no-repeat',
           opacity: 0.6,
-          zIndex: 85,
+          zIndex: 5,
           mask: 'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.2) 8vh, rgba(0,0,0,0.6) 15vh, rgba(0,0,0,0.9) 25vh, black 35vh, black 50vh, rgba(0,0,0,0.8) 60vh, rgba(0,0,0,0.4) 70vh, transparent 80vh)',
           WebkitMask: 'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.2) 8vh, rgba(0,0,0,0.6) 15vh, rgba(0,0,0,0.9) 25vh, black 35vh, black 50vh, rgba(0,0,0,0.8) 60vh, rgba(0,0,0,0.4) 70vh, transparent 80vh)'
         }}
@@ -522,7 +527,7 @@ const MissionAtomic = () => {
         style={{
           backgroundImage: `url("data:image/svg+xml,%3Csvg width='200' height='200' viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='missionNoise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='5' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23missionNoise)' opacity='0.8'/%3E%3C/svg%3E")`,
           backgroundSize: '160px 160px',
-          zIndex: 86,
+          zIndex: 6,
           mask: 'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.1) 5vh, rgba(0,0,0,0.4) 12vh, rgba(0,0,0,0.8) 22vh, black 32vh)',
           WebkitMask: 'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.1) 5vh, rgba(0,0,0,0.4) 12vh, rgba(0,0,0,0.8) 22vh, black 32vh)'
         }}
@@ -533,7 +538,7 @@ const MissionAtomic = () => {
         className="absolute bottom-0 w-full h-[60vh] pointer-events-none opacity-15 mix-blend-multiply"
         style={{
           background: 'radial-gradient(ellipse at center bottom, rgba(15, 23, 42, 0.8) 0%, rgba(30, 41, 59, 0.6) 40%, transparent 70%)',
-          zIndex: 87,
+          zIndex: 7,
           mask: 'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.3) 10vh, rgba(0,0,0,0.7) 20vh, black 30vh)',
           WebkitMask: 'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.3) 10vh, rgba(0,0,0,0.7) 20vh, black 30vh)'
         }}
@@ -544,7 +549,7 @@ const MissionAtomic = () => {
         className="absolute bottom-0 w-full h-[50vh] pointer-events-none"
         style={{
           background: 'linear-gradient(to bottom, transparent 0%, rgba(15, 23, 42, 0.3) 20%, rgba(15, 23, 42, 0.7) 60%, #0f172a 100%)',
-          zIndex: 90
+          zIndex: 8
         }}
       />
     </motion.div>

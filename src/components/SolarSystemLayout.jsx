@@ -3,10 +3,10 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 
 const orbitData = [
-  { icon: "🛠️", title: "OpsPipe", path: "/products/opspipe", angle: 0, adjustX: 100, adjustY: 20 },
-  { icon: "🚀", title: "MoonSignal", path: "/products/moonsignal", angle: 90, adjustX: 20, adjustY: 100 },
-  { icon: "🛡️", title: "Guardian", path: "/products/guardian", angle: 180, adjustX: -20, adjustY: 0 },
-  { icon: "🧠", title: "Curious", path: "/products/curious", angle: 270, adjustX: 0, adjustY: 30 },
+  { icon: "/assets/images/general/Page_Logos/OpsPipe_logo.webp", title: "OpsPipe", path: "/products/opspipe", angle: 0, adjustX: 100, adjustY: 20 },
+  { icon: "/assets/images/general/Page_Logos/MoonSignal_logo.webp", title: "MoonSignal", path: "/products/moonsignal", angle: 90, adjustX: 20, adjustY: 100 },
+  { icon: "/assets/images/general/Page_Logos/Guardian_logo.webp", title: "Guardian", path: "/products/guardian", angle: 180, adjustX: -20, adjustY: 0 },
+  { icon: "/assets/images/general/Page_Logos/Curious_logo.webp", title: "Curious", path: "/products/curious", angle: 270, adjustX: 0, adjustY: 30 },
 ];
 
 // Comet paths for more variety
@@ -355,7 +355,7 @@ export default function SolarSystemLayout() {
           }}
         >
           <motion.div 
-            className="text-4xl"
+            className="w-12 h-12 flex items-center justify-center"
             animate={{ 
               opacity: prefersReducedMotion ? 1 : [1, 0.8, 1] 
             }}
@@ -364,7 +364,11 @@ export default function SolarSystemLayout() {
               repeat: Infinity 
             }}
           >
-            ⚛️
+            <img 
+              src="/assets/images/general/Page_Logos/Aegis_logo.webp" 
+              alt="Aegis Logo" 
+              className="w-full h-full object-contain"
+            />
           </motion.div>
           <h3 className="font-bold text-xl text-white tracking-wider uppercase">Aegis</h3>
           <p className="text-sm text-white/70">Core Runtime</p>
@@ -416,7 +420,7 @@ export default function SolarSystemLayout() {
                       ease: "easeInOut" 
                     }}
                   >
-                    {icon}
+                    <img src={icon} alt={title} className="w-16 h-16" />
                   </motion.div>
                   <h3 className="text-base font-semibold text-white tracking-wider uppercase">{title}</h3>
                   <p className="text-xs text-gray-400 mt-auto">Explore →</p>
@@ -457,7 +461,7 @@ export default function SolarSystemLayout() {
             }}
           >
             <motion.div 
-              className="text-4xl mb-2" 
+              className="w-12 h-12 mx-auto mb-2 flex items-center justify-center" 
               animate={{ 
                 opacity: prefersReducedMotion ? 1 : [1, 0.8, 1] 
               }} 
@@ -466,7 +470,11 @@ export default function SolarSystemLayout() {
                 repeat: Infinity 
               }}
             >
-              ⚛️
+              <img 
+                src="/assets/images/general/Page_Logos/Aegis_logo.webp" 
+                alt="Aegis Logo" 
+                className="w-full h-full object-contain"
+              />
             </motion.div>
             <h3 className="text-lg font-bold text-white tracking-wider uppercase">Aegis</h3>
             <p className="text-sm text-white/70 text-center mt-1 mb-3">Core Runtime Engine</p>
@@ -501,7 +509,7 @@ export default function SolarSystemLayout() {
                     ease: "easeInOut" 
                   }}
                 >
-                  {product.icon}
+                  <img src={product.icon} alt={product.title} className="w-16 h-16" />
                 </motion.div>
                 <h3 className="text-lg font-semibold text-white mb-2 tracking-wider uppercase">{product.title}</h3>
                 <p className="text-xs text-purple-400 mt-auto">
