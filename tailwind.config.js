@@ -6,6 +6,9 @@ export default {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        'space': ['Space Grotesk', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+      },
       colors: {
         'curious-blue': {
           100: '#e0f2ff',
