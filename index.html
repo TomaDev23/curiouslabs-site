@@ -8,6 +8,29 @@
     <meta name="referrer" content="strict-origin-when-cross-origin">
     <meta name="description" content="CuriousLabs is an AI-driven creative code lab. Explore automation tools, stunning design systems, and breakthrough digital engineering.">
     <title>CuriousLabs - AI CodeOps Service Lab</title>
+    
+    <!-- Critical Image Preloads for LCP Optimization -->
+    <link 
+      rel="preload" 
+      as="image" 
+      href="/assets/images/planets/milkyway_Light_mobile.webp"
+      media="(max-width: 768px)"
+      fetchpriority="high"
+    >
+    <link 
+      rel="preload" 
+      as="image" 
+      href="/assets/images/planets/milkyway_Light_tablet.webp"
+      media="(min-width: 769px) and (max-width: 1200px)"
+      fetchpriority="high"
+    >
+    <link 
+      rel="preload" 
+      as="image" 
+      href="/assets/images/planets/4k/milkyway_Light.webp"
+      media="(min-width: 1201px)"
+      fetchpriority="high"
+    >
   </head>
   <body>
     <div id="root"></div>
