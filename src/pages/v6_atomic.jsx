@@ -6,11 +6,10 @@
  * @source Forked from: v6_home.jsx
  */
 
-import React from 'react';
+import React, { Suspense, lazy } from 'react';
 import SceneControllerV6 from '../components/home/v6/SceneControllerV6';
 import LayoutWrapper from '../components/home/v6/LayoutWrapper';
 import CosmicBackgroundSystemV6 from '../components/home/v6/CosmicBackgroundSystemV6';
-import NavBarCosmic from '../components/home/v6/NavBarCosmic';
 
 // --- TEMPORARY: Scene imports will be replaced one by one ---
 // import HeroSequenceV6 from '../components/home/v6/HeroSequenceV6'; // Removed
@@ -21,7 +20,8 @@ import NavBarCosmic from '../components/home/v6/NavBarCosmic';
 // import ContactTerminal from '../components/home/v6/ContactTerminal'; // Removed
 
 // --- ATOMIC: New atomic components ---
-import HeroAtomic from '../components/atomic/HeroAtomic';
+// Lazy load HeroAtomic to prevent Three.js contamination
+const HeroAtomic = lazy(() => import('../components/atomic/HeroAtomic'));
 import ProcessLegacyAtomic from '../components/atomic/ProcessLegacyAtomic';
 import MissionAtomic from '../components/atomic/MissionAtomic';
 // import ProductScrollAtomic from '../components/atomic/ProductScrollAtomic'; // Removed
@@ -34,10 +34,15 @@ const V6AtomicPage = () => {
     <SceneControllerV6>
       <LayoutWrapper>
         <CosmicBackgroundSystemV6 />
-        <NavBarCosmic />
 
         {/* ATOMIC SCENES START HERE */}
-        <HeroAtomic />
+        <Suspense fallback={
+          <div className="min-h-screen flex items-center justify-center">
+            <div className="text-white/60">Loading Hero...</div>
+          </div>
+        }>
+          <HeroAtomic />
+        </Suspense>
         <MissionAtomic />
         <OurProducts_newV6 />
         <ServicesOrbitalAtomic />

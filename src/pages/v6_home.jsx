@@ -10,7 +10,8 @@
 
 import React, { useEffect, useState, useCallback, useRef, Suspense, lazy } from 'react';
 import LayoutWrapper from '../components/home/v6/LayoutWrapper';
-import NavBarCosmic from '../components/home/v6/NavBarCosmic';
+import MissionControlNavbar from '../components/navigation/MissionControlNavbar';
+// LEGACY: import NavBarCosmic from '../components/home/v6/NavBarCosmic';
 const HeroSequenceV6 = lazy(() => import('../components/home/v6/HeroSequenceV6.jsx'));
 import ServicesOrbital from '../components/home/v6/ServicesOrbital';
 import ProcessCards from '../components/home/v6/ProcessCards';
@@ -129,7 +130,7 @@ const V6HomePage = () => {
         <CosmicBackgroundSystemV6 />
         
         {/* Navigation */}
-        <NavBarCosmic />
+        <MissionControlNavbar />
         
         {/* Render sections based on visibility status */}
         {isSectionVisible('hero') && (

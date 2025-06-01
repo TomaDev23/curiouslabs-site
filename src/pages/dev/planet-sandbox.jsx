@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useMemo, useCallback } from "react";
+import React, { useState, useRef, useEffect, useMemo, useCallback, Suspense, lazy } from "react";
 import { Canvas, useFrame, useThree, useLoader } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import { Helmet } from 'react-helmet-async';
@@ -14,7 +14,10 @@ import SaturnSphere from '../../components/journey/celestial/bodies/SaturnSphere
 import UranusSphere from '../../components/journey/celestial/bodies/UranusSphere';
 import VenusSphere from '../../components/journey/celestial/bodies/VenusSphere';
 import MoonSphere from '../../components/journey/celestial/bodies/MoonSphere';
-import EarthSphere from '../../components/journey/celestial/bodies/EarthSphere';
+// import EarthSphere from '../../components/journey/celestial/bodies/EarthSphere';
+
+// Lazy load EarthSphere for performance optimization
+const EarthSphere = lazy(() => import('../../components/journey/celestial/bodies/EarthSphere'));
 
 // Import HUD component
 import PlanetSelectorHUD from '../../components/hud/PlanetSelectorHUD';
@@ -132,7 +135,14 @@ function SolarSystem({ onPlanetClick }) {
           <sphereGeometry args={[planetScales.earth, 32, 32]} />
           <meshBasicMaterial opacity={0} transparent />
         </mesh>
-        <EarthSphere radius={planetScales.earth} />
+        <React.Suspense fallback={
+          <mesh>
+            <sphereGeometry args={[planetScales.earth, 32, 32]} />
+            <meshStandardMaterial color="#4a90e2" opacity={0.6} transparent />
+          </mesh>
+        }>
+          <EarthSphere radius={planetScales.earth} />
+        </React.Suspense>
       </group>
       
       {/* Moon orbiting Earth */}
@@ -323,7 +333,7 @@ export default function PlanetSandboxPage({ backgroundComponent }) {
   // Planet components mapping with custom rotations
   const planetComponents = {
     sun: <SunSphere position={[0, 0, 0]} radius={7} />,
-    earth: <EarthSphere position={[0, 0, 0]} radius={1.5} />,
+    earth: <EarthSphere radius={1.5} />,
     mars: <MarsSphere position={[0, 0, 0]} radius={0.9} />,
     jupiter: <JupiterSphere position={[0, 0, 0]} radius={3.5} />,
     pluto: <PlutoSphere position={[0, 0, 0]} radius={0.5} />,

@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 
 // Import optimized v4 components
 import SpaceCanvas from '../components/home/v4/SpaceCanvas';
-import NavBarCosmic from '../components/home/v4/NavBarCosmic';
+import MissionControlNavbar from '../components/navigation/MissionControlNavbar';
 import OptimizedHeroPortal from '../components/home/v4/OptimizedHeroPortal';
 import AboutMission from '../components/home/v4/AboutMission';
 import ServicesFloatLayer from '../components/home/ServicesFloatLayer';
@@ -98,7 +98,7 @@ const DevV4CosmicOptimizedPage = () => {
         <div className="relative z-10 min-h-screen">
           {/* Fixed header with component navigation */}
           <header className="fixed top-0 left-0 w-full bg-transparent z-40">
-            <NavBarCosmic />
+            <MissionControlNavbar />
           </header>
           
           {/* Cosmic HUD for position tracking */}

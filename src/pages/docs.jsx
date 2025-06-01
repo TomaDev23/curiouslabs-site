@@ -1,5 +1,5 @@
-import React from 'react';
-import NavBar from '../components/NavBar';
+import React, { useState, useEffect } from 'react';
+import MissionControlNavbar from '../components/navigation/MissionControlNavbar';
 import Footer from '../components/Footer_legacy';
 import { Link } from 'react-router-dom';
 import { IMAGES } from '../utils/assets';
@@ -7,7 +7,7 @@ import { IMAGES } from '../utils/assets';
 export default function Documentation() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#1A1A2E] via-[#272750] to-[#1A1A2E]">
-      <NavBar />
+      <MissionControlNavbar />
       
       <main className="pt-24 pb-16">
         <section className="max-w-7xl mx-auto px-4 py-16">

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import NavBar from '../components/NavBar';
+import MissionControlNavbar from '../components/navigation/MissionControlNavbar';
+// LEGACY: import NavBar from '../components/NavBar';
 import UniverseScrollReveal from '../components/UniverseScrollReveal';
 
 export default function UniverseExperience() {
@@ -22,7 +23,7 @@ export default function UniverseExperience() {
   return (
     <div className="min-h-screen bg-black text-white overflow-hidden">
       <header className="fixed top-0 left-0 right-0 z-50 bg-transparent">
-        <NavBar transparent={true} />
+        <MissionControlNavbar transparent={true} />
       </header>
       
       <main className="relative">

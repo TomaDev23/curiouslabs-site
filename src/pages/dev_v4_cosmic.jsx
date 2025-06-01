@@ -1,9 +1,10 @@
 import React, { Suspense, lazy, useEffect } from 'react';
 import { motion } from 'framer-motion';
 
-// Remove SpaceCanvas import since it's handled by BackgroundManager
-// Always import NavBar eagerly for navigation
-import NavBar from '../components/NavBar';
+// UPDATED: Using new MissionControlNavbar instead of legacy NavBar
+import MissionControlNavbar from '../components/navigation/MissionControlNavbar';
+// LEGACY: import NavBar from '../components/NavBar';
+
 // Eagerly load HeroPortal for immediate visible content
 import HeroPortal from '../components/home/v4/HeroPortal';
 // Eagerly load UI components essential for layout
@@ -111,7 +112,7 @@ const DevV4CosmicPage = () => {
       
       <div className="relative z-10 min-h-screen">
         {/* Fixed header with site-wide navigation */}
-        <NavBar />
+        <MissionControlNavbar />
         
         {/* Cosmic HUD for position tracking */}
         <CosmicHUD position="bottom-left" />
