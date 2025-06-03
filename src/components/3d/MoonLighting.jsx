@@ -11,114 +11,131 @@ import { useFrame } from '@react-three/fiber';
 import { useMoonLighting } from '../../utils/useMoonLighting';
 import * as THREE from 'three';
 
-// Eclipse shadow mask material - UPGRADED with dramatic corona effect
-const EclipseShadowMask = ({ position, intensity, coronaGlow, exitingPhase }) => {
-  const CORONA_SCALE = 1.03; // Slightly larger than moon radius
+// Eclipse nebula background - Simple and beautiful orange nebula effect
+const EclipseNebula = ({ intensity, coronaGlow }) => {
+  const nebulaRef = useRef();
   
+  useFrame((state) => {
+    if (nebulaRef.current) {
+      // Gentle rotation and pulsing effect
+      nebulaRef.current.rotation.z = state.clock.elapsedTime * 0.02;
+      const pulse = 0.7 + 0.3 * Math.sin(state.clock.elapsedTime * 0.8);
+      nebulaRef.current.material.opacity = intensity * pulse * 0.6;
+    }
+  });
+
   return (
     <group>
-      {/* Main eclipse shadow - less dark */}
-      <mesh position={position}>
-        <planeGeometry args={[20, 20]} />
-        <meshBasicMaterial 
+      {/* Main orange nebula background */}
+      <mesh ref={nebulaRef} position={[0, 0, -30]}>
+        <planeGeometry args={[80, 80]} />
+        <meshBasicMaterial
           transparent={true}
-          opacity={intensity}
-          color="#000000"
+          opacity={intensity * 0.4}
           side={THREE.DoubleSide}
-          blending={THREE.MultiplyBlending}
-        />
+          depthWrite={false}
+        >
+          <primitive 
+            object={(() => {
+              const canvas = document.createElement('canvas');
+              canvas.width = 512;
+              canvas.height = 512;
+              const ctx = canvas.getContext('2d');
+              
+              // Create radial gradient for nebula effect
+              const gradient = ctx.createRadialGradient(256, 256, 0, 256, 256, 256);
+              gradient.addColorStop(0, 'rgba(255, 140, 0, 0.8)');    // Bright orange center
+              gradient.addColorStop(0.3, 'rgba(255, 100, 20, 0.6)'); // Orange-red
+              gradient.addColorStop(0.6, 'rgba(200, 60, 10, 0.3)');  // Darker orange
+              gradient.addColorStop(0.8, 'rgba(100, 30, 5, 0.1)');   // Very dark orange
+              gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');          // Transparent edge
+              
+              ctx.fillStyle = gradient;
+              ctx.fillRect(0, 0, 512, 512);
+              
+              // Add some nebula texture with noise
+              for (let i = 0; i < 200; i++) {
+                const x = Math.random() * 512;
+                const y = Math.random() * 512;
+                const size = Math.random() * 3 + 1;
+                const alpha = Math.random() * 0.3;
+                
+                ctx.fillStyle = `rgba(255, ${120 + Math.random() * 60}, ${Math.random() * 40}, ${alpha})`;
+                ctx.beginPath();
+                ctx.arc(x, y, size, 0, Math.PI * 2);
+                ctx.fill();
+              }
+              
+              const texture = new THREE.CanvasTexture(canvas);
+              texture.needsUpdate = true;
+              return texture;
+            })()}
+            attach="map"
+          />
+        </meshBasicMaterial>
       </mesh>
       
-      {/* NEW: Dramatic Corona Glow Shell - Primary Effect */}
-      <mesh position={[0, 0, 0]}>
-        <sphereGeometry args={[4.18 * CORONA_SCALE, 64, 64]} />
-        <meshBasicMaterial 
-          color="#ffaa44"
+      {/* Secondary nebula layer for depth */}
+      <mesh position={[0, 0, -25]} rotation={[0, 0, Math.PI / 4]}>
+        <planeGeometry args={[60, 60]} />
+        <meshBasicMaterial
           transparent={true}
-          opacity={coronaGlow * 0.35}
-          side={THREE.BackSide}
+          opacity={intensity * 0.2}
+          color="#ff6600"
+          side={THREE.DoubleSide}
+          depthWrite={false}
           blending={THREE.AdditiveBlending}
-        />
+        >
+          <primitive 
+            object={(() => {
+              const canvas = document.createElement('canvas');
+              canvas.width = 256;
+              canvas.height = 256;
+              const ctx = canvas.getContext('2d');
+              
+              // Create a softer, more diffuse gradient
+              const gradient = ctx.createRadialGradient(128, 128, 0, 128, 128, 128);
+              gradient.addColorStop(0, 'rgba(255, 120, 40, 0.4)');
+              gradient.addColorStop(0.5, 'rgba(255, 80, 20, 0.2)');
+              gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+              
+              ctx.fillStyle = gradient;
+              ctx.fillRect(0, 0, 256, 256);
+              
+              const texture = new THREE.CanvasTexture(canvas);
+              texture.needsUpdate = true;
+              return texture;
+            })()}
+            attach="map"
+          />
+        </meshBasicMaterial>
       </mesh>
       
-      {/* NEW: Inner Corona Brightness Ring */}
+      {/* Atmospheric glow around moon */}
       <mesh position={[0, 0, 0]}>
-        <sphereGeometry args={[4.15 * CORONA_SCALE, 32, 32]} />
-        <meshBasicMaterial 
-          color="#ffffff"
-          transparent={true}
-          opacity={coronaGlow * 0.25}
-          side={THREE.BackSide}
-          blending={THREE.AdditiveBlending}
-        />
-      </mesh>
-      
-      {/* NEW: Outer Atmospheric Glow */}
-      <mesh position={[0, 0, 0]}>
-        <sphereGeometry args={[4.25 * CORONA_SCALE, 32, 32]} />
-        <meshBasicMaterial 
-          color="#ffcc88"
+        <sphereGeometry args={[5.5, 32, 32]} />
+        <meshBasicMaterial
+          color="#ff8800"
           transparent={true}
           opacity={coronaGlow * 0.15}
           side={THREE.BackSide}
           blending={THREE.AdditiveBlending}
+          depthWrite={false}
         />
       </mesh>
       
-      {/* Corona effect for exiting eclipse */}
-      {exitingPhase && (
-        <>
-          {/* Corona glow ring - Enhanced */}
-          <mesh position={[position[0], position[1], position[2] + 1]}>
-            <ringGeometry args={[4.2, 6.5, 32]} />
-            <meshBasicMaterial 
-              transparent={true}
-              opacity={coronaGlow * 0.8}
-              color="#ffffff"
-              side={THREE.DoubleSide}
-              blending={THREE.AdditiveBlending}
-            />
-          </mesh>
-          
-          {/* Inner corona brightness - Enhanced */}
-          <mesh position={[position[0], position[1], position[2] + 0.5]}>
-            <ringGeometry args={[4.0, 4.8, 32]} />
-            <meshBasicMaterial 
-              transparent={true}
-              opacity={coronaGlow * 0.9}
-              color="#ffffcc"
-              side={THREE.DoubleSide}
-              blending={THREE.AdditiveBlending}
-            />
-          </mesh>
-          
-          {/* NEW: Radial Flare Bursts */}
-          <pointLight
-            position={[position[0] + 3, position[1], position[2] + 2]}
-            intensity={coronaGlow * 0.6}
-            color="#ffaa44"
-            distance={30}
-            decay={1.2}
-          />
-          
-          <pointLight
-            position={[position[0] - 2, position[1] + 3, position[2] + 1]}
-            intensity={coronaGlow * 0.5}
-            color="#ffcc88"
-            distance={25}
-            decay={1.5}
-          />
-          
-          {/* NEW: Solar Flare Effect */}
-          <pointLight
-            position={[position[0], position[1] + 2, position[2] - 10]}
-            intensity={coronaGlow * 0.8}
-            color="#ffffff"
-            distance={40}
-            decay={1.0}
-          />
-        </>
-      )}
+      {/* Inner atmospheric ring */}
+      <mesh position={[0, 0, 0]}>
+        <sphereGeometry args={[4.8, 32, 32]} />
+        <meshBasicMaterial
+          color="#ffaa44"
+          transparent={true}
+          opacity={coronaGlow * 0.25}
+          side={THREE.BackSide}
+          blending={THREE.AdditiveBlending}
+          depthWrite={false}
+        />
+      </mesh>
     </group>
   );
 };
@@ -601,97 +618,64 @@ const MoonLighting = ({ debugPhase = null, anomalyMode = null }) => {
         />
       </group>
       
-      {/* ANOMALY: UPGRADED Eclipse with dramatic corona effect */}
+      {/* ANOMALY: Eclipse with dramatic orange backlight */}
       {activeAnomalyMode === 'eclipse' && anomalyConfig && (
         <>
-          <EclipseShadowMask 
-            position={anomalyConfig.shadowPosition}
-            intensity={anomalyConfig.shadowIntensity}
-            coronaGlow={anomalyConfig.coronaGlow}
-            exitingPhase={anomalyConfig.exitingPhase}
+          {/* Powerful central backlight - much stronger */}
+          <pointLight
+            position={[0, 0, -60]}
+            intensity={3.2}
+            color="#ff3000"
+            distance={320}
+            decay={1.4}
           />
           
-          {/* NEW: Primary Corona Atmospheric Lighting */}
+          {/* Wide secondary backlight for glow spread */}
           <pointLight
-            position={[0, 0, -25]}
-            intensity={anomalyConfig.rimGlow * 1.2}
-            color="#ffaa44"
-            distance={100}
-            decay={1.8}
-          />
-          
-          {/* NEW: Secondary Corona Ring Light */}
-          <pointLight
-            position={[0, 0, 30]}
-            intensity={anomalyConfig.coronaGlow * 0.8}
-            color="#ffffff"
-            distance={150}
-            decay={2.2}
-          />
-          
-          {/* NEW: Atmospheric Scattering - Multiple Layers */}
-          <pointLight
-            position={[15, 0, 0]}
-            intensity={anomalyConfig.coronaGlow * 0.4}
-            color="#ffcc88"
-            distance={80}
+            position={[0, 0, -45]}
+            intensity={2.5}
+            color="#ff5500" 
+            distance={280}
             decay={1.5}
           />
           
-          <pointLight
-            position={[-15, 0, 0]}
-            intensity={anomalyConfig.coronaGlow * 0.4}
-            color="#ffcc88"
-            distance={80}
-            decay={1.5}
-          />
-          
-          <pointLight
-            position={[0, 15, 0]}
-            intensity={anomalyConfig.coronaGlow * 0.3}
-            color="#ffaa44"
-            distance={70}
-            decay={1.3}
-          />
-          
-          <pointLight
-            position={[0, -15, 0]}
-            intensity={anomalyConfig.coronaGlow * 0.3}
-            color="#ffaa44"
-            distance={70}
-            decay={1.3}
-          />
-          
-          {/* NEW: Radial Flare Lighting System */}
-          <pointLight
-            position={[10, 10, -15]}
-            intensity={anomalyConfig.rimGlow * 0.6}
-            color="#ffffff"
-            distance={60}
-            decay={1.0}
-          />
-          
-          <pointLight
-            position={[-10, -10, -15]}
-            intensity={anomalyConfig.rimGlow * 0.6}
-            color="#ffffff"
-            distance={60}
-            decay={1.0}
-          />
-          
-          {/* NEW: Mystical Ambient Eclipse Glow */}
+          {/* Rich atmospheric orange glow */}
           <ambientLight 
-            intensity={0.05} 
-            color="#ffaa44"
+            intensity={0.35} 
+            color="#661500" 
           />
           
-          {/* Enhanced original corona rim lighting */}
+          {/* Strong rim light for defined edge highlight */}
           <pointLight
-            position={[0, 0, -20]}
-            intensity={anomalyConfig.rimGlow}
-            color={anomalyConfig.color}
-            distance={80}
-            decay={1.5}
+            position={[0, 0, -18]}
+            intensity={1.2}
+            color="#ff7830"
+            distance={120}
+            decay={1.2}
+          />
+          
+          {/* Asymmetric highlights for natural effect */}
+          <pointLight
+            position={[40, -20, -20]}
+            intensity={0.8}
+            color="#ff8030"
+            distance={100}
+            decay={1.6}
+          />
+          
+          <pointLight
+            position={[-35, 25, -25]}
+            intensity={0.7}
+            color="#ff7020"
+            distance={110}
+            decay={1.7}
+          />
+          
+          {/* Additional ambient fill for more glow */}
+          <hemisphereLight
+            intensity={0.3}
+            color="#ff6030"
+            groundColor="#221000"
           />
         </>
       )}

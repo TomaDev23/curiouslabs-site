@@ -61,6 +61,8 @@ const MoonScene = ({ debugPhase, anomalyMode }) => {
   
   // Check if supermoon mode is active for enhanced material
   const isSupermoon = anomalyMode === 'supermoon';
+  // Check if eclipse mode is active
+  const isEclipse = anomalyMode === 'eclipse';
   
   return (
     <>
@@ -77,21 +79,24 @@ const MoonScene = ({ debugPhase, anomalyMode }) => {
         />
       </Sphere>
       
-      {/* Clean moon sphere with soft surface - Using icosahedron geometry to prevent pole stretching */}
-      <mesh ref={moonRef} receiveShadow castShadow>
+      {/* Clean moon sphere with conditional surface rendering */}
+      <mesh ref={moonRef} receiveShadow={!isEclipse} castShadow={!isEclipse}>
         <icosahedronGeometry args={[4.16, 8]} /> {/* Better texture distribution than sphere */}
         <meshStandardMaterial 
-          map={moonTexture}
-          bumpMap={moonBumpMap}
-          bumpScale={0.015}
-          color={isSupermoon ? "#f8e0b0" : "#f5f5f5"}
-          metalness={isSupermoon ? 0.15 : 0.1}
-          roughness={isSupermoon ? 0.65 : 0.7}
-          emissive={isSupermoon ? "#ffd280" : "#f4f1e0"}
-          emissiveIntensity={isSupermoon ? 0.12 : 0.04}
+          map={moonTexture} // Always keep texture map loaded
+          bumpMap={moonBumpMap} // Always keep bump map loaded
+          bumpScale={isEclipse ? 0 : 0.015}
+          color={isEclipse ? "#1a0806" : (isSupermoon ? "#f8e0b0" : "#f5f5f5")} // Very dark reddish-brown for eclipse
+          metalness={isEclipse ? 0.05 : (isSupermoon ? 0.15 : 0.1)}
+          roughness={isEclipse ? 1.0 : (isSupermoon ? 0.65 : 0.7)}
+          emissive={isEclipse ? "#3f1306" : (isSupermoon ? "#ffd280" : "#f4f1e0")} // Deep reddish emissive for eclipse
+          emissiveIntensity={isEclipse ? 0.08 : (isSupermoon ? 0.12 : 0.04)}
           // Additional material properties to prevent texture stretching
           flatShading={false}
           dithering={true}
+          transparent={false} // Keep moon solid for nice silhouette
+          opacity={isEclipse ? 0.95 : 1.0} // Slightly transparent in eclipse for better nebula blend
+          depthWrite={true}
         />
       </mesh>
       
@@ -133,7 +138,8 @@ const MoonSphere = ({
   fallbackToEclipse = false, 
   showDebugHUD = true,
   debugPhase = null, // Phase override
-  anomalyMode = null // Visual anomaly mode
+  anomalyMode = null, // Visual anomaly mode
+  isEclipse = false // Added isEclipse prop
 }) => {
   // WebGL detection happens inside the component
   const [supportsWebGL, setSupportsWebGL] = React.useState(true);
@@ -494,7 +500,7 @@ const MoonSphere = ({
         <React.Suspense fallback={null}>
           <TexturePreloader />
           <CameraUpdater fov={cameraFOV} />
-          <MoonScene debugPhase={activeDebugPhase} anomalyMode={anomalyMode} />
+          <MoonScene debugPhase={activeDebugPhase} anomalyMode={anomalyMode} isEclipse={isEclipse} />
         </React.Suspense>
       </Canvas>
     </div>

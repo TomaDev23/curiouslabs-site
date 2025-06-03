@@ -115,14 +115,21 @@ const ANOMALY_CONFIGS = {
     zoomEasing: 'easeOutCubic'   // Smooth easing for zoom animation
   },
   
-  // Eclipse - UPGRADED: Beginning of exiting eclipse with corona effect
+  // Eclipse - UPGRADED: Orange nebula background with moon silhouette
   eclipse: {
     shadowPosition: [0, 0, 15],  // Shadow cast from front
-    shadowIntensity: 0.65,       // REDUCED: Less dark (was 0.85)
-    rimGlow: 0.8,                // INCREASED: Stronger edge highlight (was 0.4)
-    coronaGlow: 0.6,             // NEW: Corona effect around eclipse
-    exitingPhase: true,          // NEW: Show beginning of eclipse exit
-    color: '#ff6030'             // Reddish tint during eclipse
+    shadowIntensity: 0.8,        // Higher intensity for nebula visibility
+    rimGlow: 1.5,                // Strong rim highlight
+    coronaGlow: 1.0,             // Good corona effect for atmospheric glow
+    exitingPhase: true,          // Show nebula effect
+    color: '#ff4500',            // Orange eclipse color
+    // Enhanced eclipse properties for nebula effect
+    mainIntensity: 0.2,          // Low main lighting for silhouette
+    ambientIntensity: 0.05,      // Slightly more ambient for nebula
+    coronaColor: '#ff8800',      // Orange corona color
+    coronaOpacity: 0.8,          // Strong corona visibility
+    atmosphericBoost: 2.5,       // Strong atmospheric effect
+    mysticalGlow: true           // Enable mystical ambient effects
   },
   
   // Sci-Fi Mode - Stylized effect
@@ -289,6 +296,10 @@ export const useMoonLighting = (debugPhase = null, anomalyMode = null) => {
           else if (activeAnomalyMode === 'scifi') {
             // Sci-fi mode is primarily handled in the rendering component
           }
+        } else {
+          // Ensure anomaly properties are cleared when no anomaly is active
+          newLightingData.anomalyMode = null;
+          newLightingData.anomalyConfig = null;
         }
 
         // Check if this is a significant change that needs smooth transition
@@ -366,8 +377,8 @@ export const useMoonLighting = (debugPhase = null, anomalyMode = null) => {
     // Base color from phase
     const baseColor = ATMOSPHERIC_COLORS[lightingData.phaseConfig] || '#ffffff';
     
-    // Modify color if anomaly is active
-    if (lightingData.anomalyMode && lightingData.anomalyConfig) {
+    // Only modify color if anomaly is CURRENTLY active
+    if (lightingData.anomalyMode && lightingData.anomalyConfig && activeAnomalyMode) {
       const anomalyColor = lightingData.anomalyConfig.color;
       
       if (lightingData.anomalyMode === 'eclipse') {
@@ -390,6 +401,7 @@ export const useMoonLighting = (debugPhase = null, anomalyMode = null) => {
       }
     }
     
+    // Always return base color when no anomaly is active
     return baseColor;
   };
 
@@ -397,8 +409,8 @@ export const useMoonLighting = (debugPhase = null, anomalyMode = null) => {
   const getMoonPhaseDescription = () => {
     let description = lightingData.description || 'Unknown';
     
-    // Add anomaly suffix if active
-    if (lightingData.anomalyMode) {
+    // Add anomaly suffix only if CURRENTLY active
+    if (lightingData.anomalyMode && activeAnomalyMode) {
       const anomalySuffix = lightingData.anomalyMode.charAt(0).toUpperCase() + 
                           lightingData.anomalyMode.slice(1);
       description = `${description} (${anomalySuffix})`;
