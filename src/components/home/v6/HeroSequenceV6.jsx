@@ -27,21 +27,22 @@ const HeroSequenceV6 = () => {
   const { setPhase } = useScene();
   const [hasTriggered, setHasTriggered] = useState(false);
 
-  const blockScroll = () => {
-    document.body.style.overflow = 'hidden';
-  };
+  // REMOVED SCROLL BLOCKING CODE - was causing scroll interference
+  // const blockScroll = () => {
+  //   document.body.style.overflow = 'hidden';
+  // };
 
-  const allowScroll = () => {
-    document.body.style.overflow = '';
-  };
+  // const allowScroll = () => {
+  //   document.body.style.overflow = '';
+  // };
 
-  // Lock scroll initially
-  useEffect(() => {
-    blockScroll();
-    // Allow scroll immediately since we're in forced complete state
-    setTimeout(() => allowScroll(), 100);
-    return () => allowScroll();
-  }, []);
+  // REMOVED SCROLL LOCK - was preventing natural scrolling
+  // useEffect(() => {
+  //   blockScroll();
+  //   // Allow scroll immediately since we're in forced complete state
+  //   setTimeout(() => allowScroll(), 100);
+  //   return () => allowScroll();
+  // }, []);
 
   // ANIMATIONS DISABLED FOR TESTING
   // useEffect(() => {

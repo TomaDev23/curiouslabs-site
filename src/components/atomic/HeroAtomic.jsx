@@ -83,16 +83,16 @@ const HeroAtomic = () => {
             >
               <h1 
                 className="font-space text-2xl md:text-3xl font-semibold text-white leading-tight tracking-tight whitespace-nowrap transition-all duration-300 group-hover:text-shadow-lg"
-                role="heading"
-                aria-level={1}
-              >
+              role="heading"
+              aria-level={1}
+            >
                 We bring you a <span className="bg-gradient-to-r from-lime-400 to-emerald-500 bg-clip-text text-transparent drop-shadow-[0_0_8px_rgba(132,204,22,0.6)] group-hover:drop-shadow-[0_0_12px_rgba(132,204,22,0.8)] transition-all duration-300">universe</span> of solutions
                 <span className={`inline-block ml-2 transition-transform duration-300 ${isHeaderExpanded ? 'rotate-180' : 'rotate-0'}`}>
                   <svg className="w-5 h-5 text-lime-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                   </svg>
                 </span>
-              </h1>
+            </h1>
               
               {/* Animated underline */}
               <div className="h-0.5 bg-gradient-to-r from-lime-400/0 via-lime-400/60 to-lime-400/0 scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left mt-2"></div>
@@ -187,7 +187,7 @@ const HeroAtomic = () => {
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-6 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                  </button>
+              </button>
                 </div>
               </div>
             </div>

@@ -48,9 +48,16 @@ const preloadImages = () => {
 const V6HomePage = () => {
   const { markMissionComplete, markTaskComplete } = useMission();
   const [scrollProgress, setScrollProgress] = useState(0);
+  const [smoothScrollProgress, setSmoothScrollProgress] = useState(0);
   const [hiddenSections, setHiddenSections] = useState([]);
   const [milkywayLoaded, setMilkywayLoaded] = useState(false);
+  
+  // Refs for smooth scroll implementation (LEGIT contract compliant)
+  const targetScrollProgressRef = useRef(0);
+  const smoothScrollProgressRef = useRef(0);
+  const animationRef = useRef(null);
   const rafRef = useRef(null);
+  const smallMovementAccumulator = useRef(0);
   
   // Preload critical images
   useEffect(() => {
@@ -62,32 +69,129 @@ const V6HomePage = () => {
     preloadImages();
   }, []);
   
-  // Effect to track scroll progress
+  // LEGIT Contract Compliant Smooth Scroll Implementation
   useEffect(() => {
-    const updateScrollProgress = () => {
+    let animationFrameId = null;
+    let pendingUpdate = false;
+    let isScrolling = false;
+    let scrollTimeout = null;
+    
+    // Ultra-smooth Scroll Interpolation Settings
+    const interpolationFactor = 0.04; // Much lower for ultra-smooth deceleration
+    const animationStopThreshold = 0.0000001; // Ultra-sensitive threshold
+    const wheelSensitivity = 0.3; // Reduce wheel sensitivity for smaller increments
+    const maxScrollDelta = 15; // Maximum pixels per scroll event
+    
+    // Animation loop for smooth interpolation - Ultra-smooth "Boat in Water" effect
+    const animateScroll = () => {
+      const diff = targetScrollProgressRef.current - smoothScrollProgressRef.current;
+      
+      if (Math.abs(diff) > animationStopThreshold) {
+        smoothScrollProgressRef.current += diff * interpolationFactor;
+        setSmoothScrollProgress(smoothScrollProgressRef.current);
+        setScrollProgress(smoothScrollProgressRef.current);
+        
+        // Continue the animation loop
+        animationRef.current = requestAnimationFrame(animateScroll);
+      } else {
+        // Snap to target and stop
+        smoothScrollProgressRef.current = targetScrollProgressRef.current;
+        setSmoothScrollProgress(smoothScrollProgressRef.current);
+        setScrollProgress(smoothScrollProgressRef.current);
+        animationRef.current = null;
+        isScrolling = false;
+      }
+    };
+    
+    // Aggressive wheel event handling to control scroll increments
+    const handleWheel = (e) => {
+      e.preventDefault(); // Prevent default browser scrolling
+      
+      // Clear any existing scroll timeout
+      if (scrollTimeout) {
+        clearTimeout(scrollTimeout);
+      }
+      
+      // Calculate smooth scroll delta with reduced sensitivity
+      let deltaY = e.deltaY * wheelSensitivity;
+      
+      // Clamp the delta to prevent large jumps
+      deltaY = Math.max(-maxScrollDelta, Math.min(maxScrollDelta, deltaY));
+      
+      // Apply the smooth scroll increment
+      const currentScrollY = window.scrollY;
+      const newScrollY = Math.max(0, currentScrollY + deltaY);
+      
+      // Smooth scroll to the new position
+      window.scrollTo({
+        top: newScrollY,
+        behavior: 'auto' // Use auto to prevent browser smooth scrolling interference
+      });
+      
+      isScrolling = true;
+      
+      // Set timeout to detect end of scrolling
+      scrollTimeout = setTimeout(() => {
+        isScrolling = false;
+      }, 150);
+    };
+    
+    // Handle scroll events (now triggered by our custom wheel handler)
+    const handleScroll = () => {
+      if (!pendingUpdate) {
+        pendingUpdate = true;
+        
+        animationFrameId = requestAnimationFrame(() => {
+          const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
+          if (scrollHeight <= 0) {
+            pendingUpdate = false;
+            return;
+          }
+          
+          const rawProgress = Math.max(0, Math.min(1, window.scrollY / scrollHeight));
+          targetScrollProgressRef.current = rawProgress;
+          
+          // Start smooth animation
+          if (!animationRef.current) {
+            animationRef.current = requestAnimationFrame(animateScroll);
+          }
+          
+          pendingUpdate = false;
+        });
+      }
+    };
+    
+    // Initial setup
+    const setInitialScroll = () => {
       const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
       if (scrollHeight <= 0) return;
       
-      const scrollY = window.scrollY;
-      const progress = Math.max(0, Math.min(1, scrollY / scrollHeight));
-      
-      setScrollProgress(progress);
+      const initialProgress = Math.max(0, Math.min(1, window.scrollY / scrollHeight));
+      targetScrollProgressRef.current = initialProgress;
+      smoothScrollProgressRef.current = initialProgress;
+      setSmoothScrollProgress(initialProgress);
+      setScrollProgress(initialProgress);
     };
     
-    const handleScroll = () => {
-      if (rafRef.current) {
-        cancelAnimationFrame(rafRef.current);
-      }
-      rafRef.current = requestAnimationFrame(updateScrollProgress);
-    };
-    
+    // Setup event listeners with wheel interception
     window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll(); // Initial call
+    window.addEventListener('wheel', handleWheel, { passive: false }); // Non-passive to prevent default
     
+    // Initialize
+    setInitialScroll();
+    
+    // Cleanup
     return () => {
       window.removeEventListener('scroll', handleScroll);
-      if (rafRef.current) {
-        cancelAnimationFrame(rafRef.current);
+      window.removeEventListener('wheel', handleWheel);
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+      }
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+      }
+      if (scrollTimeout) {
+        clearTimeout(scrollTimeout);
       }
     };
   }, []);
