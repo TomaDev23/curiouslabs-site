@@ -23,8 +23,18 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './src')
+      '@': path.resolve(__dirname, './src'),
+      // Provide fallbacks for missing Three.js modules
+      'three/webgpu': path.resolve(__dirname, 'src/utils/three-webgpu-fallback.js'),
+      'three/tsl': path.resolve(__dirname, 'src/utils/three-tsl-fallback.js')
     }
+  },
+  define: {
+    global: 'globalThis',
+  },
+  optimizeDeps: {
+    exclude: ['three/webgpu', 'three/tsl'],
+    include: ['three', 'three-globe']
   },
   server: {
     open: true,
@@ -56,6 +66,7 @@ export default defineConfig({
         manualChunks: {
           // Force Three.js and related libraries into separate chunks
           'three-core': ['three'],
+          'three-globe': ['three-globe'],
           'react-three-fiber': ['@react-three/fiber'],
           'react-three-drei': ['@react-three/drei'],
           // Group other large dependencies
