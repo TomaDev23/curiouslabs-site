@@ -1,1 +1,5 @@
- 
+<!-- stars-bg.png: Generated for CuriousLabs Vite build, cosmic starry background -->
+<!-- This is a placeholder file. The actual PNG should be generated from stars-bg.svg -->
+<!-- Recommended dimensions: 2048x2048px on dark slate (#0f172a) background -->
+<!-- Should include: white and cyan stars, lime and magenta nebula clouds -->
+<!-- For production: Convert stars-bg.svg to PNG using an SVG renderer --> 
