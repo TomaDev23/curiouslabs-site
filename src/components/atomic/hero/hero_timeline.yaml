@@ -1,0 +1,97 @@
+# hero_timeline.yaml
+hero_scene:
+  name: Arrival of the Core
+  trigger: Scroll-based
+  layers:
+    - id: background_base
+      z_index: 0
+      component: BackgroundLayerAtomic
+      animations:
+        - phase: 1
+          action: Show faint gradient and grid (opacity: 0.3)
+        - phase: 5
+          action: Pulse grid (opacity: 0.3 -> 0.5 -> 0.3)
+    - id: starfield
+      z_index: 2
+      component: BackgroundLayerAtomic
+      animations:
+        - phase: 2
+          action: Fade in stars (opacity: 0.1 -> 0.7)
+          condition: performanceTier !== minimal && !prefersReducedMotion
+    - id: planet
+      z_index: 2
+      component: HeroVisualPlanet
+      animations:
+        - phase: 1
+          action: Appear top-right (80vw, -20vh, scale: 0.4, opacity: 0 -> 1)
+        - phase: 2
+          action: Drift to center (50vw, 50vh, scale: 0.7 -> 1.0), start rotation
+        - phase: 4
+          action: Lock center, continue idle rotation
+    - id: spotlight
+      z_index: 3
+      component: BackgroundLayerAtomic
+      animations:
+        - phase: 3
+          action: Radial gradient (top-left 45°, white 0.8 -> transparent)
+    - id: nebula_layers
+      z_index: [1, 4, 5, 6, 7, 10]
+      component: BackgroundLayerAtomic
+      animations:
+        - phase: 5
+          action: Fade in nebula and left-half brightening (opacity: 0.2 -> 0.6)
+    - id: orbit_rings
+      z_index: 4
+      component: HeroVisualPlanet
+      animations:
+        - phase: 7
+          action: Scale/rotate in rings (2D: SVG borders, 3D: Three.js wireframes)
+    - id: text_elements
+      z_index: 5
+      component: HeroTextSequence
+      animations:
+        - phase: 6
+          action: Type headline bottom-left (character-by-character, 0.5s)
+        - phase: 8
+          action: Fade paragraph, slide CTA
+    - id: scroll_cue
+      z_index: 6
+      component: ScrollCue
+      animations:
+        - phase: 8
+          action: Pulse loop (opacity: 0.5 -> 1 -> 0.5, bottom-center)
+  controller:
+    name: HeroStageManager
+    type: Scroll-based
+    steps:
+      - step: 1
+        scroll: 0%
+        action: Planet enters top-right
+      - step: 2
+        scroll: 10%
+        action: Planet drifts to center
+      - step: 3
+        scroll: 20%
+        action: Spotlight hits
+      - step: 4
+        scroll: 30%
+        action: Planet locks center
+      - step: 5
+        scroll: 40%
+        action: Nebula and grid activate
+      - step: 6
+        scroll: 50%
+        action: Headline types
+      - step: 7
+        scroll: 60%
+        action: Orbit rings form
+      - step: 8
+        scroll: 70%
+        action: Paragraph, CTA, scroll cue
+    conditions:
+      - prefersReducedMotion: Jump to step 8
+      - performanceTier:
+          high: Full 3D + all effects
+          medium: 3D + reduced effects
+          low: 2D + minimal effects
+          minimal: Static 2D
