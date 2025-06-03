@@ -165,14 +165,14 @@ export default function Aegis() {
               <div className="h-px w-12 bg-gradient-to-r from-transparent to-yellow-400"></div>
               <span className="text-yellow-400 font-mono text-sm tracking-wider">AEG-CORE-001</span>
               <div className="h-px w-12 bg-gradient-to-l from-transparent to-yellow-400"></div>
-            </div>
-            
+          </div>
+          
             <h1 className="text-5xl sm:text-6xl md:text-7xl font-bold text-white mb-6">
               <span className="bg-gradient-to-r from-yellow-400 via-orange-400 to-yellow-500 text-transparent bg-clip-text">
                 AEGIS
               </span>
-            </h1>
-            
+          </h1>
+          
             <div className="text-xl sm:text-2xl text-yellow-400 font-mono mb-4 tracking-wide">
               COMMAND CENTER
             </div>
@@ -233,7 +233,7 @@ export default function Aegis() {
                   <div className="w-1 h-1 bg-lime-400 rounded-full animate-pulse"></div>
                   <span className="text-lime-400 text-xs font-mono">{item.status}</span>
                 </div>
-              </div>
+          </div>
             ))}
           </motion.div>
         </section>
@@ -347,7 +347,7 @@ export default function Aegis() {
                       <div key={index} className="flex items-center gap-1">
                         <div className="w-2 h-2 bg-lime-400 rounded-full animate-pulse"></div>
                         <span className="text-lime-400 text-xs font-mono">{status}</span>
-                      </div>
+            </div>
                     ))}
                   </div>
                 </div>
@@ -459,7 +459,7 @@ export default function Aegis() {
                     <div className="h-full bg-gradient-to-r from-yellow-400 to-orange-400 rounded-full animate-pulse"></div>
                   </div>
                   <span className="text-yellow-400 text-xs font-mono">READY</span>
-                </div>
+              </div>
               </motion.div>
             ))}
           </div>
@@ -580,7 +580,7 @@ export default function Aegis() {
                   <span className="text-yellow-400 font-mono text-sm tracking-wider">PROTOCOL STANDARD</span>
                   <div className="h-px w-12 bg-gradient-to-l from-transparent to-yellow-400"></div>
                 </div>
-                
+
                 <h2 className="text-3xl sm:text-4xl font-bold text-yellow-400 mb-6">
                   Built LEGIT from the Ground Up
                   <div className="h-1 w-24 bg-gradient-to-r from-yellow-400 to-orange-400 mx-auto mt-3 rounded-full" />
@@ -589,7 +589,7 @@ export default function Aegis() {
                 <p className="text-gray-300 text-lg max-w-3xl mx-auto">
                   Every decision in Aegis follows the <span className="font-bold text-yellow-300">LEGIT</span> standard — our internal protocol for secure, testable, and audit-compliant AI runtimes.
                 </p>
-              </div>
+                </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 mb-12">
                 {[
@@ -642,7 +642,7 @@ export default function Aegis() {
                       <span className="text-yellow-400 font-bold text-lg">{item.letter} – {item.title}:</span>
                       <br />
                       <span className="text-gray-300 leading-relaxed">{item.desc}</span>
-                    </li>
+                  </li>
                   ))}
                 </ul>
               </motion.div>
@@ -709,7 +709,7 @@ export default function Aegis() {
                   <span className="text-yellow-400 font-mono text-xs">
                     CLASSIFICATION: {useCase.classification}
                   </span>
-                </div>
+              </div>
               </motion.div>
             ))}
           </div>
@@ -753,7 +753,7 @@ export default function Aegis() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                     </svg>
                   </span>
-                </Link>
+              </Link>
                 <Link 
                   to="/docs" 
                   className="group bg-black/40 backdrop-blur-md border border-yellow-500/50 text-white hover:bg-yellow-500/10 hover:border-yellow-400 font-medium py-4 px-8 rounded-lg transition-all duration-300"
@@ -764,9 +764,9 @@ export default function Aegis() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                     </svg>
                   </span>
-                </Link>
-              </div>
+              </Link>
             </div>
+          </div>
           </motion.div>
         </section>
       </main>

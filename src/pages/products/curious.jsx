@@ -195,8 +195,8 @@ export default function Curious() {
               <span className="bg-gradient-to-r from-teal-400 via-cyan-400 to-teal-500 text-transparent bg-clip-text">
                 CURIOUS
               </span>
-            </h1>
-            
+          </h1>
+          
             <div className="text-xl sm:text-2xl text-teal-400 font-mono mb-4 tracking-wide">
               AI COMPANION STATION
             </div>
@@ -257,7 +257,7 @@ export default function Curious() {
                   <div className="w-1 h-1 bg-cyan-400 rounded-full animate-pulse"></div>
                   <span className="text-cyan-400 text-xs font-mono">{item.status}</span>
                 </div>
-              </div>
+          </div>
             ))}
           </motion.div>
         </section>
@@ -377,7 +377,7 @@ export default function Curious() {
                       <div key={index} className="flex items-center gap-1">
                         <div className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse" style={{ animationDelay: `${index * 0.3}s` }}></div>
                         <span className="text-cyan-400 text-xs font-mono">{mode}</span>
-                      </div>
+            </div>
                     ))}
                   </div>
                 </div>
@@ -446,7 +446,7 @@ export default function Curious() {
                     <div className="h-full bg-gradient-to-r from-teal-400 to-cyan-400 rounded-full animate-pulse"></div>
                   </div>
                   <span className="text-teal-400 text-xs font-mono">ENGAGED</span>
-                </div>
+              </div>
               </motion.div>
             ))}
           </div>
@@ -490,7 +490,7 @@ export default function Curious() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                     </svg>
                   </span>
-                </Link>
+              </Link>
                 <Link 
                   to="/products" 
                   className="group bg-black/40 backdrop-blur-md border border-teal-500/50 text-white hover:bg-teal-500/10 hover:border-teal-400 font-medium py-4 px-8 rounded-lg transition-all duration-300"
@@ -501,9 +501,9 @@ export default function Curious() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                     </svg>
                   </span>
-                </Link>
-              </div>
+              </Link>
             </div>
+          </div>
           </motion.div>
         </section>
       </main>
