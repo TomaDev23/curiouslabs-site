@@ -8,6 +8,7 @@
 import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { motion, useAnimation } from 'framer-motion';
 import MoonSphereProxy from './proxies/MoonSphereProxy';
+import MissionControlBoard from '../cosmic/MissionControlBoard';
 
 // Lazy load MoonSphere to prevent Three.js contamination
 // const MoonSphere = lazy(() => import('./Planetary/MoonSphere'));
@@ -83,6 +84,12 @@ const MissionAtomic = () => {
   const [isMobile, setIsMobile] = useState(false);
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
   const [useSimpleEclipse, setUseSimpleEclipse] = useState(false);
+  const [isHighEnd, setIsHighEnd] = useState(true);
+  
+  // ⭐ Moon state management
+  const [moonPhaseOverride, setMoonPhaseOverride] = useState(null);
+  const [moonAnomalyMode, setMoonAnomalyMode] = useState(null);
+  
   const controls = useAnimation();
   const moonControls = useAnimation();
   
@@ -116,6 +123,16 @@ const MissionAtomic = () => {
         setUseSimpleEclipse(true);
       }
     }
+
+    const capabilities = {
+      memory: navigator.deviceMemory || 4,
+      connection: navigator.connection?.effectiveType || '4g',
+      hardwareConcurrency: navigator.hardwareConcurrency || 4
+    };
+    
+    return capabilities.memory >= 4 && 
+           ['4g', 'slow-2g', '2g', '3g'].indexOf(capabilities.connection) === -1 &&
+           capabilities.hardwareConcurrency >= 4;
   };
   
   useEffect(() => {
@@ -132,6 +149,21 @@ const MissionAtomic = () => {
   useEffect(() => {
     checkDeviceCapabilities();
   }, [isMobile, prefersReducedMotion]);
+
+  // ⭐ Enhanced: Mission Control Board phase and anomaly change handler
+  const handleMissionControlPhaseChange = (phase) => {
+    console.log(`🚀 MISSION ATOMIC: Received phase change from Mission Control - ${phase}`);
+    setMoonPhaseOverride(phase);
+  };
+  
+  // ⭐ NEW: Mission Control Board anomaly change handler
+  const handleMissionControlAnomalyChange = (anomalyMode) => {
+    // Only log in development
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`🚀 MISSION ATOMIC: Received anomaly change from Mission Control - ${anomalyMode}`);
+    }
+    setMoonAnomalyMode(anomalyMode);
+  };
 
   // Self-contained mission points data
   const MISSION_POINTS = [
@@ -412,7 +444,12 @@ const MissionAtomic = () => {
                 </div>
               </div>
             }>
-              <MoonSphereProxy className="w-[400px] h-[400px]" />
+              <MoonSphereProxy 
+                className="w-[400px] h-[400px]" 
+                showDebugHUD={false}
+                debugPhase={moonPhaseOverride}
+                anomalyMode={moonAnomalyMode}
+              />
             </Suspense>
           </div>
           
@@ -505,6 +542,24 @@ const MissionAtomic = () => {
       <div className="absolute top-8 right-[30%] z-20 text-white/50 font-light" style={{ zIndex: 4 }}>
         //<br/>//<br/>//
       </div>
+
+      {/* Mission Control Command Board - Full Screen Width */}
+      <motion.div
+        initial={{ opacity: 0, y: 40 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 1, delay: 0.3 }}
+        viewport={{ once: true, margin: "-10%" }}
+        className="absolute bottom-0 left-0 right-0 w-full pb-[30vh]"
+        style={{ zIndex: 10 }}
+      >
+        <MissionControlBoard 
+          currentPhase={moonPhaseOverride}
+          onPhaseChange={handleMissionControlPhaseChange}
+          onAnomalyChange={handleMissionControlAnomalyChange}
+          className="w-full"
+          showSlidingControl={true}
+        />
+      </motion.div>
 
       {/* Transition art between Mission and Products */}
       <div

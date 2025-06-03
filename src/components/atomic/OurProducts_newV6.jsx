@@ -1259,29 +1259,29 @@ const ProductsPage = () => {
           
           {/* Left Column - Product Info Panel */}
           <div className="col-span-12 lg:col-span-4 space-y-8">
-            <div className="h-full relative">
-              {/* Main AEGIS command card */}
-              <div 
+  <div className="h-full relative">
+      {/* Main AEGIS command card */}
+    <div 
                 className="backdrop-blur-xl bg-slate-900/80 rounded-2xl border border-white/25 p-7 h-full relative overflow-hidden"
-                style={{
+      style={{
                   boxShadow: '0 0 30px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(255, 255, 255, 0.05)',
                   background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.92), rgba(30, 41, 59, 0.8))'
-                }}
-              >
-                <div className="relative z-[10] h-full flex flex-col">
+      }}
+    >
+      <div className="relative z-[10] h-full flex flex-col">
                   {/* Enhanced AEGIS Header */}
                   <div className="space-y-5 mb-7">
                     {/* Mission Control Badge */}
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-3">
-                        <motion.div 
-                          className="w-3 h-3 rounded-full bg-lime-400"
+          <div className="flex items-center space-x-3">
+            <motion.div 
+                  className="w-3 h-3 rounded-full bg-lime-400"
                           animate={{ scale: [1, 1.2, 1], opacity: [0.7, 1, 0.7] }}
-                          transition={{ duration: 2, repeat: Infinity }}
-                        />
-                        <span className="text-sm font-mono uppercase tracking-wider text-white/60">
+                transition={{ duration: 2, repeat: Infinity }}
+              />
+              <span className="text-sm font-mono uppercase tracking-wider text-white/60">
                           MISSION CONTROL
-                        </span>
+              </span>
                       </div>
                       <div className="text-right">
                         <div className="text-xs font-mono text-lime-400 uppercase tracking-wider">
@@ -1291,20 +1291,20 @@ const ProductsPage = () => {
                           v2.1.0
                         </div>
                       </div>
-                    </div>
-                    
+            </div>
+            
                     {/* Enhanced Title */}
                     <div className="space-y-3">
-                      <h3
+            <h3
                         className="text-3xl font-bold leading-tight"
-                        style={{ 
-                          background: 'linear-gradient(135deg, #84cc16 0%, #22d3ee 100%)',
-                          WebkitBackgroundClip: 'text',
-                          WebkitTextFillColor: 'transparent',
-                        }}
-                      >
-                        AEGIS<br />Command
-                      </h3>
+              style={{ 
+                  background: 'linear-gradient(135deg, #84cc16 0%, #22d3ee 100%)',
+              WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+              }}
+            >
+                AEGIS<br />Command
+            </h3>
                       
                       <div className="relative">
                         <div className="absolute -left-3 top-0 w-1 h-full bg-gradient-to-b from-cyan-400 to-lime-400 rounded-full" />
@@ -1322,13 +1322,13 @@ const ProductsPage = () => {
                       <div className="flex items-center space-x-3 mb-2">
                         <div className="w-2 h-2 rounded-full bg-lime-400" />
                         <h4 className="font-semibold text-base text-lime-400">
-                          Adaptive. Auditable. Alive.
-                        </h4>
+                Adaptive. Auditable. Alive.
+            </h4>
                       </div>
                       <p className="text-white/80 text-xs leading-relaxed">
-                        The thinking engine behind CuriousLabs — orchestrating AI, logic, and control across all products.
-                      </p>
-                    </div>
+                The thinking engine behind CuriousLabs — orchestrating AI, logic, and control across all products.
+              </p>
+              </div>
 
                     {/* Core Principles Grid */}
                     <div className="space-y-3">
@@ -1337,8 +1337,8 @@ const ProductsPage = () => {
                         <h5 className="text-xs font-mono uppercase tracking-wider text-white/70">
                           CORE PRINCIPLES
                         </h5>
-                      </div>
-                      
+          </div>
+
                       <div className="space-y-2">
                         {[
                           { 
@@ -1356,9 +1356,9 @@ const ProductsPage = () => {
                             status: 'MONITORING',
                             metric: '2.3M events'
                           }
-                        ].map((principle, index) => (
-                          <div 
-                            key={`principle-${index}`}
+            ].map((principle, index) => (
+              <div
+                key={`principle-${index}`}
                             className="group p-3 rounded-lg bg-slate-800/40 border border-white/15 hover:border-lime-400/35 transition-all duration-300"
                           >
                             <div className="flex items-start justify-between">
@@ -1375,10 +1375,10 @@ const ProductsPage = () => {
                                 </div>
                               </div>
                             </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
+              </div>
+            ))}
+          </div>
+      </div>
 
                     {/* Enhanced AEGIS SDK Section */}
                     <div className="group/aegis-sdk">
@@ -1396,35 +1396,35 @@ const ProductsPage = () => {
                               <p className="text-xs text-white/60 truncate">
                                 Developer toolkit for mission-critical AI
                               </p>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
                   </div>
+          </div>
+                        </div>
+                </div>
+              </div>
+            </div>
 
                   {/* System Status */}
                   <div className="mt-5 pt-5 border-t border-white/15">
                     <div className="p-3 rounded-xl bg-slate-800/60 border border-lime-400/35">
-                      <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-3">
-                          <motion.div
+              <motion.div
                             className="w-2.5 h-2.5 rounded-full bg-lime-400"
                             animate={{ opacity: [0.5, 1, 0.5], scale: [1, 1.1, 1] }}
-                            transition={{ duration: 2, repeat: Infinity }}
-                          />
+                    transition={{ duration: 2, repeat: Infinity }}
+                  />
                           <div>
                             <div className="text-xs font-mono text-lime-400 uppercase tracking-wider">System Status</div>
                             <div className="text-white/80 text-xs">All agents operational</div>
-                          </div>
-                        </div>
+            </div>
+          </div>
                         <div className="text-right">
                           <div className="text-xs text-lime-400 font-mono font-bold">ACTIVE</div>
                           <div className="text-xs text-white/50 font-mono">24/7</div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+            </div>
+        </div>
+      </div>
+      </div>
                 </div>
               </div>
             </div>
@@ -1447,12 +1447,12 @@ const ProductsPage = () => {
                 <div className="text-right">
                   <div className="text-xs font-mono text-lime-400 uppercase tracking-wider">
                     ACTIVE
-                  </div>
+              </div>
                   <div className="text-xs text-white/50 font-mono">
                     {OPS_BENTO_ITEMS.length} Systems
-                  </div>
-                </div>
-              </div>
+          </div>
+        </div>
+      </div>
               
               <h2
                 className="text-5xl lg:text-7xl font-bold uppercase tracking-tight leading-none"
@@ -1479,9 +1479,9 @@ const ProductsPage = () => {
                   const isActive = index === currentPage;
                   const isFeatured = index === currentPage;
                   
-                  return (
-                    <motion.div
-                      key={item.id}
+              return (
+                <motion.div 
+                  key={item.id}
                       className="relative"
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
@@ -1489,7 +1489,7 @@ const ProductsPage = () => {
                     >
                       <div
                         className="relative w-full h-full rounded-2xl overflow-hidden backdrop-blur-sm border cursor-pointer group"
-                        style={{
+                    style={{
                           background: isFeatured 
                             ? `linear-gradient(135deg, rgba(15, 23, 42, 0.9), rgba(30, 41, 59, 0.7), ${item.accentColor}20)`
                             : 'linear-gradient(135deg, rgba(15, 23, 42, 0.8), rgba(30, 41, 59, 0.6))',
@@ -1528,12 +1528,12 @@ const ProductsPage = () => {
                         {/* Background texture */}
                         <div
                           className="absolute inset-0 opacity-15 pointer-events-none"
-                          style={{
+                      style={{
                             backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'100\' height=\'100\' viewBox=\'0 0 100 100\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noiseFilter\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.65\' numOctaves=\'3\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100\' height=\'100\' filter=\'url(%23noiseFilter)\'/%3E%3C/svg%3E")',
-                            mixBlendMode: 'overlay',
-                          }}
-                        />
-                        
+                        mixBlendMode: 'overlay',
+                      }}
+                    />
+                    
                         {/* Content */}
                         <div className="relative z-[10] p-8 h-full flex flex-col justify-between">
                           {/* Header */}
@@ -1559,12 +1559,12 @@ const ProductsPage = () => {
                               <h3
                                 className="text-3xl font-bold uppercase tracking-wide mb-3"
                                 style={{ color: item.accentColor, textShadow: `0 0 15px ${item.accentColor}60` }}
-                              >
-                                {item.title}
+                        >
+                          {item.title}
                               </h3>
                               <p className="text-base font-medium text-white/80 leading-relaxed px-2">
-                                {item.summary}
-                              </p>
+                          {item.summary}
+                        </p>
                             </div>
                           </div>
 
@@ -1577,21 +1577,21 @@ const ProductsPage = () => {
                               >
                                 <div 
                                   className="w-2 h-2 rounded-full mt-2 flex-shrink-0"
-                                  style={{ backgroundColor: item.accentColor }}
-                                />
+                                style={{ backgroundColor: item.accentColor }}
+                              />
                                 <span className="text-sm text-white/75 leading-relaxed">{feature}</span>
-                              </div>
-                            ))}
-                          </div>
+                            </div>
+                          ))}
                         </div>
                       </div>
-                    </motion.div>
-                  );
-                })}
-              </div>
-            </div>
+                      </div>
+                </motion.div>
+              );
+            })}
           </div>
         </div>
+      </div>
+      </div>
       </div>
 
       {/* Product Detail Modal */}

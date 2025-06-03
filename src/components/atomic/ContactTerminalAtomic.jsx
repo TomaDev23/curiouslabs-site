@@ -6,6 +6,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import GlobeDemo from '../ui/globe-demo';
 
 // Component metadata for LEGIT compliance
 export const metadata = {
@@ -114,7 +115,7 @@ const ContactTerminalAtomic = () => {
       aria-labelledby="contact-heading"
     >
       {/* Left Side - Contact Info Terminal */}
-      <div className="w-full md:w-1/2 max-w-md mb-16 md:mb-0">
+      <div className="w-full md:w-1/2 max-w-md mb-16 md:mb-0 md:absolute md:bottom-20 md:left-20 lg:bottom-16 lg:left-32 xl:left-48 2xl:left-64 z-50">
         <h2 id="contact-heading" className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold mb-6">
           Contact <span className="text-lime-400">Terminal</span>
         </h2>
@@ -324,40 +325,9 @@ const ContactTerminalAtomic = () => {
       {/* Right Side - Visual */}
       {!isMobile && (
         <div className="w-full md:w-1/2 flex justify-center items-center">
-          {/* Cosmic Terminal Visualization */}
-          <div className="relative">
-            {/* Terminal Globe */}
-            <div 
-              className="w-48 h-48 sm:w-64 sm:h-64 rounded-full bg-gradient-to-br from-lime-900 via-emerald-800 to-teal-900 relative overflow-hidden border border-gray-800"
-              aria-hidden="true"
-            >
-              {/* Surface details */}
-              <div className="absolute inset-0 opacity-30 mix-blend-overlay">
-                <div className="absolute inset-y-0 left-0 w-1/3 bg-gradient-to-r from-transparent to-lime-300 opacity-20"></div>
-                <div className="absolute inset-x-0 top-0 h-1/3 bg-gradient-to-b from-transparent to-lime-200 opacity-20"></div>
-              </div>
-              
-              {/* Terminal Screen Overlay */}
-              <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black opacity-70"></div>
-              
-              {/* Terminal Text Simulation */}
-              <div className="absolute inset-0 flex flex-col justify-end p-5 font-mono text-lime-400 text-xs opacity-80">
-                <div>$ {activeTab === 'info' ? 'initializing_connection' : 'input_received'}...</div>
-                <div>$ establishing_link...</div>
-                <div>$ connection_secure</div>
-                <div className="flex items-center">
-                  <span>$</span>
-                  <span className="ml-1 h-4 w-2 bg-lime-400 animate-pulse"></span>
-                </div>
-              </div>
-              
-              {/* Glowing Effect */}
-              <div className="absolute -inset-0.5 bg-lime-500 opacity-20 blur-md rounded-full"></div>
-            </div>
-            
-            {/* Orbital Rings */}
-            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] border border-dashed border-lime-900 rounded-full opacity-40"></div>
-            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[150%] h-[150%] border border-dashed border-lime-900 rounded-full opacity-20"></div>
+          {/* Interactive Globe Visualization */}
+          <div className="relative w-full h-96">
+            <GlobeDemo />
           </div>
         </div>
       )}
