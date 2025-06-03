@@ -1,0 +1,762 @@
+// @file src/components/StellarMessage.jsx
+// @description A React component for a cosmic text animation with particle effects and constellation lines
+// @version 1.4.0 - "Stellar Symphony"
+
+import { useEffect, useRef, useState } from "react";
+
+class AnimationPhaseManager {
+  constructor() {
+    this.phases = {
+      materialization: { duration: 8000, progress: 0 }, // Slower for text
+      constellation: { duration: 5000, progress: 0 }, // Longer for lines
+      breathing: { duration: 6000, progress: 0 },
+      dissolution: { duration: 4000, progress: 0 },
+    };
+    this.currentPhase = "materialization";
+    this.startTime = Date.now();
+  }
+
+  update() {
+    const elapsed = Date.now() - this.startTime;
+    const phase = this.phases[this.currentPhase];
+
+    phase.progress = Math.min(elapsed / phase.duration, 1);
+
+    if (phase.progress >= 1) {
+      this.nextPhase();
+    }
+
+    return { phase: this.currentPhase, progress: phase.progress };
+  }
+
+  nextPhase() {
+    const phaseOrder = ["materialization", "constellation", "breathing", "dissolution"];
+    const currentIndex = phaseOrder.indexOf(this.currentPhase);
+
+    if (currentIndex < phaseOrder.length - 1) {
+      this.currentPhase = phaseOrder[currentIndex + 1];
+    } else {
+      this.currentPhase = "materialization";
+      console.log("🌌 Looping back to materialization");
+    }
+    this.phases[this.currentPhase].progress = 0;
+    this.startTime = Date.now();
+    console.log(`🌌 Phase transition: ${this.currentPhase} (${currentIndex + 2}/4) - Duration: ${this.phases[this.currentPhase].duration}ms`);
+  }
+}
+
+class StellarParticle {
+  constructor(options) {
+    this.x = options.startX || 0;
+    this.y = options.startY || 0;
+    this.targetX = options.targetX || 0;
+    this.targetY = options.targetY || 0;
+    this.char = options.char || "";
+    this.word = options.word || "";
+    this.isKeyWord = options.isKeyWord || false;
+    this.opacity = 0;
+    this.size = this.isKeyWord ? 4 : 3; // Reduced from 8/6 to 4/3 for better readability
+    this.startX = options.startX || 0;
+    this.startY = options.startY || 0;
+    this.glowIntensity = this.isKeyWord ? 10 : 5; // Reduced from 20/10 to 10/5
+  }
+
+  update(phase, progress) {
+    if (phase === "materialization") {
+      const easeProgress = 1 - Math.pow(1 - progress, 3);
+      this.x = this.startX + (this.targetX - this.startX) * easeProgress;
+      this.y = this.startY + (this.targetY - this.startY) * easeProgress;
+      this.opacity = easeProgress;
+      this.size = (this.isKeyWord ? 4 : 3) * (0.5 + easeProgress * 0.5);
+    } else if (phase === "constellation") {
+      this.x = this.targetX;
+      this.y = this.targetY;
+      this.opacity = 1;
+      this.size = this.isKeyWord ? 4 : 3;
+    } else if (phase === "breathing") {
+      const time = Date.now() * 0.004;
+      const pulse = Math.sin(time + this.targetX * 0.03) * 0.5 + 0.5;
+      const moveAmount = 10;
+      this.x = this.targetX + Math.sin(time + this.targetY * 0.02) * moveAmount;
+      this.y = this.targetY + Math.cos(time + this.targetX * 0.02) * moveAmount;
+      this.opacity = 0.7 + pulse * 0.3;
+      this.size = (this.isKeyWord ? 4 : 3) * (0.8 + pulse * 0.4);
+    } else if (phase === "dissolution") {
+      const centerX = this.canvas?.width / 2 || window.innerWidth / 2;
+      const centerY = this.canvas?.height / 2 || window.innerHeight / 2;
+      const angle = Math.atan2(this.targetY - centerY, this.targetX - centerX);
+      const spiralAngle = angle + progress * Math.PI;
+      const distance = progress * 150;
+      this.x = this.targetX + Math.cos(spiralAngle) * distance;
+      this.y = this.targetY + Math.sin(spiralAngle) * distance;
+      this.opacity = Math.max(0, 1 - progress);
+      this.size = (this.isKeyWord ? 4 : 3) * (1 - progress * 0.3);
+    }
+  }
+
+  draw(ctx) {
+    if (this.opacity <= 0) return;
+
+    ctx.save();
+    ctx.globalAlpha = this.opacity;
+
+    if (this.isKeyWord && this.opacity > 0.3) {
+      ctx.shadowBlur = this.glowIntensity;
+      ctx.shadowColor = "#FF6B35";
+    }
+
+    ctx.fillStyle = this.isKeyWord ? "#FF6B35" : "#FFFFFF";
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+}
+
+class ConstellationLine {
+  constructor(startParticle, endParticle, concept, delay = 0) {
+    this.start = startParticle;
+    this.end = endParticle;
+    this.concept = concept;
+    this.opacity = 0;
+    this.pulseOffset = Math.random() * Math.PI * 2;
+    this.delay = delay; // Delay before this line starts drawing
+  }
+
+  draw(ctx, phase, progress) {
+    if (this.opacity <= 0) return;
+
+    ctx.save();
+    
+    // Calculate line drawing progress with delay
+    let lineProgress = 1; // Default to full line
+    if (phase === "constellation") {
+      // Apply delay - each line starts drawing at different times
+      const delayedProgress = Math.max(0, progress - this.delay);
+      const adjustedProgress = delayedProgress / (1 - this.delay);
+      lineProgress = Math.min(1, Math.max(0, adjustedProgress));
+    }
+    
+    if (phase === "breathing") {
+      const time = Date.now() * 0.004;
+      const pulse = Math.sin(time + this.pulseOffset) * 0.4 + 0.6;
+      ctx.globalAlpha = this.opacity * pulse;
+    } else {
+      ctx.globalAlpha = this.opacity;
+    }
+
+    ctx.shadowBlur = 10;
+    ctx.shadowColor = "#FF8C42";
+    ctx.strokeStyle = "#FF8C42";
+    ctx.lineWidth = 3;
+
+    // Calculate current end point based on progress
+    const currentEndX = this.start.x + (this.end.x - this.start.x) * lineProgress;
+    const currentEndY = this.start.y + (this.end.y - this.start.y) * lineProgress;
+
+    // Draw the line
+    ctx.beginPath();
+    ctx.moveTo(this.start.x, this.start.y);
+    ctx.lineTo(currentEndX, currentEndY);
+    ctx.stroke();
+
+    // Add bright drawing tip effect when line is actively drawing
+    if (lineProgress > 0 && lineProgress < 1 && phase === "constellation") {
+      ctx.shadowBlur = 20;
+      ctx.shadowColor = "#FFD700";
+      ctx.fillStyle = "#FFD700";
+      ctx.beginPath();
+      ctx.arc(currentEndX, currentEndY, 4, 0, Math.PI * 2);
+      ctx.fill();
+      
+      // Add trailing particles effect
+      for (let i = 1; i <= 3; i++) {
+        const trailProgress = Math.max(0, lineProgress - i * 0.1);
+        if (trailProgress > 0) {
+          const trailX = this.start.x + (this.end.x - this.start.x) * trailProgress;
+          const trailY = this.start.y + (this.end.y - this.start.y) * trailProgress;
+          ctx.globalAlpha = this.opacity * (0.6 - i * 0.15);
+          ctx.beginPath();
+          ctx.arc(trailX, trailY, 2, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+    }
+
+    ctx.restore();
+
+    if (lineProgress < 1 && lineProgress > 0) {
+      console.log(`🌌 Drawing line: ${this.concept}, progress=${lineProgress.toFixed(2)}, delay=${this.delay}`);
+    }
+  }
+}
+
+class StellarMessage {
+  constructor() {
+    this.containerId = "stellar-message-container";
+    this.canvasId = "stellar-message-canvas";
+    this.isActive = false;
+    this.isPaused = false;
+    this.isInitialized = false;
+    this.container = null;
+    this.canvas = null;
+    this.ctx = null;
+    this.particles = [];
+    this.constellations = [];
+    this.keyWordMap = new Map();
+    this.animationId = null;
+    this.pausedTime = 0;
+  }
+
+  init(container) {
+    if (this.isInitialized) return;
+    console.log("🌌 Initializing StellarMessage...");
+
+    this.container = container;
+    this.container.id = this.containerId;
+    this.container.style.cssText = `
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      z-index: 9999;
+    `;
+
+    this.canvas = document.createElement("canvas");
+    this.canvas.id = this.canvasId;
+    this.canvas.style.cssText = `
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: transparent;
+    `;
+    this.ctx = this.canvas.getContext("2d");
+    this.container.appendChild(this.canvas);
+
+    this.setupEventListeners();
+    this.isInitialized = true;
+    this.activate();
+  }
+
+  setupEventListeners() {
+    window.addEventListener("resize", () => {
+      if (this.isActive && this.canvas) {
+        this.canvas.width = this.container.clientWidth;
+        this.canvas.height = this.container.clientHeight;
+        this.convertTextToParticles();
+        this.createConstellations();
+        console.log(`🌌 Canvas resized: ${this.canvas.width}x${this.canvas.height}`);
+      }
+    });
+  }
+
+  activate() {
+    if (this.isActive) return;
+
+    this.isActive = true;
+    this.container.style.opacity = "1";
+
+    this.canvas.width = this.container.clientWidth;
+    this.canvas.height = this.container.clientHeight;
+    if (this.canvas.width === 0 || this.canvas.height === 0) {
+      console.error("🌌 Error: Invalid canvas dimensions");
+      return;
+    }
+    console.log(`🌌 Canvas set: ${this.canvas.width}x${this.canvas.height}`);
+
+    this.phaseManager = new AnimationPhaseManager();
+    this.convertTextToParticles();
+    this.createConstellations();
+    this.startRenderLoop();
+
+    console.log("🌌 Test rectangle drawn");
+    this.ctx.fillStyle = "rgba(255, 0, 0, 0.5)";
+    this.ctx.fillRect(10, 10, 100, 100);
+    setTimeout(() => {
+      this.ctx.clearRect(10, 10, 100, 100);
+      console.log("🌌 Test rectangle cleared");
+    }, 3000);
+  }
+
+  deactivate() {
+    console.log("🌌 Deactivating StellarMessage...");
+    this.stopRenderLoop();
+    if (this.container) this.container.style.opacity = "0";
+    if (this.ctx) this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    this.phaseManager = null;
+    this.isActive = false;
+  }
+
+  destroy() {
+    this.deactivate();
+    if (this.container && this.container.parentNode) {
+      this.container.parentNode.removeChild(this.container);
+    }
+    this.isInitialized = false;
+    console.log("🌌 StellarMessage destroyed");
+  }
+
+  convertTextToParticles() {
+    console.log("🌌 Converting text to particles...");
+    this.particles = [];
+    this.keyWordMap.clear();
+
+    const message = "We Care, We Create: Ethical, responsible products with humans at the core.";
+    const keyWords = ["Care", "Create", "Ethical", "responsible", "humans", "core"];
+    const lines = [
+      "We Care, We Create: Ethical,",
+      "responsible products with humans",
+      "at the core.",
+    ];
+
+    const fontSize = 80;
+    const lineHeight = fontSize * 1.6;
+    const canvasWidth = this.canvas.width;
+    const canvasHeight = this.canvas.height;
+
+    if (canvasWidth === 0 || canvasHeight === 0) {
+      console.error("🌌 Error: Invalid canvas dimensions");
+      return;
+    }
+
+    this.ctx.font = `${fontSize}px Arial, sans-serif`;
+    const testWidth = this.ctx.measureText("Test").width;
+    if (testWidth === 0) {
+      console.error("🌌 Error: Font measurement failed");
+      this.ctx.font = `${fontSize}px sans-serif`;
+    }
+    console.log(`🌌 Font set: ${this.ctx.font}, testWidth=${testWidth}`);
+
+    // Temporary canvas for glyph sampling
+    const tempCanvas = document.createElement("canvas");
+    tempCanvas.width = fontSize * 2;
+    tempCanvas.height = fontSize * 2;
+    const tempCtx = tempCanvas.getContext("2d");
+    tempCtx.font = this.ctx.font;
+    tempCtx.fillStyle = "#FFFFFF";
+    tempCtx.textBaseline = "middle";
+
+    const startY = (canvasHeight - lines.length * lineHeight) / 2;
+
+    lines.forEach((line, lineIndex) => {
+      const lineWidth = this.ctx.measureText(line).width;
+      const startX = (canvasWidth - lineWidth) / 2;
+      let currentX = startX;
+      const currentY = startY + lineIndex * lineHeight;
+
+      console.log(`🌌 Line ${lineIndex + 1}: text="${line}", width=${lineWidth}, startX=${startX}, startY=${currentY}`);
+
+      const words = line.split(" ");
+      words.forEach((word, wordIndex) => {
+        const cleanWord = word.replace(/[^\w]/g, "");
+        const isKeyWord = keyWords.includes(cleanWord);
+        const wordWidth = this.ctx.measureText(word).width;
+        const wordParticles = [];
+
+        // Sample points for each character
+        let charX = currentX;
+        for (let charIndex = 0; charIndex < word.length; charIndex++) {
+          const char = word[charIndex];
+          const charWidth = this.ctx.measureText(char).width;
+          const particlesPerChar = isKeyWord ? Math.floor(20 + char.length * 5) : Math.floor(10 + char.length * 3);
+
+          // Clear temp canvas
+          tempCtx.clearRect(0, 0, tempCanvas.width, tempCanvas.height);
+          tempCtx.fillText(char, fontSize / 2, fontSize);
+
+          // Sample glyph pixels
+          const imageData = tempCtx.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
+          const points = [];
+          for (let y = 0; y < tempCanvas.height; y += 4) {
+            for (let x = 0; x < tempCanvas.width; x += 4) {
+              const index = (y * tempCanvas.width + x) * 4;
+              if (imageData.data[index + 3] > 128) { // Alpha > 50%
+                points.push({
+                  x: x - fontSize / 2,
+                  y: y - fontSize,
+                });
+              }
+            }
+          }
+
+          // Select random points for particles
+          const selectedPoints = [];
+          const maxPoints = Math.min(particlesPerChar, points.length);
+          while (selectedPoints.length < maxPoints && points.length > 0) {
+            const index = Math.floor(Math.random() * points.length);
+            selectedPoints.push(points.splice(index, 1)[0]);
+          }
+
+          selectedPoints.forEach((point, i) => {
+            const particleX = charX + point.x * (fontSize / tempCanvas.width);
+            const particleY = currentY + point.y * (fontSize / tempCanvas.height);
+            const angle = Math.random() * Math.PI * 2;
+            const distance = 500 + Math.random() * 600;
+            const randomStartX = particleX + Math.cos(angle) * distance;
+            const randomStartY = particleY + Math.sin(angle) * distance;
+
+            const particle = new StellarParticle({
+              startX: randomStartX,
+              startY: randomStartY,
+              targetX: particleX,
+              targetY: particleY,
+              char: char,
+              word: cleanWord,
+              isKeyWord: isKeyWord,
+              size: isKeyWord ? 4 : 3,
+            });
+
+            this.particles.push(particle);
+            wordParticles.push(particle);
+
+            if (i < 2) {
+              console.log(`🌌 Particle ${i} for '${char}': target=(${particleX.toFixed(1)},${particleY.toFixed(1)}), start=(${randomStartX.toFixed(1)},${randomStartY.toFixed(1)})`);
+            }
+          });
+
+          charX += charWidth;
+        }
+
+        if (isKeyWord && wordParticles.length > 0) {
+          const centerParticle = wordParticles[Math.floor(wordParticles.length / 2)];
+          this.keyWordMap.set(cleanWord, centerParticle);
+          console.log(`🌌 Mapped key word: ${cleanWord} at (${centerParticle.targetX.toFixed(1)},${centerParticle.targetY.toFixed(1)})`);
+        }
+
+        currentX += wordWidth + this.ctx.measureText(" ").width;
+      });
+    });
+
+    console.log(`✨ Created ${this.particles.length} particles`);
+    console.log(`✨ Mapped ${this.keyWordMap.size} key words:`, Array.from(this.keyWordMap.keys()));
+  }
+
+  createConstellations() {
+    console.log("🌌 Creating constellation connections...");
+    this.constellations = [];
+
+    const connections = [
+      ["Care", "humans"],
+      ["Create", "Ethical"],
+      ["humans", "core"],
+      ["responsible", "core"],
+    ];
+
+    connections.forEach(([word1, word2], index) => {
+      const particle1 = this.keyWordMap.get(word1);
+      const particle2 = this.keyWordMap.get(word2);
+
+      if (particle1 && particle2) {
+        // Add sequential delay: each line starts 20% later than the previous
+        const delay = index * 0.2;
+        this.constellations.push(new ConstellationLine(particle1, particle2, `${word1}-${word2}`, delay));
+        console.log(`🌌 Created constellation: ${word1} → ${word2} (delay: ${delay.toFixed(1)})`);
+      } else {
+        console.warn(`🌌 Could not create constellation: ${word1} → ${word2}`, {
+          particle1: !!particle1,
+          particle2: !!particle2,
+        });
+      }
+    });
+
+    console.log(`✨ Created ${this.constellations.length} constellation lines`);
+  }
+
+  startRenderLoop() {
+    if (this.animationId) cancelAnimationFrame(this.animationId);
+
+    const render = (timestamp) => {
+      if (!this.isActive || !this.phaseManager) {
+        console.log("🌌 Render loop stopped - inactive or no phase manager");
+        return;
+      }
+
+      this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+      if (!this.isPaused) {
+        const phaseData = this.phaseManager.update();
+        
+        this.particles.forEach((particle) => {
+          particle.update(phaseData.phase, phaseData.progress);
+          particle.draw(this.ctx);
+        });
+
+        this.drawConstellations(phaseData.phase, phaseData.progress);
+        this.drawDebugHUD(phaseData.phase, phaseData.progress);
+
+        // Draw reading enhancer dots with proper timing
+        let enhancerOpacity = 0;
+        
+        if (phaseData.phase === "materialization" && phaseData.progress >= 0.75) {
+          // Fade in from 75% to 100% of materialization
+          const fadeInProgress = (phaseData.progress - 0.75) / 0.25;
+          enhancerOpacity = fadeInProgress * 0.4; // Max opacity 0.4 for better contrast
+        } else if (phaseData.phase === "constellation") {
+          // Fully visible during constellation
+          enhancerOpacity = 0.4;
+        } else if (phaseData.phase === "breathing") {
+          // Start full, fade out during last 25% of breathing phase
+          const fadeOutStart = 0.75;
+          if (phaseData.progress <= fadeOutStart) {
+            enhancerOpacity = 0.4;
+          } else {
+            const fadeOutProgress = (phaseData.progress - fadeOutStart) / 0.25;
+            enhancerOpacity = 0.4 * (1 - fadeOutProgress);
+          }
+        }
+        // No enhancer during dissolution phase
+
+        if (enhancerOpacity > 0) {
+          this.particles.forEach((p) => {
+            this.ctx.save();
+            this.ctx.globalAlpha = enhancerOpacity;
+            
+            // Add subtle glow for better contrast
+            if (p.isKeyWord) {
+              this.ctx.shadowBlur = 8;
+              this.ctx.shadowColor = "#FF6B35";
+              this.ctx.fillStyle = "#FF6B35";
+            } else {
+              this.ctx.shadowBlur = 4;
+              this.ctx.shadowColor = "#FFFFFF";
+              this.ctx.fillStyle = "#FFFFFF";
+            }
+            
+            this.ctx.beginPath();
+            this.ctx.arc(p.targetX, p.targetY, 2, 0, Math.PI * 2); // Slightly larger for visibility
+            this.ctx.fill();
+            this.ctx.restore();
+          });
+        }
+      } else {
+        this.particles.forEach((particle) => {
+          particle.draw(this.ctx);
+        });
+        
+        const currentPhase = this.phaseManager.currentPhase;
+        const currentProgress = this.phaseManager.phases[currentPhase].progress;
+        this.drawConstellations(currentPhase, currentProgress);
+        this.drawDebugHUD(currentPhase, currentProgress);
+      }
+
+      this.animationId = requestAnimationFrame(render);
+    };
+
+    this.animationId = requestAnimationFrame(render);
+    console.log("🌌 Render loop started");
+  }
+
+  stopRenderLoop() {
+    if (this.animationId) {
+      cancelAnimationFrame(this.animationId);
+      this.animationId = null;
+    }
+  }
+
+  drawConstellations(phase, progress) {
+    if (phase === "constellation" || phase === "breathing" || phase === "dissolution") {
+      this.constellations.forEach((line) => {
+        if (phase === "constellation") {
+          line.opacity = progress;
+        } else if (phase === "breathing") {
+          const time = Date.now() * 0.004;
+          const pulse = Math.sin(time + line.pulseOffset) * 0.4 + 0.6;
+          line.opacity = pulse;
+        } else if (phase === "dissolution") {
+          line.opacity = Math.max(0, 1 - progress);
+        }
+        line.draw(this.ctx, phase, progress);
+      });
+    }
+  }
+
+  drawDebugHUD(phase, progress) {
+    this.ctx.save();
+    this.ctx.font = "16px monospace";
+    this.ctx.fillStyle = "#00FF00";
+    this.ctx.shadowBlur = 0;
+    this.ctx.globalAlpha = 1;
+
+    const y = 200;
+    const lineHeight = 20;
+    let currentY = y;
+
+    if (this.isPaused) {
+      this.ctx.fillStyle = "#FF0000";
+      this.ctx.fillText("⏸️ PAUSED", 20, currentY);
+      this.ctx.fillStyle = "#00FF00";
+    } else {
+      this.ctx.fillText("▶️ PLAYING", 20, currentY);
+    }
+    currentY += lineHeight;
+
+    this.ctx.fillText(`Phase: ${phase} (${(progress * 100).toFixed(1)}%)`, 20, currentY);
+    currentY += lineHeight;
+
+    const barWidth = 300;
+    const barHeight = 10;
+    this.ctx.strokeStyle = "#00FF00";
+    this.ctx.strokeRect(20, currentY, barWidth, barHeight);
+    this.ctx.fillStyle = "#00FF00";
+    this.ctx.fillRect(20, currentY, barWidth * progress, barHeight);
+    currentY += lineHeight + 5;
+
+    const elapsed = Date.now() - this.phaseManager.startTime;
+    const duration = this.phaseManager.phases[phase].duration;
+    this.ctx.fillText(`Time: ${elapsed}ms / ${duration}ms`, 20, currentY);
+    currentY += lineHeight;
+
+    this.ctx.fillText(`Particles: ${this.particles.length}`, 20, currentY);
+    currentY += lineHeight;
+
+    this.ctx.fillText(`Keywords: ${this.keyWordMap.size}`, 20, currentY);
+    currentY += lineHeight;
+
+    this.ctx.fillText(`Constellations: ${this.constellations.length}`, 20, currentY);
+    currentY += lineHeight;
+
+    this.ctx.fillText(`Canvas: ${this.canvas.width}x${this.canvas.height}`, 20, currentY);
+    currentY += lineHeight;
+
+    this.ctx.fillStyle = "#FFFF00";
+    this.ctx.fillText("Sample Particles:", 20, currentY);
+    currentY += lineHeight;
+    
+    for (let i = 0; i < Math.min(3, this.particles.length); i++) {
+      const p = this.particles[i];
+      this.ctx.fillText(
+        `P${i}: (${p.x.toFixed(1)},${p.y.toFixed(1)}) → (${p.targetX.toFixed(1)},${p.targetY.toFixed(1)})`,
+        20,
+        currentY
+      );
+      currentY += lineHeight;
+    }
+
+    this.ctx.restore();
+  }
+
+  pause() {
+    console.log("🎮 pause() called, current isPaused:", this.isPaused);
+    if (!this.isPaused) {
+      this.isPaused = true;
+      this.pausedTime = Date.now();
+      console.log("🌌 Animation paused");
+    }
+  }
+
+  resume() {
+    console.log("🎮 resume() called, current isPaused:", this.isPaused);
+    if (this.isPaused) {
+      this.isPaused = false;
+      const pauseDuration = Date.now() - this.pausedTime;
+      if (this.phaseManager) {
+        this.phaseManager.startTime += pauseDuration;
+      }
+      console.log(`🌌 Animation resumed (paused for ${pauseDuration}ms)`);
+    }
+  }
+
+  togglePause() {
+    console.log("🎮 togglePause() called, current isPaused:", this.isPaused);
+    if (this.isPaused) {
+      this.resume();
+    } else {
+      this.pause();
+    }
+    console.log("🎮 togglePause() result, new isPaused:", this.isPaused);
+    return this.isPaused;
+  }
+}
+
+export const StellarMessageComponent = () => {
+  const containerRef = useRef(null);
+  const stellarRef = useRef(null);
+  const [isPaused, setIsPaused] = useState(false);
+
+  const handleTogglePause = () => {
+    console.log("🎮 Pause button clicked!", { 
+      stellarRef: !!stellarRef.current, 
+      currentPauseState: isPaused 
+    });
+    
+    if (stellarRef.current) {
+      const newPauseState = stellarRef.current.togglePause();
+      console.log("🎮 New pause state:", newPauseState);
+      setIsPaused(newPauseState);
+    } else {
+      console.error("🎮 stellarRef.current is null!");
+    }
+  };
+
+  useEffect(() => {
+    stellarRef.current = new StellarMessage();
+
+    const initialize = () => {
+      if (containerRef.current && !stellarRef.current.isInitialized) {
+        const rect = containerRef.current.getBoundingClientRect();
+        console.log('🌌 Container dimensions:', rect.width, 'x', rect.height);
+        
+        if (rect.width > 0 && rect.height > 0) {
+          stellarRef.current.init(containerRef.current);
+          console.log('🌌 StellarMessage initialized with container');
+          return true;
+        } else {
+          console.warn('🌌 Container has no dimensions, retrying...');
+          return false;
+        }
+      } else if (!containerRef.current) {
+        console.warn('🌌 Container ref not available, retrying...');
+        return false;
+      }
+      return true;
+    };
+
+    const timer = setTimeout(() => {
+      if (!initialize()) {
+        const retryTimer = setInterval(() => {
+          if (initialize()) clearInterval(retryTimer);
+        }, 100);
+        return () => clearInterval(retryTimer);
+      }
+    }, 100);
+
+    return () => {
+      clearTimeout(timer);
+      if (stellarRef.current) stellarRef.current.destroy();
+    };
+  }, []);
+
+  return (
+    <div
+      ref={containerRef}
+      className="relative w-full h-screen bg-gradient-to-br from-black via-gray-900 to-black"
+      style={{ 
+        position: "relative", 
+        overflow: "hidden",
+        width: "100%",
+        height: "100vh",
+        minHeight: "100vh"
+      }}
+    >
+      <button
+        onClick={handleTogglePause}
+        className="absolute top-4 right-4 z-10 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded shadow-lg transition-colors duration-200"
+        style={{
+          fontSize: "16px",
+          minWidth: "120px",
+          border: "none",
+          cursor: "pointer",
+          pointerEvents: "auto"
+        }}
+      >
+        {isPaused ? "▶️ Resume" : "⏸️ Pause"}
+      </button>
+    </div>
+  );
+};
+
+export default StellarMessageComponent;
