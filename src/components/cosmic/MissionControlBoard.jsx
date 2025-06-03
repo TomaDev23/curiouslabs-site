@@ -12,6 +12,51 @@ import { useMoonLighting } from '../../utils/useMoonLighting';
 import lune from 'lune';
 import { getDistanceToEarth, getTideInfluence, getNextLunarEvents, updateEventDays } from '../../utils/luneBridge';
 
+// CSS animations for tidal effects
+const tidalAnimations = `
+  @keyframes tidalWave {
+    0%, 100% { transform: translateY(0px); opacity: 0.8; }
+    50% { transform: translateY(-1px); opacity: 1; }
+  }
+  
+  @keyframes waveFlow {
+    0% { opacity: 0.6; transform: scaleX(0.8); }
+    50% { opacity: 1; transform: scaleX(1.2); }
+    100% { opacity: 0.6; transform: scaleX(0.8); }
+  }
+  
+  @keyframes orbitalPulse {
+    0%, 100% { box-shadow: 0 0 4px rgba(251, 191, 36, 0.8); }
+    50% { box-shadow: 0 0 8px rgba(251, 191, 36, 1), 0 0 12px rgba(251, 191, 36, 0.6); }
+  }
+`;
+
+// Custom hook for responsive breakpoints - SSR safe
+const useResponsive = () => {
+  const [isMobile, setIsMobile] = useState(false);
+  
+  useEffect(() => {
+    // SSR-safe check
+    if (typeof window === 'undefined') return;
+    
+    const checkIsMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    // Set initial value
+    checkIsMobile();
+    
+    // Add listener
+    window.addEventListener('resize', checkIsMobile);
+    
+    return () => {
+      window.removeEventListener('resize', checkIsMobile);
+    };
+  }, []);
+  
+  return { isMobile };
+};
+
 // Separate Sliding Moon Phase Control Card Component
 const SlidingPhaseControl = ({ 
   isVisible, 
@@ -184,7 +229,10 @@ const MissionControlBoard = ({
   const [lunarEvents, setLunarEvents] = useState(null);
   const [anomalyMode, setAnomalyMode] = useState(null);
   
-  // Get real lunar data from our lighting system
+  // Responsive hook
+  const { isMobile } = useResponsive();
+  
+  // Get real lunar data from our lighting system with error handling
   const { 
     phase: realPhase, 
     intensity, 
@@ -218,17 +266,17 @@ const MissionControlBoard = ({
     { code: 'SYD', name: 'Sydney', timezone: 'Australia/Sydney', flag: '🇦🇺', country: 'AU', size: 'small' }
   ];
   
-  // Moon phases with extensive controls matching the lighting system
+  // Moon phases for phase control
   const moonPhases = [
-    { code: 'AUTO', name: 'Auto Sync', value: null, icon: '🔄', status: 'SYNC', color: 'lime' },
-    { code: 'NEW', name: 'New Moon', value: 0.0, icon: '🌑', status: 'DARK', color: 'gray' },
-    { code: 'WAX_C', name: 'Wax Crescent', value: 0.15, icon: '🌒', status: 'RISE', color: 'blue' },
+    { code: 'AUTO', name: 'AUTO SYNC', value: null, icon: '🔄', status: 'SYNC', color: 'lime' },
+    { code: 'NEW', name: 'New Moon', value: 0, icon: '🌑', status: 'DARK', color: 'gray' },
+    { code: 'WAX_C', name: 'Waxing Crescent', value: 0.15, icon: '🌒', status: 'RISE', color: 'blue' },
     { code: 'FIRST', name: 'First Quarter', value: 0.28, icon: '🌓', status: 'HALF', color: 'yellow' },
-    { code: 'WAX_G', name: 'Wax Gibbous', value: 0.4, icon: '🌔', status: 'BUILD', color: 'orange' },
+    { code: 'WAX_G', name: 'Waxing Gibbous', value: 0.4, icon: '🌔', status: 'BUILD', color: 'orange' },
     { code: 'FULL', name: 'Full Moon', value: 0.5, icon: '🌕', status: 'MAX', color: 'white' },
-    { code: 'WAN_G', name: 'Wan Gibbous', value: 0.6, icon: '🌖', status: 'FADE', color: 'purple' },
+    { code: 'WAN_G', name: 'Waning Gibbous', value: 0.6, icon: '🌖', status: 'FADE', color: 'purple' },
     { code: 'LAST', name: 'Last Quarter', value: 0.72, icon: '🌗', status: 'DIM', color: 'cyan' },
-    { code: 'WAN_C', name: 'Wan Crescent', value: 0.85, icon: '🌘', status: 'END', color: 'red' }
+    { code: 'WAN_C', name: 'Waning Crescent', value: 0.85, icon: '🌘', status: 'END', color: 'red' }
   ];
 
   // Update mission time every second
@@ -253,7 +301,7 @@ const MissionControlBoard = ({
     return () => clearInterval(interval);
   }, []);
 
-  // Get time for specific timezone
+  // Get time for specific timezone with enhanced error handling
   const getTimeForZone = (timezone) => {
     try {
       return new Date().toLocaleTimeString('en-US', {
@@ -264,49 +312,62 @@ const MissionControlBoard = ({
         second: '2-digit'
       });
     } catch (e) {
+      console.warn(`Failed to get time for timezone ${timezone}:`, e);
       return '--:--:--';
     }
   };
 
-  // Check if timezone is in daylight (rough estimation)
+  // Check if timezone is in daylight (rough estimation) with error handling
   const isDaylight = (timezone) => {
-    const now = new Date();
-    const hour = parseInt(new Date().toLocaleTimeString('en-US', {
-      timeZone: timezone,
-      hour12: false,
-      hour: '2-digit'
-    }));
-    return hour >= 6 && hour < 20; // Rough daylight hours
-  };
-
-  // Handle phase selection - THIS ACTUALLY CONTROLS THE MOON!
-  const handlePhaseSelect = (phase) => {
-    console.log(`🚀 MISSION CONTROL: Phase selected - ${phase.name} (${phase.value})`);
-    
-    // Temporarily set transitioning to true when changing phases
-    setIsTransitioning(true);
-    
-    setTimeout(() => {
-      setIsTransitioning(false);
-    }, 1500);
-    
-    if (phase.value === null) {
-      // AUTO mode - use real lunar data
-      setControlMode('AUTO');
-      setManualPhase(null);
-      console.log('🌙 AUTO MODE: Syncing to real lunar phase');
-    } else {
-      // MANUAL mode - override with selected phase
-      setControlMode('MANUAL');
-      setManualPhase(phase.value);
-      console.log(`🎛️ MANUAL OVERRIDE: Phase set to ${phase.value}`);
+    try {
+      const now = new Date();
+      const hour = parseInt(new Date().toLocaleTimeString('en-US', {
+        timeZone: timezone,
+        hour12: false,
+        hour: '2-digit'
+      }));
+      return hour >= 6 && hour < 20; // Rough daylight hours
+    } catch (e) {
+      console.warn(`Failed to determine daylight for timezone ${timezone}:`, e);
+      return true; // Default to daylight if error
     }
-    
-    // Call the parent's phase change handler
-    onPhaseChange(phase.value);
   };
 
-  // Get current lunar data using the lune library directly for display
+  // Handle phase selection - THIS ACTUALLY CONTROLS THE MOON! Enhanced with error handling
+  const handlePhaseSelect = (phase) => {
+    try {
+      console.log(`🚀 MISSION CONTROL: Phase selected - ${phase.name} (${phase.value})`);
+      
+      // Temporarily set transitioning to true when changing phases
+      setIsTransitioning(true);
+      
+      setTimeout(() => {
+        setIsTransitioning(false);
+      }, 1500);
+      
+      if (phase.value === null) {
+        // AUTO mode - use real lunar data
+        setControlMode('AUTO');
+        setManualPhase(null);
+        console.log('🌙 AUTO MODE: Syncing to real lunar phase');
+      } else {
+        // MANUAL mode - override with selected phase
+        setControlMode('MANUAL');
+        setManualPhase(phase.value);
+        console.log(`🎛️ MANUAL OVERRIDE: Phase set to ${phase.value}`);
+      }
+      
+      // Call the parent's phase change handler with error handling
+      if (typeof onPhaseChange === 'function') {
+        onPhaseChange(phase.value);
+      }
+    } catch (error) {
+      console.error('Error in handlePhaseSelect:', error);
+      setIsTransitioning(false); // Reset on error
+    }
+  };
+
+  // Get current lunar data using the lune library directly for display with enhanced error handling
   const getCurrentLunarData = () => {
     try {
       const moonData = lune.phase(new Date());
@@ -315,25 +376,47 @@ const MissionControlBoard = ({
       const newMoonRef = new Date('2024-01-11'); // Reference new moon
       const daysSinceNew = (today - newMoonRef) / (1000 * 60 * 60 * 24);
       
+      // Use the same phase mapping as the lighting system for consistency
+      const getPhaseNameFromValue = (phase) => {
+        if (typeof phase !== 'number' || isNaN(phase)) return 'Unknown Phase';
+        if (phase <= 0.07) return 'New Moon';
+        if (phase <= 0.25) return 'Waxing Crescent';
+        if (phase <= 0.32) return 'First Quarter';
+        if (phase <= 0.48) return 'Waxing Gibbous';
+        if (phase <= 0.52) return 'Full Moon';
+        if (phase <= 0.68) return 'Waning Gibbous';
+        if (phase <= 0.75) return 'Last Quarter';
+        if (phase <= 0.93) return 'Waning Crescent';
+        return 'New Moon'; // 0.93 - 1.0
+      };
+      
+      // Validate moonData
+      if (!moonData || typeof moonData.phase !== 'number') {
+        throw new Error('Invalid moon data received');
+      }
+      
+      const distanceKm = getDistanceToEarth() || 384400; // Fallback to average
+      const tideInfluence = getTideInfluence() || 'Neutral'; // Fallback
+      
       return {
         phase: moonData.phase,
-        age: Math.floor(daysSinceNew % lunarMonth),
-        illumination: Math.round(moonData.illuminated * 100),
-        phaseName: moonData.phase_name || getMoonPhaseDescription(),
+        age: Math.max(0, Math.floor(daysSinceNew % lunarMonth)) || 0,
+        illumination: Math.max(0, Math.min(100, Math.round((moonData.illuminated || 0) * 100))),
+        phaseName: getPhaseNameFromValue(moonData.phase),
         isWaxing: moonData.phase < 0.5,
         nextPhase: getNextPhaseInfo(moonData.phase),
-        lunarCycle: Math.floor(daysSinceNew / lunarMonth) + 1,
-        distanceKm: getDistanceToEarth(),
-        tideInfluence: getTideInfluence()
+        lunarCycle: Math.max(1, Math.floor(daysSinceNew / lunarMonth) + 1),
+        distanceKm: distanceKm,
+        tideInfluence: tideInfluence
       };
     } catch (error) {
-      console.warn('Failed to get lunar data:', error);
+      console.warn('Failed to get lunar data, using fallbacks:', error);
       return {
-        phase: realPhase,
+        phase: realPhase || 0.5,
         age: 15,
-        illumination: Math.round(realPhase * 100),
-        phaseName: getMoonPhaseDescription(),
-        isWaxing: realPhase < 0.5,
+        illumination: Math.round((realPhase || 0.5) * 100),
+        phaseName: getMoonPhaseDescription ? getMoonPhaseDescription() : 'Full Moon',
+        isWaxing: (realPhase || 0.5) < 0.5,
         nextPhase: 'Full Moon',
         lunarCycle: 1,
         distanceKm: 384400, // Average distance
@@ -342,55 +425,78 @@ const MissionControlBoard = ({
     }
   };
 
-  // Get next phase information
+  // Get next phase information with error handling
   const getNextPhaseInfo = (currentPhase) => {
-    const phases = ['New Moon', 'First Quarter', 'Full Moon', 'Last Quarter'];
-    const phaseValues = [0, 0.25, 0.5, 0.75];
-    
-    for (let i = 0; i < phaseValues.length; i++) {
-      if (currentPhase < phaseValues[i]) {
-        return phases[i];
+    try {
+      if (typeof currentPhase !== 'number' || isNaN(currentPhase)) {
+        return 'Full Moon'; // Default fallback
       }
+      
+      const phases = ['New Moon', 'First Quarter', 'Full Moon', 'Last Quarter'];
+      const phaseValues = [0, 0.25, 0.5, 0.75];
+      
+      for (let i = 0; i < phaseValues.length; i++) {
+        if (currentPhase < phaseValues[i]) {
+          return phases[i];
+        }
+      }
+      return phases[0]; // Next new moon
+    } catch (error) {
+      console.warn('Error calculating next phase:', error);
+      return 'Full Moon'; // Safe fallback
     }
-    return phases[0]; // Next new moon
   };
 
   const lunarData = getCurrentLunarData();
   
-  // Get the current active phase (manual override or real)
+  // Get the current active phase (manual override or real) with safety checks
   const activePhase = controlMode === 'MANUAL' ? manualPhase : realPhase;
   const selectedPhase = moonPhases.find(p => p.value === activePhase) || moonPhases[0];
   
-  // Format the current date for display
-  const formattedDate = new Intl.DateTimeFormat('en-US', {
-    weekday: 'short',
-    month: 'short',
-    day: 'numeric'
-  }).format(missionTime);
-
-  // Toggle anomaly mode
-  const toggleAnomalyMode = (mode) => {
-    // Determine the new mode (if current mode is the same, set to null)
-    const newMode = anomalyMode === mode ? null : mode;
-    
-    // Update state and call parent handler
-    setAnomalyMode(newMode);
-    if (onAnomalyChange) {
-      onAnomalyChange(newMode);
+  // Format the current date for display with error handling
+  const formattedDate = (() => {
+    try {
+      return new Intl.DateTimeFormat('en-US', {
+        weekday: 'short',
+        month: 'short',
+        day: 'numeric'
+      }).format(missionTime);
+    } catch (error) {
+      console.warn('Error formatting date:', error);
+      return new Date().toDateString().slice(0, 10); // Fallback format
     }
-    
-    // Only log in development
-    if (process.env.NODE_ENV === 'development') {
-      if (newMode) {
-        console.log(`🔮 ANOMALY MODE ACTIVATED: ${newMode}`);
-      } else {
-        console.log(`🔮 ANOMALY MODE DEACTIVATED`);
+  })();
+
+  // Toggle anomaly mode with enhanced error handling
+  const toggleAnomalyMode = (mode) => {
+    try {
+      // Determine the new mode (if current mode is the same, set to null)
+      const newMode = anomalyMode === mode ? null : mode;
+      
+      // Update state and call parent handler
+      setAnomalyMode(newMode);
+      if (typeof onAnomalyChange === 'function') {
+        onAnomalyChange(newMode);
       }
+      
+      // Only log in development
+      if (process.env.NODE_ENV === 'development') {
+        if (newMode) {
+          console.log(`🔮 ANOMALY MODE ACTIVATED: ${newMode}`);
+        } else {
+          console.log(`🔮 ANOMALY MODE DEACTIVATED`);
+        }
+      }
+    } catch (error) {
+      console.error('Error in toggleAnomalyMode:', error);
     }
   };
 
   return (
     <>
+      {/* Inject tidal animation styles */}
+      <style>{tidalAnimations}</style>
+      
       <div className={`relative w-full ${className}`}>
         {/* Sliding Phase Control Card - Positioned above main board */}
         {showSlidingControl && (
@@ -413,24 +519,27 @@ const MissionControlBoard = ({
           transition={{ duration: 1, delay: 0.2 }}
           className="backdrop-blur-xl bg-black/40 rounded-lg overflow-hidden mx-2 md:mx-4 border border-white/10"
           style={{
-            height: '31vh',
-            minHeight: '250px',
-            maxHeight: '380px',
+            height: '33vh',
+            minHeight: '270px',
+            maxHeight: '400px',
             marginTop: '-15vh',
             boxShadow: '0 0 25px rgba(0, 0, 0, 0.4), inset 0 0 15px rgba(131, 204, 22, 0.18)',
           }}
         >
           {/* Integrated Mission Control Header with Toggle Button */}
-          <div className="pt-2 pb-1.5 px-4 border-b border-white/10">
+          <div className="pt-2 pb-1.5 px-2 md:px-4 border-b border-white/10">
             <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-3">
+              <div className="flex items-center space-x-2 md:space-x-3">
                 <motion.div 
                   className={`w-1.5 h-1.5 rounded-full ${controlMode === 'AUTO' ? 'bg-lime-400' : 'bg-orange-400'}`}
                   animate={{ opacity: [0.7, 1, 0.7] }}
                   transition={{ duration: 2, repeat: Infinity }}
                 />
-                <span className="text-lime-400/80 text-xs font-mono tracking-wider">
+                <span className="text-lime-400/80 text-xs font-mono tracking-wider hidden sm:inline">
                   LUNAR CONTROL COMMAND BOARD
+                </span>
+                <span className="text-lime-400/80 text-xs font-mono tracking-wider sm:hidden">
+                  LUNAR CONTROL
                 </span>
                 <div className={`text-xs font-mono ${controlMode === 'AUTO' ? 'text-lime-400' : 'text-orange-400'}`}>
                   {controlMode} {isTransitioning || lightingIsTransitioning ? '| TRANSIT' : '| OPERATIONAL'}
@@ -440,7 +549,7 @@ const MissionControlBoard = ({
                 {showSlidingControl && (
                   <motion.button
                     onClick={() => setSlidingControlVisible(!slidingControlVisible)}
-                    className="ml-4 bg-black/30 backdrop-blur-md rounded-md px-3 py-1 border border-lime-400/20 shadow-sm"
+                    className="ml-2 md:ml-4 bg-black/30 backdrop-blur-md rounded-md px-2 md:px-3 py-1 border border-lime-400/20 shadow-sm"
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.95 }}
                     animate={isTransitioning ? {
@@ -449,9 +558,9 @@ const MissionControlBoard = ({
                     } : {}}
                     transition={{ duration: 1.5, repeat: isTransitioning ? Infinity : 0, ease: "easeInOut" }}
                   >
-                    <div className="flex items-center space-x-2">
+                    <div className="flex items-center space-x-1 md:space-x-2">
                       <span className={`text-sm ${isTransitioning ? 'animate-pulse' : ''}`}>🌙</span>
-                      <span className="text-lime-400 text-xs font-mono">PHASE</span>
+                      <span className="text-lime-400 text-xs font-mono hidden md:inline">PHASE</span>
                       <motion.div
                         animate={{ rotate: slidingControlVisible ? 180 : 0 }}
                         transition={{ duration: 0.3 }}
@@ -462,36 +571,39 @@ const MissionControlBoard = ({
                   </motion.button>
                 )}
               </div>
-              <div className="flex items-center space-x-4">
-                <span className="text-yellow-400/80 text-xs font-mono tracking-wider">
+              <div className="flex items-center space-x-2 md:space-x-4">
+                <span className="text-yellow-400/80 text-xs font-mono tracking-wider hidden md:inline">
                   GLOBAL MISSION TIME
                 </span>
-                <div className="text-lime-400 font-mono text-sm tracking-wide">
+                <span className="text-yellow-400/80 text-xs font-mono tracking-wider md:hidden">
+                  GMT
+                </span>
+                <div className="text-lime-400 font-mono text-xs md:text-sm tracking-wide">
                   {missionTime.toUTCString().slice(17, 25)}
                 </div>
               </div>
             </div>
             
-            {/* NEW: Current Moon Phase Information Bar */}
-            <div className="flex items-center justify-between mt-2 text-xs">
-              <div className="flex items-center space-x-4">
-                <div className="flex items-center space-x-2">
-                  <span className="text-gray-400 font-mono">🌙 Phase:</span>
-                  <span className="text-white/90">{lunarData.phaseName}</span>
+            {/* NEW: Current Moon Phase Information Bar - Responsive */}
+            <div className="flex items-center justify-between mt-2 text-xs overflow-x-auto">
+              <div className="flex items-center space-x-2 md:space-x-4 min-w-0 flex-shrink-0">
+                <div className="flex items-center space-x-1 md:space-x-2">
+                  <span className="text-gray-400 font-mono">🌙</span>
+                  <span className="text-white/90 truncate">{lunarData.phaseName}</span>
                 </div>
                 
-                <div className="flex items-center space-x-2">
-                  <span className="text-gray-400 font-mono">📅 Date:</span>
+                <div className="flex items-center space-x-1 md:space-x-2 hidden sm:flex">
+                  <span className="text-gray-400 font-mono">📅</span>
                   <span className="text-white/90">{formattedDate}</span>
                 </div>
                 
-                <div className="flex items-center space-x-2">
-                  <span className="text-gray-400 font-mono">🕐 Age:</span>
+                <div className="flex items-center space-x-1 md:space-x-2">
+                  <span className="text-gray-400 font-mono">🕐</span>
                   <span className="text-white/90">{lunarData.age}d</span>
                 </div>
                 
-                <div className="flex items-center space-x-2">
-                  <span className="text-gray-400 font-mono">⚙️ Mode:</span>
+                <div className="flex items-center space-x-1 md:space-x-2">
+                  <span className="text-gray-400 font-mono">⚙️</span>
                   <span className={controlMode === 'AUTO' ? 'text-lime-400' : 'text-orange-400'}>
                     {controlMode}
                   </span>
@@ -499,148 +611,220 @@ const MissionControlBoard = ({
               </div>
               
               {anomalyMode && (
-                <div className="bg-black/30 px-2 py-0.5 rounded border border-lime-400/20">
-                  <span className="text-yellow-400 text-xs font-mono">🔮 ANOMALY: {anomalyMode.toUpperCase()}</span>
+                <div className="bg-black/30 px-2 py-0.5 rounded border border-lime-400/20 flex-shrink-0 ml-2">
+                  <span className="text-yellow-400 text-xs font-mono">🔮 {anomalyMode.toUpperCase()}</span>
                 </div>
               )}
             </div>
           </div>
 
-          <div className="relative z-10 h-[calc(100%-45px)] p-2">
-            {/* Three-Section Layout: Enhanced Lunar Control (30%) | World Clocks (70%) */}
-            <div className="h-full flex gap-2">
+          <div className="relative z-10 h-[calc(100%-45px)] p-1 md:p-2">
+            {/* Responsive Layout: Enhanced Lunar Control | World Clocks */}
+            <div className="h-full flex gap-1 md:gap-2 flex-col md:flex-row">
               
-              {/* Enhanced Lunar Control Section - 30% */}
-              <div className="w-[30%] flex flex-col">
-                <div className="relative" style={{ height: "210px" }}>
-                  <div className="absolute -left-1 top-0 h-full w-0.5 bg-gradient-to-b from-lime-400/60 to-transparent"></div>
+              {/* Enhanced Lunar Control Section - Mobile: Full Width, Desktop: 30% */}
+              <div className="w-full md:w-[30%] flex flex-col order-2 md:order-1">
+                <div className="relative h-full" style={{ height: isMobile ? "180px" : "230px" }}>
+                  <div className="absolute -left-1 top-0 h-full w-0.5 bg-gradient-to-b from-lime-400/60 to-transparent hidden md:block"></div>
                   
-                  {/* New Lunar Data Panel - Elegant vertical layout */}
-                  <div className="h-[90px] w-full p-0.5">
-                    <div className="bg-black/20 backdrop-blur-sm h-full flex flex-col justify-center px-3 rounded-none border-[0.5px] border-white/5">
-                      <div className="grid grid-cols-2 gap-x-4 gap-y-2">
-                        <div className="flex items-center justify-between">
-                          <span className="text-gray-400 text-xs">Age:</span>
-                          <span className="text-white text-xs font-mono">{lunarData.age}d</span>
+                  {/* Main Dashboard Container - Distance-Centered Design */}
+                  <div className="h-full w-full p-1 md:p-2 bg-black/20 backdrop-blur-sm border-[0.5px] border-white/10 relative">
+                    
+                    {/* Top Data Strip - Compact lunar metrics - Responsive Grid */}
+                    <div className="grid grid-cols-4 gap-1 md:gap-2 mb-2 md:mb-3">
+                      <div className="flex flex-col items-center">
+                        <span className="text-gray-400 text-xs">Age</span>
+                        <span className="text-lime-400 text-xs font-mono">{lunarData.age}d</span>
+                      </div>
+                      <div className="flex flex-col items-center">
+                        <span className="text-gray-400 text-xs">Light</span>
+                        <span className="text-white text-xs font-mono">{lunarData.illumination}%</span>
+                      </div>
+                      <div className="flex flex-col items-center">
+                        <span className="text-gray-400 text-xs">Cycle</span>
+                        <span className="text-yellow-400 text-xs font-mono">#{lunarData.lunarCycle}</span>
+                      </div>
+                      <div className="flex flex-col items-center">
+                        <span className="text-gray-400 text-xs">Mode</span>
+                        <span className={`text-xs font-mono ${controlMode === 'AUTO' ? 'text-lime-400' : 'text-orange-400'}`}>
+                          {controlMode}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* HERO: Central Distance Visualization with Integrated Tidal System */}
+                    <div className="flex-1 flex flex-col justify-center">
+                      <div className="text-center mb-2">
+                        <span className="text-gray-300 text-sm font-mono tracking-wider">LUNAR DISTANCE</span>
+                        <div className="text-white text-lg font-mono font-bold">
+                          {Math.round(lunarData.distanceKm / 1000)}k km
                         </div>
-                        <div className="flex items-center justify-between">
-                          <span className="text-gray-400 text-xs">Light:</span>
-                          <span className="text-white text-xs font-mono">{lunarData.illumination}%</span>
+                      </div>
+                      
+                      {/* Enhanced Large Orbital Distance Bar with Integrated Tidal Cycle */}
+                      <div className="relative px-2">
+                        <div className="w-full bg-black/60 rounded-full h-4 relative overflow-hidden border border-white/20">
+                          {/* Orbital markers with better spacing */}
+                          <div className="absolute top-0 left-0 w-1 h-full bg-orange-400/80 rounded-l-full" />
+                          <div className="absolute top-0 left-1/4 w-0.5 h-full bg-yellow-300/60" />
+                          <div className="absolute top-0 left-1/2 w-0.5 h-full bg-yellow-300/60" />
+                          <div className="absolute top-0 left-3/4 w-0.5 h-full bg-yellow-300/60" />
+                          <div className="absolute top-0 right-0 w-1 h-full bg-red-400/80 rounded-r-full" />
+                          
+                          {/* Tidal influence overlay - shows as blue glow intensity based on distance */}
+                          <div 
+                            className="absolute inset-0 rounded-full transition-all duration-3000 ease-in-out"
+                            style={{
+                              background: `linear-gradient(90deg, 
+                                rgba(59, 130, 246, ${lunarData.tideInfluence === 'High' ? '0.3' : lunarData.tideInfluence === 'Low' ? '0.1' : '0.2'}) 0%, 
+                                rgba(147, 197, 253, ${lunarData.tideInfluence === 'High' ? '0.2' : lunarData.tideInfluence === 'Low' ? '0.05' : '0.1'}) 50%, 
+                                rgba(59, 130, 246, ${lunarData.tideInfluence === 'High' ? '0.3' : lunarData.tideInfluence === 'Low' ? '0.1' : '0.2'}) 100%)`,
+                              animation: 'tidalWave 4s ease-in-out infinite'
+                            }}
+                          />
+                          
+                          {/* Current position indicator - larger and more prominent */}
+                          <div 
+                            className="absolute top-0.5 bottom-0.5 w-3 bg-gradient-to-r from-orange-500 via-yellow-300 to-orange-500 rounded-full transition-all duration-2000 ease-out shadow-lg z-10"
+                            style={{
+                              left: `${Math.max(1, Math.min(93, ((lunarData.distanceKm - 356500) / (406700 - 356500)) * 93))}%`,
+                              animation: 'orbitalPulse 3s ease-in-out infinite',
+                              boxShadow: '0 0 8px rgba(251, 191, 36, 0.8), inset 0 1px 2px rgba(255,255,255,0.3)'
+                            }}
+                          >
+                            {/* Pulsing center indicator */}
+                            <div className="absolute top-1/2 left-1/2 w-1.5 h-1.5 bg-white rounded-full animate-pulse transform -translate-x-1/2 -translate-y-1/2 shadow-sm" />
+                            {/* Velocity indicator trail */}
+                            <div className="absolute top-1/2 left-0 w-1 h-0.5 bg-gradient-to-r from-transparent to-yellow-200 transform -translate-y-1/2 opacity-60" />
+                          </div>
                         </div>
-                        <div className="flex items-center justify-between">
-                          <span className="text-gray-400 text-xs">Cycle:</span>
-                          <span className="text-white text-xs font-mono">#{lunarData.lunarCycle}</span>
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <span className="text-gray-400 text-xs">Mode:</span>
-                          <span className={`text-xs font-mono ${controlMode === 'AUTO' ? 'text-lime-400' : 'text-orange-400'}`}>
-                            {controlMode}
-                          </span>
+                        
+                        {/* Enhanced orbital labels with integrated tidal info */}
+                        <div className="flex justify-between mt-1 px-1">
+                          <div className="flex flex-col items-start">
+                            <span className="text-orange-400 font-mono text-xs font-bold">356k</span>
+                            <span className="text-gray-400 text-xs">PERIGEE</span>
+                            <span className="text-blue-300 text-xs">High Tide</span>
+                          </div>
+                          <div className="flex flex-col items-center">
+                            <span className="text-yellow-300 font-mono text-xs">381k</span>
+                            <span className="text-gray-400 text-xs">AVERAGE</span>
+                            <span className={`text-xs font-mono ${
+                              lunarData.tideInfluence === 'High' ? 'text-blue-300' :
+                              lunarData.tideInfluence === 'Low' ? 'text-blue-500' : 'text-blue-400'
+                            }`}>
+                              🌊 {lunarData.tideInfluence}
+                            </span>
+                          </div>
+                          <div className="flex flex-col items-end">
+                            <span className="text-red-400 font-mono text-xs font-bold">407k</span>
+                            <span className="text-gray-400 text-xs">APOGEE</span>
+                            <span className="text-blue-500 text-xs">Low Tide</span>
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                  
-                  {/* Middle Row - Tidal & Orbit Info */}
-                  <div className="h-[60px] w-full p-0.5">
-                    <div className="bg-black/30 backdrop-blur-sm h-full flex flex-col justify-center px-3 rounded-none border-[0.5px] border-white/10">
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="text-gray-400 text-xs">🌊 TIDAL & ORBIT</span>
+
+                    {/* Bottom Integrated Events Info - Single Line */}
+                    <div className="mt-4 flex justify-between items-center px-2">
+                      <div className="flex items-center space-x-4">
+                        <span className="text-yellow-400 text-xs">🌟</span>
+                        {lunarEvents ? (
+                          <>
+                            <div className="text-gray-400 text-xs">
+                              Super: <span className="text-yellow-300 font-mono">{lunarEvents.supermoon.daysFromNow}d</span>
+                            </div>
+                            <div className="text-gray-400 text-xs">
+                              Eclipse: <span className="text-red-300 font-mono">{lunarEvents.eclipse.daysFromNow}d</span>
+                            </div>
+                          </>
+                        ) : (
+                          <div className="text-gray-400 text-xs">Loading events...</div>
+                        )}
                       </div>
-                      <div className="grid grid-cols-2 gap-x-4 gap-y-1">
-                        <div className="flex items-center justify-between">
-                          <span className="text-gray-400 text-xs">Tide:</span>
-                          <span className="text-white text-xs font-mono">{lunarData.tideInfluence}</span>
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <span className="text-gray-400 text-xs">Distance:</span>
-                          <span className="text-white text-xs font-mono">{lunarData.distanceKm.toLocaleString()} km</span>
-                        </div>
+                      
+                      {/* Orbital position indicator */}
+                      <div className="text-right">
+                        <span className="text-gray-500 text-xs">Orbital: </span>
+                        <span className="text-lime-300 text-xs font-mono">
+                          {Math.round(((lunarData.distanceKm - 356500) / (406700 - 356500)) * 100)}%
+                        </span>
                       </div>
-                    </div>
-                  </div>
-                  
-                  {/* Bottom Row - Event Tracker */}
-                  <div className="h-[60px] w-full p-0.5">
-                    <div className="bg-black/30 backdrop-blur-sm h-full flex flex-col justify-center px-3 rounded-none border-[0.5px] border-white/10">
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="text-gray-400 text-xs">🌟 RARE EVENTS</span>
-                      </div>
-                      {lunarEvents ? (
-                        <div className="grid grid-cols-2 gap-x-4 gap-y-1">
-                          <div className="flex items-center justify-between">
-                            <span className="text-gray-400 text-xs">Supermoon:</span>
-                            <span className="text-white text-xs font-mono">{lunarEvents.supermoon.daysFromNow}d</span>
-                          </div>
-                          <div className="flex items-center justify-between">
-                            <span className="text-gray-400 text-xs">Eclipse:</span>
-                            <span className="text-white text-xs font-mono">{lunarEvents.eclipse.daysFromNow}d ({lunarEvents.eclipse.location})</span>
-                          </div>
-                        </div>
-                      ) : (
-                        <div className="text-gray-400 text-xs">Loading event data...</div>
-                      )}
                     </div>
                   </div>
                 </div>
               </div>
               
-              {/* World Clock Section - 70% */}
-              <div className="w-[70%] flex flex-col">
+              {/* World Clock Section - Mobile: Full Width First, Desktop: 70% */}
+              <div className="w-full md:w-[70%] flex flex-col order-1 md:order-2">
                 <div className="relative">
-                  <div className="absolute -left-1 top-0 h-full w-0.5 bg-gradient-to-b from-yellow-400/60 to-transparent"></div>
+                  <div className="absolute -left-1 top-0 h-full w-0.5 bg-gradient-to-b from-yellow-400/60 to-transparent hidden md:block"></div>
                 </div>
                 
-                {/* Completely Refactored Time Zone Grid - Perfectly Aligned with No Spaces */}
-                <div className="flex flex-col" style={{ height: "210px" }}>
-                  {/* Row 1 */}
-                  <div className="flex h-[70px] w-full">
-                    {timeZones.slice(0, 3).map((zone, index) => (
-                      <div key={`r1c${index}`} className="w-1/5 h-full">
-                        {renderTimeZone(zone, index)}
-                      </div>
-                    ))}
-                    <div className="w-1/5 h-full relative" style={{zIndex: 10}}>
-                      {renderTimeZone(timeZones[3], 3)}
-                    </div>
-                    <div className="w-1/5 h-full">
-                      {renderTimeZone(timeZones[4], 4)}
+                {/* Responsive Time Zone Grid - Mobile: Stacked, Desktop: Grid */}
+                <div className="flex flex-col -gap-px" style={{ height: isMobile ? "auto" : "230px" }}>
+                  {/* Mobile Layout: Simplified Grid */}
+                  <div className="md:hidden">
+                    <div className="grid grid-cols-3 gap-px">
+                      {timeZones.slice(0, 9).map((zone, index) => (
+                        <div key={`mobile-${zone.code}`} className="h-16">
+                          {renderTimeZoneMobile(zone, index)}
+                        </div>
+                      ))}
                     </div>
                   </div>
                   
-                  {/* Row 2 */}
-                  <div className="flex h-[70px] w-full">
-                    {timeZones.slice(5, 8).map((zone, index) => (
-                      <div key={`r2c${index}`} className="w-1/5 h-full">
-                        {renderTimeZone(zone, index + 5)}
+                  {/* Desktop Layout: Original Complex Grid */}
+                  <div className="hidden md:flex md:flex-col md:-gap-px">
+                    {/* Row 1 */}
+                    <div className="flex h-[76px] w-full -gap-px">
+                      {timeZones.slice(0, 3).map((zone, index) => (
+                        <div key={`r1c${index}`} className="w-1/5 h-full -mr-px">
+                          {renderTimeZone(zone, index)}
+                        </div>
+                      ))}
+                      <div className="w-1/5 h-full relative -mr-px" style={{zIndex: 10}}>
+                        {renderTimeZone(timeZones[3], 3)}
                       </div>
-                    ))}
-                    <div className="w-1/5 h-full" style={{marginTop: "-70px", opacity: 0}}>
-                      {/* Spacer for UTC's second row */}
-                    </div>
-                    <div className="w-1/5 h-full">
-                      {renderTimeZone(timeZones[8], 8)}
-                    </div>
-                  </div>
-                  
-                  {/* Row 3 */}
-                  <div className="flex h-[70px] w-full">
-                    {timeZones.slice(9).map((zone, index) => (
-                      <div key={`r3c${index}`} className="w-1/5 h-full">
-                        {renderTimeZone(zone, index + 9)}
+                      <div className="w-1/5 h-full">
+                        {renderTimeZone(timeZones[4], 4)}
                       </div>
-                    ))}
+                    </div>
+                    
+                    {/* Row 2 */}
+                    <div className="flex h-[77px] w-full -gap-px">
+                      {timeZones.slice(5, 8).map((zone, index) => (
+                        <div key={`r2c${index}`} className="w-1/5 h-full -mr-px">
+                          {renderTimeZone(zone, index + 5)}
+                        </div>
+                      ))}
+                      <div className="w-1/5 h-full -mr-px" style={{marginTop: "-77px", opacity: 0}}>
+                        {/* Spacer for UTC's second row */}
+                      </div>
+                      <div className="w-1/5 h-full">
+                        {renderTimeZone(timeZones[8], 8)}
+                      </div>
+                    </div>
+                    
+                    {/* Row 3 */}
+                    <div className="flex h-[77px] w-full -gap-px">
+                      {timeZones.slice(9).map((zone, index) => (
+                        <div key={`r3c${index}`} className="w-1/5 h-full ${index < 3 ? '-mr-px' : ''}">
+                          {renderTimeZone(zone, index + 9)}
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Ultra-Minimal Status Bar */}
-            <div className="absolute bottom-1 left-2 right-2 flex items-center justify-between text-xs text-gray-400/60 font-mono">
-              <div className="flex items-center space-x-3">
+            {/* Ultra-Minimal Status Bar - Responsive */}
+            <div className="absolute bottom-1 left-1 md:left-2 right-1 md:right-2 flex items-center justify-between text-xs text-gray-400/60 font-mono">
+              <div className="flex items-center space-x-2 md:space-x-3">
                 {/* Status indicators removed */}
               </div>
-              <div>
+              <div className="text-xs">
                 {missionTime.toISOString().slice(0, 19)}Z
               </div>
             </div>
@@ -650,6 +834,37 @@ const MissionControlBoard = ({
     </>
   );
   
+  // Mobile-optimized timezone renderer
+  function renderTimeZoneMobile(zone, index) {
+    const isDay = isDaylight(zone.timezone);
+    const zoneTime = getTimeForZone(zone.timezone);
+    
+    return (
+      <motion.div
+        key={`mobile-card-${zone.code}`}
+        initial={{ opacity: 0, y: 5 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: index * 0.02 }}
+        className="relative bg-black/20 backdrop-blur-sm overflow-hidden border border-white/5 h-full w-full rounded-sm"
+      >
+        <div className={`
+          absolute top-0 left-0 right-0 h-0.5
+          ${isDay ? 'bg-yellow-500/40' : 'bg-blue-500/40'}
+        `}></div>
+        
+        <div className="p-1 text-center h-full flex flex-col justify-center">
+          <div className="text-white/90 font-medium mb-0.5 text-xs">
+            {zone.flag} {zone.code}
+          </div>
+          <div className="text-white/80 font-mono text-xs mb-0.5">
+            {zoneTime}
+          </div>
+          <div className={`rounded-full mx-auto w-1 h-1 ${isDay ? 'bg-yellow-400' : 'bg-blue-400'}`}></div>
+        </div>
+      </motion.div>
+    );
+  }
+
   // Helper function to render time zone cards with enhanced styling
   function renderTimeZone(zone, index) {
     const isDay = isDaylight(zone.timezone);
@@ -662,10 +877,12 @@ const MissionControlBoard = ({
         initial={{ opacity: 0, y: 5 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: index * 0.02 }}
-        className="relative bg-black/20 backdrop-blur-sm overflow-hidden border-[0.5px] border-white/5 h-full"
+        className="relative bg-black/20 backdrop-blur-sm overflow-hidden border-r-[0.5px] border-b-[0.5px] border-white/5 h-full w-full"
         style={{
-          height: isUTC ? "120px" : "60px",
-          zIndex: isUTC ? 2 : 1
+          height: isUTC ? "154px" : "77px",
+          zIndex: isUTC ? 2 : 1,
+          borderTop: index < 5 ? '0.5px solid rgba(255,255,255,0.05)' : 'none',
+          borderLeft: [0, 5, 9].includes(index) ? '0.5px solid rgba(255,255,255,0.05)' : 'none'
         }}
       >
         <div className={`
