@@ -13,8 +13,12 @@
 import React, { useState, useEffect, Suspense, useRef } from 'react';
 import { Canvas, useLoader, useFrame } from '@react-three/fiber';
 import { Sphere, OrbitControls, Stars, useTexture } from '@react-three/drei';
-import { TextureLoader } from 'three';
-import * as THREE from 'three';
+import { 
+  TextureLoader, 
+  LinearMipmapLinearFilter, 
+  LinearFilter, 
+  ClampToEdgeWrapping 
+} from 'three';
 
 // Scene setup for the 3D Earth with cinematic lighting
 const EarthScene = ({ scaleFactor = 1, rotationY = 0 }) => {

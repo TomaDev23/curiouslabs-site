@@ -9,7 +9,7 @@
 import React, { useRef, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { useMoonLighting } from '../../utils/useMoonLighting';
-import * as THREE from 'three';
+import { DoubleSide, CanvasTexture, BackSide, AdditiveBlending } from 'three';
 
 // Eclipse nebula background - Simple and beautiful orange nebula effect
 const EclipseNebula = ({ intensity, coronaGlow }) => {
@@ -32,7 +32,7 @@ const EclipseNebula = ({ intensity, coronaGlow }) => {
         <meshBasicMaterial
           transparent={true}
           opacity={intensity * 0.4}
-          side={THREE.DoubleSide}
+          side={DoubleSide}
           depthWrite={false}
         >
           <primitive 
@@ -66,7 +66,7 @@ const EclipseNebula = ({ intensity, coronaGlow }) => {
                 ctx.fill();
               }
               
-              const texture = new THREE.CanvasTexture(canvas);
+              const texture = new CanvasTexture(canvas);
               texture.needsUpdate = true;
               return texture;
             })()}
@@ -82,9 +82,9 @@ const EclipseNebula = ({ intensity, coronaGlow }) => {
           transparent={true}
           opacity={intensity * 0.2}
           color="#ff6600"
-          side={THREE.DoubleSide}
+          side={DoubleSide}
           depthWrite={false}
-          blending={THREE.AdditiveBlending}
+          blending={AdditiveBlending}
         >
           <primitive 
             object={(() => {
@@ -102,7 +102,7 @@ const EclipseNebula = ({ intensity, coronaGlow }) => {
               ctx.fillStyle = gradient;
               ctx.fillRect(0, 0, 256, 256);
               
-              const texture = new THREE.CanvasTexture(canvas);
+              const texture = new CanvasTexture(canvas);
               texture.needsUpdate = true;
               return texture;
             })()}
@@ -118,8 +118,8 @@ const EclipseNebula = ({ intensity, coronaGlow }) => {
           color="#ff8800"
           transparent={true}
           opacity={coronaGlow * 0.15}
-          side={THREE.BackSide}
-          blending={THREE.AdditiveBlending}
+          side={BackSide}
+          blending={AdditiveBlending}
           depthWrite={false}
         />
       </mesh>
@@ -131,8 +131,8 @@ const EclipseNebula = ({ intensity, coronaGlow }) => {
           color="#ffaa44"
           transparent={true}
           opacity={coronaGlow * 0.25}
-          side={THREE.BackSide}
-          blending={THREE.AdditiveBlending}
+          side={BackSide}
+          blending={AdditiveBlending}
           depthWrite={false}
         />
       </mesh>

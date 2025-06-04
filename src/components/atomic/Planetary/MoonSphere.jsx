@@ -8,11 +8,19 @@
  * @legit true - MoonSphere passes LEGIT protocol
  */
 
-import React, { useRef } from 'react';
-import { Canvas, useLoader, useFrame } from '@react-three/fiber';
+import React, { useRef, useEffect } from 'react';
+import { Canvas, useLoader, useFrame, useThree } from '@react-three/fiber';
 import { Sphere } from '@react-three/drei';
-import { TextureLoader } from 'three';
-import * as THREE from 'three';
+import { 
+  TextureLoader, 
+  LinearMipmapLinearFilter, 
+  LinearFilter, 
+  ClampToEdgeWrapping,
+  BackSide,
+  FrontSide,
+  AdditiveBlending
+} from 'three';
+import MoonLighting from './MoonLighting';
 
 // Scene setup for the 3D moon with cinematic lighting
 const MoonScene = () => {
@@ -69,7 +77,7 @@ const MoonScene = () => {
           color="#eaeaea"
           transparent
           opacity={0.2}
-          side={THREE.BackSide}
+          side={BackSide}
         />
       </Sphere>
       
@@ -79,7 +87,7 @@ const MoonScene = () => {
           color="#ffffff"
           transparent
           opacity={0.1}
-          side={THREE.BackSide}
+          side={BackSide}
         />
       </Sphere>
       
@@ -98,7 +106,7 @@ const MoonScene = () => {
           color="#ffffff"
           transparent
           opacity={0.12}
-          side={THREE.FrontSide}
+          side={BackSide}
         />
       </Sphere>
       
@@ -123,8 +131,8 @@ const MoonScene = () => {
           color="#ffffff"
           transparent
           opacity={0.08}
-          side={THREE.FrontSide}
-          blending={THREE.AdditiveBlending}
+          side={BackSide}
+          blending={BackSide}
         />
       </Sphere>
     </>

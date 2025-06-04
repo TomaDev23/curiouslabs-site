@@ -11,8 +11,13 @@
 import React, { useRef, useEffect } from 'react';
 import { Canvas, useLoader, useFrame, useThree } from '@react-three/fiber';
 import { Sphere } from '@react-three/drei';
-import { TextureLoader } from 'three';
-import * as THREE from 'three';
+import { 
+  TextureLoader, 
+  LinearMipmapLinearFilter, 
+  LinearFilter, 
+  ClampToEdgeWrapping,
+  BackSide
+} from 'three';
 import MoonLighting from './MoonLighting';
 
 // Scene setup for the 3D moon with cinematic lighting
@@ -40,16 +45,16 @@ const MoonScene = ({ debugPhase, anomalyMode }) => {
   moonBumpMap.generateMipmaps = true;
   
   // Set proper texture filters
-  moonTexture.minFilter = THREE.LinearMipmapLinearFilter; // Trilinear filtering for distant views
-  moonTexture.magFilter = THREE.LinearFilter; // Linear filtering for close-up views
-  moonBumpMap.minFilter = THREE.LinearMipmapLinearFilter;
-  moonBumpMap.magFilter = THREE.LinearFilter;
+  moonTexture.minFilter = LinearMipmapLinearFilter; // Trilinear filtering for distant views
+  moonTexture.magFilter = LinearFilter; // Linear filtering for close-up views
+  moonBumpMap.minFilter = LinearMipmapLinearFilter;
+  moonBumpMap.magFilter = LinearFilter;
   
   // Set proper wrapping mode to prevent texture stretching at edges
-  moonTexture.wrapS = THREE.ClampToEdgeWrapping;
-  moonTexture.wrapT = THREE.ClampToEdgeWrapping;
-  moonBumpMap.wrapS = THREE.ClampToEdgeWrapping;
-  moonBumpMap.wrapT = THREE.ClampToEdgeWrapping;
+  moonTexture.wrapS = ClampToEdgeWrapping;
+  moonTexture.wrapT = ClampToEdgeWrapping;
+  moonBumpMap.wrapS = ClampToEdgeWrapping;
+  moonBumpMap.wrapT = ClampToEdgeWrapping;
   
   // Apply texture scaling to imply distance - FIXED: same for all modes
   moonTexture.repeat.set(0.65, 0.65);
@@ -75,7 +80,7 @@ const MoonScene = ({ debugPhase, anomalyMode }) => {
           color={isSupermoon ? "#fff2d6" : "#ffffff"}
           transparent
           opacity={isSupermoon ? 0.08 : 0.04}
-          side={THREE.BackSide}
+          side={BackSide}
         />
       </Sphere>
       

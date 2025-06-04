@@ -10,11 +10,18 @@
  * @legit true - JupiterSphere passes LEGIT protocol
  */
 
-import React, { useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { Canvas, useLoader, useFrame } from '@react-three/fiber';
-import { Sphere } from '@react-three/drei';
-import { TextureLoader } from 'three';
-import * as THREE from 'three';
+import { Sphere, OrbitControls, Stars, useTexture } from '@react-three/drei';
+import { 
+  TextureLoader, 
+  LinearMipmapLinearFilter, 
+  LinearFilter, 
+  ClampToEdgeWrapping,
+  BackSide,
+  FrontSide,
+  AdditiveBlending
+} from 'three';
 
 // Scene setup for the 3D Jupiter with cinematic lighting
 const JupiterScene = ({ scaleFactor = 1, rotationY = 0 }) => {
@@ -70,7 +77,7 @@ const JupiterScene = ({ scaleFactor = 1, rotationY = 0 }) => {
           color="#d4a574"
           transparent
           opacity={0.18}
-          side={THREE.BackSide}
+          side={BackSide}
         />
       </Sphere>
       
@@ -80,7 +87,7 @@ const JupiterScene = ({ scaleFactor = 1, rotationY = 0 }) => {
           color="#ffcc88"
           transparent
           opacity={0.12}
-          side={THREE.BackSide}
+          side={BackSide}
         />
       </Sphere>
       
@@ -99,7 +106,7 @@ const JupiterScene = ({ scaleFactor = 1, rotationY = 0 }) => {
           color="#d4a574"
           transparent
           opacity={0.12}
-          side={THREE.FrontSide}
+          side={FrontSide}
         />
       </Sphere>
       
@@ -122,8 +129,8 @@ const JupiterScene = ({ scaleFactor = 1, rotationY = 0 }) => {
           color="#d4a574"
           transparent
           opacity={0.08}
-          side={THREE.FrontSide}
-          blending={THREE.AdditiveBlending}
+          side={FrontSide}
+          blending={AdditiveBlending}
         />
       </Sphere>
       
@@ -133,8 +140,8 @@ const JupiterScene = ({ scaleFactor = 1, rotationY = 0 }) => {
           color="#ffcc88"
           transparent
           opacity={0.04}
-          side={THREE.FrontSide}
-          blending={THREE.AdditiveBlending}
+          side={FrontSide}
+          blending={AdditiveBlending}
         />
       </Sphere>
     </group>

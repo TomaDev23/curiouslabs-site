@@ -1,5 +1,35 @@
 import React, { useEffect, useRef, useState } from 'react';
-import * as THREE from 'three';
+import { 
+  Scene, 
+  PerspectiveCamera, 
+  WebGLRenderer, 
+  AmbientLight, 
+  PointLight, 
+  SpotLight, 
+  SphereGeometry, 
+  MeshStandardMaterial, 
+  Mesh, 
+  ShaderMaterial, 
+  Color, 
+  AdditiveBlending, 
+  FrontSide, 
+  ACESFilmicToneMapping, 
+  EllipseCurve, 
+  BufferGeometry, 
+  BufferAttribute, 
+  Points, 
+  Group, 
+  Vector3, 
+  Float32BufferAttribute,
+  TorusGeometry,
+  MeshBasicMaterial,
+  DoubleSide,
+  PlaneGeometry,
+  MeshLambertMaterial,
+  TextureLoader,
+  RepeatWrapping,
+  BackSide
+} from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
 const Immersive3DSolarSystem = () => {
@@ -8,15 +38,15 @@ const Immersive3DSolarSystem = () => {
   
   useEffect(() => {
     // Scene, Camera, Renderer setup
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const scene = new Scene();
+    const camera = new PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
     camera.position.set(0, 40, 120);
     
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    const renderer = new WebGLRenderer({ antialias: true, alpha: true });
     renderer.setSize(mountRef.current.clientWidth, mountRef.current.clientHeight);
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setClearColor(0x000000, 0);
-    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMapping = ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.0;
     renderer.shadowMap.enabled = true;
     
@@ -33,16 +63,16 @@ const Immersive3DSolarSystem = () => {
     controls.autoRotateSpeed = 0.2;
     
     // Lights
-    const ambientLight = new THREE.AmbientLight(0x222244, 0.7);
+    const ambientLight = new AmbientLight(0x222244, 0.7);
     scene.add(ambientLight);
     
-    const centerLight = new THREE.PointLight(0xa855f7, 3, 120);
+    const centerLight = new PointLight(0xa855f7, 3, 120);
     centerLight.position.set(0, 0, 0);
     centerLight.castShadow = true;
     scene.add(centerLight);
     
     // Dynamic spotlight that follows camera
-    const spotLight = new THREE.SpotLight(0x8844ff, 2);
+    const spotLight = new SpotLight(0x8844ff, 2);
     spotLight.position.set(50, 50, 50);
     spotLight.angle = Math.PI / 6;
     spotLight.penumbra = 0.3;
@@ -52,24 +82,24 @@ const Immersive3DSolarSystem = () => {
     scene.add(spotLight);
     
     // Central Sun
-    const sunGeometry = new THREE.SphereGeometry(8, 32, 32);
-    const sunMaterial = new THREE.MeshStandardMaterial({
+    const sunGeometry = new SphereGeometry(8, 32, 32);
+    const sunMaterial = new MeshStandardMaterial({
       emissive: 0xa855f7,
       emissiveIntensity: 1,
       color: 0xa855f7,
       roughness: 0.2,
       metalness: 0.8
     });
-    const sun = new THREE.Mesh(sunGeometry, sunMaterial);
+    const sun = new Mesh(sunGeometry, sunMaterial);
     scene.add(sun);
     
     // Sun glow effect
-    const sunGlowGeometry = new THREE.SphereGeometry(10, 32, 32);
-    const sunGlowMaterial = new THREE.ShaderMaterial({
+    const sunGlowGeometry = new SphereGeometry(10, 32, 32);
+    const sunGlowMaterial = new ShaderMaterial({
       uniforms: {
         time: { value: 0 },
-        color1: { value: new THREE.Color(0xa855f7) },
-        color2: { value: new THREE.Color(0x6366f1) }
+        color1: { value: new Color(0xa855f7) },
+        color2: { value: new Color(0x6366f1) }
       },
       vertexShader: `
         varying vec2 vUv;
@@ -99,16 +129,16 @@ const Immersive3DSolarSystem = () => {
         }
       `,
       transparent: true,
-      blending: THREE.AdditiveBlending,
+      blending: AdditiveBlending,
       depthWrite: false,
     });
-    const sunGlow = new THREE.Mesh(sunGlowGeometry, sunGlowMaterial);
+    const sunGlow = new Mesh(sunGlowGeometry, sunGlowMaterial);
     scene.add(sunGlow);
     
     // Orbit Paths - Using custom shader for glowing effect
     const createOrbitPath = (radius, color, opacity = 0.2, width = 1.0) => {
       const segments = 128;
-      const orbitCurve = new THREE.EllipseCurve(
+      const orbitCurve = new EllipseCurve(
         0, 0,             // center
         radius, radius,    // xRadius, yRadius
         0, 2 * Math.PI,    // start angle, end angle
@@ -117,7 +147,7 @@ const Immersive3DSolarSystem = () => {
       );
       
       const orbitPoints = orbitCurve.getPoints(segments);
-      const orbitGeometry = new THREE.BufferGeometry().setFromPoints(orbitPoints);
+      const orbitGeometry = new BufferGeometry().setFromPoints(orbitPoints);
       
       // Add z-coordinate for proper 3D rendering
       const positions = orbitGeometry.attributes.position.array;
@@ -131,11 +161,11 @@ const Immersive3DSolarSystem = () => {
         posArray[i3+2] = positions[i2+1];
       }
       
-      orbitGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+      orbitGeometry.setAttribute('position', new BufferAttribute(posArray, 3));
       
-      const orbitMaterial = new THREE.ShaderMaterial({
+      const orbitMaterial = new ShaderMaterial({
         uniforms: {
-          color: { value: new THREE.Color(color) },
+          color: { value: new Color(color) },
           time: { value: 0 },
           opacity: { value: opacity },
           width: { value: width }
@@ -163,11 +193,11 @@ const Immersive3DSolarSystem = () => {
           }
         `,
         transparent: true,
-        blending: THREE.AdditiveBlending,
+        blending: AdditiveBlending,
         depthWrite: false,
       });
       
-      return new THREE.Points(orbitGeometry, orbitMaterial);
+      return new Points(orbitGeometry, orbitMaterial);
     };
     
     const orbitPaths = [];
@@ -182,19 +212,19 @@ const Immersive3DSolarSystem = () => {
     
     // Create a 3D object for logos with glow effect
     const createLogoObject = (position, size, color, text) => {
-      const group = new THREE.Group();
+      const group = new Group();
       
       // Logo sphere
-      const logoGeometry = new THREE.SphereGeometry(size, 24, 24);
-      const logoMaterial = new THREE.MeshStandardMaterial({
+      const logoGeometry = new SphereGeometry(size, 24, 24);
+      const logoMaterial = new MeshStandardMaterial({
         color: 0x222244,
         metalness: 0.9,
         roughness: 0.3,
-        emissive: new THREE.Color(color),
+        emissive: new Color(color),
         emissiveIntensity: 0.4
       });
       
-      const logoMesh = new THREE.Mesh(logoGeometry, logoMaterial);
+      const logoMesh = new Mesh(logoGeometry, logoMaterial);
       logoMesh.castShadow = true;
       logoMesh.receiveShadow = true;
       
@@ -215,16 +245,16 @@ const Immersive3DSolarSystem = () => {
       context.textBaseline = 'middle';
       context.fillText(text, canvas.width/2, canvas.height/2);
       
-      const texture = new THREE.CanvasTexture(canvas);
-      const textMaterial = new THREE.MeshBasicMaterial({
+      const texture = new TextureLoader().load(canvas.toDataURL());
+      const textMaterial = new MeshBasicMaterial({
         map: texture,
         transparent: true,
-        side: THREE.DoubleSide
+        side: FrontSide
       });
       
       // Create icon plane that always faces camera
-      const iconGeometry = new THREE.PlaneGeometry(size * 1.5, size * 1.5);
-      const iconMesh = new THREE.Mesh(iconGeometry, textMaterial);
+      const iconGeometry = new PlaneGeometry(size * 1.5, size * 1.5);
+      const iconMesh = new Mesh(iconGeometry, textMaterial);
       iconMesh.position.z = size * 0.6;
       
       // Make a billboard effect (always face camera)
@@ -233,14 +263,14 @@ const Immersive3DSolarSystem = () => {
       };
       
       // Glowing ring
-      const ringGeometry = new THREE.TorusGeometry(size * 1.2, 0.2, 16, 100);
-      const ringMaterial = new THREE.MeshBasicMaterial({
-        color: new THREE.Color(color),
+      const ringGeometry = new TorusGeometry(size * 1.2, 0.2, 16, 100);
+      const ringMaterial = new MeshBasicMaterial({
+        color: new Color(color),
         transparent: true,
         opacity: 0.7,
-        side: THREE.DoubleSide
+        side: DoubleSide
       });
-      const ring = new THREE.Mesh(ringGeometry, ringMaterial);
+      const ring = new Mesh(ringGeometry, ringMaterial);
       ring.rotation.x = Math.PI / 2;
       
       group.add(logoMesh);
@@ -281,7 +311,7 @@ const Immersive3DSolarSystem = () => {
       // Slightly randomize Y position for more interesting distribution
       const y = (Math.random() - 0.5) * 5;
       
-      const position = new THREE.Vector3(x, y, z);
+      const position = new Vector3(x, y, z);
       logoPositions.push({ orbit: logo.orbit, angle, radius, speed: 0.2 - logo.orbit * 0.03 });
       
       const logoObject = createLogoObject(position, logo.size, logo.color, logo.text);
@@ -331,12 +361,12 @@ const Immersive3DSolarSystem = () => {
         sizes[i] = Math.random() * 2 + 0.5;
       }
       
-      const geometry = new THREE.BufferGeometry();
-      geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-      geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-      geometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+      const geometry = new BufferGeometry();
+      geometry.setAttribute('position', new BufferAttribute(positions, 3));
+      geometry.setAttribute('color', new BufferAttribute(colors, 3));
+      geometry.setAttribute('size', new BufferAttribute(sizes, 1));
       
-      const starMaterial = new THREE.ShaderMaterial({
+      const starMaterial = new ShaderMaterial({
         uniforms: {
           time: { value: 0 },
           pixelRatio: { value: window.devicePixelRatio }
@@ -372,11 +402,11 @@ const Immersive3DSolarSystem = () => {
           }
         `,
         transparent: true,
-        blending: THREE.AdditiveBlending,
+        blending: AdditiveBlending,
         depthWrite: false,
       });
       
-      return new THREE.Points(geometry, starMaterial);
+      return new Points(geometry, starMaterial);
     };
     
     // Create multiple starfields at different distances
@@ -387,24 +417,24 @@ const Immersive3DSolarSystem = () => {
     
     // Nebula - Volumetric effect using multiple planes with noise textures
     const createNebula = (position, radius, color) => {
-      const group = new THREE.Group();
+      const group = new Group();
       
       for (let i = 0; i < 8; i++) {
         // Create noise texture
         const texture = createNoiseTexture(color);
         
         // Create plane with noise texture
-        const planeGeometry = new THREE.PlaneGeometry(radius * 2, radius * 2);
-        const planeMaterial = new THREE.MeshBasicMaterial({
+        const planeGeometry = new PlaneGeometry(radius * 2, radius * 2);
+        const planeMaterial = new MeshBasicMaterial({
           map: texture,
           transparent: true,
           opacity: 0.04,
-          blending: THREE.AdditiveBlending,
+          blending: AdditiveBlending,
           depthWrite: false,
-          side: THREE.DoubleSide
+          side: DoubleSide
         });
         
-        const plane = new THREE.Mesh(planeGeometry, planeMaterial);
+        const plane = new Mesh(planeGeometry, planeMaterial);
         
         // Rotate and position the plane
         plane.rotation.x = Math.random() * Math.PI;
@@ -465,27 +495,27 @@ const Immersive3DSolarSystem = () => {
       
       ctx.putImageData(imgData, 0, 0);
       
-      return new THREE.CanvasTexture(canvas);
+      return new TextureLoader().load(canvas.toDataURL());
     };
     
     // Add nebulae
-    const nebula1 = createNebula(new THREE.Vector3(70, -20, 100), 80, 0x6366f1);
-    const nebula2 = createNebula(new THREE.Vector3(-120, 30, -70), 100, 0xa855f7);
+    const nebula1 = createNebula(new Vector3(70, -20, 100), 80, 0x6366f1);
+    const nebula2 = createNebula(new Vector3(-120, 30, -70), 100, 0xa855f7);
     scene.add(nebula1);
     scene.add(nebula2);
     
     // Lens flares
     const addLensFlare = () => {
-      const textureLoader = new THREE.TextureLoader();
+      const textureLoader = new TextureLoader();
       const textureFlare = textureLoader.load('data:image/png;base64,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');
       
       // Lens flare with custom shader
-      const lensFlare = new THREE.Mesh(
-        new THREE.PlaneGeometry(120, 120),
-        new THREE.ShaderMaterial({
+      const lensFlare = new Mesh(
+        new PlaneGeometry(120, 120),
+        new ShaderMaterial({
           uniforms: {
             map: { value: textureFlare },
-            screenPosition: { value: new THREE.Vector3() },
+            screenPosition: { value: new Vector3() },
             time: { value: 0 },
             opacity: { value: 0.5 }
           },
@@ -522,7 +552,7 @@ const Immersive3DSolarSystem = () => {
             }
           `,
           transparent: true,
-          blending: THREE.AdditiveBlending,
+          blending: AdditiveBlending,
           depthTest: false
         })
       );
@@ -530,7 +560,7 @@ const Immersive3DSolarSystem = () => {
       // Always face camera
       lensFlare.onBeforeRender = function() {
         // Update lens flare position based on sun position
-        const sunScreenPosition = new THREE.Vector3();
+        const sunScreenPosition = new Vector3();
         sun.updateMatrixWorld();
         sunScreenPosition.setFromMatrixPosition(sun.matrixWorld);
         sunScreenPosition.project(camera);
