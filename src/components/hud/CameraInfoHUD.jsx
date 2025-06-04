@@ -4,7 +4,7 @@
  */
 import React, { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
-import * as THREE from 'three';
+import { Vector3 } from 'three';
 import DraggableHUD from './base/DraggableHUD';
 
 /**
@@ -15,8 +15,8 @@ const CameraInfoHUD = ({
   initialPosition = { x: 20, y: 80 },
   onPositionChange,
   onClose,
-  cameraPosition = new THREE.Vector3(0, 20, 50),
-  cameraTarget = new THREE.Vector3(0, 0, 0),
+  cameraPosition = new Vector3(0, 20, 50),
+  cameraTarget = new Vector3(0, 0, 0),
   fov = 50,
   onUpdatePosition,
   onUpdateTarget,
@@ -134,29 +134,29 @@ const CameraInfoHUD = ({
     { 
       id: 'default', 
       name: 'Default View',
-      position: new THREE.Vector3(0, 20, 50),
-      target: new THREE.Vector3(0, 0, 0),
+      position: new Vector3(0, 20, 50),
+      target: new Vector3(0, 0, 0),
       fov: 50
     },
     { 
       id: 'top', 
       name: 'Top Down',
-      position: new THREE.Vector3(0, 100, 0),
-      target: new THREE.Vector3(0, 0, 0),
+      position: new Vector3(0, 100, 0),
+      target: new Vector3(0, 0, 0),
       fov: 45
     },
     { 
       id: 'side', 
       name: 'Side View',
-      position: new THREE.Vector3(80, 10, 0),
-      target: new THREE.Vector3(0, 0, 0),
+      position: new Vector3(80, 10, 0),
+      target: new Vector3(0, 0, 0),
       fov: 50
     },
     { 
       id: 'cinematic', 
       name: 'Cinematic',
-      position: new THREE.Vector3(30, 15, 45),
-      target: new THREE.Vector3(0, 0, 0),
+      position: new Vector3(30, 15, 45),
+      target: new Vector3(0, 0, 0),
       fov: 35
     }
   ];
@@ -181,7 +181,7 @@ const CameraInfoHUD = ({
   const handlePositionChange = (axis, value) => {
     if (!onUpdatePosition) return;
     
-    const newPosition = new THREE.Vector3().copy(cameraPosition);
+    const newPosition = new Vector3().copy(cameraPosition);
     newPosition[axis] = parseFloat(value);
     onUpdatePosition(newPosition);
   };
@@ -190,7 +190,7 @@ const CameraInfoHUD = ({
   const handleTargetChange = (axis, value) => {
     if (!onUpdateTarget) return;
     
-    const newTarget = new THREE.Vector3().copy(cameraTarget);
+    const newTarget = new Vector3().copy(cameraTarget);
     newTarget[axis] = parseFloat(value);
     onUpdateTarget(newTarget);
   };

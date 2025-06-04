@@ -3,8 +3,9 @@
  * GLSL shader editor and inspector
  * LEGIT compliance: UI5
  */
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import PropTypes from 'prop-types';
+import DOMPurify from 'dompurify';
 import DraggableHUD from '../ui/DraggableHUD';
 
 // LEGIT compliance metadata
@@ -19,16 +20,18 @@ export const metadata = {
  * Code editor component with syntax highlighting
  */
 const CodeEditor = ({ code, language }) => {
-  // In a real implementation, we would use a proper code editor like Monaco or CodeMirror
-  // This is a simplified version for demonstration
+  // Simple syntax highlighter for GLSL
+  const highlightSyntax = (code) => {
+    return code
+      .replace(/\b(uniform|attribute|varying|in|out|void|float|vec[234]|mat[234]|sampler2D|samplerCube|precision|mediump|highp|lowp)\b/g, '<span class="keyword">$1</span>')
+      .replace(/\b(gl_Position|gl_FragColor|gl_PointSize|gl_PointCoord)\b/g, '<span class="builtin">$1</span>')
+      .replace(/\b(sin|cos|tan|normalize|dot|cross|length|distance|mix|smoothstep|step|clamp|texture2D|textureCube)\b/g, '<span class="builtin">$1</span>')
+      .replace(/\/\/.*$/gm, '<span class="comment">$&</span>');
+  };
   
   const highlightedCode = code
-    .replace(/(uniform|varying|attribute|void|float|vec[234]|mat[234]|sampler[23]D)\b/g, '<span class="keyword">$1</span>')
-    .replace(/(precision|highp|mediump|lowp)\b/g, '<span class="precision">$1</span>')
-    .replace(/\b(gl_Position|gl_FragColor|gl_FragCoord)\b/g, '<span class="builtin">$1</span>')
-    .replace(/(\/\/.*$)/gm, '<span class="comment">$1</span>')
     .split('\n')
-    .map((line, i) => `<div class="line"><span class="line-number">${i + 1}</span>${line}</div>`)
+    .map((line, i) => `<div class="line"><span class="line-number">${i + 1}</span>${highlightSyntax(line)}</div>`)
     .join('');
     
   return (
@@ -38,7 +41,7 @@ const CodeEditor = ({ code, language }) => {
       </div>
       <div 
         className="editor-content"
-        dangerouslySetInnerHTML={{ __html: highlightedCode }}
+        dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(highlightedCode) }}
       />
       
       <style jsx>{`
