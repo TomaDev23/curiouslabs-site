@@ -1,5 +1,11 @@
 import React, { useMemo, useRef } from 'react';
-import * as THREE from 'three';
+import { 
+  BufferGeometry, 
+  BufferAttribute, 
+  PointsMaterial, 
+  AdditiveBlending,
+  ShaderMaterial
+} from 'three';
 import { useFrame } from '@react-three/fiber';
 
 /**
@@ -32,7 +38,7 @@ export default function StarField({
   // Create star vertices with useMemo
   const stars = useMemo(() => {
     // Star geometry and attributes
-    const geometry = new THREE.BufferGeometry();
+    const geometry = new BufferGeometry();
     const positions = new Float32Array(starCount * 3);
     const colors = new Float32Array(starCount * 3);
     const sizes = new Float32Array(starCount);
@@ -72,9 +78,9 @@ export default function StarField({
       sizes[i] = (0.5 + Math.random() * 1.5) * (Math.random() > 0.95 ? 3 : 1);
     }
     
-    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-    geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-    geometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+    geometry.setAttribute('position', new BufferAttribute(positions, 3));
+    geometry.setAttribute('color', new BufferAttribute(colors, 3));
+    geometry.setAttribute('size', new BufferAttribute(sizes, 1));
     
     return { geometry, positions, colors, sizes };
   }, [starCount, radius]);
@@ -83,7 +89,7 @@ export default function StarField({
   const nebula = useMemo(() => {
     if (!includeNebula) return null;
     
-    const geometry = new THREE.BufferGeometry();
+    const geometry = new BufferGeometry();
     const positions = new Float32Array(nebulaParticleCount * 3);
     const colors = new Float32Array(nebulaParticleCount * 3);
     const sizes = new Float32Array(nebulaParticleCount);
@@ -162,10 +168,10 @@ export default function StarField({
       angles[i] = Math.random() * Math.PI * 2;
     }
     
-    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-    geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-    geometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
-    geometry.setAttribute('angle', new THREE.BufferAttribute(angles, 1));
+    geometry.setAttribute('position', new BufferAttribute(positions, 3));
+    geometry.setAttribute('color', new BufferAttribute(colors, 3));
+    geometry.setAttribute('size', new BufferAttribute(sizes, 1));
+    geometry.setAttribute('angle', new BufferAttribute(angles, 1));
     
     return { geometry, positions, colors, sizes, angles };
   }, [includeNebula, nebulaParticleCount]);
@@ -174,7 +180,7 @@ export default function StarField({
   const cosmicDust = useMemo(() => {
     if (!includeCosmicDust) return null;
     
-    const geometry = new THREE.BufferGeometry();
+    const geometry = new BufferGeometry();
     const positions = new Float32Array(cosmicDustCount * 3);
     const colors = new Float32Array(cosmicDustCount * 3);
     const sizes = new Float32Array(cosmicDustCount);
@@ -225,16 +231,16 @@ export default function StarField({
       sizes[i] = 1.2 + Math.random() * 3.0;
     }
     
-    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-    geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-    geometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+    geometry.setAttribute('position', new BufferAttribute(positions, 3));
+    geometry.setAttribute('color', new BufferAttribute(colors, 3));
+    geometry.setAttribute('size', new BufferAttribute(sizes, 1));
     
     return { geometry, positions, colors, sizes };
   }, [includeCosmicDust, cosmicDustCount]);
   
   // Star shader material
   const starMaterial = useMemo(() => {
-    return new THREE.ShaderMaterial({
+    return new ShaderMaterial({
       uniforms: {
         time: { value: 0 },
         pixelRatio: { value: typeof window !== 'undefined' ? window.devicePixelRatio : 1 }
@@ -273,7 +279,7 @@ export default function StarField({
         }
       `,
       transparent: true,
-      blending: THREE.AdditiveBlending,
+      blending: AdditiveBlending,
       depthWrite: false
     });
   }, []);
@@ -282,7 +288,7 @@ export default function StarField({
   const nebulaMaterial = useMemo(() => {
     if (!includeNebula) return null;
     
-    return new THREE.ShaderMaterial({
+    return new ShaderMaterial({
       uniforms: {
         time: { value: 0 },
         pixelRatio: { value: typeof window !== 'undefined' ? window.devicePixelRatio : 1 },
@@ -357,7 +363,7 @@ export default function StarField({
         }
       `,
       transparent: true,
-      blending: THREE.AdditiveBlending,
+      blending: AdditiveBlending,
       depthWrite: false
     });
   }, [includeNebula, cosmicIntensity]);
@@ -366,7 +372,7 @@ export default function StarField({
   const cosmicDustMaterial = useMemo(() => {
     if (!includeCosmicDust) return null;
     
-    return new THREE.ShaderMaterial({
+    return new ShaderMaterial({
       uniforms: {
         time: { value: 0 },
         pixelRatio: { value: typeof window !== 'undefined' ? window.devicePixelRatio : 1 }
@@ -409,7 +415,7 @@ export default function StarField({
         }
       `,
       transparent: true,
-      blending: THREE.AdditiveBlending,
+      blending: AdditiveBlending,
       depthWrite: false
     });
   }, [includeCosmicDust]);
