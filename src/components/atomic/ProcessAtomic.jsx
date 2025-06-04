@@ -6,6 +6,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
+import { useResponsive, useDeviceCapabilities } from '../../hooks/useBreakpoint';
 
 // Self-contained data - no external imports
 const PROCESS_STEPS = [
@@ -48,24 +49,9 @@ const PROCESS_STEPS = [
 ];
 
 const ProcessAtomic = () => {
-  // Self-contained responsive state
-  const [isMobile, setIsMobile] = React.useState(false);
-  
-  // Handle responsive behavior
-  React.useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-    
-    // Initial check
-    checkMobile();
-    
-    // Add resize listener
-    window.addEventListener('resize', checkMobile);
-    
-    // Cleanup
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
+  // Use unified responsive and capability hooks (replacing individual state)
+  const { isMobile } = useResponsive();
+  const { prefersReducedMotion } = useDeviceCapabilities();
   
   return (
     <section className="min-h-screen bg-curious-dark-900 py-24 px-4 md:px-8 relative overflow-hidden">
@@ -99,7 +85,11 @@ const ProcessAtomic = () => {
               `}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
+              transition={{ 
+                duration: prefersReducedMotion ? 0.1 : 0.5, 
+                delay: prefersReducedMotion ? 0 : index * 0.1 
+              }}
+              whileHover={prefersReducedMotion ? {} : { scale: 1.05 }}
             >
               <div className="flex items-start gap-4">
                 <div className={`text-3xl font-bold ${step.color}`}>

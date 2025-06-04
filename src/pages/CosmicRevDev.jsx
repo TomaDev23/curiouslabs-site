@@ -1,8 +1,7 @@
-import React, { Suspense, useState, useEffect, useRef } from 'react';
+import React, { Suspense, useState, useEffect } from 'react';
 import { lazy } from 'react';
 
-// Lazy-load LEGIT components
-const GalaxyJourney = lazy(() => import('../components/journey/visual/GalaxyJourney/StaticGalaxy'));
+// Lazy-load LEGIT HUD components (keeping HUDs as requested!)
 const HUDManager = lazy(() => import('../components/cosmic-explorer/core/HUDManager'));
 const ModeSwitcher = lazy(() => import('../components/cosmic-explorer/core/ModeSwitcher'));
 const HUDSelector = lazy(() => import('../components/cosmic-explorer/core/HUDSelector'));
@@ -35,7 +34,7 @@ const SCENE_PRESETS = {
   }
 };
 
-// Explorer mode definitions
+// Explorer mode definitions (RESTORED!)
 const EXPLORER_MODES = {
   SHOW: {
     label: 'SHOW',
@@ -56,30 +55,27 @@ const EXPLORER_MODES = {
 };
 
 /**
- * CosmicRevDev - Static 3D galaxy space experience
- * Creates a non-scrolling, fixed viewport experience with galaxy visualization
+ * CosmicRevDev - Clean development page with HUDs but no WebGL 
+ * For testing and development without 3D visualization issues
  */
 const CosmicRevDev = () => {
-  // Explorer mode state
+  // Explorer mode state (RESTORED!)
   const [explorerMode, setExplorerMode] = useState('SHOW');
 
-  // Camera and scene state for HUDs
+  // Camera and scene state for HUDs (RESTORED!)
   const [cameraPosition, setCameraPosition] = useState({ x: 0, y: 0, z: 30 });
   const [cameraRotation, setCameraRotation] = useState({ x: 0, y: 0, z: 0 });
-
-  // Original states
+  
+  // Scene state
   const [selectedScene, setSelectedScene] = useState('cosmicReveal');
   const [sceneProgress, setSceneProgress] = useState(0.5);
   const [showControls, setShowControls] = useState(true);
   const [activeTab, setActiveTab] = useState('scene');
   
-  // 🛠️ ADDED: Camera movement toggle state
-  const [cameraMovementEnabled, setCameraMovementEnabled] = useState(true);
-  
-  // Active HUDs state
+  // Active HUDs state (RESTORED!)
   const [activeHUDs, setActiveHUDs] = useState(['selector']);
   
-  // Visual parameter states
+  // Visual parameter states (RESTORED!)
   const [visualParams, setVisualParams] = useState({
     starCount: 3000,
     galaxyCount: 15000,
@@ -89,7 +85,7 @@ const CosmicRevDev = () => {
     colorShift: 0
   });
 
-  // Load active HUDs from localStorage when mode changes
+  // Load active HUDs from localStorage when mode changes (RESTORED!)
   useEffect(() => {
     try {
       const savedActiveHUDs = localStorage.getItem(`cosmic_explorer_${explorerMode.toLowerCase()}_huds`);
@@ -104,7 +100,7 @@ const CosmicRevDev = () => {
     }
   }, [explorerMode]);
   
-  // Handle explorer mode change
+  // Handle explorer mode change (RESTORED!)
   const handleModeChange = (newMode) => {
     setExplorerMode(newMode);
     
@@ -135,15 +131,7 @@ const CosmicRevDev = () => {
     }
   };
 
-  // Handle galaxy state change
-  const handleGalaxyStateChange = (stateData) => {
-    if (stateData) {
-      if (stateData.cameraPosition) setCameraPosition(stateData.cameraPosition);
-      if (stateData.cameraRotation) setCameraRotation(stateData.cameraRotation);
-    }
-  };
-
-  // Handle HUD toggling
+  // Handle HUD toggling (RESTORED!)
   const handleToggleHUD = (newActiveHUDs) => {
     setActiveHUDs(newActiveHUDs);
     
@@ -155,6 +143,46 @@ const CosmicRevDev = () => {
     }
   };
 
+  // Handle visual param changes (RESTORED!)
+  const handleVisualParamChange = (param, value) => {
+    setVisualParams(prev => ({
+      ...prev,
+      [param]: value
+    }));
+
+    // Update camera position for HUDs when changing distance or rotation
+    if (param === 'cameraDistance' || param === 'rotation') {
+      const distance = param === 'cameraDistance' ? value : visualParams.cameraDistance;
+      const rotation = param === 'rotation' ? value * (Math.PI / 180) : visualParams.rotation * (Math.PI / 180);
+      
+      setCameraPosition({
+        x: Math.sin(rotation) * distance,
+        y: 0,
+        z: Math.cos(rotation) * distance
+      });
+      
+      setCameraRotation({
+        x: 0,
+        y: rotation,
+        z: 0
+      });
+    }
+  };
+
+  // Generate HUD selector content for ModeSwitcher to use (RESTORED!)
+  const renderHUDSelectorContent = () => {
+    return (
+      <Suspense fallback={<div className="p-2 text-white text-xs">Loading HUD Selector...</div>}>
+        <HUDSelector
+          mode={explorerMode}
+          activeHUDs={activeHUDs}
+          onToggleHUD={handleToggleHUD}
+          visualParams={visualParams}
+        />
+      </Suspense>
+    );
+  };
+  
   // Handle keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -175,6 +203,14 @@ const CosmicRevDev = () => {
         if (e.key === '2') setExplorerMode('SANDBOX');
         if (e.key === '3') setExplorerMode('DEBUG');
         if (e.key === '4') setExplorerMode('DEV');
+      }
+      
+      // Scene shortcuts (without shift)
+      if (!e.shiftKey) {
+        if (e.key === '5') setSelectedScene('dormant');
+        if (e.key === '6') setSelectedScene('awakening');
+        if (e.key === '7') setSelectedScene('cosmicReveal');
+        if (e.key === '8') setSelectedScene('cosmicFlight');
       }
       
       // Save preset with 's' key
@@ -205,98 +241,62 @@ const CosmicRevDev = () => {
         }
       }
     };
-
+    
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [selectedScene, sceneProgress, visualParams, explorerMode]);
 
-  const handleVisualParamChange = (param, value) => {
-    setVisualParams(prev => ({
-      ...prev,
-      [param]: value
-    }));
-
-    // Update camera position for HUDs when changing distance or rotation
-    if (param === 'cameraDistance' || param === 'rotation') {
-      const distance = param === 'cameraDistance' ? value : visualParams.cameraDistance;
-      const rotation = param === 'rotation' ? value * (Math.PI / 180) : visualParams.rotation * (Math.PI / 180);
-      
-      setCameraPosition({
-        x: Math.sin(rotation) * distance,
-        y: 0,
-        z: Math.cos(rotation) * distance
-      });
-      
-      setCameraRotation({
-        x: 0,
-        y: rotation,
-        z: 0
-      });
+  // Get dynamic background based on scene
+  const getSceneBackground = () => {
+    switch(selectedScene) {
+      case 'dormant': 
+        return 'linear-gradient(135deg, #0a0a0a 0%, #1a0a1a 50%, #2a1a2a 100%)';
+      case 'awakening': 
+        return 'linear-gradient(135deg, #1a0a1a 0%, #2a1a2a 50%, #3a2a3a 100%)';
+      case 'cosmicReveal': 
+        return 'linear-gradient(135deg, #2a1a2a 0%, #1a1a3a 50%, #2a2a4a 100%)';
+      case 'cosmicFlight': 
+        return 'linear-gradient(135deg, #1a1a3a 0%, #2a2a4a 50%, #3a3a5a 100%)';
+      default: 
+        return 'linear-gradient(135deg, #0a0a0a 0%, #1a0a1a 100%)';
     }
   };
 
-  // Generate HUD selector content for ModeSwitcher to use
-  const renderHUDSelectorContent = () => {
-    return (
-      <Suspense fallback={<div className="p-2 text-white text-xs">Loading HUD Selector...</div>}>
-        <HUDSelector
-          mode={explorerMode}
-          activeHUDs={activeHUDs}
-          onToggleHUD={handleToggleHUD}
-          visualParams={visualParams}
-        />
-      </Suspense>
-    );
-  };
-
   return (
-    <div id="cosmic-rev-container" className="h-screen w-screen overflow-hidden relative bg-black">
-      {/* Fixed background */}
-      <div className="fixed inset-0 bg-black z-0" />
-      
-      {/* Title bar */}
+    <div 
+      id="cosmic-rev-container" 
+      className="h-screen w-screen overflow-hidden relative transition-all duration-1000"
+      style={{ background: getSceneBackground() }}
+    >
+      {/* Title bar (RESTORED!) */}
       <div className="fixed top-0 left-0 w-full bg-black/60 p-2 flex justify-between items-center z-50">
-        <h1 className="text-white text-2xl font-bold ml-4">Cosmic Galaxy Explorer</h1>
+        <h1 className="text-white text-2xl font-bold ml-4">Cosmic Galaxy Explorer - Clean Version</h1>
         <div className="text-white opacity-50 mr-4 text-sm">
-          Press 'c' to toggle controls | 's' to save | 'l' to load
+          Press 'c' to toggle controls | 's' to save | 'l' to load | Shift+1-4: modes
         </div>
       </div>
+
+      {/* Clean animated background with stars */}
+      <div className="fixed inset-0 z-0">
+        {/* Animated stars */}
+        {Array.from({ length: 100 }).map((_, i) => (
+          <div
+            key={i}
+            className="absolute bg-white rounded-full animate-pulse"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              width: `${Math.random() * 3 + 1}px`,
+              height: `${Math.random() * 3 + 1}px`,
+              animationDelay: `${Math.random() * 3}s`,
+              animationDuration: `${Math.random() * 2 + 2}s`,
+              opacity: Math.random() * 0.8 + 0.2
+            }}
+          />
+        ))}
+      </div>
       
-      {/* Galaxy Journey Component */}
-      <Suspense fallback={<div className="fixed inset-0 flex items-center justify-center text-white">Loading Galaxy...</div>}>
-        <GalaxyJourney 
-          scene={selectedScene} 
-          progress={sceneProgress} 
-          isDebug={explorerMode === 'DEBUG'} // Now uses explorer mode
-          options={{
-            starCount: visualParams.starCount,
-            galaxyCount: visualParams.galaxyCount,
-            cameraDistance: visualParams.cameraDistance,
-            rotation: visualParams.rotation,
-            brightness: visualParams.brightness,
-            colorShift: visualParams.colorShift,
-            cameraMovementEnabled
-          }}
-          onStateChange={handleGalaxyStateChange}
-        />
-      </Suspense>
-      
-      {/* 🛠️ ADDED: Camera movement toggle button */}
-      <button
-        onClick={() => setCameraMovementEnabled(prev => !prev)}
-        className="fixed top-4 right-4 z-[9999] px-5 py-3 bg-black bg-opacity-80 text-white rounded-md shadow-lg hover:bg-opacity-90 transition-all"
-        style={{
-          border: '3px solid rgba(100, 200, 255, 0.8)',
-          fontSize: '16px',
-          fontWeight: 'bold',
-          boxShadow: '0 0 20px rgba(100, 200, 255, 0.6)',
-          cursor: 'pointer'
-        }}
-      >
-        {cameraMovementEnabled ? '🛑 Stop Camera' : '▶️ Start Camera'}
-      </button>
-      
-      {/* HUD Manager */}
+      {/* HUD Manager (RESTORED!) */}
       <Suspense fallback={<div className="fixed top-5 right-5 bg-black/60 p-2 rounded text-xs text-white">Loading HUDs...</div>}>
         <HUDManager
           activeMode={explorerMode}
@@ -308,17 +308,17 @@ const CosmicRevDev = () => {
         />
       </Suspense>
       
-      {/* Mode indicator for DEBUG and DEV modes */}
+      {/* Mode indicator for DEBUG and DEV modes (RESTORED!) */}
       {(explorerMode === 'DEBUG' || explorerMode === 'DEV') && (
-        <div className="fixed top-4 right-4 bg-black/60 py-1 px-3 text-xs font-mono text-white rounded-full z-40">
+        <div className="fixed top-16 right-4 bg-black/60 py-1 px-3 text-xs font-mono text-white rounded-full z-40">
           {explorerMode} MODE
         </div>
       )}
       
-      {/* Scene Controls with ModeSwitcher at the top */}
+      {/* Scene Controls with ModeSwitcher at the bottom (RESTORED!) */}
       {showControls && (
         <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50 bg-black/80 rounded-lg max-w-2xl w-full">
-          {/* ModeSwitcher component */}
+          {/* ModeSwitcher component (RESTORED!) */}
           <Suspense fallback={<div className="p-3 text-center text-white text-sm">Loading mode switcher...</div>}>
             <ModeSwitcher
               currentMode={explorerMode}
@@ -329,7 +329,7 @@ const CosmicRevDev = () => {
             />
           </Suspense>
           
-          {/* Only show these controls for SHOW and SANDBOX modes */}
+          {/* Only show these controls for SHOW and SANDBOX modes (RESTORED!) */}
           {(explorerMode === 'SHOW' || explorerMode === 'SANDBOX') && (
             <div className="p-4 pt-0">
               {/* Scene tab */}
@@ -366,7 +366,7 @@ const CosmicRevDev = () => {
                 </>
               )}
               
-              {/* Camera tab */}
+              {/* Camera tab (RESTORED!) */}
               {activeTab === 'camera' && (
                 <>
                   <div className="grid grid-cols-2 gap-4">
@@ -418,7 +418,7 @@ const CosmicRevDev = () => {
                 </>
               )}
               
-              {/* Visual tab */}
+              {/* Visual tab (RESTORED!) */}
               {activeTab === 'visual' && (
                 <div className="grid grid-cols-2 gap-4">
                   <div>
@@ -482,22 +482,21 @@ const CosmicRevDev = () => {
                   </div>
                 </div>
               )}
-              
-              {/* Mode tab - removed as redundant, now handled by ModeSwitcher */}
             </div>
           )}
           
-          {/* Keyboard shortcut hint at the bottom */}
+          {/* Keyboard shortcut hint at the bottom (RESTORED!) */}
           <div className="text-xs text-center text-gray-500 pb-2">
-            Shift+1-4: Switch modes | Alt+1-2: Toggle HUDs | `: Toggle HUD selector
+            Shift+1-4: Switch modes | 1-4: Tabs | 5-8: Scenes | `: Toggle HUD selector
           </div>
         </div>
       )}
       
-      {/* Current scene name */}
+      {/* Current scene name (RESTORED!) */}
       <div className="fixed top-1/2 transform -translate-y-1/2 right-8 text-lg text-white opacity-60 z-10 font-mono">
         <div className="text-green-400">{explorerMode === 'SHOW' && selectedScene && SCENE_PRESETS[selectedScene]?.name}</div>
         <div>{explorerMode === 'SHOW' && <div className="text-xs">Scene Progress: {(sceneProgress * 100).toFixed(0)}%</div>}</div>
+        <div className="text-xs text-gray-400 mt-2">WebGL-Free Version</div>
       </div>
     </div>
   );

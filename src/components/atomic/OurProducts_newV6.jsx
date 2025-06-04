@@ -12,6 +12,7 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { StellarMessageComponent } from '../StellarMessageGrok';
+import { useResponsive, useDeviceCapabilities } from '../../hooks/useBreakpoint';
 
 // Global animation delays - generated once and never change
 const PERSISTENT_ANIMATION_DELAYS = {
@@ -222,6 +223,9 @@ const useReducedMotion = () => {
 
 // AEGIS Page
 const AegisPage = () => {
+  // Use unified hooks
+  const { prefersReducedMotion } = useDeviceCapabilities();
+  
   // Add flag to control visualization rendering
   const [showVisualization, setShowVisualization] = useState(false);
   
@@ -2196,6 +2200,10 @@ const useDebugMode = () => {
 
 // Main Component
 const HorizontalProductScrollV6 = ({ className = '' }) => {
+  // Use unified responsive and capability hooks
+  const { isMobile, isTablet } = useResponsive();
+  const { prefersReducedMotion, performanceTier } = useDeviceCapabilities();
+  
   const [currentPage, setCurrentPage] = useState(0);
   const [isScrollLocked, setIsScrollLocked] = useState(false);
   const containerRef = useRef(null);

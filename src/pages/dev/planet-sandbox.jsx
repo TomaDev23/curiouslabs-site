@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect, useMemo, useCallback, Suspense, laz
 import { Canvas, useFrame, useThree, useLoader } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import { Helmet } from 'react-helmet-async';
-import * as THREE from 'three';
+import { TextureLoader, Color } from 'three';
 import { useControls, folder } from 'leva';
 import CameraInfoHUD from '../../components/hud/CameraInfoHUD';
 
@@ -33,7 +33,7 @@ console.log('[DEBUG] Planet-sandbox page loaded');
 // Sun component with simple design
 function SunSphere({ position = [0, 0, 0], radius = 4 }) {
   const sunRef = useRef();
-  const sunTexture = useLoader(THREE.TextureLoader, '/assets/images/planets/4k/sunmap_LE_upscale_balanced_x4.jpg');
+  const sunTexture = useLoader(TextureLoader, '/assets/images/planets/4k/sunmap_LE_upscale_balanced_x4.jpg');
   
   // Simple rotation
   useFrame(() => {
@@ -49,7 +49,7 @@ function SunSphere({ position = [0, 0, 0], radius = 4 }) {
         <sphereGeometry args={[radius, 64, 64]} />
         <meshStandardMaterial 
           map={sunTexture}
-          emissive={new THREE.Color('#ffcc55')}
+          emissive={new Color('#ffcc55')}
           emissiveIntensity={1.5}
         />
       </mesh>

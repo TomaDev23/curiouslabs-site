@@ -7,6 +7,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence, useInView } from 'framer-motion';
+import { useResponsive, useDeviceCapabilities } from '../../hooks/useBreakpoint';
 
 // Component metadata for LEGIT compliance
 export const metadata = {
@@ -268,43 +269,18 @@ const ServiceNavButton = ({ service, index, isActive, onClick, prefersReducedMot
 };
 
 const ServicesOrbitalAtomic = () => {
-  // Enhanced state management
+  // Enhanced state management with unified hooks
   const [activeIndex, setActiveIndex] = useState(0);
-  const [isMobile, setIsMobile] = useState(false);
-  const [isTablet, setIsTablet] = useState(false);
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
   const sectionRef = useRef(null);
   const isInView = useInView(sectionRef, { once: true, margin: "-10%" });
   
+  // Use unified responsive and capability hooks (replacing individual state)
+  const { isMobile, isTablet } = useResponsive();
+  const { prefersReducedMotion } = useDeviceCapabilities();
+  
   // Current active service
   const activeService = SERVICES[activeIndex];
-  
-  // Handle responsive behavior and reduced motion preference
-  useEffect(() => {
-    const checkResponsive = () => {
-      setIsMobile(window.innerWidth < 768);
-      setIsTablet(window.innerWidth >= 768 && window.innerWidth < 1024);
-    };
-    
-    const checkMotionPreference = () => {
-      const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-      setPrefersReducedMotion(mediaQuery.matches);
-      
-      const handleChange = (e) => setPrefersReducedMotion(e.matches);
-      if (mediaQuery.addEventListener) {
-        mediaQuery.addEventListener('change', handleChange);
-        return () => mediaQuery.removeEventListener('change', handleChange);
-      }
-    };
-    
-    checkResponsive();
-    checkMotionPreference();
-    
-    window.addEventListener('resize', checkResponsive);
-    
-    return () => window.removeEventListener('resize', checkResponsive);
-  }, []);
   
   // Auto-rotate services (disabled when hovering or reduced motion is preferred)
   useEffect(() => {
