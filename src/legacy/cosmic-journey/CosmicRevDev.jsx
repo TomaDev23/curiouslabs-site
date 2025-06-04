@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react';
-import GlobalParticleSystem from '../components/journey/visual/GlobalParticleSystem';
 
 // Metadata for LEGIT compliance
 const metadata = {
@@ -108,15 +107,23 @@ export default function CosmicRevDev() {
   );
   
   return (
-    <div ref={containerRef} className="w-full bg-black">
-      {/* Background */}
-      <div className="fixed inset-0 bg-black z-0" />
-      
-      {/* Particle System */}
-      <GlobalParticleSystem 
-        scrollProgress={scrollProgress}
-        activeScene={activeScene}
-        sceneProgress={sceneProgress}
+    <div ref={containerRef} className="w-full">
+      {/* Simple Clean Background - changes color based on active scene */}
+      <div 
+        className="fixed inset-0 z-0 transition-colors duration-1000"
+        style={{
+          background: (() => {
+            switch(activeScene) {
+              case 'dormant': return 'linear-gradient(to bottom, #0a0a0a, #1a0a1a)';
+              case 'awakening': return 'linear-gradient(to bottom, #1a0a1a, #2a1a2a)';
+              case 'cosmicReveal': return 'linear-gradient(to bottom, #2a1a2a, #1a1a3a)';
+              case 'cosmicFlight': return 'linear-gradient(to bottom, #1a1a3a, #2a2a4a)';
+              case 'sunApproach': return 'linear-gradient(to bottom, #2a2a4a, #4a3a2a)';
+              case 'sunLanding': return 'linear-gradient(to bottom, #4a3a2a, #6a4a3a)';
+              default: return 'linear-gradient(to bottom, #0a0a0a, #1a0a1a)';
+            }
+          })()
+        }}
       />
       
       {/* Debug Overlay */}

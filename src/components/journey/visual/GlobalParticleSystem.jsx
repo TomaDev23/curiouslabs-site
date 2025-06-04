@@ -1,5 +1,21 @@
 import React, { useRef, useEffect, useState } from 'react';
-import * as THREE from 'three';
+import { 
+  Scene, 
+  PerspectiveCamera, 
+  WebGLRenderer, 
+  BufferGeometry, 
+  BufferAttribute, 
+  ShaderMaterial, 
+  Points, 
+  AdditiveBlending, 
+  Color, 
+  Vector3, 
+  Group, 
+  Mesh, 
+  SphereGeometry, 
+  MeshBasicMaterial, 
+  PointsMaterial 
+} from 'three';
 
 // Metadata for LEGIT compliance
 const metadata = {
@@ -44,11 +60,11 @@ export default function GlobalParticleSystem({
     if (!containerRef.current) return;
     
     // Initialize scene, camera and renderer
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const scene = new Scene();
+    const camera = new PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
     camera.position.z = 30;
     
-    const renderer = new THREE.WebGLRenderer({ 
+    const renderer = new WebGLRenderer({ 
       alpha: true,
       antialias: true,
       powerPreference: 'high-performance'
@@ -81,11 +97,11 @@ export default function GlobalParticleSystem({
       
       // Update any size-dependent uniforms
       if (starsRef.current) {
-        starsRef.current.uniforms.pixelRatio.value = renderer.getPixelRatio();
+        starsRef.current.uniforms.uPixelRatio.value = renderer.getPixelRatio();
       }
       
       if (galaxyRef.current) {
-        galaxyRef.current.uniforms.pixelRatio.value = renderer.getPixelRatio();
+        galaxyRef.current.uniforms.uPixelRatio.value = renderer.getPixelRatio();
       }
     };
     
@@ -133,7 +149,7 @@ export default function GlobalParticleSystem({
     const renderer = rendererRef.current;
     
     // Create star field geometry
-    const geometry = new THREE.BufferGeometry();
+    const geometry = new BufferGeometry();
     const count = 2500; // A good balance between visual density and performance
     
     // Create arrays for star attributes
@@ -219,127 +235,94 @@ export default function GlobalParticleSystem({
     }
     
     // Set attributes
-    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-    geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-    geometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
-    geometry.setAttribute('randomOffset', new THREE.BufferAttribute(randomOffsets, 1));
-    geometry.setAttribute('distance', new THREE.BufferAttribute(starDistances, 1));
+    geometry.setAttribute('position', new BufferAttribute(positions, 3));
+    geometry.setAttribute('color', new BufferAttribute(colors, 3));
+    geometry.setAttribute('size', new BufferAttribute(sizes, 1));
+    geometry.setAttribute('randomOffset', new BufferAttribute(randomOffsets, 1));
+    geometry.setAttribute('distance', new BufferAttribute(starDistances, 1));
     
-    // Custom shader material for stars
-    const material = new THREE.ShaderMaterial({
+    // Create shader material for stars
+    const material = new ShaderMaterial({
       uniforms: {
-        time: { value: 0 },
-        pixelRatio: { value: renderer.getPixelRatio() },
-        globalOpacity: { value: 0.4 }, // Increased from 0.2
-        starDensity: { value: 0.8 },   // Increased from 0.7
-        cosmicIntensity: { value: 0.1 }, // Increased from 0.0
-        baseSize: { value: 1.5 }       // Increased from 1.0
+        uTime: { value: 0 },
+        uPixelRatio: { value: renderer.getPixelRatio() },
+        uScrollProgress: { value: 0 },
+        uActiveScene: { value: 0 },
+        uSceneProgress: { value: 0 }
       },
       vertexShader: `
         attribute float size;
-        attribute vec3 color;
         attribute float randomOffset;
         attribute float distance;
         
-        uniform float time;
-        uniform float pixelRatio;
-        uniform float globalOpacity;
-        uniform float starDensity;
-        uniform float cosmicIntensity;
-        uniform float baseSize;
+        uniform float uTime;
+        uniform float uPixelRatio;
+        uniform float uScrollProgress;
+        uniform float uActiveScene;
+        uniform float uSceneProgress;
         
         varying vec3 vColor;
-        varying float vOpacity;
-        
-        // A function to determine if a star should be visible based on density
-        float isVisible(float index, float density) {
-          // The higher the density, the more stars are visible
-          return step(1.0 - density, fract(index * 0.1));
-        }
+        varying float vAlpha;
         
         void main() {
           vColor = color;
           
-          // Determine base visibility based on star density
-          float visibility = isVisible(randomOffset, starDensity);
+          vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
           
           // Calculate distance-based effects
-          float distanceFactor = smoothstep(0.0, 100.0, distance);
+          float distanceFactor = 1.0 - (distance - 80.0) / 40.0;
+          distanceFactor = clamp(distanceFactor, 0.0, 1.0);
           
-          // Almost static stars with just the tiniest hint of animation
-          float twinkleSpeed = 0.02 + distanceFactor * 0.01; // Drastically reduced from 0.1
-          float twinkleAmount = 0.03 + cosmicIntensity * 0.02; // Drastically reduced from 0.1
+          // Twinkling effect
+          float twinkle = sin(uTime * 2.0 + randomOffset * 10.0) * 0.5 + 0.5;
+          twinkle = pow(twinkle, 3.0); // Make twinkling more dramatic
           
-          // Use a combination of sine waves for extremely subtle breathing effect
-          float primaryTwinkle = sin(time * twinkleSpeed + randomOffset);
-          float secondaryTwinkle = sin(time * twinkleSpeed * 0.2 + randomOffset * 1.3) * 0.3; // Slowed secondary wave too
-          float combinedTwinkle = mix(primaryTwinkle, secondaryTwinkle, 0.2);
-          
-          // Apply the twinkle effect with barely noticeable intensity
-          float twinkle = combinedTwinkle * twinkleAmount + (1.0 - twinkleAmount);
-          
-          // Cosmic scene enhancement - stars move slightly
-          vec3 modPosition = position;
-          if (cosmicIntensity > 0.0) {
-            // Add extremely subtle motion to closer stars in cosmic scenes
-            float motionScale = (1.0 - distanceFactor) * cosmicIntensity * 0.05; // Reduced from 0.2
-            modPosition.x += sin(time * 0.03 + randomOffset) * motionScale; // Slowed from 0.1
-            modPosition.y += cos(time * 0.04 + randomOffset * 1.4) * motionScale; // Slowed from 0.15
+          // Scene-based intensity
+          float sceneIntensity = 1.0;
+          if (uActiveScene == 1.0) { // Awakening scene
+            sceneIntensity = 0.7 + 0.3 * uSceneProgress;
+          } else if (uActiveScene == 2.0) { // Journey scene
+            sceneIntensity = 1.0 + 0.5 * sin(uTime * 0.5);
+          } else if (uActiveScene == 3.0) { // Discovery scene
+            sceneIntensity = 1.2 + 0.8 * twinkle;
           }
           
-          // Transform and project
-          vec4 mvPosition = modelViewMatrix * vec4(modPosition, 1.0);
+          // Final alpha calculation
+          vAlpha = distanceFactor * twinkle * sceneIntensity * 0.8;
+          
+          // Size calculation
+          float finalSize = size * uPixelRatio * (300.0 / -mvPosition.z);
+          finalSize *= (0.8 + 0.4 * twinkle) * sceneIntensity;
+          
           gl_Position = projectionMatrix * mvPosition;
-          
-          // Size calculation with twinkle effect
-          float finalSize = size * baseSize * pixelRatio * twinkle;
-          
-          // Cosmic scenes make stars slightly larger
-          finalSize *= (1.0 + cosmicIntensity * 0.5); // Increased from 0.3
-          
-          // Set point size
-          gl_PointSize = finalSize * visibility;
-          
-          // Calculate final opacity for fragment shader
-          vOpacity = globalOpacity * visibility * (1.0 + cosmicIntensity * 0.5);
+          gl_PointSize = finalSize;
         }
       `,
       fragmentShader: `
         varying vec3 vColor;
-        varying float vOpacity;
+        varying float vAlpha;
         
         void main() {
-          // Create circular points with soft edges
-          vec2 uv = gl_PointCoord.xy - 0.5;
-          float radius = length(uv);
-          float alpha = smoothstep(0.5, 0.3, radius) * vOpacity;
+          // Create circular star shape
+          float distanceToCenter = length(gl_PointCoord - 0.5);
+          float alpha = 1.0 - smoothstep(0.0, 0.5, distanceToCenter);
           
-          // Add a more pronounced glow effect for brighter stars
-          float glowStrength = dot(vColor, vec3(0.299, 0.587, 0.114)) > 0.8 ? 1.0 : 0.8;
-          alpha = max(alpha, (1.0 - smoothstep(0.3, 1.0, radius) * 0.7) * vOpacity * glowStrength);
+          // Add some sparkle
+          float sparkle = pow(alpha, 0.8);
           
-          // Output color with calculated alpha
-          gl_FragColor = vec4(vColor, alpha);
+          gl_FragColor = vec4(vColor, alpha * vAlpha * sparkle);
           
-          // Discard fragments outside the radius to avoid rendering issues
-          if (radius > 0.5) discard;
+          if (gl_FragColor.a < 0.01) discard;
         }
       `,
       transparent: true,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false
+      blending: AdditiveBlending,
+      depthWrite: false,
     });
     
-    // Create points and add to scene
-    const stars = new THREE.Points(geometry, material);
+    const stars = new Points(geometry, material);
     scene.add(stars);
-    
-    // Store references for updates and cleanup
-    starsRef.current = {
-      points: stars,
-      uniforms: material.uniforms,
-      geometry: geometry
-    };
+    starsRef.current = { points: stars, material, geometry };
     
     console.log('Star field initialized with', count, 'stars');
   };
@@ -351,9 +334,9 @@ export default function GlobalParticleSystem({
     const scene = sceneRef.current;
     const renderer = rendererRef.current;
     
-    // Create star dust geometry - many more tiny particles
-    const geometry = new THREE.BufferGeometry();
-    const count = 15000; // Much higher count for dust effect
+    // Create star dust geometry
+    const geometry = new BufferGeometry();
+    const count = 1500; // Smaller particles for atmospheric effect
     
     // Create arrays for star dust attributes
     const positions = new Float32Array(count * 3);
@@ -415,115 +398,98 @@ export default function GlobalParticleSystem({
     }
     
     // Set attributes
-    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-    geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-    geometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
-    geometry.setAttribute('randomOffset', new THREE.BufferAttribute(randomOffsets, 1));
-    geometry.setAttribute('layer', new THREE.BufferAttribute(layers, 1));
+    geometry.setAttribute('position', new BufferAttribute(positions, 3));
+    geometry.setAttribute('color', new BufferAttribute(colors, 3));
+    geometry.setAttribute('size', new BufferAttribute(sizes, 1));
+    geometry.setAttribute('randomOffset', new BufferAttribute(randomOffsets, 1));
+    geometry.setAttribute('layer', new BufferAttribute(layers, 1));
     
-    // Custom shader material for star dust
-    const material = new THREE.ShaderMaterial({
+    // Create shader material for star dust
+    const material = new ShaderMaterial({
       uniforms: {
-        time: { value: 0 },
-        pixelRatio: { value: renderer.getPixelRatio() },
-        globalOpacity: { value: 0.6 },
-        baseSize: { value: 1.8 },
-        cosmicIntensity: { value: 0.2 } // Controls intensity during cosmic scenes
+        uTime: { value: 0 },
+        uPixelRatio: { value: renderer.getPixelRatio() },
+        uScrollProgress: { value: 0 },
+        uActiveScene: { value: 0 },
+        uSceneProgress: { value: 0 }
       },
       vertexShader: `
         attribute float size;
-        attribute vec3 color;
         attribute float randomOffset;
         attribute float layer;
         
-        uniform float time;
-        uniform float pixelRatio;
-        uniform float globalOpacity;
-        uniform float baseSize;
-        uniform float cosmicIntensity;
+        uniform float uTime;
+        uniform float uPixelRatio;
+        uniform float uScrollProgress;
+        uniform float uActiveScene;
+        uniform float uSceneProgress;
         
         varying vec3 vColor;
-        varying float vOpacity;
+        varying float vAlpha;
+        varying float vLayer;
         
         void main() {
           vColor = color;
+          vLayer = layer;
           
-          // Use layer for subtle depth movement
-          float layerOffset = layer * 0.1;
-          float layerSpeed = 0.05 + layer * 0.02;
+          vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
           
-          // Apply subtle motion based on layer
-          vec3 modPosition = position;
+          // Layer-based movement
+          float layerSpeed = layer * 0.1;
+          float movement = uTime * layerSpeed;
           
-          // Cosmic scene enhancement - more motion
-          float motionIntensity = 0.1 + cosmicIntensity * 0.4;
+          // Gentle floating motion
+          vec3 pos = position;
+          pos.x += sin(movement + randomOffset) * 2.0;
+          pos.y += cos(movement * 0.7 + randomOffset * 1.5) * 1.5;
+          pos.z += sin(movement * 0.5 + randomOffset * 2.0) * 1.0;
           
-          // Each layer moves differently
-          if (layer < 1.0) {
-            // Layer 0 - slowest, nearest
-            modPosition.x += sin(time * layerSpeed + randomOffset) * motionIntensity * 0.5;
-            modPosition.y += cos(time * layerSpeed * 0.7 + randomOffset) * motionIntensity * 0.3;
-          } else if (layer < 2.0) {
-            // Layer 1 - medium
-            modPosition.x += sin(time * layerSpeed * 1.2 + randomOffset) * motionIntensity * 0.8;
-            modPosition.y += cos(time * layerSpeed * 0.9 + randomOffset) * motionIntensity * 0.6;
-          } else {
-            // ISSUE: Stuttering layer - Layer 2 has the fastest movement which likely causes stuttering
-            // Layer 2 - fastest, farthest
-            modPosition.x += sin(time * layerSpeed * 1.5 + randomOffset) * motionIntensity * 1.0;
-            modPosition.y += cos(time * layerSpeed * 1.1 + randomOffset) * motionIntensity * 0.8;
+          mvPosition = modelViewMatrix * vec4(pos, 1.0);
+          
+          // Scene-based effects
+          float sceneAlpha = 1.0;
+          if (uActiveScene == 1.0) { // Awakening
+            sceneAlpha = 0.3 + 0.4 * uSceneProgress;
+          } else if (uActiveScene == 2.0) { // Journey
+            sceneAlpha = 0.7 + 0.3 * sin(uTime * 0.3);
+          } else if (uActiveScene == 3.0) { // Discovery
+            sceneAlpha = 0.9;
           }
           
-          // Transform position
-          vec4 mvPosition = modelViewMatrix * vec4(modPosition, 1.0);
+          // Layer-based alpha (closer layers more visible)
+          float layerAlpha = 1.0 - layer * 0.3;
+          
+          vAlpha = sceneAlpha * layerAlpha * 0.6;
+          
           gl_Position = projectionMatrix * mvPosition;
-          
-          // Size calculation based on cosmic intensity
-          float sizeMultiplier = baseSize * (1.0 + cosmicIntensity * 0.5);
-          gl_PointSize = size * sizeMultiplier * pixelRatio;
-          
-          // Opacity based on cosmic intensity
-          vOpacity = globalOpacity * (0.3 + cosmicIntensity * 0.7);
-          
-          // Subtle shimmer effect
-          float shimmer = sin(time * 0.3 + randomOffset * 10.0) * 0.1 + 0.9;
-          vOpacity *= shimmer;
+          gl_PointSize = size * uPixelRatio * (200.0 / -mvPosition.z);
         }
       `,
       fragmentShader: `
         varying vec3 vColor;
-        varying float vOpacity;
+        varying float vAlpha;
+        varying float vLayer;
         
         void main() {
-          // Create soft circular points for dust effect
-          vec2 uv = gl_PointCoord.xy - 0.5;
-          float radius = length(uv);
+          float distanceToCenter = length(gl_PointCoord - 0.5);
+          float alpha = 1.0 - smoothstep(0.0, 0.5, distanceToCenter);
           
-          // Soft edge
-          float alpha = smoothstep(0.5, 0.3, radius) * vOpacity;
+          // Softer edges for dust
+          alpha = pow(alpha, 1.5);
           
-          // Output color with alpha
-          gl_FragColor = vec4(vColor, alpha);
+          gl_FragColor = vec4(vColor, alpha * vAlpha);
           
-          // Discard fragments outside radius
-          if (radius > 0.5) discard;
+          if (gl_FragColor.a < 0.005) discard;
         }
       `,
       transparent: true,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false
+      blending: AdditiveBlending,
+      depthWrite: false,
     });
     
-    // Create points and add to scene
-    const starDust = new THREE.Points(geometry, material);
+    const starDust = new Points(geometry, material);
     scene.add(starDust);
-    
-    // Store reference
-    starDustRef.current = {
-      points: starDust,
-      uniforms: material.uniforms,
-      geometry: geometry
-    };
+    starDustRef.current = { points: starDust, material, geometry };
     
     console.log('Star dust initialized with', count, 'particles');
   };
@@ -535,9 +501,9 @@ export default function GlobalParticleSystem({
     const scene = sceneRef.current;
     const renderer = rendererRef.current;
     
-    // Create galaxy geometry
-    const geometry = new THREE.BufferGeometry();
-    const count = 15000; // High particle count for detailed galaxy
+    // Create galaxy particle geometry
+    const geometry = new BufferGeometry();
+    const count = 3000; // Dense galaxy effect
     
     // Create arrays for galaxy attributes
     const positions = new Float32Array(count * 3);
@@ -638,129 +604,112 @@ export default function GlobalParticleSystem({
     }
     
     // Set attributes
-    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-    geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-    geometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
-    geometry.setAttribute('angle', new THREE.BufferAttribute(angles, 1));
-    geometry.setAttribute('randomOffset', new THREE.BufferAttribute(randomOffsets, 1));
-    geometry.setAttribute('formationData', new THREE.BufferAttribute(formationData, 1));
-    geometry.setAttribute('explosionData', new THREE.BufferAttribute(explosionData, 1));
+    geometry.setAttribute('position', new BufferAttribute(positions, 3));
+    geometry.setAttribute('color', new BufferAttribute(colors, 3));
+    geometry.setAttribute('size', new BufferAttribute(sizes, 1));
+    geometry.setAttribute('angle', new BufferAttribute(angles, 1));
+    geometry.setAttribute('randomOffset', new BufferAttribute(randomOffsets, 1));
+    geometry.setAttribute('formationData', new BufferAttribute(formationData, 1));
+    geometry.setAttribute('explosionData', new BufferAttribute(explosionData, 1));
     
-    // Galaxy shader material
-    const material = new THREE.ShaderMaterial({
+    // Create shader material for galaxy effects
+    const material = new ShaderMaterial({
       uniforms: {
-        time: { value: 0 },
-        pixelRatio: { value: renderer.getPixelRatio() },
-        globalOpacity: { value: 0.0 }, // Start invisible
-        formationProgress: { value: 0.0 }, // 0-1 controls formation
-        explosionProgress: { value: 0.0 }, // 0-1 controls explosion
-        rotationSpeed: { value: 0.1 },
-        colorShift: { value: 0.0 }
+        uTime: { value: 0 },
+        uPixelRatio: { value: renderer.getPixelRatio() },
+        uScrollProgress: { value: 0 },
+        uActiveScene: { value: 0 },
+        uSceneProgress: { value: 0 }
       },
       vertexShader: `
         attribute float size;
-        attribute vec3 color;
         attribute float angle;
         attribute float randomOffset;
         attribute float formationData;
         attribute float explosionData;
         
-        uniform float time;
-        uniform float pixelRatio;
-        uniform float globalOpacity;
-        uniform float formationProgress;
-        uniform float explosionProgress;
-        uniform float rotationSpeed;
-        uniform float colorShift;
+        uniform float uTime;
+        uniform float uPixelRatio;
+        uniform float uScrollProgress;
+        uniform float uActiveScene;
+        uniform float uSceneProgress;
         
         varying vec3 vColor;
-        varying float vOpacity;
+        varying float vAlpha;
+        varying float vFormation;
         
         void main() {
           vColor = color;
+          vFormation = formationData;
           
-          // Calculate final position with formation and explosion effects
-          vec3 finalPosition = position;
+          vec3 pos = position;
           
-          // Formation effect - particles start at center and move outward
-          float formationFactor = smoothstep(0.0, formationData, formationProgress);
+          // Galaxy rotation
+          float rotationSpeed = 0.1;
+          float currentAngle = angle + uTime * rotationSpeed;
           
-          // Explosion effect - particles explode outward based on explosion progress
-          float explosionFactor = explosionProgress * explosionData * 5.0;
+          // Spiral galaxy formation
+          float spiralFactor = length(pos.xy) * 0.02;
+          currentAngle += spiralFactor;
           
-          // Combine effects
-          vec3 modPosition = position * (formationFactor + explosionFactor);
+          // Apply rotation
+          float cosAngle = cos(currentAngle);
+          float sinAngle = sin(currentAngle);
           
-          // Add rotation over time
-          float rotationAngle = time * rotationSpeed;
-          float xNew = modPosition.x * cos(rotationAngle) - modPosition.z * sin(rotationAngle);
-          float zNew = modPosition.x * sin(rotationAngle) + modPosition.z * cos(rotationAngle);
-          modPosition.x = xNew;
-          modPosition.z = zNew;
+          vec2 rotatedPos;
+          rotatedPos.x = pos.x * cosAngle - pos.y * sinAngle;
+          rotatedPos.y = pos.x * sinAngle + pos.y * cosAngle;
           
-          // Add subtle wave motion based on angle and time
-          float waveIntensity = 0.3 * (1.0 - formationFactor); // Wave decreases as formation progresses
-          modPosition.y += sin(time * 0.5 + angle * 3.0) * waveIntensity;
+          pos.xy = rotatedPos;
           
-          // Transform and project
-          vec4 mvPosition = modelViewMatrix * vec4(modPosition, 1.0);
+          // Scene-specific effects
+          if (uActiveScene == 3.0) { // Discovery scene - galaxy formation
+            float formationProgress = uSceneProgress;
+            
+            // Particles move from explosion to formation
+            vec3 explosionPos = pos * (2.0 + explosionData);
+            pos = mix(explosionPos, pos, formationProgress);
+            
+            // Formation-based alpha
+            vAlpha = formationProgress * (0.7 + 0.3 * formationData);
+          } else {
+            vAlpha = 0.4 + 0.3 * sin(uTime * 0.5 + randomOffset);
+          }
+          
+          vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
+          
           gl_Position = projectionMatrix * mvPosition;
-          
-          // Size calculation with pulse effect
-          float pulse = 1.0 + sin(time * 2.0 + randomOffset) * 0.2;
-          float finalSize = size * (0.5 + formationFactor * 0.5) * pulse;
-          
-          // Explosion can make particles larger
-          finalSize *= (1.0 + explosionProgress * explosionData * 0.5);
-          
-          gl_PointSize = finalSize * pixelRatio;
-          
-          // Opacity based on formation progress
-          vOpacity = globalOpacity * formationFactor;
-          
-          // Add shimmer effect during formation
-          float shimmer = 0.8 + sin(time * 3.0 + randomOffset * 10.0) * 0.2;
-          vOpacity *= shimmer;
+          gl_PointSize = size * uPixelRatio * (400.0 / -mvPosition.z);
         }
       `,
       fragmentShader: `
         varying vec3 vColor;
-        varying float vOpacity;
+        varying float vAlpha;
+        varying float vFormation;
         
         void main() {
-          // Create soft circular particles
-          vec2 uv = gl_PointCoord.xy - 0.5;
-          float radius = length(uv);
+          float distanceToCenter = length(gl_PointCoord - 0.5);
+          float alpha = 1.0 - smoothstep(0.0, 0.5, distanceToCenter);
           
-          // Soft edge
-          float alpha = smoothstep(0.5, 0.3, radius) * vOpacity;
+          // Galaxy core glow
+          float coreGlow = 1.0 - smoothstep(0.0, 0.3, distanceToCenter);
+          coreGlow = pow(coreGlow, 2.0);
           
-          // Add glow
-          float glow = 1.0 - smoothstep(0.3, 0.8, radius);
-          alpha = max(alpha, glow * 0.6 * vOpacity);
+          alpha = max(alpha * 0.7, coreGlow);
           
-          // Output color with alpha
-          gl_FragColor = vec4(vColor, alpha);
+          gl_FragColor = vec4(vColor, alpha * vAlpha);
           
-          // Discard fragments outside radius
-          if (radius > 0.5) discard;
+          if (gl_FragColor.a < 0.01) discard;
         }
       `,
       transparent: true,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false
+      blending: AdditiveBlending,
+      depthWrite: false,
     });
     
-    // Create points and add to scene
-    const galaxy = new THREE.Points(geometry, material);
+    const galaxy = new Points(geometry, material);
     scene.add(galaxy);
-    
-    // Store reference
-    galaxyRef.current = {
-      points: galaxy,
-      uniforms: material.uniforms,
-      geometry: geometry
-    };
+    galaxyRef.current = { points: galaxy, material, geometry };
     
     console.log('Galaxy initialized with', count, 'particles');
   };
@@ -803,74 +752,14 @@ export default function GlobalParticleSystem({
     if (!starsRef.current) return;
     
     // Update time uniform
-    starsRef.current.uniforms.time.value = time;
+    starsRef.current.material.uniforms.uTime.value = time;
     
-    // Calculate star field configuration based on active scene
-    let starOpacity = 0.4;  // Base opacity
-    let starDensity = 0.5;  // Base density
-    let cosmicIntensity = 0.1; // Reduced from 0.2 - Base cosmic effect intensity
-    let baseSize = 1.5;     // Base size multiplier
-    
-    // Scene-specific settings
-    switch (activeScene) {
-      case 'dormant':
-        // Minimal starfield but more visible
-        starOpacity = 0.4 + (sceneProgress * 0.3);
-        starDensity = 0.5 + (sceneProgress * 0.2);
-        baseSize = 1.5;
-        break;
-        
-      case 'awakening':
-        // Stars become gradually more visible
-        starOpacity = 0.7 + (sceneProgress * 0.3);
-        starDensity = 0.7 + (sceneProgress * 0.3);
-        cosmicIntensity = 0.1 + sceneProgress * 0.2; // Reduced from 0.2 + sceneProgress * 0.4
-        baseSize = 1.8;
-        break;
-        
-      case 'cosmicReveal':
-        // Stars are prominent and have cosmic effects
-        starOpacity = 0.9;
-        starDensity = 0.9 + (sceneProgress * 0.1);
-        cosmicIntensity = 0.2 + (sceneProgress * 0.2); // Reduced from 0.4 + (sceneProgress * 0.4)
-        baseSize = 2.0 + (sceneProgress * 0.3);
-        break;
-        
-      case 'cosmicFlight':
-        // Full star field with maximum effects
-        starOpacity = 1.0;
-        starDensity = 1.0;
-        cosmicIntensity = 0.4 + (sceneProgress * 0.1); // Reduced from 0.8 + (sceneProgress * 0.2)
-        baseSize = 2.2;
-        break;
-        
-      case 'sunApproach':
-        // Stars start to fade as sun dominates
-        starOpacity = 1.0 - (sceneProgress * 0.4);
-        starDensity = 1.0;
-        cosmicIntensity = 0.5 - (sceneProgress * 0.2); // Reduced from 1.0 - (sceneProgress * 0.4)
-        baseSize = 2.0 - (sceneProgress * 0.3);
-        break;
-        
-      case 'sunLanding':
-        // Minimal stars as sun overwhelms
-        starOpacity = 0.6 - (sceneProgress * 0.5);
-        starDensity = 0.8 - (sceneProgress * 0.4);
-        cosmicIntensity = 0.3 - (sceneProgress * 0.3); // Reduced from 0.5 - (sceneProgress * 0.5)
-        baseSize = 1.5;
-        break;
-        
-      default:
-        break;
-    }
-    
-    // Apply extremely smooth transitions to the uniforms
-    const lerpFactor = 0.01; // Reduced from 0.03 for imperceptibly smooth transitions
-    starsRef.current.uniforms.globalOpacity.value += (starOpacity - starsRef.current.uniforms.globalOpacity.value) * lerpFactor;
-    starsRef.current.uniforms.starDensity.value += (starDensity - starsRef.current.uniforms.starDensity.value) * lerpFactor;
-    starsRef.current.uniforms.cosmicIntensity.value += (cosmicIntensity - starsRef.current.uniforms.cosmicIntensity.value) * lerpFactor;
-    starsRef.current.uniforms.baseSize.value += (baseSize - starsRef.current.uniforms.baseSize.value) * lerpFactor;
-    
+    // Apply smooth transitions for valid uniforms only
+    const lerpFactor = 0.05;
+    starsRef.current.material.uniforms.uScrollProgress.value += (scrollProgress - starsRef.current.material.uniforms.uScrollProgress.value) * lerpFactor;
+    starsRef.current.material.uniforms.uActiveScene.value = activeScene === 'dormant' ? 0 : activeScene === 'awakening' ? 1 : activeScene === 'cosmicReveal' ? 2 : activeScene === 'cosmicFlight' ? 3 : 0;
+    starsRef.current.material.uniforms.uSceneProgress.value += (sceneProgress - starsRef.current.material.uniforms.uSceneProgress.value) * lerpFactor;
+
     // Camera effects based on global scroll - greatly reduced movement
     if (cameraRef.current) {
       // Almost imperceptible camera movement to enhance immersion
@@ -888,169 +777,30 @@ export default function GlobalParticleSystem({
     }
   };
   
-  // Update star dust (Milky Way effect)
   const updateStarDust = (time, delta) => {
     if (!starDustRef.current) return;
     
     // Update time uniform
-    starDustRef.current.uniforms.time.value = time;
+    starDustRef.current.material.uniforms.uTime.value = time;
     
-    // Calculate star dust configuration based on active scene
-    let opacity = 0.3;
-    let cosmicIntensity = 0.0;
-    let baseSize = 1.0;
-    
-    // Scene-specific settings
-    switch (activeScene) {
-      case 'dormant':
-        // Very minimal dust
-        opacity = 0.3 + (sceneProgress * 0.2);
-        cosmicIntensity = 0.2;
-        break;
-        
-      case 'awakening':
-        // Dust starts to form
-        opacity = 0.15 + (sceneProgress * 0.2);
-        cosmicIntensity = sceneProgress * 0.2;
-        break;
-        
-      case 'cosmicReveal':
-        // Dust becomes more visible
-        opacity = 0.3 + (sceneProgress * 0.3);
-        cosmicIntensity = 0.2 + (sceneProgress * 0.4);
-        baseSize = 1.0 + (sceneProgress * 0.5);
-        break;
-        
-      case 'cosmicFlight':
-        // ISSUE: Stuttering layer - Full dust effect during flight with high cosmicIntensity
-        // This scene has the highest motion intensity which likely contributes to stuttering
-        opacity = 0.6 + (sceneProgress * 0.4);
-        cosmicIntensity = 0.6 + (sceneProgress * 0.4);
-        baseSize = 1.5 + (sceneProgress * 0.5);
-        break;
-        
-      case 'sunApproach':
-        // Dust fades as sun approaches
-        opacity = 1.0 - (sceneProgress * 0.7);
-        cosmicIntensity = 1.0 - (sceneProgress * 0.7);
-        baseSize = 2.0 - (sceneProgress * 1.0);
-        break;
-        
-      case 'sunLanding':
-        // Minimal dust near sun
-        opacity = 0.3 - (sceneProgress * 0.3);
-        cosmicIntensity = 0.3 - (sceneProgress * 0.3);
-        baseSize = 1.0;
-        break;
-        
-      default:
-        break;
-    }
-    
-    // Apply smooth transitions
+    // Apply smooth transitions for valid uniforms only
     const lerpFactor = 0.05;
-    starDustRef.current.uniforms.globalOpacity.value += (opacity - starDustRef.current.uniforms.globalOpacity.value) * lerpFactor;
-    starDustRef.current.uniforms.cosmicIntensity.value += (cosmicIntensity - starDustRef.current.uniforms.cosmicIntensity.value) * lerpFactor;
-    starDustRef.current.uniforms.baseSize.value += (baseSize - starDustRef.current.uniforms.baseSize.value) * lerpFactor;
+    starDustRef.current.material.uniforms.uScrollProgress.value += (scrollProgress - starDustRef.current.material.uniforms.uScrollProgress.value) * lerpFactor;
+    starDustRef.current.material.uniforms.uActiveScene.value = activeScene === 'dormant' ? 0 : activeScene === 'awakening' ? 1 : activeScene === 'cosmicReveal' ? 2 : activeScene === 'cosmicFlight' ? 3 : 0;
+    starDustRef.current.material.uniforms.uSceneProgress.value += (sceneProgress - starDustRef.current.material.uniforms.uSceneProgress.value) * lerpFactor;
   };
   
   const updateGalaxyEffects = (time, delta) => {
     if (!galaxyRef.current) return;
     
     // Update time uniform
-    galaxyRef.current.uniforms.time.value = time;
+    galaxyRef.current.material.uniforms.uTime.value = time;
     
-    // Calculate galaxy configuration based on active scene
-    let opacity = 0.0;
-    let formationProgress = 0.0;
-    let explosionProgress = 0.0;
-    let rotationSpeed = 0.1;
-    let colorShift = 0.0;
-    
-    // Scene-specific settings
-    switch (activeScene) {
-      case 'dormant':
-        // Galaxy not visible
-        opacity = 0.0;
-        break;
-        
-      case 'awakening':
-        // Galaxy begins to form very slightly at end of scene
-        opacity = Math.max(0, (sceneProgress - 0.7) * 0.3);
-        formationProgress = Math.max(0, (sceneProgress - 0.8) * 0.5);
-        break;
-        
-      case 'cosmicReveal':
-        // Galaxy forms and explodes during reveal scene
-        opacity = 0.3 + (sceneProgress * 0.7);
-        formationProgress = 0.4 + (sceneProgress * 0.6);
-        
-        // Explosion happens in middle of scene
-        if (sceneProgress < 0.5) {
-          // Build up to explosion
-          explosionProgress = sceneProgress * 0.4; // Gradual build-up
-        } else {
-          // Explosion occurs at 50% of the scene
-          explosionProgress = 0.2 + (sceneProgress - 0.5) * 1.6; // Peaks at 100%
-        }
-        
-        // Rotation speeds up during formation
-        rotationSpeed = 0.1 + sceneProgress * 0.4;
-        
-        // Colors shift during reveal
-        colorShift = sceneProgress * 0.3;
-        break;
-        
-      case 'cosmicFlight':
-        // Full galaxy visible during flight
-        opacity = 1.0;
-        formationProgress = 1.0;
-        
-        // Explosion fades after initial reveal
-        explosionProgress = Math.max(0, 1.0 - sceneProgress * 0.5);
-        
-        // Rotation slows down during flight
-        rotationSpeed = 0.5 - sceneProgress * 0.2;
-        
-        // Colors continue shifting slightly
-        colorShift = 0.3 + sceneProgress * 0.1;
-        break;
-        
-      case 'sunApproach':
-        // Galaxy begins to fade as sun approaches
-        opacity = 1.0 - (sceneProgress * 0.8);
-        formationProgress = 1.0;
-        
-        // Rotation slows further
-        rotationSpeed = 0.3 - sceneProgress * 0.2;
-        
-        // Colors shift toward yellow/orange
-        colorShift = 0.4 + sceneProgress * 0.2;
-        break;
-        
-      case 'sunLanding':
-        // Galaxy almost invisible near sun
-        opacity = 0.2 - (sceneProgress * 0.2);
-        formationProgress = 1.0;
-        
-        // Minimal rotation
-        rotationSpeed = 0.1;
-        
-        // Colors shift toward bright yellow
-        colorShift = 0.6 + sceneProgress * 0.4;
-        break;
-        
-      default:
-        break;
-    }
-    
-    // Apply smooth transitions
+    // Apply smooth transitions for valid uniforms only
     const lerpFactor = 0.05;
-    galaxyRef.current.uniforms.globalOpacity.value += (opacity - galaxyRef.current.uniforms.globalOpacity.value) * lerpFactor;
-    galaxyRef.current.uniforms.formationProgress.value += (formationProgress - galaxyRef.current.uniforms.formationProgress.value) * lerpFactor;
-    galaxyRef.current.uniforms.explosionProgress.value += (explosionProgress - galaxyRef.current.uniforms.explosionProgress.value) * lerpFactor;
-    galaxyRef.current.uniforms.rotationSpeed.value += (rotationSpeed - galaxyRef.current.uniforms.rotationSpeed.value) * lerpFactor;
-    galaxyRef.current.uniforms.colorShift.value += (colorShift - galaxyRef.current.uniforms.colorShift.value) * lerpFactor;
+    galaxyRef.current.material.uniforms.uScrollProgress.value += (scrollProgress - galaxyRef.current.material.uniforms.uScrollProgress.value) * lerpFactor;
+    galaxyRef.current.material.uniforms.uActiveScene.value = activeScene === 'dormant' ? 0 : activeScene === 'awakening' ? 1 : activeScene === 'cosmicReveal' ? 2 : activeScene === 'cosmicFlight' ? 3 : 0;
+    galaxyRef.current.material.uniforms.uSceneProgress.value += (sceneProgress - galaxyRef.current.material.uniforms.uSceneProgress.value) * lerpFactor;
   };
   
   const updateCosmicEffects = (time, delta) => {
@@ -1063,19 +813,19 @@ export default function GlobalParticleSystem({
     // Clean up all Three.js resources to prevent memory leaks
     if (starsRef.current) {
       starsRef.current.geometry.dispose();
-      starsRef.current.points.material.dispose();
+      starsRef.current.material.dispose();
       sceneRef.current.remove(starsRef.current.points);
     }
     
     if (starDustRef.current) {
       starDustRef.current.geometry.dispose();
-      starDustRef.current.points.material.dispose();
+      starDustRef.current.material.dispose();
       sceneRef.current.remove(starDustRef.current.points);
     }
     
     if (galaxyRef.current) {
       galaxyRef.current.geometry.dispose();
-      galaxyRef.current.points.material.dispose();
+      galaxyRef.current.material.dispose();
       sceneRef.current.remove(galaxyRef.current.points);
     }
     

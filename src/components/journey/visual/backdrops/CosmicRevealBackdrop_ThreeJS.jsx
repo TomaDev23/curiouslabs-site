@@ -1,5 +1,20 @@
 import React, { useRef, useEffect } from 'react';
-import * as THREE from 'three';
+import { 
+  Scene, 
+  PerspectiveCamera, 
+  WebGLRenderer, 
+  BufferGeometry, 
+  BufferAttribute, 
+  ShaderMaterial, 
+  Points, 
+  AdditiveBlending, 
+  Color, 
+  Mesh, 
+  SphereGeometry, 
+  MeshBasicMaterial,
+  PointLight,
+  Group
+} from 'three';
 
 // Metadata for LEGIT compliance
 const metadata = {
@@ -17,12 +32,12 @@ export default function CosmicRevealBackdropThreeJS({ progress = 0 }) {
     if (!containerRef.current) return;
     
     // Setup scene
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const scene = new Scene();
+    const camera = new PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
     camera.position.z = 30; // Closer to make particles more visible
     
     // Renderer
-    const renderer = new THREE.WebGLRenderer({ 
+    const renderer = new WebGLRenderer({ 
       alpha: true,
       antialias: true,
       powerPreference: 'high-performance'
@@ -33,7 +48,7 @@ export default function CosmicRevealBackdropThreeJS({ progress = 0 }) {
     
     // Nebula particles function - Create first for better z-ordering
     const createNebula = () => {
-      const geometry = new THREE.BufferGeometry();
+      const geometry = new BufferGeometry();
       const count = 15000; // More particles
       
       const positions = new Float32Array(count * 3);
@@ -114,13 +129,13 @@ export default function CosmicRevealBackdropThreeJS({ progress = 0 }) {
         angles[i] = Math.random() * Math.PI * 2;
       }
       
-      geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-      geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-      geometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
-      geometry.setAttribute('angle', new THREE.BufferAttribute(angles, 1));
+      geometry.setAttribute('position', new BufferAttribute(positions, 3));
+      geometry.setAttribute('color', new BufferAttribute(colors, 3));
+      geometry.setAttribute('size', new BufferAttribute(sizes, 1));
+      geometry.setAttribute('angle', new BufferAttribute(angles, 1));
       
       // Nebula particle material
-      const material = new THREE.ShaderMaterial({
+      const material = new ShaderMaterial({
         uniforms: {
           time: { value: 0 },
           pixelRatio: { value: renderer.getPixelRatio() },
@@ -195,29 +210,28 @@ export default function CosmicRevealBackdropThreeJS({ progress = 0 }) {
           }
         `,
         transparent: true,
-        blending: THREE.AdditiveBlending,
+        blending: AdditiveBlending,
         depthWrite: false
       });
       
-      const particles = new THREE.Points(geometry, material);
-      scene.add(particles);
+      const nebula = new Points(geometry, material);
+      scene.add(nebula);
       
-      return { points: particles, uniforms: material.uniforms };
+      return { nebula, material };
     };
     
-    // Stars background
+    // Create star field
     const createStars = () => {
-      const geometry = new THREE.BufferGeometry();
-      const count = 2000;
+      const starCount = 8000; // Many stars
+      const starGeometry = new BufferGeometry();
       
-      const positions = new Float32Array(count * 3);
-      const colors = new Float32Array(count * 3);
-      const sizes = new Float32Array(count);
+      const positions = new Float32Array(starCount * 3);
+      const colors = new Float32Array(starCount * 3);
+      const sizes = new Float32Array(starCount);
       
-      // Create stars with varied positions, sizes and colors
-      for (let i = 0; i < count; i++) {
-        // Position stars in a sphere
-        const radius = 80 + Math.random() * 20;
+      for (let i = 0; i < starCount; i++) {
+        // Random position in sphere
+        const radius = 150 + Math.random() * 100;
         const theta = Math.random() * Math.PI * 2;
         const phi = Math.acos(2 * Math.random() - 1);
         
@@ -225,161 +239,145 @@ export default function CosmicRevealBackdropThreeJS({ progress = 0 }) {
         positions[i * 3 + 1] = radius * Math.sin(phi) * Math.sin(theta);
         positions[i * 3 + 2] = radius * Math.cos(phi);
         
-        // Star colors - mostly white with hints of blue and purple
-        const colorChoice = Math.random();
-        if (colorChoice > 0.8) {
-          // Blue tint
-          colors[i * 3] = 0.8;
-          colors[i * 3 + 1] = 0.9;
-          colors[i * 3 + 2] = 1.0;
-        } else if (colorChoice > 0.6) {
-          // Purple tint
-          colors[i * 3] = 0.9;
-          colors[i * 3 + 1] = 0.8;
-          colors[i * 3 + 2] = 1.0;
-        } else {
-          // White to yellow-white
-          const whiteTint = 0.9 + Math.random() * 0.1;
-          colors[i * 3] = whiteTint;
-          colors[i * 3 + 1] = whiteTint;
-          colors[i * 3 + 2] = whiteTint;
-        }
+        // Star colors - white to blue-white spectrum
+        const temp = 0.8 + Math.random() * 0.2;
+        colors[i * 3] = temp;
+        colors[i * 3 + 1] = temp;
+        colors[i * 3 + 2] = 1.0;
         
-        // Star sizes
-        sizes[i] = (0.5 + Math.random() * 1.5) * (Math.random() > 0.95 ? 3 : 1);
+        // Random star sizes with more variance
+        sizes[i] = 0.5 + Math.random() * 1.5;
       }
       
-      geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-      geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-      geometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+      starGeometry.setAttribute('position', new BufferAttribute(positions, 3));
+      starGeometry.setAttribute('color', new BufferAttribute(colors, 3));
+      starGeometry.setAttribute('size', new BufferAttribute(sizes, 1));
       
-      // Star material
-      const material = new THREE.ShaderMaterial({
+      const starMaterial = new ShaderMaterial({
         uniforms: {
-          pixelRatio: { value: renderer.getPixelRatio() },
-          time: { value: 0 }
+          time: { value: 0 },
+          pixelRatio: { value: renderer.getPixelRatio() }
         },
         vertexShader: `
           attribute float size;
           attribute vec3 color;
-          varying vec3 vColor;
           uniform float time;
           uniform float pixelRatio;
+          varying vec3 vColor;
           
           void main() {
             vColor = color;
+            
+            // Add subtle twinkling by varying size
+            float twinkle = 1.0 + 0.3 * sin(time * 3.0 + position.x * 0.01);
+            
             vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
-            
-            // Twinkle effect
-            float twinkle = sin(time * 2.0 + position.x * 0.1 + position.y * 0.1 + position.z * 0.1) * 0.5 + 0.5;
-            
-            gl_PointSize = size * pixelRatio * (1.0 + 0.3 * twinkle);
             gl_Position = projectionMatrix * mvPosition;
+            gl_PointSize = size * pixelRatio * twinkle;
           }
         `,
         fragmentShader: `
           varying vec3 vColor;
           
           void main() {
-            // Crisp circle with soft edge
-            vec2 uv = gl_PointCoord.xy - 0.5;
-            float radius = length(uv);
-            float alpha = 1.0 - smoothstep(0.4, 0.5, radius);
+            vec2 center = gl_PointCoord - 0.5;
+            float dist = length(center);
             
-            // Add glow effect
-            alpha = max(alpha, 1.0 - smoothstep(0.3, 1.0, radius) * 0.8);
-            
+            float alpha = smoothstep(0.5, 0.1, dist);
             gl_FragColor = vec4(vColor, alpha);
+            
+            if (dist > 0.5) discard;
           }
         `,
         transparent: true,
-        blending: THREE.AdditiveBlending,
+        blending: AdditiveBlending,
         depthWrite: false
       });
       
-      const stars = new THREE.Points(geometry, material);
+      const stars = new Points(starGeometry, starMaterial);
       scene.add(stars);
       
-      return { points: stars, uniforms: material.uniforms };
+      return { stars, material: starMaterial };
     };
     
-    // Add bright central galaxy core - NEW
+    // Galaxy core - bright center
     const createGalaxyCore = () => {
-      // Create central glow
-      const coreGeometry = new THREE.PlaneGeometry(20, 20);
-      const coreTexture = new THREE.CanvasTexture(createGlowTexture());
+      const coreGeometry = new SphereGeometry(1.5, 32, 32);
       
-      const coreMaterial = new THREE.MeshBasicMaterial({
-        map: coreTexture,
+      function createGlowTexture() {
+        const canvas = document.createElement('canvas');
+        canvas.width = 64;
+        canvas.height = 64;
+        const ctx = canvas.getContext('2d');
+        
+        const gradient = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
+        gradient.addColorStop(0, 'rgba(255, 255, 255, 1)');
+        gradient.addColorStop(0.3, 'rgba(150, 100, 255, 0.8)');
+        gradient.addColorStop(0.7, 'rgba(100, 50, 255, 0.4)');
+        gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, 64, 64);
+        
+        return canvas;
+      }
+      
+      const coreMaterial = new MeshBasicMaterial({
+        color: 0xffffff,
         transparent: true,
-        blending: THREE.AdditiveBlending,
-        depthWrite: false,
-        opacity: 0.8
+        opacity: 0.9
       });
       
-      const core = new THREE.Mesh(coreGeometry, coreMaterial);
-      core.rotation.x = Math.PI / 2; // Face camera
+      const core = new Mesh(coreGeometry, coreMaterial);
       scene.add(core);
       
-      return { mesh: core, texture: coreTexture };
+      // Add glow around core
+      const glowGeometry = new SphereGeometry(3, 32, 32);
+      const glowMaterial = new MeshBasicMaterial({
+        color: 0x8844ff,
+        transparent: true,
+        opacity: 0.3
+      });
+      
+      const glow = new Mesh(glowGeometry, glowMaterial);
+      scene.add(glow);
+      
+      return { core, glow };
     };
     
-    // Create glow texture for galaxy core
-    function createGlowTexture() {
-      const canvas = document.createElement('canvas');
-      canvas.width = 256;
-      canvas.height = 256;
-      const ctx = canvas.getContext('2d');
-      
-      // Create radial gradient
-      const gradient = ctx.createRadialGradient(
-        128, 128, 0,   // Inner circle
-        128, 128, 128  // Outer circle
-      );
-      
-      // Add color stops for bright center
-      gradient.addColorStop(0, 'rgba(255, 255, 255, 1.0)');
-      gradient.addColorStop(0.2, 'rgba(180, 180, 255, 0.8)');
-      gradient.addColorStop(0.5, 'rgba(100, 70, 255, 0.4)');
-      gradient.addColorStop(1, 'rgba(30, 20, 100, 0)');
-      
-      // Fill with gradient
-      ctx.fillStyle = gradient;
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      
-      return canvas;
-    }
+    // Create all effects
+    const nebulaData = createNebula();
+    const starData = createStars();
+    const coreData = createGalaxyCore();
     
-    // Create visual elements in specific order for proper rendering
-    const nebula = createNebula();
-    const galaxyCore = createGalaxyCore();
-    const stars = createStars();
+    // Central bright point light
+    const centerLight = new PointLight(0x8844ff, 2, 100);
+    centerLight.position.set(0, 0, 0);
+    scene.add(centerLight);
     
-    // Animation
-    let time = 0;
+    // Animation loop
     const animate = function() {
-      const animationId = requestAnimationFrame(animate);
-      time += 0.01;
+      requestAnimationFrame(animate);
       
-      // Update uniforms
-      stars.uniforms.time.value = time;
-      nebula.uniforms.time.value = time;
-      nebula.uniforms.progress.value = Math.max(0.3, progress); // Always some visibility
+      const time = Date.now() * 0.001;
       
-      // Make the galaxy core pulse
-      const pulse = 1.0 + Math.sin(time * 1.5) * 0.2;
-      galaxyCore.mesh.scale.set(pulse, pulse, 1);
+      // Update materials
+      if (nebulaData.material) {
+        nebulaData.material.uniforms.time.value = time;
+        nebulaData.material.uniforms.progress.value = Math.max(0.3, progress);
+      }
       
-      // Rotate entire scene slightly for movement
-      scene.rotation.x = Math.sin(time * 0.05) * 0.05;
-      scene.rotation.z = Math.sin(time * 0.03) * 0.1;
+      if (starData.material) {
+        starData.material.uniforms.time.value = time;
+      }
       
+      // Render
       renderer.render(scene, camera);
     };
     
     animate();
     
-    // Handle resize
+    // Handle window resize
     const handleResize = () => {
       const width = window.innerWidth;
       const height = window.innerHeight;
@@ -389,10 +387,6 @@ export default function CosmicRevealBackdropThreeJS({ progress = 0 }) {
       
       renderer.setSize(width, height);
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-      
-      // Update uniforms
-      stars.uniforms.pixelRatio.value = renderer.getPixelRatio();
-      nebula.uniforms.pixelRatio.value = renderer.getPixelRatio();
     };
     
     window.addEventListener('resize', handleResize);
@@ -406,13 +400,14 @@ export default function CosmicRevealBackdropThreeJS({ progress = 0 }) {
       }
       
       // Dispose of resources
-      stars.points.geometry.dispose();
-      stars.points.material.dispose();
-      nebula.points.geometry.dispose();
-      nebula.points.material.dispose();
-      galaxyCore.texture.dispose();
-      galaxyCore.mesh.geometry.dispose();
-      galaxyCore.mesh.material.dispose();
+      nebulaData.nebula.geometry.dispose();
+      nebulaData.material.dispose();
+      starData.stars.geometry.dispose();
+      starData.material.dispose();
+      coreData.core.geometry.dispose();
+      coreData.core.material.dispose();
+      glow.geometry.dispose();
+      glow.material.dispose();
       renderer.dispose();
       
       cancelAnimationFrame(animate);
