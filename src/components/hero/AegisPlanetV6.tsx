@@ -4,7 +4,7 @@ import { OrbitControls, PerspectiveCamera } from '@react-three/drei';
 import { motion } from 'framer-motion';
 import { useScene } from '../scene/SceneControllerV6';
 import AegisPlanet3DV6 from './AegisPlanet3DV6';
-import * as THREE from 'three';
+import { Vector3 } from 'three';
 
 interface AegisPlanetProps {
   interactive?: boolean;
@@ -61,7 +61,7 @@ const AegisPlanetV6: React.FC<AegisPlanetProps> = ({
   // Camera settings based on device capabilities
   const cameraSettings = {
     fov: 45,
-    position: shouldRender3D ? new THREE.Vector3(3, 1, 3) : new THREE.Vector3(2, 1, 2),
+    position: shouldRender3D ? new Vector3(3, 1, 3) : new Vector3(2, 1, 2),
     near: 0.1,
     far: 1000
   };

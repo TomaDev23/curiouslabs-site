@@ -474,6 +474,9 @@ class StellarMessage {
     };
     this.fpsHistory = [];
     this.lastDebugPaint = 0;
+    
+    // MEMORY LEAK FIX: Store the resize handler for proper cleanup
+    this.resizeHandler = null;
   }
 
   init(container) {
@@ -517,13 +520,16 @@ class StellarMessage {
   }
 
   setupEventListeners() {
-    window.addEventListener("resize", () => {
+    // MEMORY LEAK FIX: Store the handler reference for cleanup
+    this.resizeHandler = () => {
       if (this.isActive && this.canvas) {
         this.resizeCanvas();
         this.convertTextToParticles();
         this.createConstellations();
       }
-    });
+    };
+    
+    window.addEventListener("resize", this.resizeHandler);
   }
 
   resizeCanvas() {
@@ -552,6 +558,12 @@ class StellarMessage {
   deactivate() {
     console.log("🌌 Deactivating StellarMessage...");
     this.stopRenderLoop();
+    
+    // MEMORY LEAK FIX: Remove event listener
+    if (this.resizeHandler) {
+      window.removeEventListener("resize", this.resizeHandler);
+    }
+    
     if (this.container) this.container.style.opacity = "0";
     if (this.ctx) this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     
@@ -568,6 +580,13 @@ class StellarMessage {
 
   destroy() {
     this.deactivate();
+    
+    // MEMORY LEAK FIX: Ensure event listener is removed
+    if (this.resizeHandler) {
+      window.removeEventListener("resize", this.resizeHandler);
+      this.resizeHandler = null;
+    }
+    
     if (this.container && this.container.parentNode) {
       this.container.parentNode.removeChild(this.container);
     }

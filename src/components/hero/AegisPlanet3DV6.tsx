@@ -3,7 +3,16 @@ import { useFrame } from '@react-three/fiber';
 import { useTexture } from '@react-three/drei';
 import { useScene } from '../scene/SceneControllerV6';
 import { useMission } from '../mission/MissionTracker';
-import * as THREE from 'three';
+import {
+  Mesh,
+  MeshPhysicalMaterial,
+  Vector2,
+  LinearMipmapLinearFilter,
+  LinearMipmapNearestFilter,
+  BackSide,
+  AdditiveBlending,
+  DoubleSide
+} from 'three';
 
 interface AegisPlanet3DProps {
   position?: [number, number, number];
@@ -16,8 +25,8 @@ const AegisPlanet3DV6: React.FC<AegisPlanet3DProps> = ({
   scale = 1,
   rotationSpeed = 0.001
 }) => {
-  const planetRef = useRef<THREE.Mesh>(null);
-  const atmosphereRef = useRef<THREE.Mesh>(null);
+  const planetRef = useRef<Mesh>(null);
+  const atmosphereRef = useRef<Mesh>(null);
   const { deviceCapabilities, phase } = useScene();
   const { updateSubtaskStatus } = useMission();
 
@@ -43,8 +52,8 @@ const AegisPlanet3DV6: React.FC<AegisPlanet3DProps> = ({
     textures.forEach(texture => {
       texture.anisotropy = deviceCapabilities.performanceTier === 'high' ? 16 : 8;
       texture.minFilter = deviceCapabilities.performanceTier === 'high' 
-        ? THREE.LinearMipmapLinearFilter 
-        : THREE.LinearMipmapNearestFilter;
+        ? LinearMipmapLinearFilter 
+        : LinearMipmapNearestFilter;
     });
 
     // Mark texture loading as complete
@@ -60,7 +69,7 @@ const AegisPlanet3DV6: React.FC<AegisPlanet3DProps> = ({
 
     // Animate atmosphere
     const time = state.clock.getElapsedTime();
-    const atmosphereMaterial = atmosphereRef.current.material as THREE.MeshPhysicalMaterial;
+    const atmosphereMaterial = atmosphereRef.current.material as MeshPhysicalMaterial;
     atmosphereMaterial.opacity = 0.6 + Math.sin(time * 0.5) * 0.1;
   });
 
@@ -77,7 +86,7 @@ const AegisPlanet3DV6: React.FC<AegisPlanet3DProps> = ({
         <meshPhysicalMaterial
           map={diffuseMap}
           normalMap={normalMap}
-          normalScale={new THREE.Vector2(0.2, 0.2)}
+          normalScale={new Vector2(0.2, 0.2)}
           roughnessMap={specularMap}
           metalness={0.5}
           roughness={0.7}
@@ -98,8 +107,8 @@ const AegisPlanet3DV6: React.FC<AegisPlanet3DProps> = ({
           transparent
           opacity={0.6}
           depthWrite={false}
-          side={THREE.BackSide}
-          blending={THREE.AdditiveBlending}
+          side={BackSide}
+          blending={AdditiveBlending}
           metalness={0}
           roughness={1}
         />
@@ -113,7 +122,7 @@ const AegisPlanet3DV6: React.FC<AegisPlanet3DProps> = ({
             color="#6366f1"
             transparent
             opacity={0.3}
-            side={THREE.DoubleSide}
+            side={DoubleSide}
           />
         </mesh>
       )}

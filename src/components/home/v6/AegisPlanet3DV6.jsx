@@ -20,8 +20,7 @@
 import React, { useRef, useMemo, useCallback } from 'react';
 import { Canvas, useLoader, useFrame, useThree } from '@react-three/fiber';
 import { Sphere, useTexture } from '@react-three/drei';
-import { TextureLoader, ShaderMaterial, Vector3 } from 'three';
-import * as THREE from 'three';
+import { TextureLoader, ShaderMaterial, Vector3, BackSide, AdditiveBlending } from 'three';
 
 // Custom atmosphere shader - COMPLEX IMPLEMENTATION
 const atmosphereVertexShader = `

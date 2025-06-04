@@ -9,6 +9,9 @@ import BackgroundManager from './components/sandbox/BackgroundManager';
 // Import native ThoughtTrails system
 import thoughtTrails from './lib/thoughtTrails';
 
+// 🚀 PHASE 6: Import Performance Monitor for bundle optimization
+import performanceMonitor, { generatePerformanceReport } from './lib/performanceMonitor';
+
 // Main Page (critical, keep eager loaded)
 import Home from './pages/index.jsx';
 import SafeV4CosmicPage from './pages/safe_v4_cosmic.jsx';
@@ -46,6 +49,7 @@ const ProcessComparisonPage = lazy(() => import('./pages/process_comparison.jsx'
 const ScrollTestPage = lazy(() => import('./pages/demo/scroll-test.jsx'));
 import CosmicRevDev from './pages/CosmicRevDev';
 import HomeLayout from './layouts/HomeLayout';
+const Museum = lazy(() => import('./pages/museum.jsx'));
 
 // Parallax test pages
 const ParallaxTest = lazy(() => import('./pages/dev/parallax-test.jsx'));
@@ -211,6 +215,16 @@ export default function App() {
         if (Object.keys(metrics).length > 0) {
           console.log('Performance metrics:', metrics);
         }
+        
+        // 🚀 PHASE 6: Generate bundle optimization report
+        const optimizationReport = generatePerformanceReport();
+        if (optimizationReport) {
+          console.log('🎯 Phase 6 Bundle Optimization Status:', {
+            bundleAnalysis: optimizationReport.bundle,
+            memoryTrend: optimizationReport.memory?.growth || 0,
+            chunkEfficiency: optimizationReport.bundle?.chunks?.successful / optimizationReport.bundle?.chunks?.total || 0
+          });
+        }
       }, 60000); // Log every minute
       
       return () => clearInterval(intervalId);
@@ -225,8 +239,26 @@ export default function App() {
       <BackgroundManagerWrapper />
       
       <Routes>
-        {/* Promote V4 Cosmic experience as the main homepage */}
+        {/* 🚀 HOMEPAGE NOW OPTIMIZED: V6AtomicPage (bulletproof!) */}
         <Route path="/" element={
+          <Suspense fallback={<LoadingFallback />}>
+            <React.StrictMode>
+              <ErrorBoundary fallback={<SafeV4CosmicPage />}>
+                <V6AtomicPage />
+              </ErrorBoundary>
+            </React.StrictMode>
+          </Suspense>
+        } />
+        
+        {/* 🏛️ MUSEUM: Code Museum - Development History Archive */}
+        <Route path="/museum" element={
+          <Suspense fallback={<LoadingFallback />}>
+            <Museum />
+          </Suspense>
+        } />
+        
+        {/* 🏛️ MUSEUM: Original V4 Cosmic experience preserved */}
+        <Route path="/dev-v4-cosmic" element={
           <Suspense fallback={<LoadingFallback />}>
             <React.StrictMode>
               <ErrorBoundary fallback={<SafeV4CosmicPage />}>
@@ -411,17 +443,6 @@ export default function App() {
             <React.StrictMode>
               <ErrorBoundary fallback={<SafeV4CosmicPage />}>
                 <V6HomePage />
-              </ErrorBoundary>
-            </React.StrictMode>
-          </Suspense>
-        } />
-        
-        {/* V6 Atomic Route */}
-        <Route path="/v6_atomic" element={
-          <Suspense fallback={<LoadingFallback />}>
-            <React.StrictMode>
-              <ErrorBoundary fallback={<SafeV4CosmicPage />}>
-                <V6AtomicPage />
               </ErrorBoundary>
             </React.StrictMode>
           </Suspense>

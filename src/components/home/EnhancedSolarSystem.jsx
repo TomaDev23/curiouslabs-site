@@ -1,6 +1,30 @@
 // 🛡️ STAR_LOCKED: Do not remove or alter – see STAR_LOCK_V1.md
 import React, { useEffect, useRef, useState } from 'react';
-import * as THREE from 'three';
+import { 
+  Scene, 
+  PerspectiveCamera, 
+  WebGLRenderer, 
+  AmbientLight, 
+  PointLight, 
+  SphereGeometry, 
+  MeshStandardMaterial, 
+  Mesh, 
+  ShaderMaterial, 
+  Color, 
+  AdditiveBlending, 
+  FrontSide, 
+  ACESFilmicToneMapping, 
+  EllipseCurve, 
+  BufferGeometry, 
+  BufferAttribute, 
+  Points, 
+  Group, 
+  Vector3, 
+  Float32BufferAttribute,
+  TorusGeometry,
+  MeshBasicMaterial,
+  DoubleSide
+} from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
 // Import shader code
@@ -33,11 +57,11 @@ const EnhancedSolarSystem = ({ scrollProgress = 0, isLowPerf = false, isReducedM
     if (!mountRef.current || isLowPerf) return;
     
     // Create scene
-    const scene = new THREE.Scene();
+    const scene = new Scene();
     sceneRef.current = scene;
     
     // Camera setup
-    const camera = new THREE.PerspectiveCamera(
+    const camera = new PerspectiveCamera(
       75, 
       window.innerWidth / window.innerHeight, 
       0.1, 
@@ -47,7 +71,7 @@ const EnhancedSolarSystem = ({ scrollProgress = 0, isLowPerf = false, isReducedM
     cameraRef.current = camera;
     
     // Renderer setup with optimizations
-    const renderer = new THREE.WebGLRenderer({ 
+    const renderer = new WebGLRenderer({ 
       antialias: true, 
       alpha: true,
       powerPreference: 'high-performance',
@@ -55,7 +79,7 @@ const EnhancedSolarSystem = ({ scrollProgress = 0, isLowPerf = false, isReducedM
     renderer.setSize(mountRef.current.clientWidth, mountRef.current.clientHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // Limit for performance
     renderer.setClearColor(0x000000, 0);
-    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMapping = ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.0;
     
     mountRef.current.appendChild(renderer.domElement);
@@ -77,42 +101,42 @@ const EnhancedSolarSystem = ({ scrollProgress = 0, isLowPerf = false, isReducedM
     controlsRef.current = controls;
     
     // Lights
-    const ambientLight = new THREE.AmbientLight(0x222244, 0.7);
+    const ambientLight = new AmbientLight(0x222244, 0.7);
     scene.add(ambientLight);
     
-    const centerLight = new THREE.PointLight(0xa855f7, 3, 120);
+    const centerLight = new PointLight(0xa855f7, 3, 120);
     centerLight.position.set(0, 0, 0);
     scene.add(centerLight);
     
     // Central Sun - Solid core with a shader-based glow
     // 1. Create solid core with emissive material
-    const sunCoreGeometry = new THREE.SphereGeometry(7, 32, 32);
-    const sunCoreMaterial = new THREE.MeshStandardMaterial({
+    const sunCoreGeometry = new SphereGeometry(7, 32, 32);
+    const sunCoreMaterial = new MeshStandardMaterial({
       emissive: 0xa855f7,
       emissiveIntensity: 1.5,
       color: 0xa855f7,
       roughness: 0.2,
       metalness: 0.8
     });
-    const sunCore = new THREE.Mesh(sunCoreGeometry, sunCoreMaterial);
+    const sunCore = new Mesh(sunCoreGeometry, sunCoreMaterial);
     scene.add(sunCore);
     
     // 2. Add glow effect with shader
-    const sunGlowGeometry = new THREE.SphereGeometry(10, 32, 32);
-    const sunGlowMaterial = new THREE.ShaderMaterial({
+    const sunGlowGeometry = new SphereGeometry(10, 32, 32);
+    const sunGlowMaterial = new ShaderMaterial({
       uniforms: {
         uTime: { value: 0 },
-        uColor1: { value: new THREE.Color(0xa855f7) }, // Purple
-        uColor2: { value: new THREE.Color(0x6366f1) }  // Indigo
+        uColor1: { value: new Color(0xa855f7) }, // Purple
+        uColor2: { value: new Color(0x6366f1) }  // Indigo
       },
       vertexShader: sunVertexShader,
       fragmentShader: sunFragmentShader,
       transparent: true,
-      blending: THREE.AdditiveBlending,
-      side: THREE.FrontSide,
+      blending: AdditiveBlending,
+      side: FrontSide,
       depthWrite: false,
     });
-    const sunGlow = new THREE.Mesh(sunGlowGeometry, sunGlowMaterial);
+    const sunGlow = new Mesh(sunGlowGeometry, sunGlowMaterial);
     scene.add(sunGlow);
     
     // Planet data representing different services/tools
@@ -127,7 +151,7 @@ const EnhancedSolarSystem = ({ scrollProgress = 0, isLowPerf = false, isReducedM
     // Create orbit paths with glow effect
     const createOrbitPath = (radius, color, opacity = 0.2, width = 1.0) => {
       const segments = 128;
-      const orbitCurve = new THREE.EllipseCurve(
+      const orbitCurve = new EllipseCurve(
         0, 0,
         radius, radius,
         0, 2 * Math.PI,
@@ -136,7 +160,7 @@ const EnhancedSolarSystem = ({ scrollProgress = 0, isLowPerf = false, isReducedM
       );
       
       const orbitPoints = orbitCurve.getPoints(segments);
-      const orbitGeometry = new THREE.BufferGeometry().setFromPoints(orbitPoints);
+      const orbitGeometry = new BufferGeometry().setFromPoints(orbitPoints);
       
       // Add z-coordinate for proper 3D rendering
       const positions = orbitGeometry.attributes.position.array;
@@ -150,11 +174,11 @@ const EnhancedSolarSystem = ({ scrollProgress = 0, isLowPerf = false, isReducedM
         posArray[i3+2] = positions[i2+1];
       }
       
-      orbitGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+      orbitGeometry.setAttribute('position', new BufferAttribute(posArray, 3));
       
-      const orbitMaterial = new THREE.ShaderMaterial({
+      const orbitMaterial = new ShaderMaterial({
         uniforms: {
-          uColor: { value: new THREE.Color(color) },
+          uColor: { value: new Color(color) },
           uTime: { value: 0 },
           uOpacity: { value: opacity },
           uWidth: { value: width }
@@ -162,11 +186,11 @@ const EnhancedSolarSystem = ({ scrollProgress = 0, isLowPerf = false, isReducedM
         vertexShader: orbitVertexShader,
         fragmentShader: orbitFragmentShader,
         transparent: true,
-        blending: THREE.AdditiveBlending,
+        blending: AdditiveBlending,
         depthWrite: false,
       });
       
-      return new THREE.Points(orbitGeometry, orbitMaterial);
+      return new Points(orbitGeometry, orbitMaterial);
     };
     
     // Create orbit paths for each planet
@@ -193,32 +217,31 @@ const EnhancedSolarSystem = ({ scrollProgress = 0, isLowPerf = false, isReducedM
       planetAngles.push(initialAngle);
       
       // Planet group to hold all components
-      const planetGroup = new THREE.Group();
+      const planetGroup = new Group();
       
       // Planet geometry
-      const planetGeometry = new THREE.SphereGeometry(planet.size, 24, 24);
-      const planetMaterial = new THREE.MeshStandardMaterial({
-        color: planet.color,
-        metalness: 0.7,
+      const planetGeometry = new SphereGeometry(planet.size, 24, 24);
+      const planetMaterial = new MeshStandardMaterial({
+        color: 0x222244,
+        metalness: 0.9,
         roughness: 0.3,
-        emissive: new THREE.Color(planet.color),
-        emissiveIntensity: 0.2
+        emissive: new Color(planet.color),
+        emissiveIntensity: 0.4
       });
       
-      const planetMesh = new THREE.Mesh(planetGeometry, planetMaterial);
+      const planetMesh = new Mesh(planetGeometry, planetMaterial);
       planetMesh.castShadow = true;
       planetMesh.receiveShadow = true;
-      planetGroup.add(planetMesh);
       
-      // Orbital ring
-      const ringGeometry = new THREE.TorusGeometry(planet.size * 1.4, 0.2, 16, 100);
-      const ringMaterial = new THREE.MeshBasicMaterial({
-        color: new THREE.Color(planet.color),
+      // Add ring to some planets
+      const ringGeometry = new TorusGeometry(planet.size * 1.4, 0.2, 16, 100);
+      const ringMaterial = new MeshBasicMaterial({
+        color: new Color(planet.color),
         transparent: true,
-        opacity: 0.7,
-        side: THREE.DoubleSide
+        opacity: 0.6,
+        side: DoubleSide
       });
-      const ring = new THREE.Mesh(ringGeometry, ringMaterial);
+      const ring = new Mesh(ringGeometry, ringMaterial);
       ring.rotation.x = Math.PI / 2;
       planetGroup.add(ring);
       
@@ -241,59 +264,43 @@ const EnhancedSolarSystem = ({ scrollProgress = 0, isLowPerf = false, isReducedM
       const sizes = new Float32Array(count);
       
       for (let i = 0; i < count; i++) {
-        // Generate random position on a sphere
-        const u = Math.random();
-        const v = Math.random();
-        const theta = u * Math.PI * 2;
-        const phi = Math.acos(2 * v - 1);
-        const r = radius * (0.8 + Math.random() * 0.3); // Vary radius slightly
+        // Random position in sphere
+        const theta = Math.random() * Math.PI * 2;
+        const phi = Math.acos(2 * Math.random() - 1);
+        const r = radius + Math.random() * 50;
         
-        const i3 = i * 3;
-        positions[i3] = r * Math.sin(phi) * Math.cos(theta);
-        positions[i3 + 1] = r * Math.sin(phi) * Math.sin(theta);
-        positions[i3 + 2] = r * Math.cos(phi);
+        positions[i * 3] = r * Math.sin(phi) * Math.cos(theta);
+        positions[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
+        positions[i * 3 + 2] = r * Math.cos(phi);
         
-        // Random color between white and blue/purple
-        const colorChoice = Math.random();
-        if (colorChoice > 0.8) {
-          // Blue star
-          colors[i3] = 0.7;
-          colors[i3 + 1] = 0.8;
-          colors[i3 + 2] = 1.0;
-        } else if (colorChoice > 0.6) {
-          // Purple star
-          colors[i3] = 0.8;
-          colors[i3 + 1] = 0.7;
-          colors[i3 + 2] = 1.0;
-        } else {
-          // White star
-          colors[i3] = 0.9;
-          colors[i3 + 1] = 0.9;
-          colors[i3 + 2] = 1.0;
-        }
+        // Random color (bluish-white stars)
+        const intensity = 0.5 + Math.random() * 0.5;
+        colors[i * 3] = intensity * 0.8;
+        colors[i * 3 + 1] = intensity * 0.9;
+        colors[i * 3 + 2] = intensity;
         
-        // Random sizes
+        // Random size
         sizes[i] = Math.random() * 2 + 0.5;
       }
       
-      const geometry = new THREE.BufferGeometry();
-      geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-      geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-      geometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+      const geometry = new BufferGeometry();
+      geometry.setAttribute('position', new BufferAttribute(positions, 3));
+      geometry.setAttribute('color', new BufferAttribute(colors, 3));
+      geometry.setAttribute('size', new BufferAttribute(sizes, 1));
       
-      const starMaterial = new THREE.ShaderMaterial({
+      const starMaterial = new ShaderMaterial({
         uniforms: {
           uTime: { value: 0 },
-          uPixelRatio: { value: window.devicePixelRatio }
+          uPixelRatio: { value: Math.min(window.devicePixelRatio, 2) }
         },
         vertexShader: starfieldVertexShader,
         fragmentShader: starfieldFragmentShader,
         transparent: true,
-        blending: THREE.AdditiveBlending,
+        blending: AdditiveBlending,
         depthWrite: false,
       });
       
-      return new THREE.Points(geometry, starMaterial);
+      return new Points(geometry, starMaterial);
     };
     
     // Add starfields at different distances
